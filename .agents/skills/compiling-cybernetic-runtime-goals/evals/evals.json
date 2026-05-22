@@ -19,7 +19,8 @@
         "References all four artifact paths.",
         "Forbids reinterpretation of requirements.",
         "Forbids rewriting control strategy.",
-        "Mentions tests as sensors, not objectives."
+        "Mentions tests as sensors, not objectives.",
+        "Stops if any referenced artifact is missing, not approved, or internally inconsistent."
       ]
     }
   ]

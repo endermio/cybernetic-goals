@@ -37,6 +37,7 @@ def main() -> int:
         "Execute serially according to the approved batch rhythm. "
         "Intermediate states inside a batch may be broken if the approved plan allows it, but each batch must end in the approved openable/verifiable state. "
         "Treat tests as sensors, not objectives; if a sensor conflicts with confirmed semantics, stop or follow the approved sensor-governance rule. "
+        "If any referenced artifact is missing, not approved, or internally inconsistent, stop and report the smallest required human decision. "
         "If the clarification, goal, plan, or review conflict or become insufficient, stop and report the smallest required human decision."
     )
 

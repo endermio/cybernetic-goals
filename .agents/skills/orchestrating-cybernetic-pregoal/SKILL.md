@@ -66,6 +66,8 @@ A completed clarification brief, usually:
 docs/superpowers/clarifications/YYYY-MM-DD-<slug>.md
 ```
 
+When the input path follows this pattern, the same `YYYY-MM-DD-<slug>` is the artifact identity for the whole pre-goal chain. Do not choose a different slug unless the user explicitly requests different output paths.
+
 The user should invoke this skill with an explicit clarification path, for example:
 
 ```text
@@ -175,6 +177,8 @@ docs/superpowers/control-reviews/YYYY-MM-DD-<slug>.md
 docs/superpowers/progress/YYYY-MM-DD-<slug>.md
 ```
 
+The goal, plan, control review, and progress log must use the same derived date/slug. This keeps queue-friendly `/goal` commands emitted by `$clarifying-cybernetic-tasks` stable. If the requested path is ambiguous or does not contain a deterministic date/slug, stop and ask for the smallest path decision instead of inventing a different slug.
+
 ### Step 2: Create or Update the Goal Contract
 
 Use `$writing-cybernetic-goals` when available.
@@ -269,6 +273,7 @@ Before outputting runtime `/goal`, ensure:
 - control review exists
 - control review is `Approved`
 - all files reference the same feature
+- artifact paths use the same date/slug unless the user explicitly specified alternatives
 - the runtime `/goal` references all approved files
 
 If available, run:
@@ -314,6 +319,12 @@ The command must reference:
 - goal file
 - execution policy / plan file
 - control review file
+
+The command must include this precondition:
+
+```text
+If any referenced artifact is missing, not approved, or internally inconsistent, stop and report the smallest required human decision.
+```
 
 ## Stop Conditions
 
@@ -389,6 +400,7 @@ Before responding, verify:
 - [ ] Review status is `Approved` before final runtime `/goal` is emitted.
 - [ ] If not approved, the response is blocked and asks for the smallest necessary decision.
 - [ ] Runtime `/goal` references clarification, goal, plan, and review files.
+- [ ] Runtime `/goal` includes the missing/not-approved/inconsistent artifact precondition.
 - [ ] Runtime `/goal` does not tell Codex to write or approve a new plan.
 
 ## Common Mistakes
@@ -399,6 +411,7 @@ Before responding, verify:
 | Spawning subagents without user authorization | Ask for authorization or run candidate-only mode |
 | Creating a final `/goal` from an incomplete clarification | Stop and return to clarification |
 | Reviewing only the plan | Review clarification, goal, plan, and runtime boundary |
+| Choosing a new slug for downstream artifacts | Use the clarification brief's date/slug unless the user explicitly specified other paths |
 | Letting review revisions change confirmed semantics | Stop and ask the human |
 | Infinite review-revision loops | Stop after two cycles |
 | Marking self-review as Approved | Require subagent, external reviewer, or explicit human approval |

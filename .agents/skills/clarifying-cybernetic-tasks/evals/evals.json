@@ -20,6 +20,19 @@
         "Records partial results with failed node marking as a default assumption.",
         "Asks only high-level product semantic questions."
       ]
+    },
+    {
+      "id": "complete-clarification-emits-queue-friendly-commands",
+      "prompt": "澄清已完成，brief 是 docs/superpowers/clarifications/2026-05-22-collaborative-supervision.md，没有开放阻塞问题。",
+      "expected_output": "Emit a pregoal orchestration command and a predicted queue-friendly /goal command using the same date/slug paths, with a precondition that stops if artifacts are missing, not approved, or inconsistent.",
+      "assertions": [
+        "Outputs a command invoking $orchestrating-cybernetic-pregoal with docs/superpowers/clarifications/2026-05-22-collaborative-supervision.md.",
+        "Outputs a predicted or queue-friendly /goal, not a final approved /goal.",
+        "The /goal references docs/superpowers/goals/2026-05-22-collaborative-supervision.md.",
+        "The /goal references docs/superpowers/plans/2026-05-22-collaborative-supervision.md.",
+        "The /goal references docs/superpowers/control-reviews/2026-05-22-collaborative-supervision.md.",
+        "The /goal says to stop if any referenced artifact is missing, not approved, or internally inconsistent."
+      ]
     }
   ]
 }

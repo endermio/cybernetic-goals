@@ -43,6 +43,7 @@ The final `/goal` must:
 - forbid rewriting the control strategy;
 - forbid replacing approved sensors without using approved sensor-governance rules;
 - execute serially unless the approved review permits otherwise;
+- stop if any referenced artifact is missing, not approved, or internally inconsistent;
 - stop if artifacts conflict or become insufficient.
 
 ## Scripted Compilation

@@ -48,7 +48,19 @@
         "The final /goal references the approved control review path.",
         "The final /goal does not say 'first write a plan'.",
         "The final /goal does not allow runtime reinterpretation of requirements.",
-        "The final /goal tells Codex to stop if artifacts conflict or become insufficient."
+        "The final /goal tells Codex to stop if artifacts conflict or become insufficient.",
+        "The final /goal tells Codex to stop if any referenced artifact is missing, not approved, or internally inconsistent."
+      ]
+    },
+    {
+      "id": "uses-clarification-slug-for-artifacts",
+      "prompt": "使用 $orchestrating-cybernetic-pregoal 根据 docs/superpowers/clarifications/2026-05-22-collaborative-supervision.md 完成 pre-goal 编译，允许使用 subagents review。",
+      "expected_output": "The skill should create or update goal, plan, and control review paths using the same 2026-05-22-collaborative-supervision slug and should not invent a different slug.",
+      "assertions": [
+        "The goal path is docs/superpowers/goals/2026-05-22-collaborative-supervision.md.",
+        "The plan path is docs/superpowers/plans/2026-05-22-collaborative-supervision.md.",
+        "The review path is docs/superpowers/control-reviews/2026-05-22-collaborative-supervision.md.",
+        "The response does not choose a different slug unless the user explicitly requested alternate output paths."
       ]
     },
     {

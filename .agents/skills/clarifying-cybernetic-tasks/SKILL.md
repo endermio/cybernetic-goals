@@ -15,7 +15,7 @@ This skill is a pre-goal control loop:
 human purpose -> AI context scan -> ambiguity map -> human decisions -> approved assumptions -> goal-ready task brief
 ```
 
-This skill clarifies requirements and product semantics. It does not write final `/goal` commands, does not create final goal files, and does not start implementation.
+This skill clarifies requirements and product semantics. It does not write approved final `/goal` commands, does not create final goal files, and does not start implementation. When clarification is complete and the brief path has a deterministic date/slug, it may output a predicted queue-friendly `/goal` command that is guarded by future approved artifacts.
 
 Output:
 
@@ -62,7 +62,39 @@ Only Level 1 items should become questions.
 5. Ask 3-7 high-value questions, preferably no more than 5.
 6. Create or update the clarification brief.
 7. If the human answers, update `Confirmed Decisions From Human` and the `Clarification Status`.
-8. Do not create a goal, plan, control review, or runtime `/goal` command.
+8. Do not create a goal, plan, control review, or approved runtime `/goal` command.
+9. If clarification is complete and the brief path deterministically identifies a date/slug, output queue-friendly next commands as described below.
+
+## Queue-Friendly Next Commands
+
+When clarification is complete and the clarification path is deterministic, output two commands the user can queue in Codex CLI:
+
+1. A pre-goal orchestration command using the concrete clarification path.
+2. A predicted queue-friendly `/goal` command using the expected artifact paths for the same date/slug.
+
+The predicted `/goal` is not the final approved runtime command. Label it as predicted or queue-friendly, and make it depend on artifacts that the pre-goal orchestrator must create and approve.
+
+Derive expected paths from:
+
+```text
+docs/superpowers/clarifications/YYYY-MM-DD-<slug>.md
+```
+
+Use the same `YYYY-MM-DD-<slug>` for:
+
+```text
+docs/superpowers/goals/YYYY-MM-DD-<slug>.md
+docs/superpowers/plans/YYYY-MM-DD-<slug>.md
+docs/superpowers/control-reviews/YYYY-MM-DD-<slug>.md
+```
+
+If the slug or path is not deterministic, do not output the predicted `/goal`; only output the orchestration command and state that the runtime command must be compiled after pre-goal approval.
+
+The predicted `/goal` command must include this precondition:
+
+```text
+If any referenced artifact is missing, not approved, or internally inconsistent, stop and report the smallest required human decision.
+```
 
 ## Clarification Status
 
@@ -123,8 +155,17 @@ Clarification is complete.
 Updated clarification brief:
 `docs/superpowers/clarifications/YYYY-MM-DD-slug.md`
 
-Ready for:
-`$writing-cybernetic-goals`
+Queue these commands:
+
+```text
+$orchestrating-cybernetic-pregoal 根据 docs/superpowers/clarifications/YYYY-MM-DD-slug.md 完成 pre-goal 编译，允许使用 subagents review。
+```
+
+Predicted queue-friendly `/goal`:
+
+```text
+/goal Execute the approved execution policy in docs/superpowers/plans/YYYY-MM-DD-slug.md under the control contract in docs/superpowers/goals/YYYY-MM-DD-slug.md and the confirmed semantics in docs/superpowers/clarifications/YYYY-MM-DD-slug.md. Use the approved control review in docs/superpowers/control-reviews/YYYY-MM-DD-slug.md as the phase-gate record. Do not reinterpret requirements, rewrite the control strategy, replace approved sensors, or start unreviewed work. If any referenced artifact is missing, not approved, or internally inconsistent, stop and report the smallest required human decision.
+```
 ```
 
 ## Validation Checklist
@@ -135,4 +176,5 @@ Ready for:
 - [ ] Obvious defaults are not asked as blocking questions.
 - [ ] There are no more than 7 questions.
 - [ ] The brief includes `Clarification Status`.
-- [ ] No goal, plan, or runtime `/goal` was created.
+- [ ] No goal, plan, control review, or approved runtime `/goal` was created.
+- [ ] Any predicted queue-friendly `/goal` is clearly labeled as predicted and includes the missing/not-approved/inconsistent artifact precondition.
