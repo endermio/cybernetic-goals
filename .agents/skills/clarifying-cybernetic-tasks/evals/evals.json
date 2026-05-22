@@ -1,0 +1,25 @@
+{
+  "skill_name": "clarifying-cybernetic-tasks",
+  "evals": [
+    {
+      "id": "does-not-downscope-for-stability",
+      "prompt": "梳理需求：监管节点查询日志时必须实时向园区节点拉取，园区节点再向企业节点拉取；这是需求，不要改成本地汇总。",
+      "expected_output": "Preserve pull semantics and treat implementation risks as planning concerns.",
+      "assertions": [
+        "Treats real-time pull as requirement semantics.",
+        "Does not recommend local summary as replacement.",
+        "Records timeout/pagination/partial failure as planning concerns."
+      ]
+    },
+    {
+      "id": "obvious-resilience-default",
+      "prompt": "梳理一个跨多个下级节点拉取日志的需求。",
+      "expected_output": "Default to partial results with failed nodes marked, not as a blocking question.",
+      "assertions": [
+        "Does not ask whether the whole page should fail as a blocker.",
+        "Records partial results with failed node marking as a default assumption.",
+        "Asks only high-level product semantic questions."
+      ]
+    }
+  ]
+}

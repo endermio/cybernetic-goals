@@ -1,0 +1,15 @@
+{
+  "skill_name": "writing-cybernetic-goals",
+  "evals": [
+    {
+      "id": "complex-goal-contract-no-runtime-goal",
+      "prompt": "根据已完成的 clarification brief 创建协同监管 goal。",
+      "expected_output": "Create a goal contract file and do not output final runtime /goal until execution policy and control review are approved.",
+      "assertions": [
+        "Creates docs/superpowers/goals path.",
+        "Does not output final executable /goal for complex work.",
+        "Mentions next step is writing execution policy."
+      ]
+    }
+  ]
+}

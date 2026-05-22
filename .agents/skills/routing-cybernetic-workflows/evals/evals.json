@@ -1,0 +1,118 @@
+{
+  "skill_name": "routing-cybernetic-workflows",
+  "evals": [
+    {
+      "id": "small-test-fix-direct",
+      "prompt": "使用 $routing-cybernetic-workflows 分析任务：修复 tests/date-format.test.ts 当前失败的日期格式单测，不改变其他功能。",
+      "expected_output": "Route to Level 0 or Level 1, not a full workflow.",
+      "assertions": [
+        "Classifies the task as Level 0 or Level 1.",
+        "Does not recommend the full pregoal pipeline.",
+        "Explains that the task is small, bounded, and has an obvious verification path.",
+        "Recommends a direct prompt or inline goal."
+      ]
+    },
+    {
+      "id": "bounded-supervision-display-fix-is-not-full-pipeline",
+      "prompt": "使用 $routing-cybernetic-workflows 分析任务：已有协同监管 clarification 和 goal。现在发现本地预览里 REG/PARK 被显示成企业 C1，需要修正 SupervisionNodePage、SupervisionLogPage 和本地 fixture，让监管节点/园区节点不被当成企业展示。不改变 schema、权限模型、拉取语义或 base58 哈希语义。",
+      "expected_output": "Route to Level 1 or Level 2, not Level 3, because this is a bounded correction inside an already clarified feature.",
+      "assertions": [
+        "Classifies the task as Level 1 or Level 2.",
+        "Does not recommend the full pregoal pipeline.",
+        "Explains that existing control artifacts already fix the semantics.",
+        "Explains that no new schema, permission, pull-vs-reporting, or enterprise/corpId decision is required.",
+        "Recommends a bounded repair prompt or small file-based goal."
+      ]
+    },
+    {
+      "id": "mentions-permission-but-no-new-permission-semantics",
+      "prompt": "使用 $routing-cybernetic-workflows 评估任务：已有权限模型不变，只修一个页面的权限提示文案和截图断言，让无权限状态显示中文提示。",
+      "expected_output": "Do not route to full pipeline merely because permissions are mentioned.",
+      "assertions": [
+        "Classifies as Level 0, Level 1, or Level 2.",
+        "Does not classify as Level 3 solely due to permission wording.",
+        "Distinguishes permission-related UI text from new permission semantics.",
+        "Recommends a lightweight workflow."
+      ]
+    },
+    {
+      "id": "new-supervision-semantics-still-full-pipeline",
+      "prompt": "使用 $routing-cybernetic-workflows 评估任务：我们还没有决定监管节点、园区节点、企业节点和 corpId 的关系，也没决定日志是拉取还是上报，现在要实现协同监管。",
+      "expected_output": "Route to Level 3 because product/domain semantics and control structure are unresolved.",
+      "assertions": [
+        "Classifies as Level 3.",
+        "Mentions unresolved domain semantics.",
+        "Mentions unresolved log acquisition semantics.",
+        "Recommends $clarifying-cybernetic-tasks.",
+        "Recommends $orchestrating-cybernetic-pregoal after clarification is complete."
+      ]
+    },
+    {
+      "id": "full-pipeline-for-ambiguous-permission-data-visibility",
+      "prompt": "使用 $routing-cybernetic-workflows 分析任务：我们要重构权限模型，从租户级改成组织、项目、环境三层授权，但还没决定迁移策略、数据可见范围和旧权限如何兼容。",
+      "expected_output": "Route to Level 3 or Level 4 depending on risk; likely Level 3 unless production data is involved.",
+      "assertions": [
+        "Classifies as Level 3 or Level 4.",
+        "Mentions unresolved permission/data visibility semantics.",
+        "Mentions migration or compatibility uncertainty.",
+        "Does not recommend direct implementation.",
+        "Recommends clarification before goal execution."
+      ]
+    },
+    {
+      "id": "high-risk-production-migration",
+      "prompt": "使用 $routing-cybernetic-workflows 分析任务：今晚要对生产数据库做不可逆 migration，并影响真实客户权限和账务数据。",
+      "expected_output": "Route to Level 4 because the task is production-impacting, irreversible, and involves permissions/billing/customer data.",
+      "assertions": [
+        "Classifies as Level 4.",
+        "Mentions human-gated workflow.",
+        "Mentions production or irreversible data risk.",
+        "Does not allow ungated runtime /goal execution."
+      ]
+    },
+    {
+      "id": "screenshot-update-not-full-pipeline",
+      "prompt": "使用 $routing-cybernetic-workflows 分析任务：已有页面语义和 goal 都确定了，只是截图基线里的按钮文案从 hash 改成 哈希，需要更新 screenshot 断言。",
+      "expected_output": "Route to Level 0, 1, or 2; screenshots alone should not force full pipeline.",
+      "assertions": [
+        "Does not classify as Level 3.",
+        "Explains that screenshots are sensors, and the semantic decision is already fixed.",
+        "Recommends a bounded repair prompt or lightweight goal.",
+        "Does not recommend clarification."
+      ]
+    },
+    {
+      "id": "schema-mentioned-but-semantics-fixed",
+      "prompt": "使用 $routing-cybernetic-workflows 分析任务：已有 approved plan 明确了 schema migration。现在只需要修 migration 文件里的索引名和对应 smoke 断言，语义不变。",
+      "expected_output": "Route to Level 1 or Level 2, not Level 3, because schema is mentioned but schema semantics are already fixed.",
+      "assertions": [
+        "Does not classify as Level 3 solely due to schema wording.",
+        "Mentions that approved plan already fixes schema semantics.",
+        "Recommends bounded repair.",
+        "Does not recommend full pregoal pipeline."
+      ]
+    },
+    {
+      "id": "existing-artifacts-lower-score",
+      "prompt": "使用 $routing-cybernetic-workflows 分析任务：已有 clarification、goal、plan、control review 都已 Approved。现在执行中发现某个 Vue 组件列名和已确认语义不一致，需要修正。",
+      "expected_output": "Route to Level 1 or Level 2 because the approved control artifacts lower the routing level.",
+      "assertions": [
+        "Mentions existing approved artifacts.",
+        "Classifies as Level 1 or Level 2.",
+        "Does not route to full pregoal pipeline.",
+        "Frames the task as a bounded correction inside existing control structure."
+      ]
+    },
+    {
+      "id": "user-asks-full-flow-for-small-task",
+      "prompt": "使用 $routing-cybernetic-workflows 分析任务：我想为改一个 README 标题走完整 cybernetic workflow。",
+      "expected_output": "Reject or discourage full workflow as over-control; recommend direct prompt or Level 0.",
+      "assertions": [
+        "Classifies as Level 0.",
+        "Explains that full workflow is over-control.",
+        "Recommends direct edit.",
+        "Does not follow the user's request to use full workflow unnecessarily."
+      ]
+    }
+  ]
+}

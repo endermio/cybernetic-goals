@@ -1,0 +1,16 @@
+{
+  "skill_name": "reviewing-cybernetic-control-structures",
+  "evals": [
+    {
+      "id": "reject-unapproved-plan",
+      "prompt": "审查 clarification、goal、plan，plan 还没有 sensor governance。",
+      "expected_output": "Review status is Needs Revision and identifies missing sensor governance.",
+      "assertions": [
+        "Does not approve.",
+        "Mentions sensor/test governance.",
+        "Does not output final /goal.",
+        "Does not implement code."
+      ]
+    }
+  ]
+}

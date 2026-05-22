@@ -1,0 +1,17 @@
+{
+  "skill_name": "writing-cybernetic-execution-policies",
+  "evals": [
+    {
+      "id": "contains-sensor-governance",
+      "prompt": "根据 clarification 和 goal 为复杂功能写 execution policy。",
+      "expected_output": "Plan includes sensor governance, batch cadence, dependency matrix, and no runtime execution.",
+      "assertions": [
+        "Includes Dependency Matrix.",
+        "Includes Sensor/Test Governance.",
+        "Includes destructive intermediate-state policy.",
+        "Does not execute code.",
+        "Marks plan as candidate, not approved."
+      ]
+    }
+  ]
+}

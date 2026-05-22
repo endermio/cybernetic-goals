@@ -1,0 +1,67 @@
+{
+  "skill_name": "orchestrating-cybernetic-pregoal",
+  "evals": [
+    {
+      "id": "orchestrates-complete-clarification-with-subagents",
+      "prompt": "使用 $orchestrating-cybernetic-pregoal 根据 docs/superpowers/clarifications/collaborative-supervision.md 自动完成 pre-goal 编译，允许使用 subagents 做独立 review。若 review 无法收敛，停止并报告阻塞点。",
+      "expected_output": "The skill should validate the completed clarification, create or update goal, execution policy, control review, run authorized subagent review cycles, and compile a final runtime /goal command without starting /goal execution.",
+      "assertions": [
+        "The response explicitly notes that subagents are allowed because the user authorized them.",
+        "The workflow creates or updates a goal contract file under docs/superpowers/goals/.",
+        "The workflow creates or updates an execution policy under docs/superpowers/plans/.",
+        "The workflow creates or updates a control review under docs/superpowers/control-reviews/.",
+        "The final /goal command references the clarification, goal, plan, and review files.",
+        "The response does not start /goal execution.",
+        "The workflow stops if review cannot converge within the maximum review cycles."
+      ]
+    },
+    {
+      "id": "no-subagents-candidate-only",
+      "prompt": "使用 $orchestrating-cybernetic-pregoal 根据 docs/superpowers/clarifications/collaborative-supervision.md 自动完成 pre-goal 编译。",
+      "expected_output": "Because the user did not explicitly authorize subagents, the skill may create candidate artifacts but must not claim independent review or emit an approved runtime /goal unless human/manual approval exists.",
+      "assertions": [
+        "The response does not claim to spawn subagents.",
+        "The response states that subagents were not authorized or that candidate-only mode is being used.",
+        "The response does not mark self-review as Approved.",
+        "The response does not emit a final runtime /goal unless it explains that explicit human approval or independent review already exists.",
+        "The response asks for subagent authorization or human approval before runtime execution."
+      ]
+    },
+    {
+      "id": "incomplete-clarification-stops",
+      "prompt": "使用 $orchestrating-cybernetic-pregoal 根据 docs/superpowers/clarifications/incomplete-feature.md 自动完成 pre-goal 编译，允许使用 subagents。该 clarification 还有开放的人类问题。",
+      "expected_output": "The skill should stop before creating downstream approved artifacts because clarification is incomplete.",
+      "assertions": [
+        "The response states that the clarification is incomplete or has open blocking questions.",
+        "The response does not create or approve a final goal contract.",
+        "The response does not create or approve an execution policy.",
+        "The response does not emit a final runtime /goal command.",
+        "The response names the smallest clarification input needed from the human."
+      ]
+    },
+    {
+      "id": "runtime-goal-does-not-write-plan",
+      "prompt": "使用 $orchestrating-cybernetic-pregoal 编译最终 /goal。已有 complete clarification、goal、approved plan、approved review。",
+      "expected_output": "The final /goal should execute approved artifacts only and must not instruct Codex to write or approve its own plan inside runtime.",
+      "assertions": [
+        "The final /goal references the approved plan path.",
+        "The final /goal references the approved control review path.",
+        "The final /goal does not say 'first write a plan'.",
+        "The final /goal does not allow runtime reinterpretation of requirements.",
+        "The final /goal tells Codex to stop if artifacts conflict or become insufficient."
+      ]
+    },
+    {
+      "id": "review-nonconvergence-blocks",
+      "prompt": "使用 $orchestrating-cybernetic-pregoal 自动编译，允许 subagents。review 两轮后仍然发现 plan 把 pull semantics 改成 push/reporting。",
+      "expected_output": "The skill should block compilation and report the unresolved semantic conflict rather than compiling a runtime /goal.",
+      "assertions": [
+        "The response states that review did not converge.",
+        "The response identifies the conflict between pull semantics and push/reporting.",
+        "The response does not emit a final runtime /goal command.",
+        "The response points to the artifact sections that conflict.",
+        "The response asks for the smallest human decision or revision needed."
+      ]
+    }
+  ]
+}
