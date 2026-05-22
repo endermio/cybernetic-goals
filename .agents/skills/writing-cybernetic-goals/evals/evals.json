@@ -10,6 +10,18 @@
         "Does not output final executable /goal for complex work.",
         "Mentions next step is writing execution policy."
       ]
+    },
+    {
+      "id": "bounded-audit-goal-direct-runtime",
+      "prompt": "router 已判定为 Level 2：为 2605 用户使用闭环审计创建小型文件 goal。只读检查代码、文档、测试、SQL 和预览证据，输出 docs/superpowers/audits/2026-05-26-2605-user-closure.md，不修改业务代码。",
+      "expected_output": "Create a bounded file goal and output a direct /goal execution command. Do not recommend writing an execution policy unless the user explicitly asks or the task exposes unresolved control decisions.",
+      "assertions": [
+        "Creates or references a docs/superpowers/goals path for the bounded audit goal.",
+        "Outputs a direct executable /goal that executes the bounded file goal.",
+        "The /goal tells Codex not to create an execution policy or control review unless explicitly instructed.",
+        "Does not recommend $writing-cybernetic-execution-policies as the default next step.",
+        "Stops if the bounded goal is insufficient, ambiguous, or requires new product/control decisions."
+      ]
     }
   ]
 }

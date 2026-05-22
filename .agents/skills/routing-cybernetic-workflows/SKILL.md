@@ -143,6 +143,7 @@ Signals:
 - no unresolved product semantics
 - no new schema, permission, or public API semantics
 - localized correction across UI, fixture, smoke, screenshot, docs, or one bounded workflow
+- wide read-only audit with fixed classification semantics and a fixed report artifact
 - moderate verification needs
 - a persistent small goal file may help, but a full pregoal pipeline would be too heavy
 
@@ -157,6 +158,8 @@ or:
 ```text
 $writing-cybernetic-goals 为这个有界修正创建小型文件 goal：<需求>
 ```
+
+For Level 2 bounded file goals, the expected next step after goal creation is a direct `/goal` execution command against that small goal file. Do not recommend `$writing-cybernetic-execution-policies` by default unless the user explicitly asks for it or the task exposes unresolved control decisions.
 
 If an existing feature has approved artifacts, reference them:
 
@@ -338,8 +341,15 @@ Use a bounded repair prompt or small file-based goal:
 修正 <issue>，保持 <approved artifact paths or confirmed semantics> 不变；验证 <commands/artifacts>.
 ```
 
+For a file-based goal:
+
+```text
+$writing-cybernetic-goals 为这个 Level 2 有界任务创建小型文件 goal，并在完成后给出直接 /goal 执行命令，不要默认建议 execution policy：...
+```
+
 Rejected workflow:
 - Reject Level 3 because no new control structure is required.
+- Do not recommend execution policy by default for Level 2; upgrade only if unresolved control decisions appear.
 ```
 
 ### Level 3
@@ -386,6 +396,7 @@ Rejected workflow:
 | Ignoring approved clarification/goal/plan artifacts | Downgrade when semantics are already frozen |
 | Listing five manual pregoal skills when orchestrator exists | Prefer `$clarifying-cybernetic-tasks` then `$orchestrating-cybernetic-pregoal` |
 | Letting small tasks use the full workflow because the user asked | Explain that the workflow is over-control and propose a lighter route |
+| Recommending execution policy after a Level 2 bounded file goal | Give the direct `/goal` path unless the user explicitly asks for policy or new control decisions appear |
 
 ## Validation Checklist
 
@@ -398,4 +409,5 @@ Before responding, verify:
 - [ ] The recommended next step is the lightest safe workflow.
 - [ ] For Level 3, the response recommends `$clarifying-cybernetic-tasks` then `$orchestrating-cybernetic-pregoal`.
 - [ ] For Level 0/1/2, the response does not recommend full pregoal pipeline.
+- [ ] For Level 2 bounded file goals, the response does not recommend execution policy by default.
 - [ ] The response includes rejected workflow rationale.

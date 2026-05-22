@@ -113,6 +113,18 @@
         "Recommends direct edit.",
         "Does not follow the user's request to use full workflow unnecessarily."
       ]
+    },
+    {
+      "id": "wide-user-closure-audit-is-level-2",
+      "prompt": "使用 $routing-cybernetic-workflows 分析任务：从用户使用层面逐项核对 2605 功能是否闭环，分类为已闭环、部分闭环、未闭环、不可判定。可以读代码、文档、测试、SQL、预览服务和截图，只输出审计报告，不实现功能，不改变 schema、权限、API 或产品语义。",
+      "expected_output": "Classify as Level 2 bounded file goal because the scope is broad but semantics are clear, and recommend a small file-based audit goal with direct /goal execution rather than the full pregoal pipeline.",
+      "assertions": [
+        "Classifies the task as Level 2.",
+        "Explains that broad scope is not the same as unresolved control structure.",
+        "Recommends a bounded file-based audit goal.",
+        "Says the bounded goal should lead to direct /goal execution.",
+        "Does not recommend the full pregoal pipeline or execution policy by default."
+      ]
     }
   ]
 }
