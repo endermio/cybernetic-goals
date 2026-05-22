@@ -127,7 +127,7 @@ The predicted `/goal` command must include this precondition:
 If any referenced artifact is missing, not approved, or internally inconsistent, stop and report the smallest required human decision.
 ```
 
-For Level 1R/2R rubric-only clarification, do not output the pregoal orchestration command by default. Output the next bounded goal-writing command instead:
+For Level 1/2 work with `Rubric Gate: required`, do not output the pregoal orchestration command by default after rubric-only clarification. Output the next bounded goal-writing command instead:
 
 ```text
 $writing-cybernetic-goals 使用 docs/superpowers/clarifications/YYYY-MM-DD-slug.md 中确认的评价口径，为这个 Level 2 有界审计/评估任务创建小型文件 goal，并在完成后给出直接 /goal 执行命令，不要默认建议 execution policy。
@@ -215,7 +215,7 @@ Predicted queue-friendly `/goal`:
 ```
 ````
 
-If all blocking decisions are resolved for Level 1R/2R rubric-only work:
+If all blocking decisions are resolved for Level 1/2 work with `Rubric Gate: required`:
 
 ````markdown
 Rubric clarification is complete.
@@ -249,5 +249,5 @@ $writing-cybernetic-goals 使用 docs/superpowers/clarifications/YYYY-MM-DD-slug
 - [ ] There are no more than 7 questions.
 - [ ] The brief includes `Clarification Status`.
 - [ ] No goal, plan, control review, or approved runtime `/goal` was created.
-- [ ] Level 1R/2R rubric-only clarification routes to `$writing-cybernetic-goals`, not full pregoal orchestration by default.
+- [ ] Level 1/2 work with `Rubric Gate: required` routes to `$writing-cybernetic-goals`, not full pregoal orchestration by default.
 - [ ] Any predicted queue-friendly `/goal` is clearly labeled as predicted and includes the missing/not-approved/inconsistent artifact precondition.

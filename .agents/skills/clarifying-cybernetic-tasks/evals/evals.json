@@ -48,7 +48,7 @@
     },
     {
       "id": "complete-rubric-clarification-routes-to-bounded-goal",
-      "prompt": "Level 2R 的评价口径澄清已完成，brief 是 docs/superpowers/clarifications/2026-05-26-2605-user-closure-rubric.md，已确认已闭环/部分闭环/未闭环/不可判定的状态定义和证据等级。",
+      "prompt": "Level 2 且 Required gates: Rubric Gate required 的评价口径澄清已完成，brief 是 docs/superpowers/clarifications/2026-05-26-2605-user-closure-rubric.md，已确认已闭环/部分闭环/未闭环/不可判定的状态定义和证据等级。",
       "expected_output": "Mark rubric clarification complete and recommend writing-cybernetic-goals for a bounded audit goal, not orchestrating-cybernetic-pregoal.",
       "assertions": [
         "Outputs that rubric clarification is complete.",
