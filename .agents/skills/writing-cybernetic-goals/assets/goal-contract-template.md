@@ -53,6 +53,19 @@ Artifact checks:
 
 - [screenshots/logs/eval reports]
 
+## Evaluation Rubric / Error Function
+
+Use this section for audit, evaluation, readiness, closure, completeness, usability, safety, stability, coverage, correctness, or status-classification goals.
+
+| Rubric element | Confirmed meaning |
+|---|---|
+| Status meanings / pass-fail categories | [confirmed categories] |
+| Evidence levels / evidence strength | [strong vs weak evidence] |
+| Minimum evidence for strongest positive status | [required evidence] |
+| Downgrade rules | [partial, stale, indirect, or missing evidence handling] |
+| External/unobservable dependency handling | [credentials, production-only, third-party, environment gaps] |
+| Confidence / evidence grade | [whether to report confidence] |
+
 ## Checkpoint Loop
 
 For each checkpoint:

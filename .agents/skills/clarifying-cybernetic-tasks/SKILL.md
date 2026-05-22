@@ -53,21 +53,52 @@ Classify uncertainty as:
 
 Only Level 1 items should become questions.
 
+### Clarify Evaluation Functions
+
+For audit, evaluation, readiness, closure, completeness, usability, safety, stability, coverage, correctness, or status-classification tasks, treat the rubric as requirement semantics.
+
+Evaluation predicates include terms such as:
+
+```text
+闭环, 完成, 可用, 通过, 达标, 就绪, 用户视角, 质量好, 稳定, 安全, 合理, 充分, 覆盖, 一致, 正确, 可交付, 生产可用, 验收通过
+```
+
+Do not treat these as self-explanatory. The clarification must identify the error function:
+
+- status meanings or pass/fail categories;
+- evidence levels or evidence strength;
+- the minimum evidence needed for the strongest positive status;
+- downgrade rules for partial, weak, missing, stale, or indirect evidence;
+- handling for external credentials, production-only dependencies, third-party services, or currently unobservable behavior;
+- whether confidence or evidence grade must be reported.
+
+For rubric-only clarification, ask a short set of high-value questions focused on the evaluation function. If the user asks to proceed by default, use a conservative rubric:
+
+```text
+Strongest positive status requires actual UI/API workflow evidence or a successfully run smoke/e2e/similar runtime check.
+Partial status means code, page, API, docs, or unrun tests exist, but actual user-path evidence is missing.
+Negative status means only placeholders/plans exist, or no usable entrypoint exists.
+Unknown/unverifiable status means external credentials, production-only environment, third-party service, or current environment prevents observation.
+```
+
 ## Process
 
 1. Inspect just enough context to ask non-generic questions.
 2. Restate the human purpose in product language.
 3. Build a control map: objective, controlled object, sensors, actuators, constraints, disturbances, stop conditions.
-4. Identify and classify decisions by level.
-5. Ask 3-7 high-value questions, preferably no more than 5.
-6. Create or update the clarification brief.
-7. If the human answers, update `Confirmed Decisions From Human` and the `Clarification Status`.
-8. Do not create a goal, plan, control review, or approved runtime `/goal` command.
-9. If clarification is complete and the brief path deterministically identifies a date/slug, output queue-friendly next commands as described below.
+4. If the task is evaluative, identify the rubric/error function and classify missing rubric elements as decisions.
+5. Identify and classify decisions by level.
+6. Ask 3-7 high-value questions, preferably no more than 5.
+7. Create or update the clarification brief.
+8. If the human answers, update `Confirmed Decisions From Human` and the `Clarification Status`.
+9. Do not create a goal, plan, control review, or approved runtime `/goal` command.
+10. If clarification is complete and the brief path deterministically identifies a date/slug, output queue-friendly next commands as described below.
 
 ## Queue-Friendly Next Commands
 
-When clarification is complete and the clarification path is deterministic, output two commands the user can queue in Codex CLI:
+When clarification is complete, choose the next command from the intended workflow.
+
+For Level 3/4 or full pregoal clarification, and when the clarification path is deterministic, output two commands the user can queue in Codex CLI:
 
 1. A pre-goal orchestration command using the concrete clarification path.
 2. A predicted queue-friendly `/goal` command using the expected artifact paths for the same date/slug.
@@ -95,6 +126,14 @@ The predicted `/goal` command must include this precondition:
 ```text
 If any referenced artifact is missing, not approved, or internally inconsistent, stop and report the smallest required human decision.
 ```
+
+For Level 1R/2R rubric-only clarification, do not output the pregoal orchestration command by default. Output the next bounded goal-writing command instead:
+
+```text
+$writing-cybernetic-goals 使用 docs/superpowers/clarifications/YYYY-MM-DD-slug.md 中确认的评价口径，为这个 Level 2 有界审计/评估任务创建小型文件 goal，并在完成后给出直接 /goal 执行命令，不要默认建议 execution policy。
+```
+
+The direct runtime `/goal` should be emitted by `$writing-cybernetic-goals` after it creates the bounded goal file.
 
 ## Clarification Status
 
@@ -131,6 +170,14 @@ Blocking human decisions:
 Default assumptions:
 - ...
 
+Evaluation rubric, if applicable:
+- Status meanings: ...
+- Evidence levels: ...
+- Minimum evidence for strongest positive status: ...
+- Downgrade rules: ...
+- External/unobservable dependency handling: ...
+- Confidence/evidence grade: ...
+
 Deferred to planning:
 - ...
 
@@ -147,9 +194,9 @@ Reply with one of:
 - cancel/postpone
 ```
 
-If all blocking decisions are resolved:
+If all blocking decisions are resolved for full pregoal work:
 
-```markdown
+````markdown
 Clarification is complete.
 
 Updated clarification brief:
@@ -166,15 +213,41 @@ Predicted queue-friendly `/goal`:
 ```text
 /goal Execute the approved execution policy in docs/superpowers/plans/YYYY-MM-DD-slug.md under the control contract in docs/superpowers/goals/YYYY-MM-DD-slug.md and the confirmed semantics in docs/superpowers/clarifications/YYYY-MM-DD-slug.md. Use the approved control review in docs/superpowers/control-reviews/YYYY-MM-DD-slug.md as the phase-gate record. Do not reinterpret requirements, rewrite the control strategy, replace approved sensors, or start unreviewed work. If any referenced artifact is missing, not approved, or internally inconsistent, stop and report the smallest required human decision.
 ```
+````
+
+If all blocking decisions are resolved for Level 1R/2R rubric-only work:
+
+````markdown
+Rubric clarification is complete.
+
+Updated clarification brief:
+`docs/superpowers/clarifications/YYYY-MM-DD-slug.md`
+
+Confirmed evaluation rubric:
+- Status meanings: ...
+- Evidence levels: ...
+- Minimum evidence for strongest positive status: ...
+- Downgrade rules: ...
+- External/unobservable dependency handling: ...
+- Confidence/evidence grade: ...
+
+Ready for bounded goal writing:
+
+```text
+$writing-cybernetic-goals 使用 docs/superpowers/clarifications/YYYY-MM-DD-slug.md 中确认的评价口径，为这个 Level 2 有界审计/评估任务创建小型文件 goal，并在完成后给出直接 /goal 执行命令，不要默认建议 execution policy。
 ```
+````
 
 ## Validation Checklist
 
 - [ ] Requirement semantics are separated from implementation planning.
+- [ ] Evaluation predicates are treated as rubric/error-function semantics, not routine execution details.
+- [ ] Evaluation tasks define or ask for status meanings, evidence strength, strongest-positive threshold, downgrade rules, and external/unobservable handling.
 - [ ] The response did not downscope because implementation is hard.
 - [ ] Uncertainty is classified into blocking decisions, default assumptions, and deferred details.
 - [ ] Obvious defaults are not asked as blocking questions.
 - [ ] There are no more than 7 questions.
 - [ ] The brief includes `Clarification Status`.
 - [ ] No goal, plan, control review, or approved runtime `/goal` was created.
+- [ ] Level 1R/2R rubric-only clarification routes to `$writing-cybernetic-goals`, not full pregoal orchestration by default.
 - [ ] Any predicted queue-friendly `/goal` is clearly labeled as predicted and includes the missing/not-approved/inconsistent artifact precondition.

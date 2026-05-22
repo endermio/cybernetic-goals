@@ -33,6 +33,30 @@
         "The /goal references docs/superpowers/control-reviews/2026-05-22-collaborative-supervision.md.",
         "The /goal says to stop if any referenced artifact is missing, not approved, or internally inconsistent."
       ]
+    },
+    {
+      "id": "rubric-clarification-for-evaluation-task",
+      "prompt": "澄清这个审计任务的评价口径：从用户使用层面逐项核对 2605 功能是否闭环，分类为已闭环、部分闭环、未闭环、不可判定。",
+      "expected_output": "Ask concise rubric questions about status meanings, evidence strength, minimum evidence for the strongest positive status, external-dependency handling, and whether confidence/evidence levels are needed.",
+      "assertions": [
+        "Treats 已闭环/部分闭环/未闭环/不可判定 as evaluation function semantics, not execution tactics.",
+        "Asks what evidence is required for 已闭环.",
+        "Asks which evidence is strong versus weak.",
+        "Asks how to classify missing external credentials, production-only dependencies, or unobservable third-party services.",
+        "Records a conservative default rubric if the user chooses defaults."
+      ]
+    },
+    {
+      "id": "complete-rubric-clarification-routes-to-bounded-goal",
+      "prompt": "Level 2R 的评价口径澄清已完成，brief 是 docs/superpowers/clarifications/2026-05-26-2605-user-closure-rubric.md，已确认已闭环/部分闭环/未闭环/不可判定的状态定义和证据等级。",
+      "expected_output": "Mark rubric clarification complete and recommend writing-cybernetic-goals for a bounded audit goal, not orchestrating-cybernetic-pregoal.",
+      "assertions": [
+        "Outputs that rubric clarification is complete.",
+        "Recommends $writing-cybernetic-goals using the clarification brief.",
+        "Says the bounded goal writer should output a direct /goal.",
+        "Does not recommend $orchestrating-cybernetic-pregoal by default.",
+        "Does not output a predicted full-pregoal runtime /goal."
+      ]
     }
   ]
 }

@@ -41,6 +41,19 @@ These are reasonable defaults and should not block progress unless the human dis
 
 - [assumption]
 
+## Evaluation Rubric / Error Function
+
+Use this section for audit, evaluation, readiness, closure, completeness, usability, safety, stability, coverage, correctness, or status-classification tasks.
+
+| Rubric element | Confirmed meaning |
+|---|---|
+| Status meanings / pass-fail categories | [e.g. 已闭环 / 部分闭环 / 未闭环 / 不可判定] |
+| Evidence levels / evidence strength | [strong vs weak evidence] |
+| Minimum evidence for strongest positive status | [required evidence] |
+| Downgrade rules | [partial, stale, indirect, or missing evidence handling] |
+| External/unobservable dependency handling | [credentials, production-only, third-party, environment gaps] |
+| Confidence / evidence grade | [whether to report confidence] |
+
 ## Deferred Execution / Planning Details
 
 These should be handled later in goal writing, planning, or implementation.
