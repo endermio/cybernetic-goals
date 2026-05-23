@@ -41,9 +41,11 @@ If subagents are not authorized and no explicit human approval or other independ
 
 No `Approved` state is allowed after an unreviewed substantive artifact mutation.
 
-A control structure may be marked `Approved` only when the last substantive change to the clarification, goal, execution policy, or review has been followed by an independent review pass that reports no Blocking or Major findings.
+A control structure may be marked `Approved` only when the last substantive change to the reviewed control artifacts, meaning the clarification, goal, or execution policy, has been followed by an independent review pass that reports no Blocking or Major findings.
 
 If any control artifact changes after the latest independent review, the review state becomes `Dirty` / `Needs Re-review` and cannot be `Approved`.
+
+Substantive changes to the control review's final decision, reviewer findings, approval rationale, or Final Observer Check after approval also require re-review or explicit human approval. Mechanical recording of already-reviewed findings into the review file does not itself create a new review cycle.
 
 Deterministic-only changes may skip subagent re-review only when all of the following are true:
 

@@ -9,16 +9,30 @@
         "Does not output final /goal.",
         "Requires review status Approved.",
         "Uses section-aware status checks for ## Clarification Status, ## Execution Policy Status, and ## Review Status.",
+        "Requires ## Final Observer Check to allow approval.",
         "Does not allow --skip-guard unless an explicit phase-gate bypass acknowledgement is provided.",
         "Does not rewrite artifacts."
       ]
     },
     {
+      "id": "requires-final-observer-check",
+      "prompt": "control review 写了 Status: Approved，但缺少 Final Observer Check，或者 Final Observer Check 写 Approval allowed after final observer check: no。请编译最终 /goal。",
+      "expected_output": "Refuse to compile runtime /goal because Approved status is not enough without a Final Observer Check that allows approval.",
+      "assertions": [
+        "Does not output final /goal.",
+        "Requires ## Final Observer Check.",
+        "Requires Approval allowed after final observer check: yes.",
+        "Requires final re-review when substantive post-review changes are recorded.",
+        "Does not treat Review Status: Approved alone as sufficient."
+      ]
+    },
+    {
       "id": "compiles-runtime-goal",
-      "prompt": "clarification Complete, goal exists, execution policy status Candidate, control review Approved；编译最终 /goal。",
+      "prompt": "clarification Complete, goal exists, execution policy status Candidate, control review Approved, Final Observer Check allows approval；编译最终 /goal。",
       "expected_output": "Outputs a final /goal referencing clarification, goal, plan, and review paths.",
       "assertions": [
         "References all four artifact paths.",
+        "Requires Final Observer Check to allow approval.",
         "Forbids reinterpretation of requirements.",
         "Forbids rewriting control strategy.",
         "Mentions tests as sensors, not objectives.",

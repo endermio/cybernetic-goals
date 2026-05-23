@@ -11,7 +11,7 @@
         "Mentions $superpowers:executing-plans, $superpowers:systematic-debugging, and $superpowers:verification-before-completion for runtime.",
         "States that unavailable required substrates cause a stop/report instead of self-substitution.",
         "States that merely mentioning a Superpowers skill or imitating generic behavior is not sufficient.",
-        "States that approval requires a final observer pass after the last substantive artifact mutation.",
+        "States that approval requires a final observer pass after the last substantive mutation to reviewed control artifacts.",
         "Does not say every cybernetic skill must invoke every Superpowers skill."
       ]
     },

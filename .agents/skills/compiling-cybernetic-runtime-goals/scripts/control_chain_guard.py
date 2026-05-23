@@ -13,6 +13,7 @@ from pathlib import Path
 
 HEADING_RE = re.compile(r"^(#{1,6})\s+(.+?)\s*$", re.MULTILINE)
 STATUS_LINE_RE = re.compile(r"(?im)^\s*Status\s*:\s*`?([^`\n]+?)`?\s*$")
+YES_NO_LINE_RE = re.compile(r"(?im)^\s*-\s*{label}\s*:\s*`?([^`\n]+?)`?\s*$")
 
 STATUS_ALIASES = {
     "complete": "Complete",
@@ -66,6 +67,69 @@ def section_status(text: str, heading: str) -> str | None:
     return canonical_status(m.group(1)) if m else None
 
 
+def yes_no_value(text: str, label: str) -> str | None:
+    pattern = re.compile(YES_NO_LINE_RE.pattern.format(label=re.escape(label)), YES_NO_LINE_RE.flags)
+    m = pattern.search(text)
+    if not m:
+        return None
+    value = m.group(1).strip().casefold()
+    if value in {"yes", "y", "true", "是"}:
+        return "yes"
+    if value in {"no", "n", "false", "否"}:
+        return "no"
+    return value
+
+
+def bullet_has_content(text: str, label: str) -> bool:
+    pattern = re.compile(rf"(?im)^\s*-\s*{re.escape(label)}\s*:\s*(.+?)\s*$")
+    m = pattern.search(text)
+    if m and meaningful_line(m.group(1)):
+        return True
+
+    block_pattern = re.compile(rf"(?ims)^\s*-\s*{re.escape(label)}\s*:\s*$\n(?P<body>.*?)(?=^-\s*\S|\Z)")
+    block = block_pattern.search(text)
+    if not block:
+        return False
+    body = block.group("body")
+    return any(meaningful_line(line) for line in body.splitlines())
+
+
+def meaningful_line(line: str) -> bool:
+    text = line.strip().strip("`")
+    if not text:
+        return False
+    if text.startswith("-"):
+        text = text[1:].strip()
+    if text.startswith("[") and text.endswith("]"):
+        return False
+    if text in {"yes/no", "yes / no"}:
+        return False
+    return True
+
+
+def check_final_observer(review: str, errors: list[str]) -> None:
+    body = section_body(review, "Final Observer Check")
+    if body is None:
+        errors.append("control review missing ## Final Observer Check")
+        return
+
+    approval_allowed = yes_no_value(body, "Approval allowed after final observer check")
+    if approval_allowed != "yes":
+        errors.append(f"final observer check does not allow approval: {approval_allowed!r}")
+
+    substantive_changes = yes_no_value(body, "Substantive artifact changes after last independent review")
+    final_re_review = yes_no_value(body, "If yes, final re-review performed")
+    if substantive_changes == "yes":
+        if final_re_review != "yes":
+            errors.append("substantive post-review changes require final re-review")
+        if not bullet_has_content(body, "Final reviewers confirming no Blocking/Major findings"):
+            errors.append("final observer check lacks reviewers confirming no Blocking/Major findings")
+
+    deterministic_exception = yes_no_value(body, "Deterministic-only exception used")
+    if deterministic_exception == "yes" and not bullet_has_content(body, "Deterministic guard covering exception"):
+        errors.append("deterministic-only exception lacks guard evidence")
+
+
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--clarification", required=True)
@@ -98,6 +162,7 @@ def main() -> int:
         review_status = section_status(review, "Review Status")
         if review_status != "Approved":
             errors.append(f"control review status under ## Review Status is not Approved: {review_status!r}")
+        check_final_observer(review, errors)
 
     for path, text, label in [
         (args.clarification, goal, "goal"),

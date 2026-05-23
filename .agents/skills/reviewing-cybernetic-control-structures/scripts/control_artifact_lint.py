@@ -146,8 +146,8 @@ def main() -> int:
 
     if review:
         check_required_sections("review", review, [
-            "Review Status", "Inputs Reviewed", "Review Independence", "Requirement Traceability",
-            "Goal Fidelity", "Control Law Quality", "Sensor / Test Governance",
+            "Review Status", "Inputs Reviewed", "Review Independence", "Final Observer Check",
+            "Requirement Traceability", "Goal Fidelity", "Control Law Quality", "Sensor / Test Governance",
             "Batch Rhythm", "Runtime Suitability", "Final Decision"
         ], errors)
         st = section_status(review, "Review Status")

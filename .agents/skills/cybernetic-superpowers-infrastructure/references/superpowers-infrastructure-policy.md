@@ -43,9 +43,11 @@ If subagents are not authorized:
 
 ## Final Observer Rule
 
-Approval requires a final observer pass after the last substantive artifact mutation.
+Approval requires a final observer pass after the last substantive mutation to the reviewed control artifacts.
 
 If any control artifact changes after the latest independent review, the review state becomes `Dirty` / `Needs Re-review` and cannot be `Approved` until an independent reviewer confirms no Blocking or Major findings on the changed artifact.
+
+Mechanical recording of already-reviewed findings into the control review file does not itself create a new review cycle. Substantive changes to the review's final decision, reviewer findings, approval rationale, or Final Observer Check after approval require re-review or explicit human approval.
 
 Deterministic-only changes may skip subagent re-review only when the change is explicitly listed, a deterministic guard covers the condition and passes, and the review records that no semantic or control-policy content changed.
 

@@ -41,6 +41,10 @@ Do not output `/goal` unless:
 - goal contract exists;
 - execution policy exists;
 - control review status is Approved;
+- control review includes `Final Observer Check`;
+- final observer check allows approval;
+- any substantive post-review change has final re-review recorded;
+- any deterministic-only exception has guard evidence recorded;
 - files reference the same feature and do not visibly conflict;
 - runtime `/goal` will not need to write or approve a new plan.
 
@@ -99,6 +103,7 @@ Do not create or modify implementation files.
 
 - [ ] Guard passed or equivalent checks passed.
 - [ ] No control artifact was rewritten.
+- [ ] Final Observer Check is present and allows approval.
 - [ ] The final `/goal` references all approved files.
 - [ ] The final `/goal` does not ask runtime Codex to write a new plan.
 - [ ] The final `/goal` includes executing, debugging, and completion-verification discipline.
