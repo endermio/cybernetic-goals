@@ -25,6 +25,8 @@ When a required substrate applies:
 - do not treat merely mentioning the substrate, citing it, or imitating generic behavior as sufficient;
 - if the substrate is unavailable, stop and report the missing infrastructure.
 
+Approval requires a final observer pass after the last substantive artifact mutation. An older review result must not be transferred to a changed control structure unless the change is deterministic-only and guard-covered.
+
 ## Stage Summary
 
 | Stage | Superpowers substrate | Required? |

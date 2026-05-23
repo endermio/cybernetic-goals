@@ -37,6 +37,16 @@ Subagents require explicit user authorization.
 
 If subagents are not authorized, pre-goal orchestration may produce candidate artifacts, but control review must be marked `Needs Independent Review` unless explicit human approval or another independent reviewer is already present.
 
+## Final Observer Rule
+
+Approval requires a final observer pass after the last substantive artifact mutation.
+
+If any control artifact changes after the latest independent review, the review state becomes `Dirty` / `Needs Re-review` and cannot be `Approved` until an independent reviewer confirms no Blocking or Major findings on the changed artifact.
+
+Deterministic-only changes may skip subagent re-review only when the change is explicitly listed, a deterministic guard covers the condition and passes, and the review records that no semantic or control-policy content changed.
+
+Lint PASS is a structural sensor, not semantic approval.
+
 ## Pre-goal Boundary
 
 Required Superpowers infrastructure must run before `/goal` execution when it affects the control structure.

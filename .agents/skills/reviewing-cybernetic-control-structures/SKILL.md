@@ -37,6 +37,44 @@ If subagents are explicitly authorized, use independent reviewer passes for the 
 
 If subagents are not authorized and no explicit human approval or other independent reviewer exists, produce a review marked `Needs Independent Review`. Do not mark `Approved`.
 
+## Final Observer Rule
+
+No `Approved` state is allowed after an unreviewed substantive artifact mutation.
+
+A control structure may be marked `Approved` only when the last substantive change to the clarification, goal, execution policy, or review has been followed by an independent review pass that reports no Blocking or Major findings.
+
+If any control artifact changes after the latest independent review, the review state becomes `Dirty` / `Needs Re-review` and cannot be `Approved`.
+
+Deterministic-only changes may skip subagent re-review only when all of the following are true:
+
+- the change is explicitly listed as deterministic-only;
+- a deterministic guard covers the changed condition and passes;
+- the control review records that no semantic or control-policy content changed.
+
+Substantive changes include changes to:
+
+- confirmed semantics;
+- goal success conditions;
+- scope, boundaries, or invariants;
+- execution policy or batch cadence;
+- sensor or evidence schema;
+- progress log required fields;
+- stop conditions;
+- runtime boundary;
+- approval criteria;
+- artifact consistency rules;
+- anything required by a prior reviewer as a Blocking or Major finding.
+
+Deterministic-only changes include:
+
+- heading capitalization required by lint;
+- Markdown fence repair;
+- path typo repair when the intended path is unambiguous;
+- manifest ordering;
+- whitespace.
+
+The author of a post-review revision must not be the sole approver of that revision.
+
 ## Review Dimensions
 
 ### 1. Requirement Traceability
@@ -94,6 +132,10 @@ The review must record:
 - whether approval is allowed;
 - why approval is blocked when independent review is missing.
 
+### 9. Final Observer Check
+
+The review must record whether any substantive artifact changed after the latest independent review pass and whether a final independent observer confirmed no Blocking or Major findings after that change.
+
 ## Deterministic Lint
 
 If scripts are available, run:
@@ -113,6 +155,8 @@ The review must be either:
 
 - `Needs Revision`
 - `Needs Independent Review`
+- `Dirty`
+- `Needs Re-review`
 - `Approved`
 
 Only mark `Approved` when:
@@ -123,14 +167,19 @@ Only mark `Approved` when:
 - test/sensor governance is explicit;
 - runtime `/goal` can execute without writing or approving a new plan.
 - independent review discipline was satisfied or explicit human approval exists.
+- no substantive artifact mutation remains unreviewed after the latest independent review.
+- any deterministic-only exception is explicitly recorded and guard-covered.
 
 ## Validation Checklist
 
 - [ ] The review file was created.
 - [ ] Review status is explicit.
 - [ ] Review independence is recorded.
+- [ ] Final observer check is recorded.
 - [ ] The review does not mark self-review as `Approved`.
 - [ ] If subagents were not authorized and no human approval exists, status is `Needs Independent Review`.
+- [ ] If any substantive artifact changed after independent review, status is `Dirty` or `Needs Re-review` until final independent re-review reports no Blocking or Major findings.
+- [ ] Lint PASS is not treated as semantic/control-policy approval.
 - [ ] Critical findings distinguish semantic, goal, plan, sensor, and runtime issues.
 - [ ] Required revisions are actionable.
 - [ ] The review did not execute implementation.

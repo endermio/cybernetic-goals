@@ -35,6 +35,18 @@
         "Does not dispatch implementer agents.",
         "Approval is allowed only after independent review discipline is satisfied."
       ]
+    },
+    {
+      "id": "post-review-substantive-change-needs-re-review",
+      "prompt": "独立 reviewer 发现 evidence schema 和 progress log 字段有 blocker。主 agent 修改了 plan 和 goal 来修这些 blocker，但修改后没有让独立 reviewer 复审。",
+      "expected_output": "The review must not mark Approved; it records a Dirty or Needs Re-review state because a substantive post-review mutation has not been independently observed.",
+      "assertions": [
+        "Mentions the Final Observer Rule or equivalent no-approval-after-unreviewed-mutation rule.",
+        "Classifies evidence schema and progress log field changes as substantive changes.",
+        "Does not treat lint PASS as semantic or control-policy approval.",
+        "Uses Dirty or Needs Re-review instead of Approved.",
+        "Requires final independent re-review reporting no Blocking or Major findings before Approved is allowed."
+      ]
     }
   ]
 }

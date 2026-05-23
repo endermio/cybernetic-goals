@@ -53,6 +53,7 @@ Required infrastructure boundaries:
 
 - non-trivial execution policy generation requires `$superpowers:writing-plans` as planning substrate;
 - control review `Approved` requires independent review discipline or explicit human approval;
+- control review `Approved` requires a final observer pass after the last substantive artifact mutation;
 - runtime `/goal` compilation must include `$superpowers:executing-plans`, `$superpowers:systematic-debugging`, and `$superpowers:verification-before-completion` discipline.
 
 If a required substrate is unavailable, stop and report the missing infrastructure. Do not self-substitute and do not mark the control structure `Approved`.
@@ -279,14 +280,25 @@ docs/superpowers/control-reviews/YYYY-MM-DD-<slug>.md
 
 If independent review discipline is missing and no explicit human approval exists, the review status must be `Needs Independent Review`, not `Approved`.
 
+Apply the Final Observer Rule:
+
+- If a reviewer reports a Blocking or Major finding and the orchestrator changes any control artifact to address it, the modified artifact is `Dirty`.
+- Dirty artifacts cannot be marked `Approved`.
+- Run final independent re-review on the changed sections before approval.
+- The final re-review prompt must ask whether prior blockers were resolved, whether new blockers were introduced, and whether approval is recommended.
+- Lint PASS is a structural sensor only; it does not replace semantic or control-policy re-review.
+- Deterministic-only exceptions are allowed only for guard-covered formatting or lint-only repairs, and must be recorded in the control review.
+
 ### Step 5: Revise and Re-Review
 
 If review status is `Needs Revision`:
 
 1. Apply only the required revisions.
 2. Avoid over-correcting non-critical suggestions.
-3. Re-run review.
-4. Stop after two review-revision cycles if not approved.
+3. Mark changed control artifacts `Dirty` unless every change is deterministic-only and guard-covered.
+4. Re-run independent review for substantive changes, focused on the changed sections and prior blockers.
+5. Record the final observer check in the control review.
+6. Stop after two review-revision cycles if not approved.
 
 Do not alter confirmed human decisions. If a revision would change product semantics, stop and ask for human input.
 
@@ -301,6 +313,8 @@ Before outputting runtime `/goal`, ensure:
 - execution policy exists
 - control review exists
 - control review is `Approved`
+- no substantive post-review artifact mutation remains unobserved by final independent re-review
+- deterministic-only exceptions, if used, are explicitly recorded and guard-covered
 - all files reference the same feature
 - artifact paths use the same date/slug unless the user explicitly specified alternatives
 - the runtime `/goal` references all approved files
@@ -375,6 +389,8 @@ Stop and report if:
 - subagents are needed but not authorized
 - required Superpowers planning substrate is unavailable
 - independent review discipline is missing and no explicit human approval exists
+- any substantive post-review artifact mutation remains dirty or lacks final independent re-review
+- lint PASS is the only evidence for resolving a semantic/control-policy reviewer blocker
 - final runtime `/goal` would need to invent or approve its own control structure
 
 ## Output Format
@@ -439,6 +455,8 @@ Before responding, verify:
 - [ ] Execution policy uses `$superpowers:writing-plans` for non-trivial implementation plans or blocks.
 - [ ] Review checked the whole control structure, not only the plan.
 - [ ] Review does not mark self-review as `Approved`.
+- [ ] Any substantive post-review artifact mutation had final independent re-review before approval.
+- [ ] Lint PASS was not used as a substitute for semantic/control-policy re-review.
 - [ ] Review status is `Approved` before final runtime `/goal` is emitted.
 - [ ] If not approved, the response is blocked and asks for the smallest necessary decision.
 - [ ] Runtime `/goal` references clarification, goal, plan, and review files.
@@ -455,6 +473,8 @@ Before responding, verify:
 | Creating a final `/goal` from an incomplete clarification | Stop and return to clarification |
 | Reviewing only the plan | Review clarification, goal, plan, and runtime boundary |
 | Replacing missing `$superpowers:writing-plans` with an ad hoc approved plan | Stop and report missing planning infrastructure |
+| Marking Approved after fixing reviewer blockers without final re-review | Mark artifacts Dirty / Needs Re-review and run final independent re-review |
+| Treating lint PASS as proof that semantic reviewer blockers are resolved | Use lint only as a structural sensor; require final observer pass for substantive changes |
 | Choosing a new slug for downstream artifacts | Use the clarification brief's date/slug unless the user explicitly specified other paths |
 | Letting review revisions change confirmed semantics | Stop and ask the human |
 | Infinite review-revision loops | Stop after two cycles |

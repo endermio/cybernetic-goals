@@ -100,6 +100,18 @@
         "Does not compile a final runtime /goal unless explicit approval is present.",
         "Asks for subagent authorization, independent review, or explicit human approval."
       ]
+    },
+    {
+      "id": "post-review-revision-requires-final-observer",
+      "prompt": "使用 $orchestrating-cybernetic-pregoal 自动编译，允许 subagents。第二轮 reviewer 发现 evidence schema 和 progress log 字段 blocker；主 agent 修改 plan/goal 后只跑 lint PASS，没有让 reviewer 复审，就想标 Approved 并编译 /goal。",
+      "expected_output": "The orchestrator blocks approval and runtime /goal compilation because substantive post-review changes remain dirty without final independent re-review.",
+      "assertions": [
+        "Mentions the Final Observer Rule or no Approved state after unreviewed substantive mutation.",
+        "Classifies evidence schema and progress log field fixes as substantive changes.",
+        "Does not treat lint PASS as sufficient approval evidence.",
+        "Marks the artifacts Dirty, Needs Re-review, or blocks approval.",
+        "Does not compile a final runtime /goal until final independent re-review reports no Blocking or Major findings."
+      ]
     }
   ]
 }

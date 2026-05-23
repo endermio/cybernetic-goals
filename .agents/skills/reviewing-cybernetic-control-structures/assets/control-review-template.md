@@ -26,6 +26,22 @@ Notes:
 
 - [independence note]
 
+## Final Observer Check
+
+- Last independent review completed at: `[time or review pass label]`
+- Substantive artifact changes after last independent review: `yes/no`
+- If yes, final re-review performed: `yes/no`
+- Final reviewers confirming no Blocking/Major findings:
+  - [reviewer / role]
+- Deterministic-only exception used: `yes/no`
+- Deterministic guard covering exception:
+  - [command/result]
+- Approval allowed after final observer check: `yes/no`
+
+Rationale:
+
+- [why the final observed artifact may or may not be approved]
+
 ## Structural Lint Result
 
 - [pass/fail summary]
@@ -99,6 +115,8 @@ The control structure may be approved only if:
 - batch cadence is explicit;
 - runtime execution does not need to synthesize a new plan.
 - independent review discipline was satisfied or explicit human approval exists.
+- no substantive artifact mutation remains unreviewed after the latest independent review.
+- any deterministic-only exception is explicitly recorded and guard-covered.
 
 ## Final Decision
 

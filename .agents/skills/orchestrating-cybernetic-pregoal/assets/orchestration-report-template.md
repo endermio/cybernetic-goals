@@ -26,6 +26,18 @@ Status: `Approved` / `Blocked` / `Needs Independent Review`
 | 1 |  |  |  |
 | 2 |  |  |  |
 
+## Final Observer Summary
+
+- Substantive artifact changes after latest independent review: `yes/no`
+- Dirty artifacts remaining: `yes/no`
+- Final independent re-review performed: `yes/no`
+- Final reviewers confirming no Blocking/Major findings:
+  - [reviewer / role]
+- Deterministic-only exception used: `yes/no`
+- Guard result for deterministic-only exception:
+  - [command/result]
+- Runtime `/goal` compilation allowed: `yes/no`
+
 ## Final Runtime Goal
 
 ```text
