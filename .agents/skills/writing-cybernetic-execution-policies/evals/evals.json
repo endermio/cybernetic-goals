@@ -12,6 +12,18 @@
         "Does not execute code.",
         "Marks plan as candidate, not approved."
       ]
+    },
+    {
+      "id": "requires-superpowers-planning-substrate",
+      "prompt": "根据 clarification 和 goal 为一个非平凡实现任务写 execution policy，但 $superpowers:writing-plans 不可用。",
+      "expected_output": "The skill stops or marks the policy blocked because the required planning substrate is unavailable, instead of drafting an approved ad hoc plan.",
+      "assertions": [
+        "Mentions $superpowers:writing-plans as the required planning substrate for non-trivial implementation plans.",
+        "Stops or reports missing required planning infrastructure when the substrate is unavailable.",
+        "Does not self-substitute with an unreviewed internal plan.",
+        "Does not mark the execution policy Approved.",
+        "Does not execute code."
+      ]
     }
   ]
 }

@@ -1,4 +1,4 @@
-# Subagent Review Roles for Pregoal Compilation
+# Subagent Review Roles for Pre-goal Compilation
 
 Use these roles only when the user explicitly authorizes subagents.
 

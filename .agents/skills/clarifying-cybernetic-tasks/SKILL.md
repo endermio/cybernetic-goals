@@ -98,7 +98,7 @@ Unknown/unverifiable status means external credentials, production-only environm
 
 When clarification is complete, choose the next command from the intended workflow.
 
-For Level 3/4 or full pregoal clarification, and when the clarification path is deterministic, output two commands the user can queue in Codex CLI:
+For Level 3/4 or full pre-goal clarification, and when the clarification path is deterministic, output two commands the user can queue in Codex CLI:
 
 1. A pre-goal orchestration command using the concrete clarification path.
 2. A predicted queue-friendly `/goal` command using the expected artifact paths for the same date/slug.
@@ -127,7 +127,7 @@ The predicted `/goal` command must include this precondition:
 If any referenced artifact is missing, not approved, or internally inconsistent, stop and report the smallest required human decision.
 ```
 
-For Level 1/2 work with `Rubric Gate: required`, do not output the pregoal orchestration command by default after rubric-only clarification. Output the next bounded goal-writing command instead:
+For Level 1/2 work with `Rubric Gate: required`, do not output the pre-goal orchestration command by default after rubric-only clarification. Output the next bounded goal-writing command instead:
 
 ```text
 $writing-cybernetic-goals 使用 docs/superpowers/clarifications/YYYY-MM-DD-slug.md 中确认的评价口径，为这个 Level 2 有界审计/评估任务创建小型文件 goal，并在完成后给出直接 /goal 执行命令，不要默认建议 execution policy。
@@ -194,7 +194,7 @@ Reply with one of:
 - cancel/postpone
 ```
 
-If all blocking decisions are resolved for full pregoal work:
+If all blocking decisions are resolved for full pre-goal work:
 
 ````markdown
 Clarification is complete.
@@ -249,5 +249,5 @@ $writing-cybernetic-goals 使用 docs/superpowers/clarifications/YYYY-MM-DD-slug
 - [ ] There are no more than 7 questions.
 - [ ] The brief includes `Clarification Status`.
 - [ ] No goal, plan, control review, or approved runtime `/goal` was created.
-- [ ] Level 1/2 work with `Rubric Gate: required` routes to `$writing-cybernetic-goals`, not full pregoal orchestration by default.
+- [ ] Level 1/2 work with `Rubric Gate: required` routes to `$writing-cybernetic-goals`, not full pre-goal orchestration by default.
 - [ ] Any predicted queue-friendly `/goal` is clearly labeled as predicted and includes the missing/not-approved/inconsistent artifact precondition.

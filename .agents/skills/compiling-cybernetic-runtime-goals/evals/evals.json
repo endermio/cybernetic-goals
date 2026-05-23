@@ -20,6 +20,8 @@
         "Forbids reinterpretation of requirements.",
         "Forbids rewriting control strategy.",
         "Mentions tests as sensors, not objectives.",
+        "Mentions $superpowers:executing-plans, $superpowers:systematic-debugging, and $superpowers:verification-before-completion runtime discipline.",
+        "Says to follow equivalent approved artifact discipline if runtime cannot load those skills.",
         "Stops if any referenced artifact is missing, not approved, or internally inconsistent."
       ]
     }

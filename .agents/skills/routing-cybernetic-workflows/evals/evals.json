@@ -7,7 +7,7 @@
       "expected_output": "Route to Level 0 or Level 1, not a full workflow.",
       "assertions": [
         "Classifies the task as Level 0 or Level 1.",
-        "Does not recommend the full pregoal pipeline.",
+        "Does not recommend the full pre-goal pipeline.",
         "Explains that the task is small, bounded, and has an obvious verification path.",
         "Recommends a direct prompt or inline goal."
       ]
@@ -18,7 +18,7 @@
       "expected_output": "Route to Level 1 or Level 2, not Level 3, because this is a bounded correction inside an already clarified feature.",
       "assertions": [
         "Classifies the task as Level 1 or Level 2.",
-        "Does not recommend the full pregoal pipeline.",
+        "Does not recommend the full pre-goal pipeline.",
         "Explains that existing control artifacts already fix the semantics.",
         "Explains that no new schema, permission, pull-vs-reporting, or enterprise/corpId decision is required.",
         "Recommends a bounded repair prompt or small file-based goal."
@@ -89,7 +89,7 @@
         "Does not classify as Level 3 solely due to schema wording.",
         "Mentions that approved plan already fixes schema semantics.",
         "Recommends bounded repair.",
-        "Does not recommend full pregoal pipeline."
+        "Does not recommend full pre-goal pipeline."
       ]
     },
     {
@@ -99,7 +99,7 @@
       "assertions": [
         "Mentions existing approved artifacts.",
         "Classifies as Level 1 or Level 2.",
-        "Does not route to full pregoal pipeline.",
+        "Does not route to full pre-goal pipeline.",
         "Frames the task as a bounded correction inside existing control structure."
       ]
     },
@@ -125,7 +125,7 @@
         "Explains that broad scope is not the same as unresolved control structure.",
         "Explains that the evaluation function or rubric is not sufficiently defined.",
         "Recommends clarifying status definitions, evidence strength, and minimum evidence for the strongest positive status before creating the audit goal.",
-        "Does not recommend the full pregoal pipeline or execution policy by default."
+        "Does not recommend the full pre-goal pipeline or execution policy by default."
       ]
     },
     {
@@ -137,7 +137,7 @@
         "States that the evaluation rubric is explicit.",
         "Recommends a bounded file-based audit goal.",
         "Says the bounded goal should lead to direct /goal execution.",
-        "Does not recommend the full pregoal pipeline or execution policy by default."
+        "Does not recommend the full pre-goal pipeline or execution policy by default."
       ]
     }
   ]

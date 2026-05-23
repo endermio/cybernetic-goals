@@ -7,9 +7,12 @@ The core idea is:
 ```text
 skills = compile-time control tools
 /goal = runtime executor
+Superpowers = planning/review/execution substrate
 ```
 
 For complex work, do not let `/goal` clarify requirements, write its own plan, review its own plan, or invent a new control strategy during execution. Instead, prepare and approve control artifacts first, then compile the final runtime `/goal` command.
+
+Superpowers dependencies are stage-specific infrastructure, not optional style suggestions. See `docs/cybernetic-framework/superpowers-infrastructure-policy.md`.
 
 ## Install
 
@@ -65,6 +68,7 @@ For simple work, the router should reject the full pipeline and recommend an inl
 - `routing-cybernetic-workflows`: classify complexity and route to the right workflow.
 - `clarifying-cybernetic-tasks`: clarify human intent and create a clarification brief.
 - `orchestrating-cybernetic-pregoal`: orchestrate the pre-goal compilation chain after clarification.
+- `cybernetic-superpowers-infrastructure`: define stage-specific Superpowers substrate dependencies and non-substitution rules.
 - `writing-cybernetic-goals`: create a control contract, not a runtime `/goal`, for complex work.
 - `writing-cybernetic-execution-policies`: create an execution policy / plan as a control law.
 - `reviewing-cybernetic-control-structures`: review clarification, goal, and plan as a coherent control system.
@@ -81,4 +85,4 @@ The scripts are intentionally small and deterministic. They check structure and 
 
 ## Why this structure exists
 
-Pregoal skills synthesize and review the control structure. `/goal` runs the approved control structure. This separates controller synthesis from controller execution and prevents an execution agent from designing, approving, and running its own control law.
+Pre-goal skills synthesize and review the control structure. `/goal` runs the approved control structure. This separates controller synthesis from controller execution and prevents an execution agent from designing, approving, and running its own control law.

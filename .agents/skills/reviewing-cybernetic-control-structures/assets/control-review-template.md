@@ -10,6 +10,22 @@ Status: `Needs Revision`
 - Goal: `[path]`
 - Execution policy: `[path]`
 
+## Review Independence
+
+- Subagents authorized: `yes/no`
+- Independent review passes completed:
+  - Requirement traceability: `yes/no`
+  - Goal fidelity: `yes/no`
+  - Sensor governance: `yes/no`
+  - Execution cadence: `yes/no`
+  - Runtime safety: `yes/no`
+- Explicit human approval present: `yes/no`
+- Approval allowed: `yes/no`
+
+Notes:
+
+- [independence note]
+
 ## Structural Lint Result
 
 - [pass/fail summary]
@@ -82,6 +98,7 @@ The control structure may be approved only if:
 - sensor governance is explicit;
 - batch cadence is explicit;
 - runtime execution does not need to synthesize a new plan.
+- independent review discipline was satisfied or explicit human approval exists.
 
 ## Final Decision
 

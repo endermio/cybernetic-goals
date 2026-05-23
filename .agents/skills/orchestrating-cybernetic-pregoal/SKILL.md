@@ -3,7 +3,7 @@ name: orchestrating-cybernetic-pregoal
 description: 'Use after a completed clarification brief to orchestrate the pre-goal compilation chain before launching a Codex /goal. Coordinates existing cybernetic skills to create or update the goal contract, execution policy, control review, and final runtime /goal command. Requires explicit user authorization before spawning subagents. Does not implement code and does not start /goal execution.'
 ---
 
-# Orchestrating Cybernetic Pregoal
+# Orchestrating Cybernetic Pre-goal
 
 ## Overview
 
@@ -36,11 +36,26 @@ This skill must not:
 This skill may:
 
 - inspect a completed clarification brief
-- call or emulate the existing cybernetic skills in the correct order
+- call existing cybernetic skills in the correct order
+- emulate narrow cybernetic formatting only when a downstream cybernetic skill is unavailable
 - create or update control artifacts under `docs/superpowers/`
 - use explicitly authorized subagents as independent reviewers
 - iterate review and revision up to the configured limit
 - compile the final `/goal` command after approval
+
+## Required Infrastructure
+
+Follow `$cybernetic-superpowers-infrastructure`.
+
+This orchestrator may emulate cybernetic artifact formatting when a downstream cybernetic skill is unavailable. It must not emulate required Superpowers infrastructure.
+
+Required infrastructure boundaries:
+
+- non-trivial execution policy generation requires `$superpowers:writing-plans` as planning substrate;
+- control review `Approved` requires independent review discipline or explicit human approval;
+- runtime `/goal` compilation must include `$superpowers:executing-plans`, `$superpowers:systematic-debugging`, and `$superpowers:verification-before-completion` discipline.
+
+If a required substrate is unavailable, stop and report the missing infrastructure. Do not self-substitute and do not mark the control structure `Approved`.
 
 ## Relationship to Other Skills
 
@@ -55,8 +70,15 @@ This skill orchestrates:
 - `$writing-cybernetic-execution-policies`
 - `$reviewing-cybernetic-control-structures`
 - `$compiling-cybernetic-runtime-goals`
+- `$cybernetic-superpowers-infrastructure`
 
-It should not duplicate their templates or rules unless they are unavailable. If a downstream skill is available, prefer using it. If it is unavailable, emulate only its narrow responsibility and state that the fallback was used.
+It should not duplicate their templates or rules unless they are unavailable. If a downstream cybernetic skill is available, prefer using it. If a downstream cybernetic skill is unavailable, emulate only its narrow cybernetic responsibility and state that the fallback was used.
+
+Never emulate required Superpowers substrates. In particular:
+
+- do not replace `$superpowers:writing-plans` with ad hoc internal planning for non-trivial implementation plans;
+- do not replace independent review discipline with self-review;
+- do not compile a runtime `/goal` that omits required runtime execution, debugging, and verification discipline.
 
 ## Required Input
 
@@ -93,7 +115,7 @@ If subagents are not authorized:
 - You must not claim independent review or mark the control structure `Approved` unless a separate reviewer, explicit human approval, or an authorized subagent review exists.
 - Ask the user to authorize subagent review or manually approve the artifacts before compiling a final runtime `/goal`.
 
-## Pregoal Orchestration Modes
+## Pre-goal Orchestration Modes
 
 ### Mode A: Candidate-Only Mode
 
@@ -103,7 +125,7 @@ Behavior:
 
 1. Check the clarification brief.
 2. Create or update goal contract.
-3. Create or update execution policy.
+3. Create or update execution policy only if required planning substrate is satisfied or not required.
 4. Create a control review draft marked `Needs Independent Review`.
 5. Do not compile final runtime `/goal` unless the user explicitly approves the artifacts.
 
@@ -115,8 +137,8 @@ Behavior:
 
 1. Check the clarification brief.
 2. Create or update goal contract.
-3. Create or update execution policy.
-4. Run independent subagent review passes.
+3. Create or update execution policy only if required planning substrate is satisfied or not required.
+4. Run independent subagent review passes without running implementation or dispatching implementer agents.
 5. Revise artifacts based on review findings.
 6. Re-review until approval or stop after the maximum review cycles.
 7. Create an approved control review if findings converge.
@@ -207,6 +229,7 @@ Use `$writing-cybernetic-execution-policies` when available.
 The execution policy must:
 
 - reference the clarification and goal files
+- record `$superpowers:writing-plans` substrate status for non-trivial implementation plans
 - include a dependency matrix
 - distinguish semantic invariants from tactical degrees of freedom
 - define batch cadence
@@ -217,6 +240,8 @@ The execution policy must:
 - define phase gates
 - define stop conditions
 - define progress log rules
+
+If `$superpowers:writing-plans` is required but unavailable, stop and report missing planning infrastructure. Do not write an ad hoc approved plan as a substitute.
 
 Expected artifact:
 
@@ -236,6 +261,8 @@ If subagents are authorized, use independent reviewer roles. At minimum:
 4. Sensor Governance Reviewer
 5. Runtime Boundary Reviewer
 
+Do not run implementation and do not dispatch implementer agents during pre-goal review.
+
 Review the whole chain:
 
 ```text
@@ -249,6 +276,8 @@ Expected artifact:
 ```text
 docs/superpowers/control-reviews/YYYY-MM-DD-<slug>.md
 ```
+
+If independent review discipline is missing and no explicit human approval exists, the review status must be `Needs Independent Review`, not `Approved`.
 
 ### Step 5: Revise and Re-Review
 
@@ -313,6 +342,13 @@ It must not instruct Codex to:
 - replace approved sensors
 - redesign the execution policy
 
+It must instruct Codex to:
+
+- use `$superpowers:executing-plans` discipline against the approved plan;
+- use `$superpowers:systematic-debugging` for unclear or repeated failures;
+- use `$superpowers:verification-before-completion` before claiming completion;
+- follow equivalent approved artifact discipline if runtime cannot load those skills.
+
 The command must reference:
 
 - clarification file
@@ -337,6 +373,8 @@ Stop and report if:
 - review does not converge after two cycles
 - reviewer disagreements imply a product decision
 - subagents are needed but not authorized
+- required Superpowers planning substrate is unavailable
+- independent review discipline is missing and no explicit human approval exists
 - final runtime `/goal` would need to invent or approve its own control structure
 
 ## Output Format
@@ -393,14 +431,19 @@ Before responding, verify:
 - [ ] This skill did not implement code.
 - [ ] This skill did not start `/goal`.
 - [ ] Subagents were used only if explicitly authorized.
+- [ ] Required Superpowers substrate status was checked.
+- [ ] No required Superpowers substrate was silently emulated.
 - [ ] Clarification was complete before creating downstream artifacts.
 - [ ] Goal contract preserved confirmed human decisions.
 - [ ] Execution policy preserved the goal contract.
+- [ ] Execution policy uses `$superpowers:writing-plans` for non-trivial implementation plans or blocks.
 - [ ] Review checked the whole control structure, not only the plan.
+- [ ] Review does not mark self-review as `Approved`.
 - [ ] Review status is `Approved` before final runtime `/goal` is emitted.
 - [ ] If not approved, the response is blocked and asks for the smallest necessary decision.
 - [ ] Runtime `/goal` references clarification, goal, plan, and review files.
 - [ ] Runtime `/goal` includes the missing/not-approved/inconsistent artifact precondition.
+- [ ] Runtime `/goal` includes executing, debugging, and completion-verification discipline.
 - [ ] Runtime `/goal` does not tell Codex to write or approve a new plan.
 
 ## Common Mistakes
@@ -411,6 +454,7 @@ Before responding, verify:
 | Spawning subagents without user authorization | Ask for authorization or run candidate-only mode |
 | Creating a final `/goal` from an incomplete clarification | Stop and return to clarification |
 | Reviewing only the plan | Review clarification, goal, plan, and runtime boundary |
+| Replacing missing `$superpowers:writing-plans` with an ad hoc approved plan | Stop and report missing planning infrastructure |
 | Choosing a new slug for downstream artifacts | Use the clarification brief's date/slug unless the user explicitly specified other paths |
 | Letting review revisions change confirmed semantics | Stop and ask the human |
 | Infinite review-revision loops | Stop after two cycles |

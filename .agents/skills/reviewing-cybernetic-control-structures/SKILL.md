@@ -25,6 +25,18 @@ Use `assets/control-review-template.md`.
 
 This skill does not implement code and does not start `/goal`.
 
+## Required Infrastructure
+
+Follow `$cybernetic-superpowers-infrastructure`.
+
+This skill requires independent review discipline before it may mark a control structure `Approved`.
+
+Do not self-review and mark `Approved`. Do not run implementation. Do not dispatch implementer agents during pre-goal control review.
+
+If subagents are explicitly authorized, use independent reviewer passes for the control structure. This is not the full `$superpowers:subagent-driven-development` implementation workflow; it is independent review discipline only.
+
+If subagents are not authorized and no explicit human approval or other independent reviewer exists, produce a review marked `Needs Independent Review`. Do not mark `Approved`.
+
 ## Review Dimensions
 
 ### 1. Requirement Traceability
@@ -71,7 +83,16 @@ Semantic invariants must be frozen. Tactical implementation details must remain 
 
 ### 7. Runtime Suitability
 
-The runtime `/goal` must be able to execute the approved artifacts without calling new skills or inventing new control structures.
+The runtime `/goal` must be able to execute the approved artifacts without inventing new control structures. Any required runtime Superpowers discipline must be precompiled into the approved plan, review, or final `/goal`.
+
+### 8. Review Independence
+
+The review must record:
+
+- whether subagents were explicitly authorized;
+- which independent review passes were completed;
+- whether approval is allowed;
+- why approval is blocked when independent review is missing.
 
 ## Deterministic Lint
 
@@ -91,6 +112,7 @@ Use the lint output as a structural sensor. Do not treat lint as semantic approv
 The review must be either:
 
 - `Needs Revision`
+- `Needs Independent Review`
 - `Approved`
 
 Only mark `Approved` when:
@@ -100,11 +122,15 @@ Only mark `Approved` when:
 - execution policy does not self-authorize uncontrolled changes;
 - test/sensor governance is explicit;
 - runtime `/goal` can execute without writing or approving a new plan.
+- independent review discipline was satisfied or explicit human approval exists.
 
 ## Validation Checklist
 
 - [ ] The review file was created.
 - [ ] Review status is explicit.
+- [ ] Review independence is recorded.
+- [ ] The review does not mark self-review as `Approved`.
+- [ ] If subagents were not authorized and no human approval exists, status is `Needs Independent Review`.
 - [ ] Critical findings distinguish semantic, goal, plan, sensor, and runtime issues.
 - [ ] Required revisions are actionable.
 - [ ] The review did not execute implementation.

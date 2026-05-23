@@ -1,6 +1,6 @@
 ---
 name: routing-cybernetic-workflows
-description: 'Use first when deciding whether a task should use the cybernetic workflow. Classifies work by control uncertainty, not scary keywords: direct prompt, inline goal, bounded file goal, full pregoal pipeline, or high-risk human-gated workflow. Downgrades bounded corrections inside existing approved control artifacts and rejects over-heavy workflow for small tasks.'
+description: 'Use first when deciding whether a task should use the cybernetic workflow. Classifies work by control uncertainty, not scary keywords: direct prompt, inline goal, bounded file goal, full pre-goal pipeline, or high-risk human-gated workflow. Downgrades bounded corrections inside existing approved control artifacts and rejects over-heavy workflow for small tasks.'
 ---
 
 # Routing Cybernetic Workflows
@@ -17,7 +17,7 @@ It decides whether the task needs:
 - an inline `/goal`
 - a bounded file-based goal
 - rubric clarification before a bounded/evaluation goal
-- the full pregoal pipeline
+- the full pre-goal pipeline
 - a high-risk human-gated workflow
 
 The key routing question is not:
@@ -44,7 +44,7 @@ Route based on unresolved control decisions, not scary keywords.
 
 Use the lightest workflow that keeps the agent from inventing control structure during execution.
 
-A task should not be routed to the full pregoal pipeline merely because it mentions:
+A task should not be routed to the full pre-goal pipeline merely because it mentions:
 
 - permissions
 - corpId
@@ -185,7 +185,7 @@ Signals:
 - localized correction across UI, fixture, smoke, screenshot, docs, or one bounded workflow
 - wide read-only audit with fixed classification semantics, an explicit evaluation rubric, and a fixed report artifact
 - moderate verification needs
-- a persistent small goal file may help, but a full pregoal pipeline would be too heavy
+- a persistent small goal file may help, but a full pre-goal pipeline would be too heavy
 
 Recommended next step options:
 
@@ -232,7 +232,7 @@ After rubric clarification is complete:
 $writing-cybernetic-goals 为这个 Level 2 有界任务创建小型文件 goal，并在完成后给出直接 /goal 执行命令，不要默认建议 execution policy：<任务 + confirmed rubric>
 ```
 
-### Level 3: Full Pregoal Pipeline
+### Level 3: Full Pre-goal Pipeline
 
 Use when the execution agent would otherwise need to invent or revise the control structure.
 
@@ -286,7 +286,7 @@ Signals:
 Recommended next step:
 
 ```text
-Use the full pregoal pipeline, but require explicit human approval before runtime /goal execution.
+Use the full pre-goal pipeline, but require explicit human approval before runtime /goal execution.
 ```
 
 ## Scoring Heuristic
@@ -464,7 +464,7 @@ Rejected workflow:
 ### Level 3
 
 ```markdown
-Routing decision: Level 3 - Full Pregoal Pipeline
+Routing decision: Level 3 - Full Pre-goal Pipeline
 
 Why:
 - ...
@@ -493,12 +493,12 @@ Why:
 - ...
 
 Required gates:
-- Full pregoal gates: required.
+- Full pre-goal gates: required.
 - Explicit Human Approval Gate: required before runtime execution.
 - Rubric Gate: required if the task is evaluative and the rubric is not explicit.
 
 Recommended next step:
-Run the full pregoal pipeline, but require explicit human approval before runtime `/goal`.
+Run the full pre-goal pipeline, but require explicit human approval before runtime `/goal`.
 
 Rejected workflow:
 - Do not allow ungated runtime execution.
@@ -515,7 +515,7 @@ Rejected workflow:
 | Treating existing-feature fixes as new-feature work | Run the downgrade pass |
 | Recommending full pipeline for local display/fixture cleanup | Use Level 1/2 |
 | Ignoring approved clarification/goal/plan artifacts | Downgrade when semantics are already frozen |
-| Listing five manual pregoal skills when orchestrator exists | Prefer `$clarifying-cybernetic-tasks` then `$orchestrating-cybernetic-pregoal` |
+| Listing five manual pre-goal skills when orchestrator exists | Prefer `$clarifying-cybernetic-tasks` then `$orchestrating-cybernetic-pregoal` |
 | Letting small tasks use the full workflow because the user asked | Explain that the workflow is over-control and propose a lighter route |
 | Recommending execution policy after a Level 2 bounded file goal | Give the direct `/goal` path unless the user explicitly asks for policy or new control decisions appear |
 | Treating an object checklist as a completed rubric | Check the evaluation function before routing to execution |
@@ -536,7 +536,7 @@ Before responding, verify:
 - [ ] A complete object list is not mistaken for a complete evaluation rubric.
 - [ ] The recommended next step is the lightest safe workflow.
 - [ ] For Level 3, the response recommends `$clarifying-cybernetic-tasks` then `$orchestrating-cybernetic-pregoal`.
-- [ ] For Level 0/1/2, the response does not recommend full pregoal pipeline.
+- [ ] For Level 0/1/2, the response does not recommend full pre-goal pipeline.
 - [ ] For Level 2 bounded file goals, the response does not recommend execution policy by default.
 - [ ] If Rubric Gate is required, the response recommends rubric clarification before execution.
 - [ ] The response includes rejected workflow rationale.

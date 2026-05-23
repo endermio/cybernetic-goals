@@ -1,0 +1,48 @@
+---
+name: cybernetic-superpowers-infrastructure
+description: 'Use when a cybernetic skill needs to decide which Superpowers substrate is required for planning, independent review, runtime execution, debugging, or completion verification. Defines stage dependencies and non-substitution rules; it does not create control artifacts or execute implementation.'
+---
+
+# Cybernetic Superpowers Infrastructure
+
+## Overview
+
+This skill defines how cybernetic skills depend on Superpowers skills.
+
+Cybernetic skills compile control structures. Superpowers skills provide the behavior substrate for planning, independent review discipline, execution, debugging, and completion verification.
+
+Use `references/superpowers-infrastructure-policy.md`.
+
+## Core Rule
+
+Superpowers are infrastructure dependencies, not optional style suggestions.
+
+When a required substrate applies:
+
+- invoke or explicitly apply that substrate;
+- record the substrate status in the produced artifact;
+- do not silently replace it with ad hoc behavior from the current cybernetic skill;
+- if the substrate is unavailable, stop and report the missing infrastructure.
+
+## Stage Summary
+
+| Stage | Superpowers substrate | Required? |
+|---|---|---|
+| Product/design-heavy clarification | `$superpowers:brainstorming` | Optional |
+| Non-trivial execution policy generation | `$superpowers:writing-plans` | Required |
+| Control review approval | Independent subagent review discipline | Required for `Approved` unless explicit human approval exists |
+| Runtime execution | `$superpowers:executing-plans` discipline | Required |
+| Unclear or repeated runtime failure | `$superpowers:systematic-debugging` | Required |
+| Completion claim | `$superpowers:verification-before-completion` | Required |
+
+## Non-Goals
+
+This skill does not:
+
+- write goal contracts;
+- write execution policies;
+- perform control review;
+- compile runtime `/goal` commands;
+- implement code.
+
+It only supplies the shared infrastructure policy those skills must obey.

@@ -10,6 +10,7 @@
         "The workflow creates or updates a goal contract file under docs/superpowers/goals/.",
         "The workflow creates or updates an execution policy under docs/superpowers/plans/.",
         "The workflow creates or updates a control review under docs/superpowers/control-reviews/.",
+        "The workflow checks required Superpowers substrate status and does not silently emulate missing infrastructure.",
         "The final /goal command references the clarification, goal, plan, and review files.",
         "The response does not start /goal execution.",
         "The workflow stops if review cannot converge within the maximum review cycles."
@@ -48,6 +49,7 @@
         "The final /goal references the approved control review path.",
         "The final /goal does not say 'first write a plan'.",
         "The final /goal does not allow runtime reinterpretation of requirements.",
+        "The final /goal mentions $superpowers:executing-plans, $superpowers:systematic-debugging, and $superpowers:verification-before-completion discipline.",
         "The final /goal tells Codex to stop if artifacts conflict or become insufficient.",
         "The final /goal tells Codex to stop if any referenced artifact is missing, not approved, or internally inconsistent."
       ]
@@ -73,6 +75,30 @@
         "The response does not emit a final runtime /goal command.",
         "The response points to the artifact sections that conflict.",
         "The response asks for the smallest human decision or revision needed."
+      ]
+    },
+    {
+      "id": "missing-required-superpowers-substrate-blocks",
+      "prompt": "使用 $orchestrating-cybernetic-pregoal 自动编译一个非平凡实现任务。$superpowers:writing-plans 不可用，但希望直接生成 approved plan 和 approved review。",
+      "expected_output": "The orchestrator blocks or reports missing planning infrastructure instead of emulating required Superpowers substrate or marking the control structure Approved.",
+      "assertions": [
+        "Mentions $superpowers:writing-plans as required planning substrate for non-trivial implementation plans.",
+        "Stops or reports missing required planning infrastructure.",
+        "Does not self-substitute with an ad hoc approved plan.",
+        "Does not mark the control structure Approved.",
+        "Does not compile a final runtime /goal."
+      ]
+    },
+    {
+      "id": "no-independent-review-no-approval",
+      "prompt": "使用 $orchestrating-cybernetic-pregoal 自动编译。所有 artifact 看起来一致，但没有 subagent 授权、没有人工批准，也没有其他独立 reviewer。",
+      "expected_output": "The orchestrator creates candidate artifacts at most and marks review Needs Independent Review instead of Approved.",
+      "assertions": [
+        "Does not mark self-review as Approved.",
+        "Uses Needs Independent Review or blocks approval.",
+        "Does not run implementation or dispatch implementer agents.",
+        "Does not compile a final runtime /goal unless explicit approval is present.",
+        "Asks for subagent authorization, independent review, or explicit human approval."
       ]
     }
   ]

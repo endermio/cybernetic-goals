@@ -24,7 +24,7 @@
     {
       "id": "complete-clarification-emits-queue-friendly-commands",
       "prompt": "澄清已完成，brief 是 docs/superpowers/clarifications/2026-05-22-collaborative-supervision.md，没有开放阻塞问题。",
-      "expected_output": "Emit a pregoal orchestration command and a predicted queue-friendly /goal command using the same date/slug paths, with a precondition that stops if artifacts are missing, not approved, or inconsistent.",
+      "expected_output": "Emit a pre-goal orchestration command and a predicted queue-friendly /goal command using the same date/slug paths, with a precondition that stops if artifacts are missing, not approved, or inconsistent.",
       "assertions": [
         "Outputs a command invoking $orchestrating-cybernetic-pregoal with docs/superpowers/clarifications/2026-05-22-collaborative-supervision.md.",
         "Outputs a predicted or queue-friendly /goal, not a final approved /goal.",
@@ -55,7 +55,7 @@
         "Recommends $writing-cybernetic-goals using the clarification brief.",
         "Says the bounded goal writer should output a direct /goal.",
         "Does not recommend $orchestrating-cybernetic-pregoal by default.",
-        "Does not output a predicted full-pregoal runtime /goal."
+        "Does not output a predicted full pre-goal runtime /goal."
       ]
     }
   ]

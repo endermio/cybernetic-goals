@@ -1,0 +1,17 @@
+{
+  "skill_name": "cybernetic-superpowers-infrastructure",
+  "evals": [
+    {
+      "id": "maps-superpowers-stage-dependencies",
+      "prompt": "说明 cybernetic pre-goal pipeline 中 Superpowers 应该如何作为基础设施使用。",
+      "expected_output": "The response identifies stage-specific Superpowers substrates, distinguishes required and optional substrates, and states the non-substitution rule.",
+      "assertions": [
+        "Mentions $superpowers:writing-plans as required for non-trivial execution policy generation.",
+        "Mentions independent subagent review discipline as required for Approved control review unless explicit human approval exists.",
+        "Mentions $superpowers:executing-plans, $superpowers:systematic-debugging, and $superpowers:verification-before-completion for runtime.",
+        "States that unavailable required substrates cause a stop/report instead of self-substitution.",
+        "Does not say every cybernetic skill must invoke every Superpowers skill."
+      ]
+    }
+  ]
+}

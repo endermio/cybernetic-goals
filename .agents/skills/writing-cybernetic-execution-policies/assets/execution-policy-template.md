@@ -9,6 +9,24 @@ Status: `Candidate`
 - Clarification: `[path]`
 - Goal contract: `[path]`
 
+## Superpowers Planning Substrate
+
+- Required substrate: `$superpowers:writing-plans`
+- Substrate status: `Required / Used / Blocked / Not required`
+- Planning status: `Candidate`
+
+Cybernetic constraints supplied to the substrate:
+
+- confirmed semantic invariants;
+- tactical degrees of freedom;
+- dependency matrix;
+- batch cadence;
+- destructive intermediate-state policy;
+- sensor/test governance;
+- stale test retirement and rewrite policy.
+
+If the required substrate is unavailable for a non-trivial implementation plan, this policy is blocked and must not be treated as an approved internal substitute.
+
 ## Confirmed Semantic Invariants
 
 These cannot be changed during runtime execution without stopping.

@@ -20,6 +20,19 @@ This skill is a thin compiler. It must not rewrite the control structure.
 
 Use `scripts/control_chain_guard.py` and `scripts/compile_runtime_goal.py` when available.
 
+## Required Infrastructure
+
+Follow `$cybernetic-superpowers-infrastructure`.
+
+This skill does not invoke runtime execution. It compiles runtime discipline into the final `/goal` command.
+
+The final command must instruct runtime Codex to:
+
+- use `$superpowers:executing-plans` discipline against the approved plan;
+- use `$superpowers:systematic-debugging` for unclear or repeated failures;
+- use `$superpowers:verification-before-completion` before claiming completion;
+- if runtime cannot load these skills, follow the equivalent discipline already written in the approved plan and control review.
+
 ## Preconditions
 
 Do not output `/goal` unless:
@@ -43,6 +56,10 @@ The final `/goal` must:
 - forbid rewriting the control strategy;
 - forbid replacing approved sensors without using approved sensor-governance rules;
 - execute serially unless the approved review permits otherwise;
+- use `$superpowers:executing-plans` discipline against the approved execution policy;
+- use `$superpowers:systematic-debugging` for unclear or repeated failures;
+- use `$superpowers:verification-before-completion` before claiming completion;
+- follow equivalent discipline already written in the approved plan and control review if runtime cannot load those skills;
 - stop if any referenced artifact is missing, not approved, or internally inconsistent;
 - stop if artifacts conflict or become insufficient.
 
@@ -82,4 +99,5 @@ Do not create or modify implementation files.
 - [ ] No control artifact was rewritten.
 - [ ] The final `/goal` references all approved files.
 - [ ] The final `/goal` does not ask runtime Codex to write a new plan.
+- [ ] The final `/goal` includes executing, debugging, and completion-verification discipline.
 - [ ] The skill did not implement code.

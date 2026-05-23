@@ -1,4 +1,4 @@
-# Pregoal Orchestration Report: [Name]
+# Pre-goal Orchestration Report: [Name]
 
 ## Status
 

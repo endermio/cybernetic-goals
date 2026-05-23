@@ -26,23 +26,42 @@ Use `assets/execution-policy-template.md`.
 
 This skill does not clarify requirements, does not write the goal contract, does not review its own plan, and does not implement code.
 
+## Required Infrastructure
+
+Follow `$cybernetic-superpowers-infrastructure`.
+
+This skill does not replace `$superpowers:writing-plans`.
+
+For non-trivial implementation plans, invoke or explicitly apply `$superpowers:writing-plans` as the planning substrate. This skill supplies the cybernetic constraints that the planning substrate must preserve:
+
+- confirmed semantic invariants;
+- tactical degrees of freedom;
+- dependency matrix requirement;
+- batch cadence;
+- destructive intermediate-state policy;
+- sensor/test governance;
+- stale test retirement and rewrite policy.
+
+If `$superpowers:writing-plans` is unavailable for a non-trivial implementation plan, stop and report that required planning infrastructure is missing. Do not self-substitute with an unreviewed internal plan.
+
 ## Required Sections
 
 The execution policy must include:
 
 1. Source Contracts
-2. Confirmed Semantic Invariants
-3. Tactical Degrees of Freedom
-4. Dependency Matrix
-5. Batch Cadence
-6. Destructive Intermediate-State Policy
-7. Sensor / Test Governance
-8. Old Test Retirement and Rewrite Policy
-9. Phase Gates
-10. Execution Rhythm
-11. Stop Conditions
-12. Progress Log Rules
-13. Candidate Plan Tasks
+2. Superpowers Planning Substrate
+3. Confirmed Semantic Invariants
+4. Tactical Degrees of Freedom
+5. Dependency Matrix
+6. Batch Cadence
+7. Destructive Intermediate-State Policy
+8. Sensor / Test Governance
+9. Old Test Retirement and Rewrite Policy
+10. Phase Gates
+11. Execution Rhythm
+12. Stop Conditions
+13. Progress Log Rules
+14. Candidate Plan Tasks
 
 ## Batch Cadence
 
@@ -83,6 +102,7 @@ Created candidate execution policy:
 `docs/superpowers/plans/YYYY-MM-DD-slug.md`
 
 Control-law summary:
+- Planning substrate: ...
 - Semantic invariants: ...
 - Batch cadence: ...
 - Sensor governance: ...
@@ -94,6 +114,9 @@ Use `$reviewing-cybernetic-control-structures` before starting runtime /goal.
 
 ## Validation Checklist
 
+- [ ] Non-trivial implementation plans use `$superpowers:writing-plans` as planning substrate or stop/report missing infrastructure.
+- [ ] The plan records planning substrate status.
+- [ ] The plan does not self-substitute for a missing required planning substrate.
 - [ ] The plan distinguishes semantic invariants from tactical degrees of freedom.
 - [ ] The plan has dependency matrix.
 - [ ] The plan has batch cadence.
