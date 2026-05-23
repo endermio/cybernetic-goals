@@ -11,6 +11,23 @@ import sys
 from pathlib import Path
 
 
+HEADING_RE = re.compile(r"^(#{1,6})\s+(.+?)\s*$", re.MULTILINE)
+STATUS_LINE_RE = re.compile(r"(?im)^\s*Status\s*:\s*`?([^`\n]+?)`?\s*$")
+
+STATUS_ALIASES = {
+    "complete": "Complete",
+    "completed": "Complete",
+    "完成": "Complete",
+    "已完成": "Complete",
+    "approved": "Approved",
+    "批准": "Approved",
+    "已批准": "Approved",
+    "candidate": "Candidate",
+    "候选": "Candidate",
+    "候选状态": "Candidate",
+}
+
+
 def read(path: str) -> str:
     p = Path(path)
     if not p.exists():
@@ -18,9 +35,35 @@ def read(path: str) -> str:
     return p.read_text(encoding="utf-8")
 
 
-def status(text: str) -> str | None:
-    m = re.search(r"Status\s*:\s*`?([A-Za-z ]+)`?", text)
-    return m.group(1).strip() if m else None
+def canonical_status(value: str) -> str:
+    status = value.strip().strip("`").strip()
+    return STATUS_ALIASES.get(status.casefold(), status)
+
+
+def section_body(text: str, heading: str) -> str | None:
+    target = heading.casefold()
+    for match in HEADING_RE.finditer(text):
+        title = match.group(2).strip().rstrip("#").strip()
+        if title.casefold() != target:
+            continue
+
+        level = len(match.group(1))
+        start = match.end()
+        end = len(text)
+        for next_match in HEADING_RE.finditer(text, start):
+            if len(next_match.group(1)) <= level:
+                end = next_match.start()
+                break
+        return text[start:end]
+    return None
+
+
+def section_status(text: str, heading: str) -> str | None:
+    body = section_body(text, heading)
+    if body is None:
+        return None
+    m = STATUS_LINE_RE.search(body)
+    return canonical_status(m.group(1)) if m else None
 
 
 def main() -> int:
@@ -41,10 +84,20 @@ def main() -> int:
         errors.append(str(e))
         clarification = goal = plan = review = ""
 
-    if clarification and status(clarification) != "Complete":
-        errors.append("clarification status is not Complete")
-    if review and status(review) != "Approved":
-        errors.append("control review status is not Approved")
+    if clarification:
+        clarification_status = section_status(clarification, "Clarification Status")
+        if clarification_status != "Complete":
+            errors.append(f"clarification status under ## Clarification Status is not Complete: {clarification_status!r}")
+
+    if plan:
+        plan_status = section_status(plan, "Execution Policy Status")
+        if plan_status != "Candidate":
+            errors.append(f"execution policy status under ## Execution Policy Status must be Candidate: {plan_status!r}")
+
+    if review:
+        review_status = section_status(review, "Review Status")
+        if review_status != "Approved":
+            errors.append(f"control review status under ## Review Status is not Approved: {review_status!r}")
 
     for path, text, label in [
         (args.clarification, goal, "goal"),

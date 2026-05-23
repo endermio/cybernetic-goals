@@ -32,7 +32,9 @@ Follow `$cybernetic-superpowers-infrastructure`.
 
 This skill does not replace `$superpowers:writing-plans`.
 
-For non-trivial implementation plans, invoke or explicitly apply `$superpowers:writing-plans` as the planning substrate. This skill supplies the cybernetic constraints that the planning substrate must preserve:
+For non-trivial implementation plans, invoke `$superpowers:writing-plans` or load and follow its `SKILL.md` instructions as the required planning substrate. Merely mentioning the skill, citing it, or imitating generic planning is not sufficient.
+
+This skill supplies the cybernetic constraints that the planning substrate must preserve:
 
 - confirmed semantic invariants;
 - tactical degrees of freedom;
@@ -114,7 +116,7 @@ Use `$reviewing-cybernetic-control-structures` before starting runtime /goal.
 
 ## Validation Checklist
 
-- [ ] Non-trivial implementation plans use `$superpowers:writing-plans` as planning substrate or stop/report missing infrastructure.
+- [ ] Non-trivial implementation plans invoke `$superpowers:writing-plans` or load and follow its `SKILL.md` instructions, otherwise stop/report missing infrastructure.
 - [ ] The plan records planning substrate status.
 - [ ] The plan does not self-substitute for a missing required planning substrate.
 - [ ] The plan distinguishes semantic invariants from tactical degrees of freedom.

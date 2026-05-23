@@ -10,7 +10,18 @@
         "Mentions independent subagent review discipline as required for Approved control review unless explicit human approval exists.",
         "Mentions $superpowers:executing-plans, $superpowers:systematic-debugging, and $superpowers:verification-before-completion for runtime.",
         "States that unavailable required substrates cause a stop/report instead of self-substitution.",
+        "States that merely mentioning a Superpowers skill or imitating generic behavior is not sufficient.",
         "Does not say every cybernetic skill must invoke every Superpowers skill."
+      ]
+    },
+    {
+      "id": "manifest-includes-infrastructure-skill",
+      "prompt": "打包 cybernetic-goals skill pack。",
+      "expected_output": "The package manifest includes the cybernetic-superpowers-infrastructure skill and the human-readable infrastructure policy document.",
+      "assertions": [
+        "MANIFEST includes .agents/skills/cybernetic-superpowers-infrastructure/SKILL.md.",
+        "MANIFEST includes .agents/skills/cybernetic-superpowers-infrastructure/references/superpowers-infrastructure-policy.md.",
+        "MANIFEST includes docs/cybernetic-framework/superpowers-infrastructure-policy.md."
       ]
     }
   ]

@@ -19,9 +19,10 @@ Superpowers are infrastructure dependencies, not optional style suggestions.
 
 When a required substrate applies:
 
-- invoke or explicitly apply that substrate;
+- invoke the substrate, or load and follow its `SKILL.md` instructions when direct invocation is unavailable;
 - record the substrate status in the produced artifact;
 - do not silently replace it with ad hoc behavior from the current cybernetic skill;
+- do not treat merely mentioning the substrate, citing it, or imitating generic behavior as sufficient;
 - if the substrate is unavailable, stop and report the missing infrastructure.
 
 ## Stage Summary

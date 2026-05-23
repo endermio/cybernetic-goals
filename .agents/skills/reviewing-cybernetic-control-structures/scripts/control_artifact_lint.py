@@ -13,6 +13,23 @@ import sys
 from pathlib import Path
 
 
+HEADING_RE = re.compile(r"^(#{1,6})\s+(.+?)\s*$", re.MULTILINE)
+STATUS_LINE_RE = re.compile(r"(?im)^\s*Status\s*:\s*`?([^`\n]+?)`?\s*$")
+
+STATUS_ALIASES = {
+    "complete": "Complete",
+    "completed": "Complete",
+    "完成": "Complete",
+    "已完成": "Complete",
+    "approved": "Approved",
+    "批准": "Approved",
+    "已批准": "Approved",
+    "candidate": "Candidate",
+    "候选": "Candidate",
+    "候选状态": "Candidate",
+}
+
+
 def read(path: str) -> str:
     p = Path(path)
     if not p.exists():
@@ -25,10 +42,35 @@ def has_section(text: str, section: str) -> bool:
     return bool(pat.search(text))
 
 
-def status_value(text: str, label: str) -> str | None:
-    # Matches: Status: `Complete` or Status: Complete
-    m = re.search(rf"{re.escape(label)}\s*:\s*`?([A-Za-z ]+)`?", text)
-    return m.group(1).strip() if m else None
+def canonical_status(value: str) -> str:
+    status = value.strip().strip("`").strip()
+    return STATUS_ALIASES.get(status.casefold(), status)
+
+
+def section_body(text: str, heading: str) -> str | None:
+    target = heading.casefold()
+    for match in HEADING_RE.finditer(text):
+        title = match.group(2).strip().rstrip("#").strip()
+        if title.casefold() != target:
+            continue
+
+        level = len(match.group(1))
+        start = match.end()
+        end = len(text)
+        for next_match in HEADING_RE.finditer(text, start):
+            if len(next_match.group(1)) <= level:
+                end = next_match.start()
+                break
+        return text[start:end]
+    return None
+
+
+def section_status(text: str, heading: str) -> str | None:
+    body = section_body(text, heading)
+    if body is None:
+        return None
+    m = STATUS_LINE_RE.search(body)
+    return canonical_status(m.group(1)) if m else None
 
 
 def check_required_sections(name: str, text: str, sections: list[str], errors: list[str]) -> None:
@@ -64,9 +106,9 @@ def main() -> int:
             "Clarification Status", "Human Purpose", "Current Understanding",
             "Confirmed Decisions From Human", "Non-Goals", "Draft Verification Strategy"
         ], errors)
-        st = status_value(clarification, "Status")
+        st = section_status(clarification, "Clarification Status")
         if st != "Complete":
-            errors.append(f"clarification: Status must be Complete, got {st!r}")
+            errors.append(f"clarification: Status under ## Clarification Status must be Complete, got {st!r}")
 
     if goal:
         check_required_sections("goal", goal, [
@@ -88,15 +130,15 @@ def main() -> int:
 
     if plan:
         check_required_sections("plan", plan, [
-            "Execution Policy Status", "Source Contracts", "Confirmed Semantic Invariants",
-            "Tactical Degrees of Freedom", "Dependency Matrix", "Batch Cadence",
+            "Execution Policy Status", "Source Contracts", "Superpowers Planning Substrate",
+            "Confirmed Semantic Invariants", "Tactical Degrees of Freedom", "Dependency Matrix", "Batch Cadence",
             "Destructive Intermediate-State Policy", "Sensor / Test Governance",
             "Old Test Retirement and Rewrite Policy", "Phase Gates", "Execution Rhythm",
             "Stop Conditions", "Progress Log Rules"
         ], errors)
-        st = status_value(plan, "Status")
+        st = section_status(plan, "Execution Policy Status")
         if st not in {"Candidate", "Approved"}:
-            warnings.append(f"plan: expected Status Candidate or Approved, got {st!r}")
+            warnings.append(f"plan: expected Status under ## Execution Policy Status to be Candidate or Approved, got {st!r}")
         if args.clarification not in plan:
             warnings.append("plan: does not reference clarification path literally")
         if args.goal not in plan:
@@ -104,13 +146,13 @@ def main() -> int:
 
     if review:
         check_required_sections("review", review, [
-            "Review Status", "Inputs Reviewed", "Requirement Traceability",
+            "Review Status", "Inputs Reviewed", "Review Independence", "Requirement Traceability",
             "Goal Fidelity", "Control Law Quality", "Sensor / Test Governance",
             "Batch Rhythm", "Runtime Suitability", "Final Decision"
         ], errors)
-        st = status_value(review, "Status")
+        st = section_status(review, "Review Status")
         if st != "Approved":
-            errors.append(f"review: Status must be Approved for runtime compilation, got {st!r}")
+            errors.append(f"review: Status under ## Review Status must be Approved for runtime compilation, got {st!r}")
         for path, label in [(args.clarification, "clarification"), (args.goal, "goal"), (args.plan, "plan")]:
             if path not in review:
                 warnings.append(f"review: does not reference {label} path literally")

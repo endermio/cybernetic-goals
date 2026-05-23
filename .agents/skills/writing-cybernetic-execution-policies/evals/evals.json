@@ -19,6 +19,7 @@
       "expected_output": "The skill stops or marks the policy blocked because the required planning substrate is unavailable, instead of drafting an approved ad hoc plan.",
       "assertions": [
         "Mentions $superpowers:writing-plans as the required planning substrate for non-trivial implementation plans.",
+        "States that merely mentioning $superpowers:writing-plans or imitating generic planning is not sufficient.",
         "Stops or reports missing required planning infrastructure when the substrate is unavailable.",
         "Does not self-substitute with an unreviewed internal plan.",
         "Does not mark the execution policy Approved.",

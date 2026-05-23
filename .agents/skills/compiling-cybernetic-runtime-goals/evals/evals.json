@@ -8,12 +8,14 @@
       "assertions": [
         "Does not output final /goal.",
         "Requires review status Approved.",
+        "Uses section-aware status checks for ## Clarification Status, ## Execution Policy Status, and ## Review Status.",
+        "Does not allow --skip-guard unless an explicit phase-gate bypass acknowledgement is provided.",
         "Does not rewrite artifacts."
       ]
     },
     {
       "id": "compiles-runtime-goal",
-      "prompt": "clarification Complete, goal exists, plan exists, control review Approved；编译最终 /goal。",
+      "prompt": "clarification Complete, goal exists, execution policy status Candidate, control review Approved；编译最终 /goal。",
       "expected_output": "Outputs a final /goal referencing clarification, goal, plan, and review paths.",
       "assertions": [
         "References all four artifact paths.",

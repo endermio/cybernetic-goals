@@ -9,6 +9,10 @@
 .agents/skills/compiling-cybernetic-runtime-goals/evals/evals.json
 .agents/skills/compiling-cybernetic-runtime-goals/scripts/compile_runtime_goal.py
 .agents/skills/compiling-cybernetic-runtime-goals/scripts/control_chain_guard.py
+.agents/skills/cybernetic-superpowers-infrastructure/SKILL.md
+.agents/skills/cybernetic-superpowers-infrastructure/agents/openai.yaml
+.agents/skills/cybernetic-superpowers-infrastructure/evals/evals.json
+.agents/skills/cybernetic-superpowers-infrastructure/references/superpowers-infrastructure-policy.md
 .agents/skills/orchestrating-cybernetic-pregoal/SKILL.md
 .agents/skills/orchestrating-cybernetic-pregoal/agents/openai.yaml
 .agents/skills/orchestrating-cybernetic-pregoal/assets/orchestration-report-template.md
@@ -38,4 +42,6 @@
 .agents/skills/writing-cybernetic-goals/assets/goal-contract-template.md
 .agents/skills/writing-cybernetic-goals/evals/evals.json
 .agents/skills/writing-cybernetic-goals/references/control-contract-rules.md
+docs/cybernetic-framework/superpowers-infrastructure-policy.md
+MANIFEST.txt
 README.md

@@ -21,6 +21,8 @@ Cybernetic skills compile control structures. Superpowers provide planning, exec
 
 If a required substrate is unavailable, stop and report the missing infrastructure.
 
+When a required Superpowers skill applies, invoke it or load and follow its `SKILL.md` instructions. Merely mentioning the skill, citing it, or imitating generic behavior is not sufficient.
+
 Do not silently replace:
 
 - `$superpowers:writing-plans` with ad hoc plan writing;

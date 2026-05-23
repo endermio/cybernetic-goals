@@ -75,6 +75,8 @@ python3 .agents/skills/compiling-cybernetic-runtime-goals/scripts/compile_runtim
   --review docs/superpowers/control-reviews/YYYY-MM-DD-feature.md
 ```
 
+Do not use `--skip-guard` for official runtime `/goal` compilation. It is only for tests and requires the explicit `--i-understand-this-bypasses-phase-gates` acknowledgement.
+
 ## Output Format
 
 ```markdown

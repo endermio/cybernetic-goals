@@ -15,11 +15,15 @@ def main() -> int:
     ap.add_argument("--plan", required=True)
     ap.add_argument("--review", required=True)
     ap.add_argument("--out")
-    ap.add_argument("--skip-guard", action="store_true")
+    ap.add_argument("--skip-guard", action="store_true", help="Testing only. Bypasses phase-gate checks and must not be used for official runtime goal compilation.")
+    ap.add_argument("--i-understand-this-bypasses-phase-gates", action="store_true", help="Required with --skip-guard to make phase-gate bypass explicit.")
     args = ap.parse_args()
 
     here = Path(__file__).resolve().parent
     guard = here / "control_chain_guard.py"
+    if args.skip_guard and not args.i_understand_this_bypasses_phase_gates:
+        print("ERROR: --skip-guard is for tests only and requires --i-understand-this-bypasses-phase-gates", file=sys.stderr)
+        return 2
     if not args.skip_guard:
         cmd = [sys.executable, str(guard), "--clarification", args.clarification, "--goal", args.goal, "--plan", args.plan, "--review", args.review]
         result = subprocess.run(cmd, text=True, capture_output=True)
