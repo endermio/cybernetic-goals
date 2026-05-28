@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Guard for compiling a runtime /goal from approved control artifacts.
 
-This script checks phase-gate conditions. It does not decide product semantics.
+This script checks phase-gate conditions. It does not decide requirement semantics.
 """
 from __future__ import annotations
 
@@ -223,7 +223,7 @@ def main() -> int:
         "first create a plan",
         "Start with $superpowers:writing-plans",
         "Start with `$superpowers:writing-plans`",
-        "write an implementation plan and then execute",
+        "write an execution policy and then execute",
     ]
     for phrase in forbidden:
         if phrase.lower() in goal.lower():

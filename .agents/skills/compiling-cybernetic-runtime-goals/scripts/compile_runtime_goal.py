@@ -17,7 +17,7 @@ def main() -> int:
     ap.add_argument("--plan", required=True)
     ap.add_argument("--review", required=True)
     ap.add_argument("--out")
-    ap.add_argument("--skip-guard", action="store_true", help="Testing only. Bypasses phase-gate checks and must not be used for official runtime goal compilation.")
+    ap.add_argument("--skip-guard", action="store_true", help="Internal validation only. Bypasses phase-gate checks and must not be used for official runtime goal compilation.")
     ap.add_argument("--i-understand-this-bypasses-phase-gates", action="store_true", help="Required with --skip-guard to make phase-gate bypass explicit.")
     args = ap.parse_args()
     if not args.requirements:
@@ -26,7 +26,7 @@ def main() -> int:
     here = Path(__file__).resolve().parent
     guard = here / "control_chain_guard.py"
     if args.skip_guard and not args.i_understand_this_bypasses_phase_gates:
-        print("ERROR: --skip-guard is for tests only and requires --i-understand-this-bypasses-phase-gates", file=sys.stderr)
+        print("ERROR: --skip-guard is for internal validation only and requires --i-understand-this-bypasses-phase-gates", file=sys.stderr)
         return 2
     if not args.skip_guard:
         cmd = [sys.executable, str(guard), "--requirements", args.requirements, "--goal", args.goal, "--plan", args.plan, "--review", args.review]
@@ -39,7 +39,7 @@ def main() -> int:
             return result.returncode
 
     design_boundary = "rewrite the solution design, " if args.design else ""
-    design_sensor_clause = " or the solution design" if args.design else ""
+    design_sensor_clause = " or solution-design invariants" if args.design else ""
     conflict_clause = "design, " if args.design else ""
     if args.design:
         context_clause = (
@@ -64,7 +64,7 @@ def main() -> int:
         "If runtime cannot load these skills, follow the equivalent discipline already written in the approved plan and control review. "
         "Execute serially according to the approved batch rhythm. "
         "Intermediate states inside a batch may be broken if the approved plan allows it, but each batch must end in the approved openable/verifiable state. "
-        f"Treat tests as sensors, not objectives; if a sensor conflicts with confirmed requirements{design_sensor_clause}, stop or follow the approved sensor-governance rule. "
+        f"Treat approved sensors, checks, and evidence channels as sensors, not objectives; if an evidence channel conflicts with confirmed requirements{design_sensor_clause}, stop or follow the approved sensor-governance rule. "
         "If any referenced artifact is missing, not approved, or internally inconsistent, stop and report the smallest required human decision. "
         f"If the requirements analysis, {conflict_clause}goal, plan, or review conflict or become insufficient, stop and report the smallest required human decision."
     )

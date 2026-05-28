@@ -1,23 +1,23 @@
 ---
 name: writing-cybernetic-execution-policies
-description: 'Use after an approved requirements analysis brief, any required solution design, and goal contract exist, before starting an executable /goal. Creates an implementation plan as a cybernetic execution policy: dependency matrix, batch cadence, destructive intermediate-state policy, test/sensor governance, semantic invariants, design invariants, tactical degrees of freedom, phase gates, and execution rhythm. Does not implement code and does not start /goal execution.'
+description: 'Use after an approved requirements analysis brief, any required solution design, and control contract exist, before starting an executable /goal. Creates a cybernetic execution policy for controlled execution: dependency matrix, batch cadence, destructive intermediate-state policy, sensor/evidence governance, semantic invariants, design invariants, tactical degrees of freedom, phase gates, and execution rhythm. Does not execute target work and does not start /goal execution.'
 ---
 
 # Writing Cybernetic Execution Policies
 
 ## Overview
 
-Create the execution control law for a complex AI coding task.
+Create the execution control law for controlled work.
 
 This skill converts:
 
 - requirements analysis brief
 - solution design, when Design Gate is required or a design exists
-- goal contract
+- control contract
 
 into:
 
-- candidate execution policy / implementation plan
+- candidate execution policy
 
 The plan is not approved until `$reviewing-cybernetic-control-structures` marks it Approved.
 
@@ -25,7 +25,7 @@ Use `assets/execution-policy-template.md`.
 
 ## Core Boundary
 
-This skill does not analyze requirements, does not write the goal contract, does not review its own plan, and does not implement code.
+This skill does not analyze requirements, does not write the control contract, does not review its own policy, and does not execute target work.
 
 ## Required Infrastructure
 
@@ -33,7 +33,7 @@ Follow `$cybernetic-superpowers-infrastructure`.
 
 This skill does not replace `$superpowers:writing-plans`.
 
-For non-trivial implementation plans, invoke `$superpowers:writing-plans` or load and follow its `SKILL.md` instructions as the required planning substrate. Merely mentioning the skill, citing it, or imitating generic planning is not sufficient.
+For non-trivial execution policies, invoke `$superpowers:writing-plans` or load and follow its `SKILL.md` instructions as the required planning substrate. Merely mentioning the skill, citing it, or imitating generic planning is not sufficient.
 
 This skill supplies the cybernetic constraints that the planning substrate must preserve:
 
@@ -43,10 +43,10 @@ This skill supplies the cybernetic constraints that the planning substrate must 
 - dependency matrix requirement;
 - batch cadence;
 - destructive intermediate-state policy;
-- sensor/test governance;
-- stale test retirement and rewrite policy.
+- sensor/evidence governance;
+- stale sensor retirement and rewrite policy.
 
-If `$superpowers:writing-plans` is unavailable for a non-trivial implementation plan, stop and report that required planning infrastructure is missing. Do not self-substitute with an unreviewed internal plan.
+If `$superpowers:writing-plans` is unavailable for a non-trivial execution policy, stop and report that required planning infrastructure is missing. Do not self-substitute with an unreviewed internal policy.
 
 ## Required Sections
 
@@ -59,8 +59,8 @@ The execution policy must include:
 5. Dependency Matrix
 6. Batch Cadence
 7. Destructive Intermediate-State Policy
-8. Sensor / Test Governance
-9. Old Test Retirement and Rewrite Policy
+8. Sensor / Evidence Governance
+9. Stale Sensor Retirement and Rewrite Policy
 10. Phase Gates
 11. Execution Rhythm
 12. Stop Conditions
@@ -71,32 +71,32 @@ The execution policy must include:
 
 For large structural changes:
 
-- intermediate steps inside a batch may temporarily break build, tests, or UI;
+- intermediate steps inside a batch may temporarily break local observability or artifact consistency;
 - each batch must end in an openable or meaningfully verifiable state;
-- batch size should be large enough to avoid test-driven local minima;
+- batch size should be large enough to avoid sensor-driven local minima;
 - batch size should be small enough that failures remain diagnosable.
 
-## Sensor / Test Governance
+## Sensor / Evidence Governance
 
-Tests are sensors, not the objective.
+Approved sensors, checks, and evidence channels are sensors, not objectives.
 
-Classify tests as:
+Classify sensors as:
 
 - strong sensors: preserve;
 - weak or stale sensors: inspect before obeying;
 - obsolete sensors: may be retired and rewritten.
 
-If many tests conflict with confirmed product semantics, implement the product behavior first, then rewrite product-level tests.
+If many sensors conflict with confirmed requirement semantics, preserve the target state first, then rewrite the affected evidence channels.
 
-Do not let brittle old tests define the target behavior.
+Do not let brittle old sensors define the target state.
 
 ## Design Boundary
 
 If a solution design exists or Design Gate was required, the execution policy must reference the design under `Source Contracts`.
 
-The policy may choose tactical implementation details, batch cadence, and file/workstream organization. It must not redesign:
+The policy may choose tactical execution details, batch cadence, and workstream organization. It must not redesign:
 
-- domain objects, actors, roles, or relationships;
+- controlled objects, actors, roles, or relationships;
 - information/state/evidence flow;
 - interfaces/contracts;
 - lifecycle or failure model;
@@ -133,7 +133,7 @@ Use `$reviewing-cybernetic-control-structures` before starting runtime /goal.
 
 ## Validation Checklist
 
-- [ ] Non-trivial implementation plans invoke `$superpowers:writing-plans` or load and follow its `SKILL.md` instructions, otherwise stop/report missing infrastructure.
+- [ ] Non-trivial execution policies invoke `$superpowers:writing-plans` or load and follow its `SKILL.md` instructions, otherwise stop/report missing infrastructure.
 - [ ] The plan records planning substrate status.
 - [ ] The plan does not self-substitute for a missing required planning substrate.
 - [ ] The plan distinguishes semantic invariants from tactical degrees of freedom.
@@ -143,7 +143,7 @@ Use `$reviewing-cybernetic-control-structures` before starting runtime /goal.
 - [ ] The plan has batch cadence.
 - [ ] The plan allows destructive intermediate states only within approved batches.
 - [ ] Each batch ends in an openable/verifiable state.
-- [ ] The plan treats tests as sensors, not objectives.
-- [ ] The plan includes stale test retirement/rewrite policy.
+- [ ] The plan treats approved sensors, checks, and evidence channels as sensors, not objectives.
+- [ ] The plan includes stale sensor retirement/rewrite policy.
 - [ ] The plan does not claim to be approved.
-- [ ] The skill does not execute implementation.
+- [ ] The skill does not execute target work.

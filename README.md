@@ -84,7 +84,7 @@ For simple work, the router should reject the full pipeline and recommend an inl
 
 ## Scripts
 
-The scripts are intentionally small and deterministic. They check structure and phase gates; they do not decide product semantics.
+The scripts are intentionally small and deterministic. They check structure and phase gates; they do not decide requirement semantics.
 
 - `control_artifact_lint.py`: lint requirements analysis/design/goal/plan/review artifacts.
 - `check_pregoal_inputs.py`: check that orchestration starts from the expected requirements analysis input.

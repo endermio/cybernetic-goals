@@ -10,11 +10,11 @@ Status: `Incomplete`
 
 ## Current Understanding
 
-[Concise summary of the requested capability, audit, research task, process, or artifact in task/product language.]
+[Concise summary of the requested capability, evaluation task, process, or artifact in task language.]
 
 ## Context Inspected
 
-- [file/doc/script]
+- [source artifact]
 - [important existing constraint]
 
 ## Requirement Semantics
@@ -44,9 +44,9 @@ Outside scope:
 | Control element | Current analysis |
 |---|---|
 | Objective | [draft objective] |
-| Controlled object | [product/code/data/process/report/research area] |
-| Candidate sensors | [tests/builds/screenshots/evals/logs/reports/observations] |
-| Candidate actuators | [files/tools/subsystems/procedures] |
+| Controlled object | [target object/process/report/work artifact] |
+| Candidate sensors | [checks/evidence channels/logs/reports/observations] |
+| Candidate actuators | [source artifacts/tools/subsystems/procedures] |
 | Constraints | [invariants/non-goals] |
 | Disturbances | [ambiguities/risks/unobservables] |
 | Stop conditions | [where Codex must stop] |
@@ -96,7 +96,7 @@ These belong in `$designing-cybernetic-solutions`, not requirements analysis.
 
 ## Deferred Planning / Execution Details
 
-These should be handled later in goal writing, planning, or implementation.
+These should be handled later in goal writing, execution-policy writing, or execution.
 
 - [detail]
 

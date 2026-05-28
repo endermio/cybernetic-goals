@@ -1,6 +1,6 @@
 ---
 name: designing-cybernetic-solutions
-description: 'Use after requirements analysis is complete and before goal writing when a task has a Design Gate: the target semantics are known but the solution structure is not yet explicit. Creates a general cybernetic solution design for software or non-software work: core objects/actors/roles, relationships, information or state flow, boundaries, mechanisms, interfaces/contracts, lifecycle, failure model, evidence/sensor model, design decisions, and mappings to goal and execution policy. Does not write goal contracts, execution policies, control reviews, runtime /goal commands, or implementation code.'
+description: 'Use after requirements analysis when the required solution model is not explicit. Creates a core cybernetic solution model: controlled objects, roles, relationships, flows, boundaries, mechanisms, interfaces/contracts, lifecycle, failure model, evidence model, design decisions, and mappings to control contract and execution policy. Does not write control contracts, execution policies, control reviews, runtime /goal commands, or execute target work.'
 ---
 
 # Designing Cybernetic Solutions
@@ -15,7 +15,7 @@ This skill resolves the `Design Gate` by turning:
 requirements analysis -> controllable solution model -> goal-ready design artifact
 ```
 
-It is not a software-architecture-only skill. For software tasks the design may describe domain models, APIs, UI information architecture, state flow, permissions, and migration. For non-software tasks it may describe roles, procedures, audit models, research variables, evidence chains, decision points, or operating protocols.
+The design expresses the controllable structure needed for later control artifacts. It must stay in the core cybernetic vocabulary and avoid importing adapter-specific terms.
 
 Output:
 
@@ -31,15 +31,15 @@ This skill must not:
 
 - analyze unresolved requirement semantics from scratch;
 - write a goal contract;
-- write an execution policy or implementation plan;
+- write an execution policy;
 - review the whole control structure;
 - compile or start a runtime `/goal`;
-- implement code;
-- force software-specific architecture terms onto non-software work.
+- execute target work;
+- force adapter-specific terms onto the core solution model.
 
 This skill may:
 
-- inspect the completed requirements analysis brief and relevant docs/code/specs;
+- inspect the completed requirements analysis brief and relevant source artifacts;
 - ask a small number of high-value design questions when solution structure cannot be safely inferred;
 - create or update one solution design artifact;
 - record open design questions and stop before approval;
@@ -63,7 +63,7 @@ If the requirements analysis is missing, incomplete, or has open blocking human 
 
 ## Optional Infrastructure
 
-Use `$superpowers:brainstorming` only when the design space is exploratory, product/design-heavy, or the user explicitly asks for design exploration.
+Use `$superpowers:brainstorming` only when the design space is exploratory or the user explicitly asks for design exploration.
 
 Do not require brainstorming for a small Design Gate where the requirements analysis or existing specs already fix the core structure. Record brainstorming substrate status in the design:
 
@@ -78,12 +78,12 @@ Design Gate is required when the goal is clear but the solution model is not.
 Typical signals:
 
 - multiple reasonable solution structures exist;
-- domain objects, actors, roles, or relationships are unclear;
+- controlled objects, actors, roles, or relationships are unclear;
 - system/process boundaries are unclear;
 - information flow, state flow, evidence flow, or decision flow is unclear;
 - interfaces, contracts, procedures, or user interactions are unclear;
 - a new abstraction must be introduced;
-- an old concept must be replaced without letting old implementation define the requirement;
+- an old concept must be replaced without letting old realization details define the requirement;
 - several subsystems or roles must coordinate around one model;
 - runtime execution would otherwise invent objects, boundaries, sensors, or flow.
 
@@ -124,7 +124,7 @@ Use one of:
 
 Do not mark self-authored design `Approved` solely because it looks consistent.
 
-Open design questions that affect product semantics, domain relationships, interfaces/contracts, evidence model, or boundaries block `Approved`.
+Open design questions that affect requirement semantics, controlled relationships, interfaces/contracts, evidence model, or boundaries block `Approved`.
 
 ## Process
 
@@ -137,7 +137,7 @@ Open design questions that affect product semantics, domain relationships, inter
 7. Separate design invariants from tactical degrees of freedom.
 8. Map design elements to goal implications and execution-policy implications.
 9. If material design questions remain, record them and stop without marking Approved.
-10. Do not create goal, plan, review, runtime `/goal`, or implementation files.
+10. Do not create goal, plan, review, runtime `/goal`, or target-work files.
 
 ## Output Format
 
@@ -180,7 +180,7 @@ Do not write the goal contract until this design decision is resolved or the hum
 
 - [ ] Requirements analysis is complete before design is approved.
 - [ ] The design path uses the requirements analysis date/slug.
-- [ ] The design is general, not software-only unless the task is software.
+- [ ] The design stays within core cybernetic vocabulary unless an explicit adapter supplies additional terms.
 - [ ] Conceptual design and detailed design are both present.
 - [ ] Core objects/actors/roles, relationships, flows, and boundaries are explicit.
 - [ ] Interfaces/contracts, lifecycle/state, failure model, and evidence/sensor model are explicit when relevant.
@@ -188,4 +188,4 @@ Do not write the goal contract until this design decision is resolved or the hum
 - [ ] Design invariants are separated from tactical degrees of freedom.
 - [ ] Design-to-goal and design-to-execution mappings are present.
 - [ ] `$superpowers:brainstorming` is used only when required by exploratory design.
-- [ ] No goal, execution policy, control review, runtime `/goal`, or implementation code was created.
+- [ ] No goal, execution policy, control review, runtime `/goal`, or target-work artifact was created.

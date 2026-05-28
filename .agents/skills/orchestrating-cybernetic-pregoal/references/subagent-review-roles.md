@@ -10,8 +10,8 @@ Check:
 
 - Every confirmed human decision appears in the goal and plan.
 - Every confirmed human decision that affects structure appears in the solution design.
-- No confirmed semantic decision is weakened, reworded into ambiguity, or converted into an implementation option.
-- No new product requirement appears without source.
+- No confirmed semantic decision is weakened, reworded into ambiguity, or converted into an execution option.
+- No new requirement appears without source.
 
 ## Solution Design Fidelity Reviewer
 
@@ -33,7 +33,7 @@ Check:
 
 - Goal has success conditions, boundaries, invariants, verification surfaces, stop conditions, and source of truth.
 - Goal does not ask runtime `/goal` to generate or approve its own plan.
-- Goal separates product semantics from execution tactics.
+- Goal separates requirement semantics from execution tactics.
 
 ## Execution Policy / Cadence Reviewer
 
@@ -45,18 +45,18 @@ Check:
 - Plan defines batch cadence.
 - Plan defines destructive intermediate-state policy.
 - Plan defines batch-end openable or verifiable state.
-- Plan avoids both tiny test-bound steps and huge unobservable batches.
+- Plan avoids both tiny sensor-bound steps and huge unobservable batches.
 
-## Sensor Governance Reviewer
+## Sensor / Evidence Governance Reviewer
 
 Input: solution design when present, goal contract, and execution policy.
 
 Check:
 
-- Tests are treated as sensors, not objectives.
-- Old tests may be preserved, retired, or rewritten according to explicit rules.
-- Product-level verification dominates brittle implementation-level tests.
-- Sensor hierarchy is clear: build, API smoke, screenshots, product behavior, old unit tests.
+- Approved sensors, checks, and evidence channels are treated as sensors, not objectives.
+- Old sensors may be preserved, retired, or rewritten according to explicit rules.
+- Target-state evidence dominates brittle realization-detail sensors.
+- Sensor hierarchy is explicit and stays in core cybernetic vocabulary.
 
 ## Runtime Boundary Reviewer
 

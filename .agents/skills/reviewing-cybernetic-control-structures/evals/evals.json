@@ -7,9 +7,9 @@
       "expected_output": "Review status is Needs Revision and identifies missing sensor governance.",
       "assertions": [
         "Does not approve.",
-        "Mentions sensor/test governance.",
+        "Mentions sensor/evidence governance.",
         "Does not output final /goal.",
-        "Does not implement code."
+        "Does not execute target work."
       ]
     },
     {
@@ -20,7 +20,7 @@
         "Records whether subagents were authorized.",
         "Does not mark self-review as Approved.",
         "Uses Needs Independent Review when no subagent authorization, human approval, or other independent reviewer exists.",
-        "Does not run implementation or dispatch implementer agents.",
+        "Does not run target execution or dispatch execution agents.",
         "Does not output final /goal."
       ]
     },
@@ -31,18 +31,18 @@
       "assertions": [
         "Mentions independent review passes.",
         "Includes requirement traceability, goal fidelity, sensor governance, execution cadence, and runtime safety.",
-        "Does not run implementation.",
-        "Does not dispatch implementer agents.",
+        "Does not run target execution.",
+        "Does not dispatch execution agents.",
         "Approval is allowed only after independent review discipline is satisfied."
       ]
     },
     {
       "id": "post-review-substantive-change-needs-re-review",
-      "prompt": "独立 reviewer 发现 evidence schema 和 progress log 字段有 blocker。主 agent 修改了 plan 和 goal 来修这些 blocker，但修改后没有让独立 reviewer 复审。",
+      "prompt": "独立 reviewer 发现 evidence structure 和 progress log 字段有 blocker。主 agent 修改了 plan 和 goal 来修这些 blocker，但修改后没有让独立 reviewer 复审。",
       "expected_output": "The review must not mark Approved; it records a Dirty or Needs Re-review state because a substantive post-review mutation has not been independently observed.",
       "assertions": [
         "Mentions the Final Observer Rule or equivalent no-approval-after-unreviewed-mutation rule.",
-        "Classifies evidence schema and progress log field changes as substantive changes.",
+        "Classifies evidence structure and progress log field changes as substantive changes.",
         "Does not treat lint PASS as semantic or control-policy approval.",
         "Uses Dirty or Needs Re-review instead of Approved.",
         "Requires final independent re-review reporting no Blocking or Major findings before Approved is allowed."
@@ -50,13 +50,13 @@
     },
     {
       "id": "reviews-design-fidelity",
-      "prompt": "审查 requirements analysis、solution design、goal、plan。plan 把 design 中的实时 pull 信息流改成 push/reporting，并把 tactical UI 组件名当成 semantic invariant。",
+      "prompt": "审查 requirements analysis、solution design、goal、plan。plan 把 design 中的实时 direct-observation 信息流改成 mediated-reporting，并把 tactical observer-surface name 当成 semantic invariant。",
       "expected_output": "Review status is Needs Revision and identifies design fidelity violations.",
       "assertions": [
         "Reviews the chain as requirements analysis → design → goal → plan.",
         "Includes Design Fidelity as a review dimension.",
-        "Flags changing pull information flow to push/reporting as a design fidelity issue.",
-        "Flags tactical UI component naming being frozen as semantic invariant.",
+        "Flags changing direct-observation information flow to mediated-reporting as a design fidelity issue.",
+        "Flags tactical observer-surface naming being frozen as semantic invariant.",
         "Does not output a final /goal."
       ]
     }

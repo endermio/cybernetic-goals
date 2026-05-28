@@ -1,6 +1,6 @@
 ---
 name: clarifying-cybernetic-tasks
-description: 'Deprecated compatibility alias for analyzing-cybernetic-requirements. Use only for older prompts that invoke clarification terminology. Route to $analyzing-cybernetic-requirements and create requirements analysis briefs under docs/cybernetics/requirements/. Do not create solution designs, goal contracts, execution policies, control reviews, runtime /goal commands, or implementation code.'
+description: 'Deprecated compatibility alias for analyzing-cybernetic-requirements. Use only for older prompts that invoke clarification terminology. Route to $analyzing-cybernetic-requirements and create requirements analysis briefs under docs/cybernetics/requirements/. Do not create solution designs, control contracts, execution policies, control reviews, runtime /goal commands, or target-work artifacts.'
 ---
 
 # Clarifying Cybernetic Tasks
@@ -27,4 +27,4 @@ Compatibility terms:
 - "Clarification Status" means "Requirements Analysis Status".
 - "Confirmed Decisions From Human" means "Confirmed Requirement Decisions".
 
-The boundary is unchanged: this alias may analyze requirements, rubrics, safe defaults, blocking decisions, and gates, but it must not resolve solution design, write goals, write plans, review control structures, compile runtime `/goal`, or implement code.
+The boundary is unchanged: this alias may analyze requirements, rubrics, safe defaults, blocking decisions, and gates, but it must not resolve solution design, write goals, write plans, review control structures, compile runtime `/goal`, or execute target work.

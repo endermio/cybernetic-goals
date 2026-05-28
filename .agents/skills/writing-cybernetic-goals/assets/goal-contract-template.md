@@ -52,7 +52,7 @@ Broader checks:
 
 Artifact checks:
 
-- [screenshots/logs/eval reports]
+- [evidence artifacts/logs/evaluation reports]
 
 ## Evaluation Rubric / Error Function
 
@@ -81,8 +81,8 @@ For each checkpoint:
 ## Repair Policy
 
 - Use root-cause debugging for unclear failures.
-- Do not weaken semantic invariants to pass tests.
-- Do not treat stale tests as authoritative sensors.
+- Do not weaken semantic invariants to satisfy sensors.
+- Do not treat stale sensors as authoritative.
 - Stop if a confirmed human decision must be changed.
 
 ## Progress Log

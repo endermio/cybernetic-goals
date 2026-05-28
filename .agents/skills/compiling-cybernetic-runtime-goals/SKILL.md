@@ -1,6 +1,6 @@
 ---
 name: compiling-cybernetic-runtime-goals
-description: 'Use only after requirements analysis, any required solution design, goal contract, execution policy, and approved control review exist. Produces the final executable Codex /goal command that references the approved files. Does not analyze requirements, design solutions, write plans, review plans, or implement code.'
+description: 'Use only after requirements analysis, any required solution design, control contract, execution policy, and approved control review exist. Produces the final executable Codex /goal command that references the approved files. Does not analyze requirements, design solutions, write execution policies, review control artifacts, or execute target work.'
 ---
 
 # Compiling Cybernetic Runtime Goals
@@ -85,7 +85,7 @@ python3 .agents/skills/compiling-cybernetic-runtime-goals/scripts/compile_runtim
   --review docs/cybernetics/control-reviews/YYYY-MM-DD-feature.md
 ```
 
-Do not use `--skip-guard` for official runtime `/goal` compilation. It is only for tests and requires the explicit `--i-understand-this-bypasses-phase-gates` acknowledgement.
+Do not use `--skip-guard` for official runtime `/goal` compilation. It is only for internal validation and requires the explicit `--i-understand-this-bypasses-phase-gates` acknowledgement.
 
 ## Output Format
 
@@ -104,7 +104,7 @@ Preflight:
 - Control review: Approved
 ```
 
-Do not create or modify implementation files.
+Do not create or modify target-work artifacts.
 
 ## Validation Checklist
 
@@ -115,4 +115,4 @@ Do not create or modify implementation files.
 - [ ] The final `/goal` does not ask runtime Codex to write a new plan.
 - [ ] The final `/goal` does not ask runtime Codex to create or revise solution design.
 - [ ] The final `/goal` includes executing, debugging, and completion-verification discipline.
-- [ ] The skill did not implement code.
+- [ ] The skill did not execute target work.

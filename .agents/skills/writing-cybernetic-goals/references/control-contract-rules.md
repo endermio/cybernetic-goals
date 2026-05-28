@@ -10,12 +10,12 @@ A goal contract is not a runtime command. It is a frozen statement of:
 
 When Design Gate is required, the goal contract is downstream of the solution design. It should preserve design invariants and boundary decisions without redoing the design or freezing tactical details as semantics.
 
-For complex implementation work, do not let the runtime `/goal` write its own plan. The goal contract must be paired with an approved execution policy and an approved control review before execution.
+For complex controlled work, do not let the runtime `/goal` write its own policy. The goal contract must be paired with an approved execution policy and an approved control review before execution.
 
 ## Bad runtime goal pattern
 
 ```text
-/goal First write a plan, then implement it...
+/goal First write a plan, then execute it...
 ```
 
 ## Good runtime goal pattern

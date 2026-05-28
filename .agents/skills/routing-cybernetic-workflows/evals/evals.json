@@ -2,8 +2,8 @@
   "skill_name": "routing-cybernetic-workflows",
   "evals": [
     {
-      "id": "small-test-fix-direct",
-      "prompt": "使用 $routing-cybernetic-workflows 分析任务：修复 tests/date-format.test.ts 当前失败的日期格式单测，不改变其他功能。",
+      "id": "small-check-fix-direct",
+      "prompt": "使用 $routing-cybernetic-workflows 分析任务：修复当前失败的一个局部检查，不改变相关目标行为。",
       "expected_output": "Route to Level 0 or Level 1, not a full workflow.",
       "assertions": [
         "Classifies the task as Level 0 or Level 1.",
@@ -13,88 +13,88 @@
       ]
     },
     {
-      "id": "bounded-supervision-display-fix-is-not-full-pipeline",
-      "prompt": "使用 $routing-cybernetic-workflows 分析任务：已有协同监管 requirements analysis 和 goal。现在发现本地预览里 REG/PARK 被显示成企业 C1，需要修正 SupervisionNodePage、SupervisionLogPage 和本地 fixture，让监管节点/园区节点不被当成企业展示。不改变 schema、权限模型、拉取语义或 base58 哈希语义。",
+      "id": "bounded-observer-display-fix-is-not-full-pipeline",
+      "prompt": "使用 $routing-cybernetic-workflows 分析任务：已有 requirements analysis 和 goal。现在发现本地预览里 Actor A/B 被显示成 Entity C，需要修正观察表面和本地 fixture，让不同角色不被混同展示。不改变结构契约、授权模型、观测流语义或标识符语义。",
       "expected_output": "Route to Level 1 or Level 2, not Level 3, because this is a bounded correction inside an already analyzed feature.",
       "assertions": [
         "Classifies the task as Level 1 or Level 2.",
         "Does not recommend the full pre-goal pipeline.",
         "Explains that existing control artifacts already fix the semantics.",
-        "Explains that no new schema, permission, pull-vs-reporting, or enterprise/corpId decision is required.",
+        "Explains that no new structure-contract, authorization, observation-flow, or entity-mapping decision is required.",
         "Recommends a bounded repair prompt or small file-based goal."
       ]
     },
     {
-      "id": "mentions-permission-but-no-new-permission-semantics",
-      "prompt": "使用 $routing-cybernetic-workflows 评估任务：已有权限模型不变，只修一个页面的权限提示文案和截图断言，让无权限状态显示中文提示。",
+      "id": "mentions-authorization-but-no-new-authorization-semantics",
+      "prompt": "使用 $routing-cybernetic-workflows 评估任务：已有授权模型不变，只修一个观察表面的授权提示文案和证据断言，让未授权状态显示明确提示。",
       "expected_output": "Do not route to full pipeline merely because permissions are mentioned.",
       "assertions": [
         "Classifies as Level 0, Level 1, or Level 2.",
-        "Does not classify as Level 3 solely due to permission wording.",
-        "Distinguishes permission-related UI text from new permission semantics.",
+        "Does not classify as Level 3 solely due to authorization wording.",
+        "Distinguishes authorization-related observer text from new authorization semantics.",
         "Recommends a lightweight workflow."
       ]
     },
     {
-      "id": "new-supervision-semantics-still-full-pipeline",
-      "prompt": "使用 $routing-cybernetic-workflows 评估任务：我们还没有决定监管节点、园区节点、企业节点和 corpId 的关系，也没决定日志是拉取还是上报，现在要实现协同监管。",
-      "expected_output": "Route to Level 3 because product/domain semantics and control structure are unresolved.",
+      "id": "new-relationship-semantics-still-full-pipeline",
+      "prompt": "使用 $routing-cybernetic-workflows 评估任务：我们还没有决定 Actor A、Group B、Entity C 和 identifier 的关系，也没决定记录是直接观测还是中介上报，现在要建立新的控制关系。",
+      "expected_output": "Route to Level 3 because requirement semantics and control structure are unresolved.",
       "assertions": [
         "Classifies as Level 3.",
-        "Mentions unresolved domain semantics.",
-        "Mentions unresolved log acquisition semantics.",
+        "Mentions unresolved requirement semantics.",
+        "Mentions unresolved observation-flow semantics.",
         "Recommends $analyzing-cybernetic-requirements.",
         "Recommends $orchestrating-cybernetic-pregoal after requirements analysis is complete."
       ]
     },
     {
-      "id": "full-pipeline-for-ambiguous-permission-data-visibility",
-      "prompt": "使用 $routing-cybernetic-workflows 分析任务：我们要重构权限模型，从租户级改成组织、项目、环境三层授权，但还没决定迁移策略、数据可见范围和旧权限如何兼容。",
-      "expected_output": "Route to Level 3 or Level 4 depending on risk; likely Level 3 unless production data is involved.",
+      "id": "full-pipeline-for-ambiguous-authorization-visibility",
+      "prompt": "使用 $routing-cybernetic-workflows 分析任务：我们要重构授权模型，从单层改成三层授权，但还没决定迁移策略、可见范围和旧授权如何兼容。",
+      "expected_output": "Route to Level 3 or Level 4 depending on risk; likely Level 3 unless live external state is involved.",
       "assertions": [
         "Classifies as Level 3 or Level 4.",
-        "Mentions unresolved permission/data visibility semantics.",
+        "Mentions unresolved authorization/visibility semantics.",
         "Mentions migration or compatibility uncertainty.",
-        "Does not recommend direct implementation.",
+        "Does not recommend direct execution.",
         "Recommends requirements analysis before goal execution."
       ]
     },
     {
-      "id": "high-risk-production-migration",
-      "prompt": "使用 $routing-cybernetic-workflows 分析任务：今晚要对生产数据库做不可逆 migration，并影响真实客户权限和账务数据。",
-      "expected_output": "Route to Level 4 because the task is production-impacting, irreversible, and involves permissions/billing/customer data.",
+      "id": "high-risk-live-state-transition",
+      "prompt": "使用 $routing-cybernetic-workflows 分析任务：今晚要对真实外部状态做不可逆迁移，并影响真实参与者授权和结算记录。",
+      "expected_output": "Route to Level 4 because the task is live-state-impacting, irreversible, and involves authorization/settlement/participant records.",
       "assertions": [
         "Classifies as Level 4.",
         "Mentions human-gated workflow.",
-        "Mentions production or irreversible data risk.",
+        "Mentions live-state or irreversible record risk.",
         "Does not allow ungated runtime /goal execution."
       ]
     },
     {
-      "id": "screenshot-update-not-full-pipeline",
-      "prompt": "使用 $routing-cybernetic-workflows 分析任务：已有页面语义和 goal 都确定了，只是截图基线里的按钮文案从 hash 改成 哈希，需要更新 screenshot 断言。",
-      "expected_output": "Route to Level 0, 1, or 2; screenshots alone should not force full pipeline.",
+      "id": "evidence-baseline-update-not-full-pipeline",
+      "prompt": "使用 $routing-cybernetic-workflows 分析任务：已有观察语义和 goal 都确定了，只是证据基线里的按钮文案从 hash 改成 哈希，需要更新证据断言。",
+      "expected_output": "Route to Level 0, 1, or 2; evidence artifacts alone should not force full pipeline.",
       "assertions": [
         "Does not classify as Level 3.",
-        "Explains that screenshots are sensors, and the semantic decision is already fixed.",
+        "Explains that evidence artifacts are sensors, and the semantic decision is already fixed.",
         "Recommends a bounded repair prompt or lightweight goal.",
         "Does not recommend requirements analysis."
       ]
     },
     {
-      "id": "schema-mentioned-but-semantics-fixed",
-      "prompt": "使用 $routing-cybernetic-workflows 分析任务：已有 approved plan 明确了 schema migration。现在只需要修 migration 文件里的索引名和对应 smoke 断言，语义不变。",
-      "expected_output": "Route to Level 1 or Level 2, not Level 3, because schema is mentioned but schema semantics are already fixed.",
+      "id": "structure-mentioned-but-semantics-fixed",
+      "prompt": "使用 $routing-cybernetic-workflows 分析任务：已有 approved plan 明确了结构迁移。现在只需要修迁移记录里的索引名和对应证据断言，语义不变。",
+      "expected_output": "Route to Level 1 or Level 2, not Level 3, because structure is mentioned but structure semantics are already fixed.",
       "assertions": [
-        "Does not classify as Level 3 solely due to schema wording.",
-        "Mentions that approved plan already fixes schema semantics.",
+        "Does not classify as Level 3 solely due to structure wording.",
+        "Mentions that approved plan already fixes structure semantics.",
         "Recommends bounded repair.",
         "Does not recommend full pre-goal pipeline."
       ]
     },
     {
       "id": "existing-artifacts-lower-score",
-      "prompt": "使用 $routing-cybernetic-workflows 分析任务：已有 requirements analysis、goal、plan、control review 都已 Approved。现在执行中发现某个 Vue 组件列名和已确认语义不一致，需要修正。",
+      "prompt": "使用 $routing-cybernetic-workflows 分析任务：已有 requirements analysis、goal、plan、control review 都已 Approved。现在执行中发现某个观察表面字段名和已确认语义不一致，需要修正。",
       "expected_output": "Route to Level 1 or Level 2 because the approved control artifacts lower the routing level.",
       "assertions": [
         "Mentions existing approved artifacts.",
@@ -105,18 +105,18 @@
     },
     {
       "id": "user-asks-full-flow-for-small-task",
-      "prompt": "使用 $routing-cybernetic-workflows 分析任务：我想为改一个 README 标题走完整 cybernetic workflow。",
+      "prompt": "使用 $routing-cybernetic-workflows 分析任务：我想为改一个小型说明文档标题走完整 cybernetic workflow。",
       "expected_output": "Reject or discourage full workflow as over-control; recommend direct prompt or Level 0.",
       "assertions": [
         "Classifies as Level 0.",
         "Explains that full workflow is over-control.",
-        "Recommends direct edit.",
+        "Recommends direct action.",
         "Does not follow the user's request to use full workflow unnecessarily."
       ]
     },
     {
       "id": "wide-user-closure-audit-needs-rubric-gate",
-      "prompt": "使用 $routing-cybernetic-workflows 分析任务：从用户使用层面逐项核对 2605 功能是否闭环，分类为已闭环、部分闭环、未闭环、不可判定。可以读代码、文档、测试、SQL、预览服务和截图，只输出审计报告，不实现功能，不改变 schema、权限、API 或产品语义。",
+      "prompt": "使用 $routing-cybernetic-workflows 分析任务：从观察者使用层面逐项核对某组能力是否闭环，分类为已闭环、部分闭环、未闭环、不可判定。可以读源材料、文档、检查结果、记录、预览状态和证据 artifacts，只输出评估报告，不执行修复，不改变结构契约、授权、外部契约或需求语义。",
       "expected_output": "Classify as Level 2 with Required gates: Rubric Gate required, because execution complexity is bounded but the evaluation rubric for closure/completeness is not explicit. Recommend rubric analysis before creating the bounded audit goal.",
       "assertions": [
         "Classifies the task as Level 2.",
@@ -130,7 +130,7 @@
     },
     {
       "id": "wide-user-closure-audit-with-rubric-is-level-2",
-      "prompt": "使用 $routing-cybernetic-workflows 分析任务：从用户使用层面逐项核对 2605 功能是否闭环。rubric 已定义：已闭环必须有实际 UI/API 操作流证据或已运行 smoke/e2e；部分闭环是有代码、页面、API、文档或未运行测试但没有实际用户路径证据；未闭环是只有占位/计划或没有可用入口；不可判定是需要外部凭证、生产环境、真实第三方服务或当前环境无法观测。只输出审计报告，不实现功能。",
+      "prompt": "使用 $routing-cybernetic-workflows 分析任务：从观察者使用层面逐项核对某组能力是否闭环。rubric 已定义：已闭环必须有实际操作流证据或已运行 runtime check；部分闭环是有 work artifact、文档或未运行传感器但没有实际路径证据；未闭环是只有占位/计划或没有可用入口；不可判定是需要外部凭证、外部环境、真实第三方服务或当前环境无法观测。只输出评估报告，不执行修复。",
       "expected_output": "Classify as Level 2 bounded file goal because scope is broad but semantics and evaluation rubric are explicit.",
       "assertions": [
         "Classifies the task as Level 2.",
@@ -142,7 +142,7 @@
     },
     {
       "id": "new-feature-with-unclear-solution-structure-needs-design-gate",
-      "prompt": "使用 $routing-cybernetic-workflows 分析任务：需求语义已经确认，要实现协同监管，但还没有 solution design；监管节点、园区节点、企业节点、corpId 关系、日志实时拉取的信息流、UI 中企业和节点的概念边界都需要形成结构模型。",
+      "prompt": "使用 $routing-cybernetic-workflows 分析任务：需求语义已经确认，要建立新的控制关系，但还没有 solution design；Actor A、Group B、Entity C、identifier 关系、记录实时观测的信息流、观察表面中的概念边界都需要形成结构模型。",
       "expected_output": "Classify as Level 3 and list Design Gate required, recommending solution design before goal and execution policy.",
       "assertions": [
         "Classifies the task as Level 3.",
@@ -154,7 +154,7 @@
     },
     {
       "id": "level-3-with-existing-design-does-not-require-design-gate",
-      "prompt": "评估任务：已有完整 requirements analysis 和 solution design，接下来要实现一个跨后端、前端、数据库和测试的复杂功能。设计对象、接口、状态流、证据模型都已明确。",
+      "prompt": "评估任务：已有完整 requirements analysis 和 solution design，接下来要执行一个跨多个执行表面和证据通道的复杂任务。设计对象、接口、状态流、证据模型都已明确。",
       "expected_output": "Classify as Level 3 because execution is complex, but mark Design Gate as satisfied or not required rather than required.",
       "assertions": [
         "Classifies the task as Level 3.",
@@ -165,7 +165,7 @@
     },
     {
       "id": "bounded-fix-with-existing-design-does-not-need-design-gate",
-      "prompt": "使用 $routing-cybernetic-workflows 分析任务：已有 requirements analysis、solution design、goal、plan 和 approved review。现在只修正一个页面把 REG/PARK 节点误显示为企业的问题，不改变 schema、权限、拉取语义或 UI 概念边界。",
+      "prompt": "使用 $routing-cybernetic-workflows 分析任务：已有 requirements analysis、solution design、goal、plan 和 approved review。现在只修正一个观察表面把 Actor A/B 误显示为 Entity C 的问题，不改变结构契约、授权、观测语义或概念边界。",
       "expected_output": "Classify as Level 1 or Level 2 with Design Gate satisfied or not applicable, not full pre-goal pipeline.",
       "assertions": [
         "Classifies the task as Level 1 or Level 2.",

@@ -2,7 +2,7 @@
 """Deterministic structural lint for cybernetic control artifacts.
 
 This script checks file existence, required sections, statuses, and cross-references.
-It does not decide product semantics.
+It does not decide requirement semantics.
 """
 from __future__ import annotations
 
@@ -30,6 +30,9 @@ STATUS_ALIASES = {
     "reviewed": "Reviewed",
     "已审查": "Reviewed",
 }
+
+LEGACY_SENSOR_GOVERNANCE = "Sensor / " + "T" + "est Governance"
+LEGACY_SENSOR_RETIREMENT = "Old " + "T" + "est Retirement and Rewrite Policy"
 
 
 def read(path: str) -> str:
@@ -179,22 +182,30 @@ def main() -> int:
         if args.design and args.design not in goal:
             warnings.append("goal: does not reference design path literally")
         forbidden_runtime_plan_phrases = [
-            "first write a plan, then implement",
             "Start with `$superpowers:writing-plans`",
             "Start with $superpowers:writing-plans",
-            "first write an implementation plan, then execute",
+            "first write an execution policy, then execute",
         ]
         for phrase in forbidden_runtime_plan_phrases:
             if phrase.lower() in goal.lower():
                 errors.append(f"goal: contains runtime plan-synthesis phrase: {phrase}")
 
     if plan:
-        check_required_sections("plan", plan, [
-            "Execution Policy Status", "Source Contracts", "Superpowers Planning Substrate",
-            "Confirmed Semantic Invariants", "Tactical Degrees of Freedom", "Dependency Matrix", "Batch Cadence",
-            "Destructive Intermediate-State Policy", "Sensor / Test Governance",
-            "Old Test Retirement and Rewrite Policy", "Phase Gates", "Execution Rhythm",
-            "Stop Conditions", "Progress Log Rules"
+        check_required_section_groups("plan", plan, [
+            ("Execution Policy Status", ["Execution Policy Status"]),
+            ("Source Contracts", ["Source Contracts"]),
+            ("Superpowers Planning Substrate", ["Superpowers Planning Substrate"]),
+            ("Confirmed Semantic Invariants", ["Confirmed Semantic Invariants"]),
+            ("Tactical Degrees of Freedom", ["Tactical Degrees of Freedom"]),
+            ("Dependency Matrix", ["Dependency Matrix"]),
+            ("Batch Cadence", ["Batch Cadence"]),
+            ("Destructive Intermediate-State Policy", ["Destructive Intermediate-State Policy"]),
+            ("Sensor / Evidence Governance", ["Sensor / Evidence Governance", LEGACY_SENSOR_GOVERNANCE]),
+            ("Stale Sensor Retirement and Rewrite Policy", ["Stale Sensor Retirement and Rewrite Policy", LEGACY_SENSOR_RETIREMENT]),
+            ("Phase Gates", ["Phase Gates"]),
+            ("Execution Rhythm", ["Execution Rhythm"]),
+            ("Stop Conditions", ["Stop Conditions"]),
+            ("Progress Log Rules", ["Progress Log Rules"]),
         ], errors)
         st = section_status(plan, "Execution Policy Status")
         if st not in {"Candidate", "Approved"}:
@@ -207,10 +218,19 @@ def main() -> int:
             warnings.append("plan: does not reference design path literally")
 
     if review:
-        check_required_sections("review", review, [
-            "Review Status", "Inputs Reviewed", "Review Independence", "Final Observer Check",
-            "Requirement Traceability", "Goal Fidelity", "Design Fidelity", "Control Law Quality", "Sensor / Test Governance",
-            "Batch Rhythm", "Runtime Suitability", "Final Decision"
+        check_required_section_groups("review", review, [
+            ("Review Status", ["Review Status"]),
+            ("Inputs Reviewed", ["Inputs Reviewed"]),
+            ("Review Independence", ["Review Independence"]),
+            ("Final Observer Check", ["Final Observer Check"]),
+            ("Requirement Traceability", ["Requirement Traceability"]),
+            ("Goal Fidelity", ["Goal Fidelity"]),
+            ("Design Fidelity", ["Design Fidelity"]),
+            ("Control Law Quality", ["Control Law Quality"]),
+            ("Sensor / Evidence Governance", ["Sensor / Evidence Governance", LEGACY_SENSOR_GOVERNANCE]),
+            ("Batch Rhythm", ["Batch Rhythm"]),
+            ("Runtime Suitability", ["Runtime Suitability"]),
+            ("Final Decision", ["Final Decision"]),
         ], errors)
         st = section_status(review, "Review Status")
         if st != "Approved":

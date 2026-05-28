@@ -10,10 +10,10 @@ Cybernetic skills compile control structures. Superpowers provide planning, exec
 
 | Stage | Required substrate | Required? | Notes |
 |---|---|---:|---|
-| Product/design-heavy requirements analysis | `$superpowers:brainstorming` | Optional | Do not use for simple rubric analysis unless exploration is requested. |
+| Exploratory requirements analysis | `$superpowers:brainstorming` | Optional | Do not use for simple rubric analysis unless exploration is requested. |
 | Exploratory solution design | `$superpowers:brainstorming` | Optional | Use when the solution model needs exploration, not when objects, flows, and boundaries are already explicit. |
-| Execution policy generation | `$superpowers:writing-plans` | Required for non-trivial implementation plans | The cybernetic skill supplies control constraints to the planning substrate. |
-| Control structure review | Independent subagent review discipline | Required for `Approved` unless explicit human approval exists | Do not run implementation or dispatch implementer agents during pre-goal review. |
+| Execution policy generation | `$superpowers:writing-plans` | Required for non-trivial execution policies | The cybernetic skill supplies control constraints to the planning substrate. |
+| Control structure review | Independent subagent review discipline | Required for `Approved` unless explicit human approval exists | Do not run target execution or dispatch execution agents during pre-goal review. |
 | Runtime execution | `$superpowers:executing-plans` discipline | Required | Execute approved artifacts only; do not create a new plan at runtime. |
 | Runtime debugging | `$superpowers:systematic-debugging` | Required for unclear or repeated failures | Do not random-walk fixes. |
 | Completion claim | `$superpowers:verification-before-completion` | Required | No completion claim without recorded evidence. |

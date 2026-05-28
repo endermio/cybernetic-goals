@@ -10,10 +10,10 @@ Cybernetic skills compile solution designs and control structures: requirements 
 
 | Stage | Required substrate | Required? | Notes |
 |---|---|---:|---|
-| Product/design-heavy requirements analysis | `$superpowers:brainstorming` | Optional | Use for exploratory product/design requirements analysis, not simple rubric analysis. |
+| Exploratory requirements analysis | `$superpowers:brainstorming` | Optional | Use for exploratory requirements analysis, not simple rubric analysis. |
 | Exploratory solution design | `$superpowers:brainstorming` | Optional | Use when solution structure needs exploration, not when objects, flows, and boundaries are already explicit. |
-| Execution policy generation | `$superpowers:writing-plans` | Required for non-trivial implementation plans | Cybernetic execution-policy skills provide semantic invariants, tactical freedom, dependency matrix, batch cadence, sensor governance, and stale-test policy as inputs. |
-| Control structure review | Independent subagent review discipline | Required for `Approved` unless explicit human approval exists | This is review discipline, not the full implementation workflow from `$superpowers:subagent-driven-development`. |
+| Execution policy generation | `$superpowers:writing-plans` | Required for non-trivial execution policies | Cybernetic execution-policy skills provide semantic invariants, tactical freedom, dependency matrix, batch cadence, sensor/evidence governance, and stale-sensor policy as inputs. |
+| Control structure review | Independent subagent review discipline | Required for `Approved` unless explicit human approval exists | This is review discipline, not the full execution workflow from `$superpowers:subagent-driven-development`. |
 | Runtime execution | `$superpowers:executing-plans` discipline | Required | Execute the approved plan; do not create or approve a new plan at runtime. |
 | Runtime debugging | `$superpowers:systematic-debugging` | Required for unclear or repeated failures | Investigate before changing behavior. |
 | Completion claim | `$superpowers:verification-before-completion` | Required | Completion requires fresh verification evidence. |

@@ -1,13 +1,13 @@
 ---
 name: analyzing-cybernetic-requirements
-description: 'Use before solution design, goal writing, execution-policy writing, or implementation for complex, ambiguous, or evaluative work. Analyzes human purpose, requirement semantics, domain objects and boundaries, evaluation rubrics/error functions, constraints, non-goals, safe defaults, blocking human decisions, and required gates. Does not create solution designs, goal contracts, execution policies, control reviews, runtime /goal commands, or implementation code. Creates a requirements analysis brief under docs/cybernetics/requirements/ when file writing is available.'
+description: 'Use before solution design, control-contract writing, execution-policy writing, or controlled execution for complex, ambiguous, or evaluative work. Analyzes human purpose, requirement semantics, controlled objects and boundaries, evaluation functions, constraints, non-goals, safe defaults, blocking human decisions, and required gates. Does not create solution designs, control contracts, execution policies, control reviews, runtime /goal commands, or target-work artifacts. Creates a requirements analysis brief under docs/cybernetics/requirements/ when file writing is available.'
 ---
 
 # Analyzing Cybernetic Requirements
 
 ## Overview
 
-Turn a human intention into a requirements analysis brief before it becomes a solution design, Codex `/goal`, execution policy, or code change.
+Turn a human intention into a requirements analysis brief before it becomes a solution design, Codex `/goal`, execution policy, or target-work change.
 
 This skill is a pre-goal control loop:
 
@@ -29,12 +29,12 @@ Use `assets/requirements-analysis-template.md`.
 This skill analyzes requirements. It must not:
 
 - design the solution structure;
-- define interfaces, data models, component architecture, workflows, report schemas, or state machines as a new solution model;
+- define interfaces, object structures, mechanism architecture, flows, report structures, or lifecycle models as a new solution model;
 - write a goal contract;
-- write an execution policy or implementation plan;
+- write an execution policy;
 - review the whole control structure;
 - compile or start a runtime `/goal`;
-- implement code.
+- execute target work.
 
 This skill may:
 
@@ -51,20 +51,20 @@ Requirement object lists are not solution designs. They name what the human is t
 
 ## Analyze Requirements, Do Not Downscope Them
 
-Do not reduce, simplify, postpone, or replace the requested behavior merely because implementation seems complex, risky, unstable, or hard.
+Do not reduce, simplify, postpone, or replace the requested behavior merely because execution seems complex, risky, unstable, or hard.
 
-Implementation complexity may be recorded as execution risk, planning concern, verification concern, or future implementation challenge. It must not become the recommended product default unless the human explicitly asks for a lower-risk scope.
+Execution complexity may be recorded as execution risk, planning concern, evidence concern, or future realization challenge. It must not become the recommended default unless the human explicitly asks for a lower-risk scope.
 
 ## Ask Only High-Value Human Questions
 
 Ask the human a question only if all are true:
 
-1. The answer materially changes requirement semantics, evaluation rubric, data visibility, permission model, public API semantics, user-visible behavior, or control boundaries.
+1. The answer materially changes requirement semantics, evaluation rubric, visibility boundary, authorization model, external contract semantics, observer-visible behavior, or control boundaries.
 2. There are at least two plausible business choices.
-3. The correct answer cannot be safely inferred from the user request, existing docs, or common product conventions.
+3. The correct answer cannot be safely inferred from the user request, existing source artifacts, or common requirement conventions.
 4. A wrong default would be costly to reverse or would cause serious misalignment.
 
-Do not ask the human about routine execution tactics, obvious resilience behavior, implementation mechanics, or design details that belong in `$designing-cybernetic-solutions`.
+Do not ask the human about routine execution tactics, obvious resilience behavior, execution mechanics, or design details that belong in `$designing-cybernetic-solutions`.
 
 Use `references/decision-levels.md` for decision classification.
 
@@ -90,8 +90,8 @@ Do not treat these as self-explanatory. Requirements analysis must identify the 
 For rubric-only analysis, ask a short set of high-value questions focused on the evaluation function. If the user asks to proceed by default, use a conservative rubric:
 
 ```text
-Strongest positive status requires actual UI/API workflow evidence or a successfully run smoke/e2e/similar runtime check.
-Partial status means code, page, API, docs, or unrun tests exist, but actual user-path evidence is missing.
+Strongest positive status requires direct workflow evidence or a successfully run runtime check.
+Partial status means work products or unrun sensors exist, but direct path evidence is missing.
 Negative status means only placeholders/plans exist, or no usable entrypoint exists.
 Unknown/unverifiable status means external credentials, production-only environment, third-party service, or current environment prevents observation.
 ```
@@ -103,12 +103,12 @@ This skill identifies whether Design Gate is required. It does not resolve it.
 Mark `Design Gate: required` when:
 
 - multiple reasonable solution structures exist;
-- domain objects, actors, roles, or relationships are not explicit enough for goal writing;
+- controlled objects, actors, roles, or relationships are not explicit enough for goal writing;
 - system/process/organizational boundaries are unclear;
 - information flow, state flow, evidence flow, or decision flow is unclear;
 - interfaces, contracts, procedures, reports, events, or user interactions are unclear;
 - a new abstraction must be introduced;
-- an old concept must be replaced without letting old implementation define the requirement;
+- an old concept must be replaced without letting old realization details define the requirement;
 - several subsystems or roles must coordinate around one model;
 - runtime execution would otherwise invent objects, boundaries, sensors, or flow.
 
@@ -117,7 +117,7 @@ When Design Gate is required, record the missing solution-model questions and re
 ## Process
 
 1. Inspect just enough context to avoid generic questions.
-2. Restate the human purpose in task/product language.
+2. Restate the human purpose in task language.
 3. Extract confirmed requirement semantics, terms, objects, boundaries, constraints, and non-goals.
 4. Build a requirements control map: objective, controlled object, candidate sensors, actuators, constraints, disturbances, stop conditions.
 5. If the task is evaluative, identify the rubric/error function and classify missing rubric elements as decisions.
@@ -126,7 +126,7 @@ When Design Gate is required, record the missing solution-model questions and re
 8. Ask 3-7 high-value questions, preferably no more than 5.
 9. Create or update the requirements analysis brief.
 10. If the human answers, update `Confirmed Requirement Decisions` and `Requirements Analysis Status`.
-11. Do not create a solution design, goal, plan, control review, runtime `/goal`, or implementation files.
+11. Do not create a solution design, goal, plan, control review, runtime `/goal`, or target-work artifacts.
 12. If analysis is complete and the brief path deterministically identifies a date/slug, output queue-friendly next commands as described below.
 
 ## Queue-Friendly Next Commands
@@ -283,11 +283,11 @@ $writing-cybernetic-goals 使用 docs/cybernetics/requirements/YYYY-MM-DD-slug.m
 
 ## Validation Checklist
 
-- [ ] Requirement semantics are separated from solution design and implementation planning.
+- [ ] Requirement semantics are separated from solution design and execution-policy writing.
 - [ ] Evaluation predicates are treated as rubric/error-function semantics.
 - [ ] Evaluation tasks define or ask for status meanings, evidence strength, strongest-positive threshold, downgrade rules, and external/unobservable handling.
 - [ ] Design Gate is recorded as required, satisfied, or not applicable when solution structure matters.
-- [ ] The response did not downscope because implementation is hard.
+- [ ] The response did not downscope because execution is hard.
 - [ ] Uncertainty is classified into blocking decisions, default assumptions, deferred design, and deferred planning/execution.
 - [ ] Obvious defaults are not asked as blocking questions.
 - [ ] There are no more than 7 questions.

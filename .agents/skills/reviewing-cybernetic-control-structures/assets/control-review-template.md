@@ -72,7 +72,7 @@ Findings:
 
 - [finding]
 
-## Sensor / Test Governance
+## Sensor / Evidence Governance
 
 Findings:
 
@@ -121,7 +121,7 @@ The control structure may be approved only if:
 - goal preserves requirements analysis semantics;
 - goal and execution policy preserve required design invariants;
 - execution policy preserves goal and requirements analysis;
-- sensor governance is explicit;
+- sensor/evidence governance is explicit;
 - batch cadence is explicit;
 - runtime execution does not need to synthesize a new plan.
 - independent review discipline was satisfied or explicit human approval exists.

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Check whether a requirements analysis brief is ready for pre-goal compilation.
 
-This script performs deterministic structural checks only. It does not judge product semantics.
+This script performs deterministic structural checks only. It does not judge requirement semantics.
 """
 from __future__ import annotations
 

@@ -13,7 +13,7 @@ Design Gate is required when any of these are unresolved:
 - interfaces, contracts, reports, procedures, events, or interactions;
 - lifecycle, state model, failure model, or exception handling;
 - evidence/sensor model needed to prove the design works;
-- replacement of old concepts or old implementation assumptions;
+- replacement of old concepts or old realization assumptions;
 - cross-subsystem or cross-role coordination model.
 
 ## Satisfied

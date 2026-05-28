@@ -7,8 +7,8 @@
 - goal or plan contradicts the solution design;
 - the goal omits a confirmed decision;
 - the runtime goal would need to write or approve a plan;
-- tests are treated as the objective;
-- no stale-test policy exists;
+- approved sensors, checks, or evidence channels are treated as the objective;
+- no stale-sensor policy exists;
 - batch cadence is missing;
 - destructive intermediate-state policy is missing;
 - semantic invariants and tactical details are mixed;

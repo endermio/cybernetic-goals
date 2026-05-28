@@ -1,6 +1,6 @@
 ---
 name: orchestrating-cybernetic-pregoal
-description: 'Use after a completed requirements analysis brief to orchestrate the pre-goal compilation chain before launching a Codex /goal. Coordinates existing cybernetic skills to create or update any required solution design, goal contract, execution policy, control review, and final runtime /goal command. Requires explicit user authorization before spawning subagents. Does not implement code and does not start /goal execution.'
+description: 'Use after a completed requirements analysis brief to orchestrate the pre-goal compilation chain before launching a Codex /goal. Coordinates existing cybernetic skills to create or update any required solution design, control contract, execution policy, control review, and final runtime /goal command. Requires explicit user authorization before spawning subagents. Does not execute target work and does not start /goal execution.'
 ---
 
 # Orchestrating Cybernetic Pre-goal
@@ -28,9 +28,9 @@ This skill must not:
 
 - analyze requirements from scratch
 - invent required solution design inside the execution policy
-- implement code
+- execute target work
 - start `/goal` execution
-- make product decisions for the human
+- make requirement decisions for the human
 - mark a control structure approved when semantic conflicts remain
 - spawn subagents unless the user explicitly authorized subagents in the current request
 - let `/goal` write or approve its own plan
@@ -81,7 +81,7 @@ It should not duplicate their templates or rules unless they are unavailable. If
 
 Never emulate required Superpowers substrates. In particular:
 
-- do not replace `$superpowers:writing-plans` with ad hoc internal planning for non-trivial implementation plans;
+- do not replace `$superpowers:writing-plans` with ad hoc internal planning for non-trivial execution policies;
 - do not replace independent review discipline with self-review;
 - do not compile a runtime `/goal` that omits required runtime execution, debugging, and verification discipline.
 
@@ -145,7 +145,7 @@ Behavior:
 2. Create or validate solution design if Design Gate is required.
 3. Create or update goal contract.
 4. Create or update execution policy only if required planning substrate is satisfied or not required.
-5. Run independent subagent review passes without running implementation or dispatching implementer agents.
+5. Run independent subagent review passes without running target execution or dispatching execution agents.
 6. Revise artifacts based on review findings.
 7. Re-review until approval or stop after the maximum review cycles.
 8. Create an approved control review if findings converge.
@@ -220,7 +220,7 @@ The solution design must:
 - define interfaces/contracts, lifecycle or state model, failure model, and evidence/sensor model when relevant;
 - distinguish design invariants from tactical degrees of freedom;
 - map design elements to goal and execution-policy implications;
-- not create goal, plan, review, runtime `/goal`, or implementation files.
+- not create goal, plan, review, runtime `/goal`, or target-work artifacts.
 
 Expected artifact:
 
@@ -260,14 +260,14 @@ The execution policy must:
 
 - reference the requirements analysis and goal files
 - reference the solution design when Design Gate is required or a design exists
-- record `$superpowers:writing-plans` substrate status for non-trivial implementation plans
+- record `$superpowers:writing-plans` substrate status for non-trivial execution policies
 - include a dependency matrix
 - distinguish semantic invariants from tactical degrees of freedom
 - define batch cadence
 - define destructive intermediate-state policy
 - define batch-end openable/verifiable requirements
-- define sensor/test governance
-- define stale/obsolete test retirement and rewrite policy
+- define sensor/evidence governance
+- define stale/obsolete sensor retirement and rewrite policy
 - define phase gates
 - define stop conditions
 - define progress log rules
@@ -293,7 +293,7 @@ If subagents are authorized, use independent reviewer roles. At minimum:
 5. Sensor Governance Reviewer
 6. Runtime Boundary Reviewer
 
-Do not run implementation and do not dispatch implementer agents during pre-goal review.
+Do not run target execution and do not dispatch execution agents during pre-goal review.
 
 Review the whole chain:
 
@@ -331,7 +331,7 @@ If review status is `Needs Revision`:
 5. Record the final observer check in the control review.
 6. Stop after two review-revision cycles if not approved.
 
-Do not alter confirmed human decisions. If a revision would change product semantics, stop and ask for human input.
+Do not alter confirmed human decisions. If a revision would change requirement semantics, stop and ask for human input.
 
 ### Step 7: Compile the Runtime `/goal`
 
@@ -382,7 +382,7 @@ The final `/goal` must instruct Codex to execute approved control artifacts only
 
 It must not instruct Codex to:
 
-- write a new implementation plan
+- write a new execution policy
 - approve its own plan
 - reinterpret requirements
 - change confirmed semantics
@@ -422,7 +422,7 @@ Stop and report if:
 - execution policy changes goal semantics
 - execution policy redesigns the solution model
 - review does not converge after two cycles
-- reviewer disagreements imply a product decision
+- reviewer disagreements imply a requirement decision
 - subagents are needed but not authorized
 - required Superpowers planning substrate is unavailable
 - independent review discipline is missing and no explicit human approval exists
@@ -484,7 +484,7 @@ Smallest human decision needed:
 
 Before responding, verify:
 
-- [ ] This skill did not implement code.
+- [ ] This skill did not execute target work.
 - [ ] This skill did not start `/goal`.
 - [ ] Subagents were used only if explicitly authorized.
 - [ ] Required Superpowers substrate status was checked.
@@ -494,7 +494,7 @@ Before responding, verify:
 - [ ] Goal contract preserved confirmed human decisions.
 - [ ] Goal and execution policy preserved required solution design.
 - [ ] Execution policy preserved the goal contract.
-- [ ] Execution policy uses `$superpowers:writing-plans` for non-trivial implementation plans or blocks.
+- [ ] Execution policy uses `$superpowers:writing-plans` for non-trivial execution policies or blocks.
 - [ ] Review checked the whole control structure, including design when required, not only the plan.
 - [ ] Review does not mark self-review as `Approved`.
 - [ ] Any substantive post-review artifact mutation had final independent re-review before approval.
@@ -510,7 +510,7 @@ Before responding, verify:
 
 | Mistake | Fix |
 |---|---|
-| Treating this as an implementation skill | Stop; this skill only compiles control artifacts |
+| Treating this as an execution skill | Stop; this skill only compiles control artifacts |
 | Spawning subagents without user authorization | Ask for authorization or run candidate-only mode |
 | Creating a final `/goal` from an incomplete requirements analysis | Stop and return to requirements analysis |
 | Skipping design when Design Gate is required | Run `$designing-cybernetic-solutions` before goal writing |

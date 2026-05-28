@@ -9,7 +9,7 @@ description: 'Use after requirements analysis is complete and any required solut
 
 Create a control contract from confirmed semantics and any required solution design.
 
-This skill writes the goal contract. It does not analyze requirements, write execution policies, review control structures, or execute code.
+This skill writes the control contract. It does not analyze requirements, write execution policies, review control structures, or execute target work.
 
 For complex work, the output is:
 
@@ -21,7 +21,7 @@ Use `assets/goal-contract-template.md`.
 
 ## Runtime Boundary
 
-For complex implementation work, this skill must not produce an executable `/goal` command unless any required solution design exists and an approved execution policy and approved control review already exist.
+For complex controlled work, this skill must not produce an executable `/goal` command unless any required solution design exists and an approved execution policy and approved control review already exist.
 
 If `Design Gate: required`, do not create the final complex goal contract until a solution design exists or the human explicitly says the Design Gate is unnecessary.
 
@@ -58,7 +58,7 @@ If the rubric is missing or partial, do not create an executable bounded goal an
 
 ### Mode A: Complex Control Contract
 
-Use when the task is Level 3/4, a complex implementation, or would require runtime Codex to coordinate execution policy, phase gates, sensor governance, or multi-batch implementation strategy.
+Use when the task is Level 3/4, a complex execution, or would require runtime Codex to coordinate execution policy, phase gates, sensor governance, or multi-batch execution strategy.
 
 Behavior:
 
@@ -75,7 +75,7 @@ Use when `$routing-cybernetic-workflows` selected Level 2, or the user explicitl
 Signals:
 
 - task semantics are already fixed by the user or existing artifacts;
-- no schema, permission, public API, or product semantics need to be decided;
+- no structure contract, authorization boundary, external contract, or requirement semantics need to be decided;
 - the output is one bounded artifact such as an audit report, repair report, checklist, or small patch contract;
 - audit/evaluation/status-classification goals include an explicit rubric;
 - verification needs are moderate, but no separate execution policy or phase-gate review is needed;
@@ -90,7 +90,7 @@ Behavior:
 5. Preserve the rubric inside the goal when the task is evaluative.
 6. Output a direct executable `/goal` command that references the small goal file.
 7. Do not recommend execution policy or control review by default.
-8. If the bounded goal proves insufficient, ambiguous, or dependent on new product/control decisions, instruct runtime Codex to stop and report the smallest required human decision.
+8. If the bounded goal proves insufficient, ambiguous, or dependent on new requirement/control decisions, instruct runtime Codex to stop and report the smallest required human decision.
 
 ## Preconditions
 
@@ -136,8 +136,8 @@ For evaluation goals, the goal must also include the confirmed rubric as the err
 
 Map requirements analysis to:
 
-- Objective: observable product/code state
-- Sensors: tests, builds, API smoke, screenshots, reviews
+- Objective: observable target state
+- Sensors: approved sensors, checks, evidence channels, and reviews
 - Error function: rubric for interpreting sensor output when the task is evaluative
 - Constraints: invariants and non-goals
 - Stop conditions: when Codex must stop instead of guessing
@@ -182,7 +182,7 @@ Control map:
 Use this `/goal`:
 
 ```text
-/goal Execute the bounded file goal in docs/cybernetics/goals/YYYY-MM-DD-slug.md as the controlling contract. Do not create an execution policy or control review unless explicitly instructed. Do not reinterpret scope, expand requirements, or modify files outside the goal boundaries. If the goal is insufficient, ambiguous, or requires new product/control decisions, stop and report the smallest required human decision.
+/goal Execute the bounded file goal in docs/cybernetics/goals/YYYY-MM-DD-slug.md as the controlling contract. Do not create an execution policy or control review unless explicitly instructed. Do not reinterpret scope, expand requirements, or modify files outside the goal boundaries. If the goal is insufficient, ambiguous, or requires new requirement/control decisions, stop and report the smallest required human decision.
 ```
 ````
 
@@ -239,4 +239,4 @@ If the user explicitly requests a small inline `/goal` and the task is low-risk,
 - [ ] Evaluation tasks define an explicit rubric before any executable goal is emitted.
 - [ ] For complex work, no final runtime `/goal` was output unless approved plan and review exist.
 - [ ] For Level 2 bounded file goals, the response outputs a direct `/goal` and does not recommend execution policy by default.
-- [ ] Any bounded file `/goal` stops if the goal is insufficient, ambiguous, or requires new product/control decisions.
+- [ ] Any bounded file `/goal` stops if the goal is insufficient, ambiguous, or requires new requirement/control decisions.

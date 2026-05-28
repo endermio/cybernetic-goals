@@ -3,52 +3,52 @@
   "evals": [
     {
       "id": "does-not-downscope-for-stability",
-      "prompt": "分析需求：监管节点查询日志时必须实时向园区节点拉取，园区节点再向企业节点拉取；这是需求，不要改成本地汇总。",
-      "expected_output": "Preserve pull semantics and treat implementation risks as planning concerns.",
+      "prompt": "分析需求：Actor A 查询记录时必须实时向 Group B 直接观测，Group B 再向 Entity C 直接观测；这是需求，不要改成本地汇总。",
+      "expected_output": "Preserve direct-observation semantics and treat execution risks as planning concerns.",
       "assertions": [
-        "Treats real-time pull as requirement semantics.",
+        "Treats real-time direct observation as requirement semantics.",
         "Does not recommend local summary as replacement.",
         "Records timeout/pagination/partial failure as planning concerns or design questions, not scope reductions."
       ]
     },
     {
       "id": "obvious-resilience-default",
-      "prompt": "分析一个跨多个下级节点拉取日志的需求。",
+      "prompt": "分析一个跨多个下级来源观测记录的需求。",
       "expected_output": "Default to partial results with failed nodes marked, not as a blocking question.",
       "assertions": [
-        "Does not ask whether the whole page should fail as a blocker.",
+        "Does not ask whether the whole observer surface should fail as a blocker.",
         "Records partial results with failed node marking as a default assumption.",
         "Asks only high-level requirement semantic questions."
       ]
     },
     {
       "id": "complete-analysis-emits-queue-friendly-commands",
-      "prompt": "需求分析已完成，brief 是 docs/cybernetics/requirements/2026-05-22-collaborative-supervision.md，没有开放阻塞问题。",
+      "prompt": "需求分析已完成，brief 是 docs/cybernetics/requirements/2026-05-22-control-relationship.md，没有开放阻塞问题。",
       "expected_output": "Emit a pre-goal orchestration command and a predicted queue-friendly /goal command using the same date/slug paths, with a precondition that stops if artifacts are missing, not approved, or inconsistent.",
       "assertions": [
-        "Outputs a command invoking $orchestrating-cybernetic-pregoal with docs/cybernetics/requirements/2026-05-22-collaborative-supervision.md.",
+        "Outputs a command invoking $orchestrating-cybernetic-pregoal with docs/cybernetics/requirements/2026-05-22-control-relationship.md.",
         "Outputs a predicted or queue-friendly /goal, not a final approved /goal.",
-        "The /goal references docs/cybernetics/goals/2026-05-22-collaborative-supervision.md.",
-        "The /goal references docs/cybernetics/plans/2026-05-22-collaborative-supervision.md.",
-        "The /goal references docs/cybernetics/control-reviews/2026-05-22-collaborative-supervision.md.",
+        "The /goal references docs/cybernetics/goals/2026-05-22-control-relationship.md.",
+        "The /goal references docs/cybernetics/plans/2026-05-22-control-relationship.md.",
+        "The /goal references docs/cybernetics/control-reviews/2026-05-22-control-relationship.md.",
         "The /goal says to stop if any referenced artifact is missing, not approved, or internally inconsistent."
       ]
     },
     {
       "id": "rubric-analysis-for-evaluation-task",
-      "prompt": "分析这个审计任务的评价口径：从用户使用层面逐项核对 2605 功能是否闭环，分类为已闭环、部分闭环、未闭环、不可判定。",
+      "prompt": "分析这个评估任务的评价口径：从观察者路径逐项核对某组能力是否闭环，分类为已闭环、部分闭环、未闭环、不可判定。",
       "expected_output": "Ask concise rubric questions about status meanings, evidence strength, minimum evidence for the strongest positive status, external-dependency handling, and whether confidence/evidence levels are needed.",
       "assertions": [
         "Treats 已闭环/部分闭环/未闭环/不可判定 as evaluation function semantics, not execution tactics.",
         "Asks what evidence is required for 已闭环.",
         "Asks which evidence is strong versus weak.",
-        "Asks how to classify missing external credentials, production-only dependencies, or unobservable third-party services.",
+        "Asks how to classify missing external credentials, external-only dependencies, or unobservable third-party services.",
         "Records a conservative default rubric if the user chooses defaults."
       ]
     },
     {
       "id": "complete-rubric-analysis-routes-to-bounded-goal",
-      "prompt": "Level 2 且 Required gates: Rubric Gate required 的评价口径需求分析已完成，brief 是 docs/cybernetics/requirements/2026-05-26-2605-user-closure-rubric.md，已确认已闭环/部分闭环/未闭环/不可判定的状态定义和证据等级。",
+      "prompt": "Level 2 且 Required gates: Rubric Gate required 的评价口径需求分析已完成，brief 是 docs/cybernetics/requirements/2026-05-26-closure-rubric.md，已确认已闭环/部分闭环/未闭环/不可判定的状态定义和证据等级。",
       "expected_output": "Mark rubric analysis complete and recommend writing-cybernetic-goals for a bounded audit goal, not orchestrating-cybernetic-pregoal.",
       "assertions": [
         "Outputs that rubric analysis is complete.",
@@ -60,12 +60,12 @@
     },
     {
       "id": "design-gate-recorded-not-resolved",
-      "prompt": "分析协同监管需求：目标是让监管节点能跨园区查企业日志，但监管节点、园区节点、企业节点、corp_id、权限边界和 UI 概念关系都还没有定。",
+      "prompt": "分析一个控制关系需求：目标是让 Actor A 能跨 Group B 观测 Entity C 记录，但 Actor A、Group B、Entity C、identifier、授权边界和观察概念关系都还没有定。",
       "expected_output": "Records Design Gate required and routes to solution design without designing the full model inside requirements analysis.",
       "assertions": [
         "Marks Design Gate as required.",
         "Lists missing solution-model questions as deferred solution design questions.",
-        "Does not define final data model, interfaces, state flow, or component architecture.",
+        "Does not define final object structure, interfaces, state flow, or mechanism architecture.",
         "Recommends $designing-cybernetic-solutions before goal writing."
       ]
     }

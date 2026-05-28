@@ -1,6 +1,6 @@
 ---
 name: reviewing-cybernetic-control-structures
-description: 'Use after requirements analysis, any required solution design, goal contract, and execution policy files exist, before starting /goal execution. Reviews the whole AI control structure, not only the plan: requirement traceability, design fidelity, goal fidelity, control law quality, sensor/test governance, batch cadence, phase gates, stop conditions, and semantic-vs-tactical boundaries. Produces a control review file under docs/cybernetics/control-reviews/ and must mark Approved before runtime /goal may start.'
+description: 'Use after requirements analysis, any required solution design, control contract, and execution policy files exist, before starting /goal execution. Reviews the whole AI control structure, not only the plan: requirement traceability, design fidelity, goal fidelity, control law quality, sensor/evidence governance, batch cadence, phase gates, stop conditions, and semantic-vs-tactical boundaries. Produces a control review file under docs/cybernetics/control-reviews/ and must mark Approved before runtime /goal may start.'
 ---
 
 # Reviewing Cybernetic Control Structures
@@ -13,7 +13,7 @@ Inputs:
 
 - requirements analysis brief
 - solution design, when Design Gate is required or a design exists
-- goal contract
+- control contract
 - execution policy / plan
 
 Output:
@@ -24,7 +24,7 @@ docs/cybernetics/control-reviews/YYYY-MM-DD-<slug>.md
 
 Use `assets/control-review-template.md`.
 
-This skill does not implement code and does not start `/goal`.
+This skill does not execute target work and does not start `/goal`.
 
 ## Required Infrastructure
 
@@ -32,9 +32,9 @@ Follow `$cybernetic-superpowers-infrastructure`.
 
 This skill requires independent review discipline before it may mark a control structure `Approved`.
 
-Do not self-review and mark `Approved`. Do not run implementation. Do not dispatch implementer agents during pre-goal control review.
+Do not self-review and mark `Approved`. Do not run target execution. Do not dispatch execution agents during pre-goal control review.
 
-If subagents are explicitly authorized, use independent reviewer passes for the control structure. This is not the full `$superpowers:subagent-driven-development` implementation workflow; it is independent review discipline only.
+If subagents are explicitly authorized, use independent reviewer passes for the control structure. This is not the full `$superpowers:subagent-driven-development` execution workflow; it is independent review discipline only.
 
 If subagents are not authorized and no explicit human approval or other independent reviewer exists, produce a review marked `Needs Independent Review`. Do not mark `Approved`.
 
@@ -61,7 +61,7 @@ Substantive changes include changes to:
 - goal success conditions;
 - scope, boundaries, or invariants;
 - execution policy or batch cadence;
-- sensor or evidence schema;
+- sensor or evidence structure;
 - progress log required fields;
 - stop conditions;
 - runtime boundary;
@@ -87,7 +87,7 @@ Every confirmed human decision in the requirements analysis brief must appear in
 
 ### 2. Goal Fidelity
 
-The goal must not add, remove, downscope, or reinterpret product semantics.
+The goal must not add, remove, downscope, or reinterpret requirement semantics.
 
 ### 3. Design Fidelity
 
@@ -109,16 +109,16 @@ The execution policy must define a sane control law:
 - repair policy
 - stop conditions
 
-### 5. Sensor Governance
+### 5. Sensor / Evidence Governance
 
-Tests are sensors, not objectives.
+Approved sensors, checks, and evidence channels are sensors, not objectives.
 
 Flag plans that:
 
-- overfit old tests;
+- overfit old sensors;
 - require every micro-step to pass;
-- lack stale test retirement rules;
-- lack product-level verification.
+- lack stale sensor retirement rules;
+- lack target-state evidence.
 
 ### 6. Batch Rhythm
 
@@ -131,7 +131,7 @@ Flag:
 
 ### 7. Semantic vs Tactical Boundary
 
-Semantic invariants must be frozen. Tactical implementation details must remain adjustable.
+Semantic invariants must be frozen. Tactical execution details must remain adjustable.
 
 ### 8. Runtime Suitability
 
@@ -180,7 +180,7 @@ Only mark `Approved` when:
 - required design exists and is consistent with requirements analysis, goal, and plan;
 - no unresolved semantic decision remains;
 - execution policy does not self-authorize uncontrolled changes;
-- test/sensor governance is explicit;
+- sensor/evidence governance is explicit;
 - runtime `/goal` can execute without writing or approving a new plan.
 - independent review discipline was satisfied or explicit human approval exists.
 - no substantive artifact mutation remains unreviewed after the latest independent review.
@@ -198,5 +198,5 @@ Only mark `Approved` when:
 - [ ] Lint PASS is not treated as semantic/control-policy approval.
 - [ ] Critical findings distinguish semantic, design, goal, plan, sensor, and runtime issues.
 - [ ] Required revisions are actionable.
-- [ ] The review did not execute implementation.
+- [ ] The review did not execute target work.
 - [ ] The review did not output final runtime `/goal`.

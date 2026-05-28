@@ -24,10 +24,10 @@ Cybernetic constraints supplied to the substrate:
 - dependency matrix;
 - batch cadence;
 - destructive intermediate-state policy;
-- sensor/test governance;
-- stale test retirement and rewrite policy.
+- sensor/evidence governance;
+- stale sensor retirement and rewrite policy.
 
-If the required substrate is unavailable for a non-trivial implementation plan, this policy is blocked and must not be treated as an approved internal substitute.
+If the required substrate is unavailable for a non-trivial execution policy, this policy is blocked and must not be treated as an approved internal substitute.
 
 ## Confirmed Semantic Invariants
 
@@ -39,9 +39,9 @@ These cannot be changed during runtime execution without stopping.
 
 These may change during execution if invariants are preserved.
 
-- [implementation detail]
-- [file organization detail]
-- [test fixture detail]
+- [execution detail]
+- [workstream organization detail]
+- [sensor fixture/detail]
 
 ## Dependency Matrix
 
@@ -51,7 +51,7 @@ These may change during execution if invariants are preserved.
 
 ## Batch Cadence
 
-- Intermediate steps inside a batch may temporarily break build/tests/UI when necessary.
+- Intermediate steps inside a batch may temporarily break local observability or artifact consistency when necessary.
 - Each batch must end in an openable or meaningfully verifiable state.
 - Batch size should avoid both micro-step local minima and huge unobservable changes.
 
@@ -70,38 +70,38 @@ Batch-end requirements:
 
 - [openable/verifiable condition]
 
-## Sensor / Test Governance
+## Sensor / Evidence Governance
 
-Tests are sensors, not objectives.
+Approved sensors, checks, and evidence channels are sensors, not objectives.
 
 Strong sensors to preserve:
 
-- [test/eval]
+- [sensor/check/evidence channel]
 
 Weak or stale sensors to inspect before obeying:
 
-- [test/eval]
+- [sensor/check/evidence channel]
 
 Obsolete sensors that may be retired and rewritten:
 
-- [test/eval]
+- [sensor/check/evidence channel]
 
-Product-level verification has priority over preserving brittle old tests.
+Target-state evidence has priority over preserving brittle old sensors.
 
-## Old Test Retirement and Rewrite Policy
+## Stale Sensor Retirement and Rewrite Policy
 
-A test may be retired or rewritten when:
+A sensor, check, or evidence channel may be retired or rewritten when:
 
-- it encodes old product semantics;
-- it over-constrains implementation details;
+- it encodes old requirement semantics;
+- it over-constrains execution details;
 - it conflicts with confirmed semantic invariants;
 - it prevents correct structural change.
 
-Any retired/replaced test must be recorded in the progress log with reason and replacement coverage.
+Any retired/replaced sensor must be recorded in the progress log with reason and replacement evidence coverage.
 
 ## Phase Gates
 
-Before implementation:
+Before execution:
 
 - control review status must be Approved.
 
@@ -119,7 +119,7 @@ Before completion:
 ## Execution Rhythm
 
 - Execute serially unless review explicitly approves parallel subagents.
-- If subagents are used, only one implementation subagent is active at a time unless approved.
+- If subagents are used, only one execution subagent is active at a time unless approved.
 - Do not let runtime `/goal` rewrite this policy.
 
 ## Stop Conditions
@@ -155,7 +155,7 @@ Each entry must include:
 
 Goal:
 
-- [product slice]
+- [target-state slice]
 
 Allowed intermediate breakage:
 

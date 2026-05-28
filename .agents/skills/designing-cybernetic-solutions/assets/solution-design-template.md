@@ -8,7 +8,7 @@ Status: `Candidate`
 
 - Requirements analysis: `[path]`
 - Rubric, if any: `[path or section]`
-- Existing specs/docs/code context:
+- Existing source-artifact context:
   - `[path]`
 
 ## Human Purpose
@@ -71,7 +71,7 @@ Outside scope:
 
 ### Interfaces / Contracts
 
-[APIs, documents, events, forms, reports, procedures, or equivalent contracts.]
+[External contracts, documents, events, forms, reports, procedures, or equivalent contracts.]
 
 ### State Model / Lifecycle
 

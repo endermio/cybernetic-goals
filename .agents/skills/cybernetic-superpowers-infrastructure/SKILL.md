@@ -1,6 +1,6 @@
 ---
 name: cybernetic-superpowers-infrastructure
-description: 'Use when a cybernetic skill needs to decide which Superpowers substrate is required for planning, independent review, runtime execution, debugging, or completion verification. Defines stage dependencies and non-substitution rules; it does not create control artifacts or execute implementation.'
+description: 'Use when a cybernetic skill needs to decide which Superpowers substrate is required for planning, independent review, runtime execution, debugging, or completion verification. Defines stage dependencies and non-substitution rules; it does not create control artifacts or execute target work.'
 ---
 
 # Cybernetic Superpowers Infrastructure
@@ -31,7 +31,7 @@ Approval requires a final observer pass after the last substantive mutation to t
 
 | Stage | Superpowers substrate | Required? |
 |---|---|---|
-| Product/design-heavy requirements analysis | `$superpowers:brainstorming` | Optional |
+| Exploratory requirements analysis | `$superpowers:brainstorming` | Optional |
 | Exploratory solution design | `$superpowers:brainstorming` | Optional |
 | Non-trivial execution policy generation | `$superpowers:writing-plans` | Required |
 | Control review approval | Independent subagent review discipline | Required for `Approved` unless explicit human approval exists |
@@ -47,6 +47,6 @@ This skill does not:
 - write execution policies;
 - perform control review;
 - compile runtime `/goal` commands;
-- implement code.
+- execute target work.
 
 It only supplies the shared infrastructure policy those skills must obey.

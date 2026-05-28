@@ -30,7 +30,7 @@ Does this task mention complex concepts?
 The key routing question is:
 
 ```text
-Would the execution agent otherwise need to invent or revise goals, product semantics, solution structure, sensors, execution policy, or phase gates during runtime?
+Would the execution agent otherwise need to invent or revise control contracts, requirement semantics, solution structure, sensors, execution policy, or phase gates during runtime?
 ```
 
 For evaluation tasks, also ask:
@@ -47,16 +47,16 @@ Use the lightest workflow that keeps the agent from inventing control structure 
 
 A task should not be routed to the full pre-goal pipeline merely because it mentions:
 
-- permissions
-- corpId
-- tenants
-- supervision
-- schema
-- screenshots
-- tests
-- API smoke
-- security words
-- multiple files
+- authorization
+- identity mapping
+- participant groups
+- oversight
+- structure contracts
+- evidence artifacts
+- checks
+- evidence channels
+- risk words
+- multiple artifacts
 
 Route to the full pipeline only when those areas contain unresolved control decisions.
 
@@ -72,7 +72,7 @@ Every routing response must include:
 6. `Recommended next step`
 7. `Rejected workflow, if any`
 
-Do not create files. Do not run implementation. Do not write a goal contract. Do not write an execution policy.
+Do not create files. Do not run target execution. Do not write a goal contract. Do not write an execution policy.
 
 ## Evaluation Function Gate
 
@@ -103,7 +103,7 @@ Examples:
 - `Level 2` + `Required gates: Rubric Gate required` means rubric analysis before bounded file/audit goal.
 - `Level 3` + `Required gates: Rubric Gate required` means the full requirements analysis phase must explicitly include rubric semantics.
 
-Do not route an unrubriced evaluation task directly to execution merely because implementation scope is bounded.
+Do not route an unrubriced evaluation task directly to execution merely because execution scope is bounded.
 
 ## Design Gate
 
@@ -124,7 +124,7 @@ If solution structure is missing or partial, keep the execution-complexity level
 Examples:
 
 - `Level 2` + `Design Gate: required` can describe a bounded audit/report task whose rubric is clear but report/evidence structure still needs a lightweight design.
-- `Level 3` + `Design Gate: required` describes complex work where product semantics are analyzed but the system/process model must be synthesized before goal and plan writing.
+- `Level 3` + `Design Gate: required` describes complex work where requirement semantics are analyzed but the system/process model must be synthesized before goal and plan writing.
 
 Do not encode design in the level name. Use `Level N` plus `Required gates`.
 
@@ -134,21 +134,21 @@ Before routing to Level 3, check whether this is a bounded correction inside an 
 
 Downgrade to Level 1 or Level 2 when all are true:
 
-- The task does not introduce a new product capability.
+- The task does not introduce a new required capability.
 - Confirmed semantics and any required solution structure already exist in a requirements analysis, solution design, goal, plan, control review, prior approved decision, or explicit user instruction.
-- The task does not require changing schema semantics, permission semantics, public API semantics, data visibility semantics, or product setpoint.
-- The expected change can be described as a local correction to display, fixture data, naming, tests, screenshots, or one bounded workflow.
+- The task does not require changing structure-contract semantics, authorization semantics, external contract semantics, visibility semantics, or target setpoint.
+- The expected change can be described as a local correction to observer output, source fixtures, naming, checks, evidence artifacts, or one bounded workflow.
 - The agent would not need to invent new solution design, goals, sensors, execution policies, or phase gates during execution.
 
 Examples:
 
-- Fixing REG/PARK being displayed as enterprise C1 after collaborative supervision semantics are already analyzed.
-- Adjusting local preview fixture names to avoid misleading corpId display.
-- Changing a column label from `hash` to `哈希` when base58 semantics are already confirmed.
-- Updating a stale screenshot assertion to match an already confirmed product decision.
-- Tightening a route guard message without changing permission semantics.
+- Correcting an observer label after the identity semantics are already analyzed.
+- Adjusting local source fixtures to avoid misleading entity display.
+- Changing a displayed term when identifier semantics are already confirmed.
+- Updating a stale evidence assertion to match an already confirmed requirement decision.
+- Tightening an access-boundary message without changing authorization semantics.
 
-These are not Level 3 merely because they mention permissions, corpId, supervision, tests, or screenshots.
+These are not Level 3 merely because they mention authorization, identity mapping, oversight, checks, or evidence artifacts.
 
 ## Complexity Levels
 
@@ -159,9 +159,9 @@ Use when the task is simple, local, low-risk, and has an obvious verification pa
 Signals:
 
 - one file or one small area
-- no new product semantics
-- no permission/data visibility change
-- no schema/API contract change
+- no new requirement semantics
+- no authorization/visibility change
+- no structure/external contract change
 - no long-lived control artifact needed
 - obvious verification command or inspection
 
@@ -174,7 +174,7 @@ Use a direct prompt.
 Example:
 
 ```text
-修复 tests/date-format.test.ts 当前失败的日期格式单测，不改变其他日期格式行为；运行 npm test tests/date-format.test.ts 验证。
+修复一个当前失败的局部检查，不改变相关目标行为；运行对应 focused check 验证。
 ```
 
 Reject full workflow because the coordination overhead is larger than the task.
@@ -188,7 +188,7 @@ Signals:
 - one bounded objective
 - clear success condition
 - one or two verification surfaces
-- no unresolved product semantics
+- no unresolved requirement semantics
 - no need for a persistent goal file
 
 Recommended next step:
@@ -205,9 +205,9 @@ Signals:
 
 - requirements are already clear
 - existing requirements analysis/solution design/goal/plan already fixes semantics and solution structure, or the user provides clear constraints
-- no unresolved product semantics
-- no new schema, permission, or public API semantics
-- localized correction across UI, fixture, smoke, screenshot, docs, or one bounded workflow
+- no unresolved requirement semantics
+- no new structure-contract, authorization, or external contract semantics
+- localized correction across observer output, source fixture, evidence channel, documentation, or one bounded workflow
 - wide read-only audit with fixed classification semantics, an explicit evaluation rubric, and a fixed report artifact
 - moderate verification needs
 - a persistent small goal file may help, but a full pre-goal pipeline would be too heavy
@@ -242,7 +242,7 @@ Signals:
 
 - the task is an audit, evaluation, readiness check, closure check, usability judgment, completeness check, safety/stability assessment, or status classification;
 - object scope is clear enough for a bounded file goal;
-- product/schema/permission/API semantics are not being redesigned;
+- requirement, structure-contract, authorization, or external-contract semantics are not being redesigned;
 - labels such as complete/closed/ready/usable/pass/fail/partial/unknown are present but not operationally defined.
 
 Recommended next step:
@@ -263,10 +263,10 @@ Use when the execution agent would otherwise need to invent or revise the contro
 
 Strong signals:
 
-- product/domain semantics are unresolved
-- permission or data visibility semantics are unresolved
-- schema/API/UI/test changes must be coordinated and no approved control artifacts exist
-- old tests may be stale and no sensor governance exists yet
+- requirement semantics are unresolved
+- authorization or visibility semantics are unresolved
+- structure contracts, observer surfaces, and evidence channels must be coordinated and no approved control artifacts exist
+- old sensors may be stale and no sensor governance exists yet
 - solution structure is unresolved: objects, relationships, boundaries, flows, interfaces, or evidence model need design
 - execution requires multiple batches and phase gates not yet defined
 - the task would require creating or revising requirements analysis, solution design, goal, execution policy, or control review before safe execution
@@ -306,13 +306,13 @@ Use when the task has high irreversible, external, or regulated risk.
 
 Signals:
 
-- production deployment
+- live external-state change
 - real credentials
-- irreversible data migration
+- irreversible state transition
 - financial, legal, medical, compliance, safety, or security-critical decisions
-- external customer data
+- external participant data
 - destructive actions
-- public API breakage with external consumers
+- external contract breakage with external consumers
 - regulatory or contractual implications
 
 Recommended next step:
@@ -323,23 +323,23 @@ Use the full pre-goal pipeline, but require explicit human approval before runti
 
 ## Scoring Heuristic
 
-Score actual control uncertainty, not merely possible implementation surface.
+Score actual control uncertainty, not merely possible execution surface.
 
 | Dimension | Score |
 |---|---:|
-| New product/domain semantics must be decided | +3 |
-| New permission/data visibility semantics must be decided | +3 |
-| New schema or migration semantics must be decided | +2 |
+| New requirement semantics must be decided | +3 |
+| New authorization/visibility semantics must be decided | +3 |
+| New structure or transition semantics must be decided | +2 |
 | Solution structure or design model must be decided | +3 |
 | Multiple subsystems need coordinated changes | +2 |
-| Public API or external contract semantics must change | +2 |
-| Existing tests are likely stale sensors and require governance | +2 |
-| Requires multiple implementation batches | +2 |
-| Requires screenshots/API smoke/evals | +1 |
-| Irreversible or production-impacting | +4 |
+| External contract semantics must change | +2 |
+| Existing sensors are likely stale and require governance | +2 |
+| Requires multiple execution batches | +2 |
+| Requires multiple evidence channels | +1 |
+| Irreversible or live-state-impacting | +4 |
 | Existing requirements analysis/solution design/goal/plan/control review already fixes semantics and solution structure | -3 |
 | Task is a bounded correction inside an existing feature | -3 |
-| No schema/permission/API semantic change | -2 |
+| No structure/authorization/external-contract semantic change | -2 |
 | Goal and verification are already obvious | -1 |
 
 Guidance:
@@ -366,23 +366,23 @@ What unresolved control decision would the execution agent have to make if we di
 
 If the answer is only:
 
-- component naming
-- column visibility
+- mechanism naming
+- observer-field visibility
 - fixture cleanup
-- screenshot text
-- obvious UI copy
-- bounded test update
-- local route guard presentation
+- evidence-artifact text
+- obvious observer text
+- bounded sensor update
+- local boundary-message presentation
 - stale assertion update
 
 then do not choose Level 3.
 
 If the answer includes:
 
-- what the product means
+- what the requirement means
 - who can see what
-- how data visibility works
-- whether schema semantics change
+- how visibility works
+- whether structure semantics change
 - what the target state is
 - what solution model, object relationships, boundaries, or information/state flow should be used
 - which sensors are authoritative
@@ -442,7 +442,7 @@ Routing decision: Level 2 - Bounded File Goal / Bounded Repair
 
 Why:
 - Existing semantics are already fixed.
-- No new schema/permission/API semantics appear required.
+- No new structure/authorization/external-contract semantics appear required.
 - The task is a bounded correction.
 
 Required gates:
@@ -479,7 +479,7 @@ Routing decision: Level 2 - Bounded Audit
 
 Why:
 - Execution scope is bounded enough for a file goal.
-- Product/schema/permission/API semantics do not need redesign.
+- Requirement, structure-contract, authorization, and external-contract semantics do not need redesign.
 - The evaluation function is not explicit enough for runtime execution.
 
 Required gates:
@@ -497,7 +497,7 @@ $analyzing-cybernetic-requirements 分析这个审计/评估任务的评价口�
 
 Rejected workflow:
 - Reject direct Level 2 execution because runtime Codex would invent the error function.
-- Reject Level 3 unless broader product/control semantics are also unresolved.
+- Reject Level 3 unless broader requirement/control semantics are also unresolved.
 ```
 
 ### Level 2 With Design Gate
@@ -507,7 +507,7 @@ Routing decision: Level 2 - Bounded Design/Audit/Repair
 
 Why:
 - Execution scope is bounded enough for a small goal after design.
-- Product/schema/permission/API semantics do not need redesign.
+- Requirement, structure-contract, authorization, and external-contract semantics do not need redesign.
 - The solution/report/evidence structure is not explicit enough for runtime execution.
 
 Required gates:
@@ -580,9 +580,9 @@ Rejected workflow:
 | Mistake | Fix |
 |---|---|
 | Routing by scary keywords | Route by unresolved control decisions |
-| Treating any permission mention as Level 3 | Ask whether permission semantics change |
-| Treating any schema mention as Level 3 | Ask whether schema semantics change |
-| Treating any screenshot mention as Level 3 | Screenshots alone are often Level 1/2 sensors |
+| Treating any authorization mention as Level 3 | Ask whether authorization semantics change |
+| Treating any structure mention as Level 3 | Ask whether structure semantics change |
+| Treating any evidence-artifact mention as Level 3 | Evidence artifacts alone are often Level 1/2 sensors |
 | Treating existing-feature fixes as new-feature work | Run the downgrade pass |
 | Recommending full pipeline for local display/fixture cleanup | Use Level 1/2 |
 | Ignoring approved requirements analysis/design/goal/plan artifacts | Downgrade when semantics and solution structure are already frozen |

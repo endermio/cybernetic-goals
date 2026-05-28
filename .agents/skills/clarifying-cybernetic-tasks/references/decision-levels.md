@@ -6,12 +6,12 @@ Ask the human. Do not proceed to solution design or final goal creation without 
 
 Examples:
 
-- real-time pull vs local summary vs push-based reporting
-- enterprise equals corp_id vs independent enterprise entity
-- regulator can query all parks vs only authorized parks
-- whether offline filing workflow is in scope
-- whether user-visible hash concept is base58-only or dual-format
-- whether permission scope is node-level, tenant-level, organization-level, or hybrid
+- whether Actor A observes Object B directly or through an intermediary summary
+- whether Concept X is an alias of Concept Y or an independent entity
+- whether Role A can observe all groups or only authorized groups
+- whether deferred/offline handling is inside scope
+- whether observer-visible identifier semantics are single-format or multi-format
+- whether authorization scope is local, group-level, organization-level, or hybrid
 
 ## Level 2: Default Assumption
 
@@ -19,21 +19,21 @@ Do not ask by default. Record the assumption and allow override.
 
 Examples:
 
-- fan-out query returns partial results and marks failed nodes
-- multiple node results are globally sorted by time descending
-- UI shows failure badges or warnings for unreachable nodes
-- existing excluded features remain out of scope unless reopened
+- partial results are surfaced with failed source markers
+- multiple source results are sorted by a confirmed ordering rule
+- unreachable sources are surfaced as observer-visible warnings
+- existing excluded capabilities remain out of scope unless reopened
 
 ## Level 3: Deferred Design / Planning / Execution Detail
 
-Do not ask during requirements analysis. Defer to solution design, goal writing, planning, or implementation.
+Do not ask during requirements analysis. Defer to solution design, goal writing, execution-policy writing, or execution.
 
 Examples:
 
 - exact timeout values
 - retry count
-- endpoint names
-- test file names
-- schema index names
-- helper function names
-- screenshot file names
+- interface names
+- sensor artifact names
+- structure index names
+- helper mechanism names
+- evidence artifact names
