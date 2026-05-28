@@ -340,7 +340,7 @@ Use `$compiling-cybernetic-runtime-goals` when available.
 Before outputting runtime `/goal`, ensure:
 
 - requirements analysis is complete
-- required solution design exists
+- solution design exists when Design Gate was required or a design artifact exists
 - goal contract exists
 - execution policy exists
 - control review exists

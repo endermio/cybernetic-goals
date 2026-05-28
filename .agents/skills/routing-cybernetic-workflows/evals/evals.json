@@ -153,6 +153,17 @@
       ]
     },
     {
+      "id": "level-3-with-existing-design-does-not-require-design-gate",
+      "prompt": "评估任务：已有完整 requirements analysis 和 solution design，接下来要实现一个跨后端、前端、数据库和测试的复杂功能。设计对象、接口、状态流、证据模型都已明确。",
+      "expected_output": "Classify as Level 3 because execution is complex, but mark Design Gate as satisfied or not required rather than required.",
+      "assertions": [
+        "Classifies the task as Level 3.",
+        "Does not mark Design Gate as required.",
+        "Explains that solution structure is already explicit.",
+        "Recommends pre-goal pipeline without redoing solution design."
+      ]
+    },
+    {
       "id": "bounded-fix-with-existing-design-does-not-need-design-gate",
       "prompt": "使用 $routing-cybernetic-workflows 分析任务：已有 requirements analysis、solution design、goal、plan 和 approved review。现在只修正一个页面把 REG/PARK 节点误显示为企业的问题，不改变 schema、权限、拉取语义或 UI 概念边界。",
       "expected_output": "Classify as Level 1 or Level 2 with Design Gate satisfied or not applicable, not full pre-goal pipeline.",

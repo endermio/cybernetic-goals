@@ -37,6 +37,17 @@
         "Plan does not invent new domain objects, relationships, information flow, or interface semantics not present in requirements analysis or design.",
         "Does not execute code."
       ]
+    },
+    {
+      "id": "execution-policy-must-not-redesign-solution",
+      "prompt": "根据 requirements、solution design 和 goal 创建 execution policy。solution design 已定义对象、接口、状态流和证据模型；执行阶段发现另一个实现结构更方便。",
+      "expected_output": "The execution policy must preserve the solution design and must not introduce a different object model, interface contract, state flow, or evidence model. It should stop or ask for a design revision if the design is insufficient.",
+      "assertions": [
+        "References the solution design as a source contract.",
+        "Does not invent a new solution model.",
+        "Does not replace design objects, relationships, flows, interfaces, or evidence model.",
+        "Routes back to $designing-cybernetic-solutions or asks for the smallest design decision if the design is insufficient."
+      ]
     }
   ]
 }

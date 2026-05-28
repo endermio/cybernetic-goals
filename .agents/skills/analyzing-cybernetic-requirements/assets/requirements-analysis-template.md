@@ -122,11 +122,11 @@ Record confirmed requirement decisions here.
 
 - [excluded scope]
 
-## Draft Verification Strategy
+## Candidate Sensors / Evidence Needs
 
-- [focused check]
-- [broader check]
-- [artifact/screenshot/eval]
+- [candidate sensor or observation]
+- [evidence needed to judge requirement satisfaction]
+- [external or currently unobservable evidence concern]
 
 ## Next Action
 

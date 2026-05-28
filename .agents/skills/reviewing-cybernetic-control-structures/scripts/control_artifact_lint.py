@@ -147,7 +147,7 @@ def main() -> int:
             ("Current Understanding", ["Current Understanding"]),
             ("Confirmed Requirement Decisions", ["Confirmed Requirement Decisions", "Confirmed Decisions From Human"]),
             ("Non-Goals", ["Non-Goals"]),
-            ("Draft Verification Strategy", ["Draft Verification Strategy"]),
+            ("Candidate Sensors / Evidence Needs", ["Candidate Sensors / Evidence Needs", "Candidate Verification Concerns", "Draft Verification Strategy"]),
         ], errors)
         st = first_section_status(requirements, "Requirements Analysis Status", "Clarification Status")
         if st != "Complete":

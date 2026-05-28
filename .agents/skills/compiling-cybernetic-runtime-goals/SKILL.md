@@ -40,7 +40,7 @@ Do not output `/goal` unless:
 
 - requirements analysis status is Complete;
 - goal contract exists;
-- required solution design exists;
+- solution design exists when Design Gate was required or a design artifact exists;
 - execution policy exists;
 - control review status is Approved;
 - control review includes `Final Observer Check`;
