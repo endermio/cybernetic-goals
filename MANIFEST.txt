@@ -1,3 +1,8 @@
+.agents/skills/analyzing-cybernetic-requirements/SKILL.md
+.agents/skills/analyzing-cybernetic-requirements/agents/openai.yaml
+.agents/skills/analyzing-cybernetic-requirements/assets/requirements-analysis-template.md
+.agents/skills/analyzing-cybernetic-requirements/evals/evals.json
+.agents/skills/analyzing-cybernetic-requirements/references/decision-levels.md
 .agents/skills/clarifying-cybernetic-tasks/SKILL.md
 .agents/skills/clarifying-cybernetic-tasks/agents/openai.yaml
 .agents/skills/clarifying-cybernetic-tasks/assets/clarification-brief-template.md
@@ -13,6 +18,11 @@
 .agents/skills/cybernetic-superpowers-infrastructure/agents/openai.yaml
 .agents/skills/cybernetic-superpowers-infrastructure/evals/evals.json
 .agents/skills/cybernetic-superpowers-infrastructure/references/superpowers-infrastructure-policy.md
+.agents/skills/designing-cybernetic-solutions/SKILL.md
+.agents/skills/designing-cybernetic-solutions/agents/openai.yaml
+.agents/skills/designing-cybernetic-solutions/assets/solution-design-template.md
+.agents/skills/designing-cybernetic-solutions/evals/evals.json
+.agents/skills/designing-cybernetic-solutions/references/design-gate.md
 .agents/skills/orchestrating-cybernetic-pregoal/SKILL.md
 .agents/skills/orchestrating-cybernetic-pregoal/agents/openai.yaml
 .agents/skills/orchestrating-cybernetic-pregoal/assets/orchestration-report-template.md

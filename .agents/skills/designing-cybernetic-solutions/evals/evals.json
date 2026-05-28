@@ -1,0 +1,50 @@
+{
+  "skill_name": "designing-cybernetic-solutions",
+  "evals": [
+    {
+      "id": "creates-general-solution-design-from-requirements-analysis",
+      "prompt": "使用 $designing-cybernetic-solutions 根据 docs/cybernetics/requirements/2026-05-22-collaborative-supervision.md 创建 solution design。需求语义已经确认，但监管节点、园区节点、企业节点、corpId、日志拉取和 UI 概念需要形成解决方案模型。",
+      "expected_output": "Create docs/cybernetics/designs/2026-05-22-collaborative-supervision.md with conceptual and detailed design sections, without creating a goal, plan, control review, or runtime /goal.",
+      "assertions": [
+        "Creates or references docs/cybernetics/designs/2026-05-22-collaborative-supervision.md.",
+        "Includes Conceptual Design with core objects/actors/roles, relationships, information/state flow, boundaries, alternatives, and conceptual invariants.",
+        "Includes Detailed Design with components/mechanisms, interfaces/contracts, lifecycle/state model, error/failure model, evidence/sensor model, compatibility/integration, and design decisions.",
+        "Includes Design-to-Goal Mapping and Design-to-Execution Mapping.",
+        "Does not write a goal contract.",
+        "Does not write an execution policy.",
+        "Does not output a runtime /goal."
+      ]
+    },
+    {
+      "id": "blocks-when-requirements-analysis-incomplete",
+      "prompt": "使用 $designing-cybernetic-solutions 根据 docs/cybernetics/requirements/incomplete-feature.md 创建 solution design。该 requirements analysis 还有开放的人类问题。",
+      "expected_output": "Stop before creating an approved design because requirement semantics are incomplete.",
+      "assertions": [
+        "States that requirements analysis must be Complete before design can be approved.",
+        "Does not mark design Approved.",
+        "Does not create goal or plan artifacts.",
+        "Reports the smallest required human decision or requirements analysis input."
+      ]
+    },
+    {
+      "id": "does-not-force-software-architecture-language",
+      "prompt": "使用 $designing-cybernetic-solutions 为一个非软件任务设计方案：创建研究综述的证据模型、变量框架和分析流程。",
+      "expected_output": "Use general solution-design language rather than software-only architecture language.",
+      "assertions": [
+        "Uses general terms such as objects, actors, roles, information flow, evidence model, procedures, or lifecycle.",
+        "Does not require software-only sections such as API, database schema, UI component tree, or code module unless relevant.",
+        "Maps the design to goal implications and execution-policy implications."
+      ]
+    },
+    {
+      "id": "uses-brainstorming-only-when-exploratory",
+      "prompt": "使用 $designing-cybernetic-solutions 根据一个已完成 requirements analysis 写 design。设计空间很小，用户已经明确对象关系和信息流。",
+      "expected_output": "Do not require $superpowers:brainstorming when the design structure is already clear.",
+      "assertions": [
+        "Records $superpowers:brainstorming as Not required or not used.",
+        "Explains that brainstorming is optional and used only for exploratory/product-design-heavy cases or explicit user request.",
+        "Creates a concise design instead of expanding into unnecessary exploration."
+      ]
+    }
+  ]
+}
