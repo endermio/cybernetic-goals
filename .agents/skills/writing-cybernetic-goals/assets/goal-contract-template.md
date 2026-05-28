@@ -19,7 +19,8 @@ Codex may stop only when:
 
 Read first:
 
-- [clarification brief]
+- [requirements analysis brief]
+- [solution design, if Design Gate is required or a design exists]
 - [relevant docs]
 
 ## Scope and Boundaries
@@ -88,7 +89,7 @@ For each checkpoint:
 
 Maintain:
 
-- `docs/superpowers/progress/YYYY-MM-DD-slug.md`
+- `docs/cybernetics/progress/YYYY-MM-DD-slug.md`
 
 Each entry must include:
 

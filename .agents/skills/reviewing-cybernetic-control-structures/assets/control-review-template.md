@@ -6,7 +6,8 @@ Status: `Needs Revision`
 
 ## Inputs Reviewed
 
-- Clarification: `[path]`
+- Requirements analysis: `[path]`
+- Solution design: `[path or not required]`
 - Goal: `[path]`
 - Execution policy: `[path]`
 
@@ -15,6 +16,7 @@ Status: `Needs Revision`
 - Subagents authorized: `yes/no`
 - Independent review passes completed:
   - Requirement traceability: `yes/no`
+  - Design fidelity: `yes/no`
   - Goal fidelity: `yes/no`
   - Sensor governance: `yes/no`
   - Execution cadence: `yes/no`
@@ -53,6 +55,12 @@ Findings:
 - [finding]
 
 ## Goal Fidelity
+
+Findings:
+
+- [finding]
+
+## Design Fidelity
 
 Findings:
 
@@ -108,9 +116,11 @@ Findings:
 
 The control structure may be approved only if:
 
-- clarification status is Complete;
-- goal preserves clarification semantics;
-- execution policy preserves goal and clarification;
+- requirements analysis status is Complete;
+- required solution design exists and preserves requirements analysis semantics;
+- goal preserves requirements analysis semantics;
+- goal and execution policy preserve required design invariants;
+- execution policy preserves goal and requirements analysis;
 - sensor governance is explicit;
 - batch cadence is explicit;
 - runtime execution does not need to synthesize a new plan.

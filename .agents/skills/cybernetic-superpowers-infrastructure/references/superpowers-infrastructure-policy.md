@@ -10,7 +10,8 @@ Cybernetic skills compile control structures. Superpowers provide planning, exec
 
 | Stage | Required substrate | Required? | Notes |
 |---|---|---:|---|
-| Product/design-heavy clarification | `$superpowers:brainstorming` | Optional | Do not use for simple rubric clarification unless exploration is requested. |
+| Product/design-heavy requirements analysis | `$superpowers:brainstorming` | Optional | Do not use for simple rubric analysis unless exploration is requested. |
+| Exploratory solution design | `$superpowers:brainstorming` | Optional | Use when the solution model needs exploration, not when objects, flows, and boundaries are already explicit. |
 | Execution policy generation | `$superpowers:writing-plans` | Required for non-trivial implementation plans | The cybernetic skill supplies control constraints to the planning substrate. |
 | Control structure review | Independent subagent review discipline | Required for `Approved` unless explicit human approval exists | Do not run implementation or dispatch implementer agents during pre-goal review. |
 | Runtime execution | `$superpowers:executing-plans` discipline | Required | Execute approved artifacts only; do not create a new plan at runtime. |
@@ -45,7 +46,7 @@ If subagents are not authorized:
 
 Approval requires a final observer pass after the last substantive mutation to the reviewed control artifacts.
 
-If any control artifact changes after the latest independent review, the review state becomes `Dirty` / `Needs Re-review` and cannot be `Approved` until an independent reviewer confirms no Blocking or Major findings on the changed artifact.
+If any control artifact changes after the latest independent review, including a required solution design, the review state becomes `Dirty` / `Needs Re-review` and cannot be `Approved` until an independent reviewer confirms no Blocking or Major findings on the changed artifact.
 
 Mechanical recording of already-reviewed findings into the control review file does not itself create a new review cycle. Substantive changes to the review's final decision, reviewer findings, approval rationale, or Final Observer Check after approval require re-review or explicit human approval.
 

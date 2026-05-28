@@ -4,13 +4,14 @@
 
 Superpowers are infrastructure substrates for the cybernetic skill chain.
 
-Cybernetic skills compile control structures: clarification, goal contracts, execution policies, control reviews, and runtime `/goal` commands. Superpowers provide the lower-level behavior protocols for planning, independent review discipline, runtime execution, debugging, and verification.
+Cybernetic skills compile solution designs and control structures: requirements analysis, solution designs, goal contracts, execution policies, control reviews, and runtime `/goal` commands. Superpowers provide the lower-level behavior protocols for planning, independent review discipline, runtime execution, debugging, and verification.
 
 ## Stage Dependency Matrix
 
 | Stage | Required substrate | Required? | Notes |
 |---|---|---:|---|
-| Product/design-heavy clarification | `$superpowers:brainstorming` | Optional | Use for exploratory product/design clarification, not simple rubric clarification. |
+| Product/design-heavy requirements analysis | `$superpowers:brainstorming` | Optional | Use for exploratory product/design requirements analysis, not simple rubric analysis. |
+| Exploratory solution design | `$superpowers:brainstorming` | Optional | Use when solution structure needs exploration, not when objects, flows, and boundaries are already explicit. |
 | Execution policy generation | `$superpowers:writing-plans` | Required for non-trivial implementation plans | Cybernetic execution-policy skills provide semantic invariants, tactical freedom, dependency matrix, batch cadence, sensor governance, and stale-test policy as inputs. |
 | Control structure review | Independent subagent review discipline | Required for `Approved` unless explicit human approval exists | This is review discipline, not the full implementation workflow from `$superpowers:subagent-driven-development`. |
 | Runtime execution | `$superpowers:executing-plans` discipline | Required | Execute the approved plan; do not create or approve a new plan at runtime. |
@@ -41,7 +42,7 @@ If subagents are not authorized, pre-goal orchestration may produce candidate ar
 
 Approval requires a final observer pass after the last substantive mutation to the reviewed control artifacts.
 
-If any control artifact changes after the latest independent review, the review state becomes `Dirty` / `Needs Re-review` and cannot be `Approved` until an independent reviewer confirms no Blocking or Major findings on the changed artifact.
+If any control artifact changes after the latest independent review, including a required solution design, the review state becomes `Dirty` / `Needs Re-review` and cannot be `Approved` until an independent reviewer confirms no Blocking or Major findings on the changed artifact.
 
 Mechanical recording of already-reviewed findings into the control review file does not itself create a new review cycle. Substantive changes to the review's final decision, reviewer findings, approval rationale, or Final Observer Check after approval require re-review or explicit human approval.
 

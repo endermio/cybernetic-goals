@@ -1,6 +1,6 @@
 ---
 name: writing-cybernetic-execution-policies
-description: 'Use after an approved clarification brief and goal contract exist, before starting an executable /goal. Creates an implementation plan as a cybernetic execution policy: dependency matrix, batch cadence, destructive intermediate-state policy, test/sensor governance, semantic invariants, tactical degrees of freedom, phase gates, and execution rhythm. Does not implement code and does not start /goal execution.'
+description: 'Use after an approved requirements analysis brief, any required solution design, and goal contract exist, before starting an executable /goal. Creates an implementation plan as a cybernetic execution policy: dependency matrix, batch cadence, destructive intermediate-state policy, test/sensor governance, semantic invariants, design invariants, tactical degrees of freedom, phase gates, and execution rhythm. Does not implement code and does not start /goal execution.'
 ---
 
 # Writing Cybernetic Execution Policies
@@ -11,7 +11,8 @@ Create the execution control law for a complex AI coding task.
 
 This skill converts:
 
-- clarification brief
+- requirements analysis brief
+- solution design, when Design Gate is required or a design exists
 - goal contract
 
 into:
@@ -24,7 +25,7 @@ Use `assets/execution-policy-template.md`.
 
 ## Core Boundary
 
-This skill does not clarify requirements, does not write the goal contract, does not review its own plan, and does not implement code.
+This skill does not analyze requirements, does not write the goal contract, does not review its own plan, and does not implement code.
 
 ## Required Infrastructure
 
@@ -37,6 +38,7 @@ For non-trivial implementation plans, invoke `$superpowers:writing-plans` or loa
 This skill supplies the cybernetic constraints that the planning substrate must preserve:
 
 - confirmed semantic invariants;
+- solution-design invariants and interfaces/contracts;
 - tactical degrees of freedom;
 - dependency matrix requirement;
 - batch cadence;
@@ -88,12 +90,26 @@ If many tests conflict with confirmed product semantics, implement the product b
 
 Do not let brittle old tests define the target behavior.
 
+## Design Boundary
+
+If a solution design exists or Design Gate was required, the execution policy must reference the design under `Source Contracts`.
+
+The policy may choose tactical implementation details, batch cadence, and file/workstream organization. It must not redesign:
+
+- domain objects, actors, roles, or relationships;
+- information/state/evidence flow;
+- interfaces/contracts;
+- lifecycle or failure model;
+- design invariants.
+
+If the design is missing, contradictory, or insufficient for planning, stop and route back to `$designing-cybernetic-solutions` or ask for the smallest design decision.
+
 ## Output Format
 
 Create:
 
 ```text
-docs/superpowers/plans/YYYY-MM-DD-<slug>.md
+docs/cybernetics/plans/YYYY-MM-DD-<slug>.md
 ```
 
 Then respond:
@@ -101,11 +117,12 @@ Then respond:
 ```markdown
 Created candidate execution policy:
 
-`docs/superpowers/plans/YYYY-MM-DD-slug.md`
+`docs/cybernetics/plans/YYYY-MM-DD-slug.md`
 
 Control-law summary:
 - Planning substrate: ...
 - Semantic invariants: ...
+- Design source: ...
 - Batch cadence: ...
 - Sensor governance: ...
 - Phase gates: ...
@@ -120,6 +137,8 @@ Use `$reviewing-cybernetic-control-structures` before starting runtime /goal.
 - [ ] The plan records planning substrate status.
 - [ ] The plan does not self-substitute for a missing required planning substrate.
 - [ ] The plan distinguishes semantic invariants from tactical degrees of freedom.
+- [ ] If Design Gate is required, the plan references the solution design.
+- [ ] The plan does not invent or revise the solution model.
 - [ ] The plan has dependency matrix.
 - [ ] The plan has batch cadence.
 - [ ] The plan allows destructive intermediate states only within approved batches.

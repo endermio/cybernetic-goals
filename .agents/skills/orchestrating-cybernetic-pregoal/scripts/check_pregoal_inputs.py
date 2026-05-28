@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Check whether a clarification brief is ready for pre-goal compilation.
+"""Check whether a requirements analysis brief is ready for pre-goal compilation.
 
 This script performs deterministic structural checks only. It does not judge product semantics.
 """
@@ -21,8 +21,10 @@ def read_text(path: Path) -> str:
 
 def has_complete_status(text: str) -> bool:
     patterns = [
+        r"Requirements\s+Analysis\s+Status[^\n]*(Complete|`Complete`)",
         r"Clarification\s+Status[^\n]*(Complete|`Complete`)",
         r"Status\s*:\s*`?Complete`?",
+        r"Requirements\s+analysis\s+is\s+complete",
         r"Clarification\s+is\s+complete",
         r"No\s+open\s+blocking\s+questions",
         r"No\s+open\s+questions",
@@ -32,7 +34,11 @@ def has_complete_status(text: str) -> bool:
 
 
 def has_confirmed_decisions(text: str) -> bool:
-    return bool(re.search(r"##\s+Confirmed\s+Decisions", text, re.IGNORECASE)) or "已确认" in text
+    return (
+        bool(re.search(r"##\s+Confirmed\s+Requirement\s+Decisions", text, re.IGNORECASE))
+        or bool(re.search(r"##\s+Confirmed\s+Decisions", text, re.IGNORECASE))
+        or "已确认" in text
+    )
 
 
 def has_open_questions(text: str) -> bool:
@@ -51,10 +57,14 @@ def has_open_questions(text: str) -> bool:
 
 def main() -> int:
     parser = argparse.ArgumentParser()
-    parser.add_argument("--clarification", required=True, help="Path to clarification brief")
+    parser.add_argument("--requirements", dest="requirements", help="Path to requirements analysis brief")
+    parser.add_argument("--clarification", dest="requirements", help="Deprecated alias for --requirements")
     args = parser.parse_args()
 
-    path = Path(args.clarification)
+    if not args.requirements:
+        parser.error("--requirements is required")
+
+    path = Path(args.requirements)
     result: dict[str, Any] = {
         "path": str(path),
         "exists": path.exists(),
@@ -64,7 +74,7 @@ def main() -> int:
     }
 
     if not path.exists():
-        result["errors"].append("clarification file does not exist")
+        result["errors"].append("requirements analysis file does not exist")
         print(json.dumps(result, ensure_ascii=False, indent=2))
         return 2
 
@@ -80,7 +90,7 @@ def main() -> int:
     }
 
     if not complete:
-        result["errors"].append("clarification is not marked complete")
+        result["errors"].append("requirements analysis is not marked complete")
     if open_questions:
         result["errors"].append("open human questions detected")
     if not confirmed:

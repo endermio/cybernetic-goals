@@ -26,6 +26,8 @@ STATUS_ALIASES = {
     "candidate": "Candidate",
     "候选": "Candidate",
     "候选状态": "Candidate",
+    "reviewed": "Reviewed",
+    "已审查": "Reviewed",
 }
 
 
@@ -65,6 +67,27 @@ def section_status(text: str, heading: str) -> str | None:
         return None
     m = STATUS_LINE_RE.search(body)
     return canonical_status(m.group(1)) if m else None
+
+
+def first_section_status(text: str, *headings: str) -> str | None:
+    for heading in headings:
+        status = section_status(text, heading)
+        if status is not None:
+            return status
+    return None
+
+
+def design_gate_required(*texts: str) -> bool:
+    combined = "\n".join(texts)
+    for line in combined.splitlines():
+        lowered = line.casefold()
+        if "design gate" not in lowered:
+            continue
+        if re.search(r"not\s+required|not\s+applicable|satisfied", lowered):
+            continue
+        if "required" in lowered:
+            return True
+    return False
 
 
 def yes_no_value(text: str, label: str) -> str | None:
@@ -132,26 +155,41 @@ def check_final_observer(review: str, errors: list[str]) -> None:
 
 def main() -> int:
     ap = argparse.ArgumentParser()
-    ap.add_argument("--clarification", required=True)
+    ap.add_argument("--requirements", dest="requirements")
+    ap.add_argument("--clarification", dest="requirements", help="Deprecated alias for --requirements")
+    ap.add_argument("--design", required=False)
     ap.add_argument("--goal", required=True)
     ap.add_argument("--plan", required=True)
     ap.add_argument("--review", required=True)
     args = ap.parse_args()
+    if not args.requirements:
+        ap.error("--requirements is required")
 
     errors: list[str] = []
     try:
-        clarification = read(args.clarification)
+        requirements = read(args.requirements)
+        design = read(args.design) if args.design else None
         goal = read(args.goal)
         plan = read(args.plan)
         review = read(args.review)
     except FileNotFoundError as e:
         errors.append(str(e))
-        clarification = goal = plan = review = ""
+        requirements = goal = plan = review = ""
+        design = None
 
-    if clarification:
-        clarification_status = section_status(clarification, "Clarification Status")
-        if clarification_status != "Complete":
-            errors.append(f"clarification status under ## Clarification Status is not Complete: {clarification_status!r}")
+    if requirements:
+        requirements_status = first_section_status(requirements, "Requirements Analysis Status", "Clarification Status")
+        if requirements_status != "Complete":
+            errors.append(f"requirements analysis status is not Complete: {requirements_status!r}")
+
+    if design:
+        design_status = section_status(design, "Design Status")
+        if design_status not in {"Candidate", "Reviewed", "Approved"}:
+            errors.append(f"design status under ## Design Status must be Candidate, Reviewed, or Approved: {design_status!r}")
+        if args.requirements not in design:
+            errors.append(f"design does not reference required requirements path: {args.requirements}")
+    elif design_gate_required(requirements, goal, plan, review):
+        errors.append("Design Gate is required but --design was not provided")
 
     if plan:
         plan_status = section_status(plan, "Execution Policy Status")
@@ -165,13 +203,18 @@ def main() -> int:
         check_final_observer(review, errors)
 
     for path, text, label in [
-        (args.clarification, goal, "goal"),
-        (args.clarification, plan, "plan"),
+        (args.requirements, goal, "goal"),
+        (args.design, goal, "goal"),
+        (args.requirements, plan, "plan"),
+        (args.design, plan, "plan"),
         (args.goal, plan, "plan"),
-        (args.clarification, review, "review"),
+        (args.requirements, review, "review"),
+        (args.design, review, "review"),
         (args.goal, review, "review"),
         (args.plan, review, "review"),
     ]:
+        if not path:
+            continue
         if text and path not in text:
             errors.append(f"{label} does not reference required path: {path}")
 

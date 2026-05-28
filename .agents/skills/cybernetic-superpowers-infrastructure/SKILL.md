@@ -25,13 +25,14 @@ When a required substrate applies:
 - do not treat merely mentioning the substrate, citing it, or imitating generic behavior as sufficient;
 - if the substrate is unavailable, stop and report the missing infrastructure.
 
-Approval requires a final observer pass after the last substantive mutation to the reviewed control artifacts. An older review result must not be transferred to a changed control structure unless the change is deterministic-only and guard-covered.
+Approval requires a final observer pass after the last substantive mutation to the reviewed control artifacts, including required solution design. An older review result must not be transferred to a changed control structure unless the change is deterministic-only and guard-covered.
 
 ## Stage Summary
 
 | Stage | Superpowers substrate | Required? |
 |---|---|---|
-| Product/design-heavy clarification | `$superpowers:brainstorming` | Optional |
+| Product/design-heavy requirements analysis | `$superpowers:brainstorming` | Optional |
+| Exploratory solution design | `$superpowers:brainstorming` | Optional |
 | Non-trivial execution policy generation | `$superpowers:writing-plans` | Required |
 | Control review approval | Independent subagent review discipline | Required for `Approved` unless explicit human approval exists |
 | Runtime execution | `$superpowers:executing-plans` discipline | Required |

@@ -1,6 +1,6 @@
 ---
 name: compiling-cybernetic-runtime-goals
-description: 'Use only after clarification, goal contract, execution policy, and approved control review exist. Produces the final executable Codex /goal command that references the approved files. Does not clarify requirements, write plans, review plans, or implement code.'
+description: 'Use only after requirements analysis, any required solution design, goal contract, execution policy, and approved control review exist. Produces the final executable Codex /goal command that references the approved files. Does not analyze requirements, design solutions, write plans, review plans, or implement code.'
 ---
 
 # Compiling Cybernetic Runtime Goals
@@ -11,7 +11,8 @@ Produce the final executable `/goal` command from approved control artifacts.
 
 Inputs:
 
-- clarification brief with status Complete
+- requirements analysis brief with status Complete
+- solution design, when Design Gate was required or a design exists
 - goal contract
 - execution policy / plan
 - control review with status Approved
@@ -37,8 +38,9 @@ The final command must instruct runtime Codex to:
 
 Do not output `/goal` unless:
 
-- clarification status is Complete;
+- requirements analysis status is Complete;
 - goal contract exists;
+- required solution design exists;
 - execution policy exists;
 - control review status is Approved;
 - control review includes `Final Observer Check`;
@@ -47,17 +49,20 @@ Do not output `/goal` unless:
 - any deterministic-only exception has guard evidence recorded;
 - files reference the same feature and do not visibly conflict;
 - runtime `/goal` will not need to write or approve a new plan.
+- runtime `/goal` will not need to create or revise solution design.
 
 ## Runtime Goal Contract
 
 The final `/goal` must:
 
-- reference the concrete clarification path;
+- reference the concrete requirements path;
+- reference the concrete design path when Design Gate was required or a design exists;
 - reference the concrete goal path;
 - reference the concrete execution policy path;
 - reference the concrete control review path;
 - forbid reinterpreting requirements;
 - forbid rewriting the control strategy;
+- forbid rewriting the solution design;
 - forbid replacing approved sensors without using approved sensor-governance rules;
 - execute serially unless the approved review permits otherwise;
 - use `$superpowers:executing-plans` discipline against the approved execution policy;
@@ -73,10 +78,11 @@ Preferred:
 
 ```bash
 python3 .agents/skills/compiling-cybernetic-runtime-goals/scripts/compile_runtime_goal.py \
-  --clarification docs/superpowers/clarifications/YYYY-MM-DD-feature.md \
-  --goal docs/superpowers/goals/YYYY-MM-DD-feature.md \
-  --plan docs/superpowers/plans/YYYY-MM-DD-feature.md \
-  --review docs/superpowers/control-reviews/YYYY-MM-DD-feature.md
+  --requirements docs/cybernetics/requirements/YYYY-MM-DD-feature.md \
+  --design docs/cybernetics/designs/YYYY-MM-DD-feature.md \
+  --goal docs/cybernetics/goals/YYYY-MM-DD-feature.md \
+  --plan docs/cybernetics/plans/YYYY-MM-DD-feature.md \
+  --review docs/cybernetics/control-reviews/YYYY-MM-DD-feature.md
 ```
 
 Do not use `--skip-guard` for official runtime `/goal` compilation. It is only for tests and requires the explicit `--i-understand-this-bypasses-phase-gates` acknowledgement.
@@ -91,8 +97,9 @@ Runtime /goal is ready:
 ```
 
 Preflight:
-- Clarification: Complete
+- Requirements analysis: Complete
 - Goal: present
+- Solution design: present or not required
 - Execution policy: present
 - Control review: Approved
 ```
@@ -106,5 +113,6 @@ Do not create or modify implementation files.
 - [ ] Final Observer Check is present and allows approval.
 - [ ] The final `/goal` references all approved files.
 - [ ] The final `/goal` does not ask runtime Codex to write a new plan.
+- [ ] The final `/goal` does not ask runtime Codex to create or revise solution design.
 - [ ] The final `/goal` includes executing, debugging, and completion-verification discipline.
 - [ ] The skill did not implement code.

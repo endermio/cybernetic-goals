@@ -4,17 +4,30 @@ Use these roles only when the user explicitly authorizes subagents.
 
 ## Requirement Traceability Reviewer
 
-Input: clarification brief, goal contract, execution policy.
+Input: requirements analysis brief, solution design when present, goal contract, execution policy.
 
 Check:
 
 - Every confirmed human decision appears in the goal and plan.
+- Every confirmed human decision that affects structure appears in the solution design.
 - No confirmed semantic decision is weakened, reworded into ambiguity, or converted into an implementation option.
 - No new product requirement appears without source.
 
+## Solution Design Fidelity Reviewer
+
+Input: requirements analysis brief, solution design, goal contract, execution policy.
+
+Check:
+
+- Design preserves requirements analysis semantics.
+- Design defines objects/actors/roles, relationships, flows, boundaries, interfaces/contracts, failure model, and evidence model when relevant.
+- Goal preserves design invariants.
+- Plan does not redesign the solution model.
+- Tactical degrees of freedom are not frozen as semantic invariants unless the design explicitly says so.
+
 ## Control Contract Reviewer
 
-Input: clarification brief and goal contract.
+Input: requirements analysis brief, solution design when present, and goal contract.
 
 Check:
 
@@ -24,7 +37,7 @@ Check:
 
 ## Execution Policy / Cadence Reviewer
 
-Input: goal contract and execution policy.
+Input: solution design when present, goal contract, and execution policy.
 
 Check:
 
@@ -36,7 +49,7 @@ Check:
 
 ## Sensor Governance Reviewer
 
-Input: goal contract and execution policy.
+Input: solution design when present, goal contract, and execution policy.
 
 Check:
 
@@ -53,5 +66,6 @@ Check:
 
 - Runtime `/goal` only executes approved artifacts.
 - Runtime `/goal` does not rewrite requirements, plan, sensors, or review.
-- Runtime `/goal` references clarification, goal, plan, and review.
+- Runtime `/goal` does not rewrite required solution design.
+- Runtime `/goal` references requirements analysis, required design, goal, plan, and review.
 - Runtime `/goal` stops if artifacts conflict or become insufficient.

@@ -14,8 +14,8 @@
     },
     {
       "id": "bounded-supervision-display-fix-is-not-full-pipeline",
-      "prompt": "使用 $routing-cybernetic-workflows 分析任务：已有协同监管 clarification 和 goal。现在发现本地预览里 REG/PARK 被显示成企业 C1，需要修正 SupervisionNodePage、SupervisionLogPage 和本地 fixture，让监管节点/园区节点不被当成企业展示。不改变 schema、权限模型、拉取语义或 base58 哈希语义。",
-      "expected_output": "Route to Level 1 or Level 2, not Level 3, because this is a bounded correction inside an already clarified feature.",
+      "prompt": "使用 $routing-cybernetic-workflows 分析任务：已有协同监管 requirements analysis 和 goal。现在发现本地预览里 REG/PARK 被显示成企业 C1，需要修正 SupervisionNodePage、SupervisionLogPage 和本地 fixture，让监管节点/园区节点不被当成企业展示。不改变 schema、权限模型、拉取语义或 base58 哈希语义。",
+      "expected_output": "Route to Level 1 or Level 2, not Level 3, because this is a bounded correction inside an already analyzed feature.",
       "assertions": [
         "Classifies the task as Level 1 or Level 2.",
         "Does not recommend the full pre-goal pipeline.",
@@ -43,8 +43,8 @@
         "Classifies as Level 3.",
         "Mentions unresolved domain semantics.",
         "Mentions unresolved log acquisition semantics.",
-        "Recommends $clarifying-cybernetic-tasks.",
-        "Recommends $orchestrating-cybernetic-pregoal after clarification is complete."
+        "Recommends $analyzing-cybernetic-requirements.",
+        "Recommends $orchestrating-cybernetic-pregoal after requirements analysis is complete."
       ]
     },
     {
@@ -56,7 +56,7 @@
         "Mentions unresolved permission/data visibility semantics.",
         "Mentions migration or compatibility uncertainty.",
         "Does not recommend direct implementation.",
-        "Recommends clarification before goal execution."
+        "Recommends requirements analysis before goal execution."
       ]
     },
     {
@@ -78,7 +78,7 @@
         "Does not classify as Level 3.",
         "Explains that screenshots are sensors, and the semantic decision is already fixed.",
         "Recommends a bounded repair prompt or lightweight goal.",
-        "Does not recommend clarification."
+        "Does not recommend requirements analysis."
       ]
     },
     {
@@ -94,7 +94,7 @@
     },
     {
       "id": "existing-artifacts-lower-score",
-      "prompt": "使用 $routing-cybernetic-workflows 分析任务：已有 clarification、goal、plan、control review 都已 Approved。现在执行中发现某个 Vue 组件列名和已确认语义不一致，需要修正。",
+      "prompt": "使用 $routing-cybernetic-workflows 分析任务：已有 requirements analysis、goal、plan、control review 都已 Approved。现在执行中发现某个 Vue 组件列名和已确认语义不一致，需要修正。",
       "expected_output": "Route to Level 1 or Level 2 because the approved control artifacts lower the routing level.",
       "assertions": [
         "Mentions existing approved artifacts.",
@@ -117,14 +117,14 @@
     {
       "id": "wide-user-closure-audit-needs-rubric-gate",
       "prompt": "使用 $routing-cybernetic-workflows 分析任务：从用户使用层面逐项核对 2605 功能是否闭环，分类为已闭环、部分闭环、未闭环、不可判定。可以读代码、文档、测试、SQL、预览服务和截图，只输出审计报告，不实现功能，不改变 schema、权限、API 或产品语义。",
-      "expected_output": "Classify as Level 2 with Required gates: Rubric Gate required, because execution complexity is bounded but the evaluation rubric for closure/completeness is not explicit. Recommend rubric clarification before creating the bounded audit goal.",
+      "expected_output": "Classify as Level 2 with Required gates: Rubric Gate required, because execution complexity is bounded but the evaluation rubric for closure/completeness is not explicit. Recommend rubric analysis before creating the bounded audit goal.",
       "assertions": [
         "Classifies the task as Level 2.",
         "Includes Required gates with Rubric Gate required.",
         "Does not encode the Rubric Gate in the routing level name.",
         "Explains that broad scope is not the same as unresolved control structure.",
         "Explains that the evaluation function or rubric is not sufficiently defined.",
-        "Recommends clarifying status definitions, evidence strength, and minimum evidence for the strongest positive status before creating the audit goal.",
+        "Recommends analyzing status definitions, evidence strength, and minimum evidence for the strongest positive status before creating the audit goal.",
         "Does not recommend the full pre-goal pipeline or execution policy by default."
       ]
     },
@@ -138,6 +138,30 @@
         "Recommends a bounded file-based audit goal.",
         "Says the bounded goal should lead to direct /goal execution.",
         "Does not recommend the full pre-goal pipeline or execution policy by default."
+      ]
+    },
+    {
+      "id": "new-feature-with-unclear-solution-structure-needs-design-gate",
+      "prompt": "使用 $routing-cybernetic-workflows 分析任务：需求语义已经确认，要实现协同监管，但还没有 solution design；监管节点、园区节点、企业节点、corpId 关系、日志实时拉取的信息流、UI 中企业和节点的概念边界都需要形成结构模型。",
+      "expected_output": "Classify as Level 3 and list Design Gate required, recommending solution design before goal and execution policy.",
+      "assertions": [
+        "Classifies the task as Level 3.",
+        "Includes Required gates with Design Gate required.",
+        "Explains that the execution agent would otherwise need to invent the solution structure.",
+        "Recommends $designing-cybernetic-solutions after requirements analysis and before goal writing.",
+        "Keeps the routing decision as Level 3 without encoding a suffix such as Level 3D."
+      ]
+    },
+    {
+      "id": "bounded-fix-with-existing-design-does-not-need-design-gate",
+      "prompt": "使用 $routing-cybernetic-workflows 分析任务：已有 requirements analysis、solution design、goal、plan 和 approved review。现在只修正一个页面把 REG/PARK 节点误显示为企业的问题，不改变 schema、权限、拉取语义或 UI 概念边界。",
+      "expected_output": "Classify as Level 1 or Level 2 with Design Gate satisfied or not applicable, not full pre-goal pipeline.",
+      "assertions": [
+        "Classifies the task as Level 1 or Level 2.",
+        "Does not classify as Level 3 solely because design-sensitive concepts are mentioned.",
+        "Lists Design Gate as satisfied or not applicable.",
+        "Explains that existing design/control artifacts already fix the solution structure.",
+        "Recommends a bounded repair prompt or small file-based goal."
       ]
     }
   ]

@@ -6,7 +6,8 @@ This orchestrator is a pre-goal compiler, not a runtime controller.
 
 | Artifact | Control role |
 |---|---|
-| Clarification brief | Setpoint synthesis: confirmed human semantics |
+| Requirements analysis brief | Setpoint synthesis: confirmed human semantics |
+| Solution design | System/regulator model: objects, relationships, flows, boundaries, interfaces, evidence model |
 | Goal contract | Control contract: target, boundaries, sensors, stop conditions |
 | Execution policy | Control law: batch cadence, dependency matrix, sensor governance |
 | Control review | Meta-control: independent review of the whole control structure |
@@ -14,6 +15,6 @@ This orchestrator is a pre-goal compiler, not a runtime controller.
 
 ## Non-Negotiable Boundary
 
-The runtime `/goal` must not create or approve its own control structure.
+The runtime `/goal` must not create or approve its own solution design or control structure.
 
 The orchestrator may coordinate creation and review of control artifacts before `/goal`, but it must not start `/goal`.

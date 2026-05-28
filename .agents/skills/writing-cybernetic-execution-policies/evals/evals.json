@@ -3,7 +3,7 @@
   "evals": [
     {
       "id": "contains-sensor-governance",
-      "prompt": "根据 clarification 和 goal 为复杂功能写 execution policy。",
+      "prompt": "根据 requirements analysis 和 goal 为复杂功能写 execution policy。",
       "expected_output": "Plan includes sensor governance, batch cadence, dependency matrix, and no runtime execution.",
       "assertions": [
         "Includes Dependency Matrix.",
@@ -15,7 +15,7 @@
     },
     {
       "id": "requires-superpowers-planning-substrate",
-      "prompt": "根据 clarification 和 goal 为一个非平凡实现任务写 execution policy，但 $superpowers:writing-plans 不可用。",
+      "prompt": "根据 requirements analysis 和 goal 为一个非平凡实现任务写 execution policy，但 $superpowers:writing-plans 不可用。",
       "expected_output": "The skill stops or marks the policy blocked because the required planning substrate is unavailable, instead of drafting an approved ad hoc plan.",
       "assertions": [
         "Mentions $superpowers:writing-plans as the required planning substrate for non-trivial implementation plans.",
@@ -23,6 +23,18 @@
         "Stops or reports missing required planning infrastructure when the substrate is unavailable.",
         "Does not self-substitute with an unreviewed internal plan.",
         "Does not mark the execution policy Approved.",
+        "Does not execute code."
+      ]
+    },
+    {
+      "id": "references-design-and-does-not-redesign",
+      "prompt": "根据 requirements analysis、docs/cybernetics/designs/2026-05-22-collaborative-supervision.md 和 goal 为复杂功能写 execution policy。",
+      "expected_output": "Create a candidate execution policy that references the solution design and uses it as input, without redefining the conceptual model inside the plan.",
+      "assertions": [
+        "Source Contracts includes the solution design path.",
+        "Plan preserves confirmed design invariants.",
+        "Plan distinguishes design invariants from tactical degrees of freedom.",
+        "Plan does not invent new domain objects, relationships, information flow, or interface semantics not present in requirements analysis or design.",
         "Does not execute code."
       ]
     }

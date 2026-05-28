@@ -6,7 +6,8 @@ Status: `Candidate`
 
 ## Source Contracts
 
-- Clarification: `[path]`
+- Requirements analysis: `[path]`
+- Solution design: `[path or not required]`
 - Goal contract: `[path]`
 
 ## Superpowers Planning Substrate
@@ -18,6 +19,7 @@ Status: `Candidate`
 Cybernetic constraints supplied to the substrate:
 
 - confirmed semantic invariants;
+- approved or candidate solution-design invariants;
 - tactical degrees of freedom;
 - dependency matrix;
 - batch cadence;
@@ -112,7 +114,7 @@ Before moving to next batch:
 Before completion:
 
 - final verification evidence recorded;
-- no unresolved conflict among clarification, goal, plan, and review.
+- no unresolved conflict among requirements analysis, solution design when required, goal, plan, and review.
 
 ## Execution Rhythm
 
@@ -124,7 +126,8 @@ Before completion:
 
 Stop if:
 
-- the plan conflicts with clarification or goal;
+- the plan conflicts with requirements analysis or goal;
+- the plan conflicts with required solution design;
 - confirmed semantics appear wrong or insufficient;
 - sensor governance is insufficient for a failing check;
 - executing further requires a new human decision;
@@ -134,7 +137,7 @@ Stop if:
 
 Maintain:
 
-- `docs/superpowers/progress/YYYY-MM-DD-slug.md`
+- `docs/cybernetics/progress/YYYY-MM-DD-slug.md`
 
 Each entry must include:
 

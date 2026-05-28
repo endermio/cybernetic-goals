@@ -1,6 +1,6 @@
 ---
 name: reviewing-cybernetic-control-structures
-description: 'Use after clarification, goal contract, and execution policy files exist, before starting /goal execution. Reviews the whole AI control structure, not only the plan: requirement traceability, goal fidelity, control law quality, sensor/test governance, batch cadence, phase gates, stop conditions, and semantic-vs-tactical boundaries. Produces a control review file under docs/superpowers/control-reviews/ and must mark Approved before runtime /goal may start.'
+description: 'Use after requirements analysis, any required solution design, goal contract, and execution policy files exist, before starting /goal execution. Reviews the whole AI control structure, not only the plan: requirement traceability, design fidelity, goal fidelity, control law quality, sensor/test governance, batch cadence, phase gates, stop conditions, and semantic-vs-tactical boundaries. Produces a control review file under docs/cybernetics/control-reviews/ and must mark Approved before runtime /goal may start.'
 ---
 
 # Reviewing Cybernetic Control Structures
@@ -11,14 +11,15 @@ Review whether the AI control structure is coherent enough to execute.
 
 Inputs:
 
-- clarification brief
+- requirements analysis brief
+- solution design, when Design Gate is required or a design exists
 - goal contract
 - execution policy / plan
 
 Output:
 
 ```text
-docs/superpowers/control-reviews/YYYY-MM-DD-<slug>.md
+docs/cybernetics/control-reviews/YYYY-MM-DD-<slug>.md
 ```
 
 Use `assets/control-review-template.md`.
@@ -41,7 +42,7 @@ If subagents are not authorized and no explicit human approval or other independ
 
 No `Approved` state is allowed after an unreviewed substantive artifact mutation.
 
-A control structure may be marked `Approved` only when the last substantive change to the reviewed control artifacts, meaning the clarification, goal, or execution policy, has been followed by an independent review pass that reports no Blocking or Major findings.
+A control structure may be marked `Approved` only when the last substantive change to the reviewed control artifacts, meaning the requirements analysis, solution design, goal, or execution policy, has been followed by an independent review pass that reports no Blocking or Major findings.
 
 If any control artifact changes after the latest independent review, the review state becomes `Dirty` / `Needs Re-review` and cannot be `Approved`.
 
@@ -56,6 +57,7 @@ Deterministic-only changes may skip subagent re-review only when all of the foll
 Substantive changes include changes to:
 
 - confirmed semantics;
+- solution design objects, relationships, flows, boundaries, interfaces/contracts, evidence model, or design invariants;
 - goal success conditions;
 - scope, boundaries, or invariants;
 - execution policy or batch cadence;
@@ -81,13 +83,23 @@ The author of a post-review revision must not be the sole approver of that revis
 
 ### 1. Requirement Traceability
 
-Every confirmed human decision in the clarification brief must appear in the goal and execution policy.
+Every confirmed human decision in the requirements analysis brief must appear in the goal and execution policy.
 
 ### 2. Goal Fidelity
 
 The goal must not add, remove, downscope, or reinterpret product semantics.
 
-### 3. Control Law Quality
+### 3. Design Fidelity
+
+When a solution design exists or Design Gate was required:
+
+- the design must preserve requirements analysis semantics;
+- the goal must preserve design invariants;
+- the plan must preserve design objects, relationships, boundaries, flows, interfaces/contracts, lifecycle/failure model, and evidence model;
+- tactical degrees of freedom must not be frozen as semantic invariants unless the design explicitly says so;
+- the plan must not redesign the solution model.
+
+### 4. Control Law Quality
 
 The execution policy must define a sane control law:
 
@@ -97,7 +109,7 @@ The execution policy must define a sane control law:
 - repair policy
 - stop conditions
 
-### 4. Sensor Governance
+### 5. Sensor Governance
 
 Tests are sensors, not objectives.
 
@@ -108,7 +120,7 @@ Flag plans that:
 - lack stale test retirement rules;
 - lack product-level verification.
 
-### 5. Batch Rhythm
+### 6. Batch Rhythm
 
 Flag:
 
@@ -117,15 +129,15 @@ Flag:
 - no batch-end openability requirement;
 - no destructive intermediate-state policy.
 
-### 6. Semantic vs Tactical Boundary
+### 7. Semantic vs Tactical Boundary
 
 Semantic invariants must be frozen. Tactical implementation details must remain adjustable.
 
-### 7. Runtime Suitability
+### 8. Runtime Suitability
 
 The runtime `/goal` must be able to execute the approved artifacts without inventing new control structures. Any required runtime Superpowers discipline must be precompiled into the approved plan, review, or final `/goal`.
 
-### 8. Review Independence
+### 9. Review Independence
 
 The review must record:
 
@@ -134,7 +146,7 @@ The review must record:
 - whether approval is allowed;
 - why approval is blocked when independent review is missing.
 
-### 9. Final Observer Check
+### 10. Final Observer Check
 
 The review must record whether any substantive artifact changed after the latest independent review pass and whether a final independent observer confirmed no Blocking or Major findings after that change.
 
@@ -144,7 +156,8 @@ If scripts are available, run:
 
 ```bash
 python3 .agents/skills/reviewing-cybernetic-control-structures/scripts/control_artifact_lint.py \
-  --clarification [CLARIFICATION] \
+  --requirements [REQUIREMENTS] \
+  --design [DESIGN] \
   --goal [GOAL] \
   --plan [PLAN]
 ```
@@ -163,7 +176,8 @@ The review must be either:
 
 Only mark `Approved` when:
 
-- clarification, goal, and plan are consistent;
+- requirements analysis, required design, goal, and plan are consistent;
+- required design exists and is consistent with requirements analysis, goal, and plan;
 - no unresolved semantic decision remains;
 - execution policy does not self-authorize uncontrolled changes;
 - test/sensor governance is explicit;
@@ -180,9 +194,9 @@ Only mark `Approved` when:
 - [ ] Final observer check is recorded.
 - [ ] The review does not mark self-review as `Approved`.
 - [ ] If subagents were not authorized and no human approval exists, status is `Needs Independent Review`.
-- [ ] If any substantive artifact changed after independent review, status is `Dirty` or `Needs Re-review` until final independent re-review reports no Blocking or Major findings.
+- [ ] If any substantive artifact changed after independent review, including required design, status is `Dirty` or `Needs Re-review` until final independent re-review reports no Blocking or Major findings.
 - [ ] Lint PASS is not treated as semantic/control-policy approval.
-- [ ] Critical findings distinguish semantic, goal, plan, sensor, and runtime issues.
+- [ ] Critical findings distinguish semantic, design, goal, plan, sensor, and runtime issues.
 - [ ] Required revisions are actionable.
 - [ ] The review did not execute implementation.
 - [ ] The review did not output final runtime `/goal`.

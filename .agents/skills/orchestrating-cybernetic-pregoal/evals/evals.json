@@ -2,23 +2,23 @@
   "skill_name": "orchestrating-cybernetic-pregoal",
   "evals": [
     {
-      "id": "orchestrates-complete-clarification-with-subagents",
-      "prompt": "使用 $orchestrating-cybernetic-pregoal 根据 docs/superpowers/clarifications/collaborative-supervision.md 自动完成 pre-goal 编译，允许使用 subagents 做独立 review。若 review 无法收敛，停止并报告阻塞点。",
-      "expected_output": "The skill should validate the completed clarification, create or update goal, execution policy, control review, run authorized subagent review cycles, and compile a final runtime /goal command without starting /goal execution.",
+      "id": "orchestrates-complete-requirements-analysis-with-subagents",
+      "prompt": "使用 $orchestrating-cybernetic-pregoal 根据 docs/cybernetics/requirements/collaborative-supervision.md 自动完成 pre-goal 编译，允许使用 subagents 做独立 review。若 review 无法收敛，停止并报告阻塞点。",
+      "expected_output": "The skill should validate the completed requirements analysis, create or update goal, execution policy, control review, run authorized subagent review cycles, and compile a final runtime /goal command without starting /goal execution.",
       "assertions": [
         "The response explicitly notes that subagents are allowed because the user authorized them.",
-        "The workflow creates or updates a goal contract file under docs/superpowers/goals/.",
-        "The workflow creates or updates an execution policy under docs/superpowers/plans/.",
-        "The workflow creates or updates a control review under docs/superpowers/control-reviews/.",
+        "The workflow creates or updates a goal contract file under docs/cybernetics/goals/.",
+        "The workflow creates or updates an execution policy under docs/cybernetics/plans/.",
+        "The workflow creates or updates a control review under docs/cybernetics/control-reviews/.",
         "The workflow checks required Superpowers substrate status and does not silently emulate missing infrastructure.",
-        "The final /goal command references the clarification, goal, plan, and review files.",
+        "The final /goal command references the requirements analysis, required design, goal, plan, and review files.",
         "The response does not start /goal execution.",
         "The workflow stops if review cannot converge within the maximum review cycles."
       ]
     },
     {
       "id": "no-subagents-candidate-only",
-      "prompt": "使用 $orchestrating-cybernetic-pregoal 根据 docs/superpowers/clarifications/collaborative-supervision.md 自动完成 pre-goal 编译。",
+      "prompt": "使用 $orchestrating-cybernetic-pregoal 根据 docs/cybernetics/requirements/collaborative-supervision.md 自动完成 pre-goal 编译。",
       "expected_output": "Because the user did not explicitly authorize subagents, the skill may create candidate artifacts but must not claim independent review or emit an approved runtime /goal unless human/manual approval exists.",
       "assertions": [
         "The response does not claim to spawn subagents.",
@@ -29,20 +29,20 @@
       ]
     },
     {
-      "id": "incomplete-clarification-stops",
-      "prompt": "使用 $orchestrating-cybernetic-pregoal 根据 docs/superpowers/clarifications/incomplete-feature.md 自动完成 pre-goal 编译，允许使用 subagents。该 clarification 还有开放的人类问题。",
-      "expected_output": "The skill should stop before creating downstream approved artifacts because clarification is incomplete.",
+      "id": "incomplete-requirements-analysis-stops",
+      "prompt": "使用 $orchestrating-cybernetic-pregoal 根据 docs/cybernetics/requirements/incomplete-feature.md 自动完成 pre-goal 编译，允许使用 subagents。该 requirements analysis 还有开放的人类问题。",
+      "expected_output": "The skill should stop before creating downstream approved artifacts because requirements analysis is incomplete.",
       "assertions": [
-        "The response states that the clarification is incomplete or has open blocking questions.",
+        "The response states that the requirements analysis is incomplete or has open blocking questions.",
         "The response does not create or approve a final goal contract.",
         "The response does not create or approve an execution policy.",
         "The response does not emit a final runtime /goal command.",
-        "The response names the smallest clarification input needed from the human."
+        "The response names the smallest requirements analysis input needed from the human."
       ]
     },
     {
       "id": "runtime-goal-does-not-write-plan",
-      "prompt": "使用 $orchestrating-cybernetic-pregoal 编译最终 /goal。已有 complete clarification、goal、approved plan、approved review。",
+      "prompt": "使用 $orchestrating-cybernetic-pregoal 编译最终 /goal。已有 complete requirements analysis、goal、approved plan、approved review。",
       "expected_output": "The final /goal should execute approved artifacts only and must not instruct Codex to write or approve its own plan inside runtime.",
       "assertions": [
         "The final /goal references the approved plan path.",
@@ -55,13 +55,14 @@
       ]
     },
     {
-      "id": "uses-clarification-slug-for-artifacts",
-      "prompt": "使用 $orchestrating-cybernetic-pregoal 根据 docs/superpowers/clarifications/2026-05-22-collaborative-supervision.md 完成 pre-goal 编译，允许使用 subagents review。",
-      "expected_output": "The skill should create or update goal, plan, and control review paths using the same 2026-05-22-collaborative-supervision slug and should not invent a different slug.",
+      "id": "uses-requirements-analysis-slug-for-artifacts",
+      "prompt": "使用 $orchestrating-cybernetic-pregoal 根据 docs/cybernetics/requirements/2026-05-22-collaborative-supervision.md 完成 pre-goal 编译，允许使用 subagents review。",
+      "expected_output": "The skill should create or update design when required, goal, plan, and control review paths using the same 2026-05-22-collaborative-supervision slug and should not invent a different slug.",
       "assertions": [
-        "The goal path is docs/superpowers/goals/2026-05-22-collaborative-supervision.md.",
-        "The plan path is docs/superpowers/plans/2026-05-22-collaborative-supervision.md.",
-        "The review path is docs/superpowers/control-reviews/2026-05-22-collaborative-supervision.md.",
+        "The goal path is docs/cybernetics/goals/2026-05-22-collaborative-supervision.md.",
+        "The design path is docs/cybernetics/designs/2026-05-22-collaborative-supervision.md when Design Gate is required.",
+        "The plan path is docs/cybernetics/plans/2026-05-22-collaborative-supervision.md.",
+        "The review path is docs/cybernetics/control-reviews/2026-05-22-collaborative-supervision.md.",
         "The response does not choose a different slug unless the user explicitly requested alternate output paths."
       ]
     },
@@ -111,6 +112,18 @@
         "Does not treat lint PASS as sufficient approval evidence.",
         "Marks the artifacts Dirty, Needs Re-review, or blocks approval.",
         "Does not compile a final runtime /goal until final independent re-review reports no Blocking or Major findings."
+      ]
+    },
+    {
+      "id": "inserts-design-stage-when-design-gate-required",
+      "prompt": "使用 $orchestrating-cybernetic-pregoal 根据 docs/cybernetics/requirements/2026-05-22-collaborative-supervision.md 完成 pre-goal 编译，允许使用 subagents review。requirements analysis 标记 Design Gate required，且 design artifact 不存在。",
+      "expected_output": "The orchestrator runs or requests designing-cybernetic-solutions before goal writing, then reviews requirements analysis, design, goal, and plan.",
+      "assertions": [
+        "Derives design path docs/cybernetics/designs/2026-05-22-collaborative-supervision.md.",
+        "Runs or recommends $designing-cybernetic-solutions before $writing-cybernetic-goals.",
+        "Does not create goal and plan by inventing solution structure inside execution policy.",
+        "Control review includes the design artifact in its reviewed inputs.",
+        "Final runtime /goal compilation is blocked unless the required design exists and is sufficiently approved or reviewed."
       ]
     }
   ]

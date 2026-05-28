@@ -6,7 +6,8 @@ Status: `Approved` / `Blocked` / `Needs Independent Review`
 
 ## Artifacts
 
-- Clarification: `[path]`
+- Requirements analysis: `[path]`
+- Solution design: `[path or not required]`
 - Goal contract: `[path]`
 - Execution policy: `[path]`
 - Control review: `[path]`
@@ -14,6 +15,7 @@ Status: `Approved` / `Blocked` / `Needs Independent Review`
 ## Control Summary
 
 - Setpoint:
+- Solution model:
 - Semantic invariants:
 - Tactical degrees of freedom:
 - Sensors:

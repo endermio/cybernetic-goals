@@ -6,7 +6,8 @@ Status: `Blocked` / `In Progress` / `Ready for Runtime`
 
 ## Inputs
 
-- Clarification: `[path]`
+- Requirements analysis: `[path]`
+- Existing solution design: `[path or none/not required]`
 - Existing goal contract: `[path or none]`
 - Existing execution policy: `[path or none]`
 - Existing control review: `[path or none]`
@@ -20,7 +21,8 @@ Evidence:
 
 ## Current Step
 
-- [ ] Validate clarification
+- [ ] Validate requirements analysis
+- [ ] Create or validate solution design if Design Gate is required
 - [ ] Create goal contract
 - [ ] Create execution policy
 - [ ] Review control structure

@@ -8,7 +8,7 @@
       "assertions": [
         "Does not output final /goal.",
         "Requires review status Approved.",
-        "Uses section-aware status checks for ## Clarification Status, ## Execution Policy Status, and ## Review Status.",
+        "Uses section-aware status checks for ## Requirements Analysis Status, ## Execution Policy Status, and ## Review Status.",
         "Requires ## Final Observer Check to allow approval.",
         "Does not allow --skip-guard unless an explicit phase-gate bypass acknowledgement is provided.",
         "Does not rewrite artifacts."
@@ -28,8 +28,8 @@
     },
     {
       "id": "compiles-runtime-goal",
-      "prompt": "clarification Complete, goal exists, execution policy status Candidate, control review Approved, Final Observer Check allows approval；编译最终 /goal。",
-      "expected_output": "Outputs a final /goal referencing clarification, goal, plan, and review paths.",
+      "prompt": "requirements analysis Complete, goal exists, execution policy status Candidate, control review Approved, Final Observer Check allows approval；编译最终 /goal。",
+      "expected_output": "Outputs a final /goal referencing requirements analysis, goal, plan, and review paths.",
       "assertions": [
         "References all four artifact paths.",
         "Requires Final Observer Check to allow approval.",
@@ -39,6 +39,29 @@
         "Mentions $superpowers:executing-plans, $superpowers:systematic-debugging, and $superpowers:verification-before-completion runtime discipline.",
         "Says to follow equivalent approved artifact discipline if runtime cannot load those skills.",
         "Stops if any referenced artifact is missing, not approved, or internally inconsistent."
+      ]
+    },
+    {
+      "id": "requires-design-when-design-gate-required",
+      "prompt": "requirements analysis Complete 且写着 Design Gate required，goal、plan、approved review 都存在，但没有传入 docs/cybernetics/designs/2026-05-22-collaborative-supervision.md。请编译最终 /goal。",
+      "expected_output": "Refuse to compile runtime /goal because required solution design is missing.",
+      "assertions": [
+        "Does not output final /goal.",
+        "Requires the design artifact when Design Gate is required.",
+        "Does not let runtime Codex invent solution design.",
+        "Does not rewrite artifacts."
+      ]
+    },
+    {
+      "id": "compiles-runtime-goal-with-design",
+      "prompt": "requirements analysis Complete, solution design exists, goal references design, execution policy references design, control review Approved and references design；编译最终 /goal。",
+      "expected_output": "Outputs a final /goal referencing requirements analysis, design, goal, plan, and review paths.",
+      "assertions": [
+        "References the solution design path.",
+        "Forbids rewriting the solution design.",
+        "References requirements analysis, goal, plan, and review paths.",
+        "Uses executing, debugging, and completion verification discipline.",
+        "Stops if artifacts conflict or become insufficient."
       ]
     }
   ]

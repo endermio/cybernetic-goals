@@ -3,7 +3,7 @@
   "evals": [
     {
       "id": "reject-unapproved-plan",
-      "prompt": "审查 clarification、goal、plan，plan 还没有 sensor governance。",
+      "prompt": "审查 requirements analysis、goal、plan，plan 还没有 sensor governance。",
       "expected_output": "Review status is Needs Revision and identifies missing sensor governance.",
       "assertions": [
         "Does not approve.",
@@ -14,7 +14,7 @@
     },
     {
       "id": "requires-independent-review-for-approval",
-      "prompt": "审查 clarification、goal、plan。所有 artifact 一致，但用户没有授权 subagents，也没有显式人工批准。",
+      "prompt": "审查 requirements analysis、goal、plan。所有 artifact 一致，但用户没有授权 subagents，也没有显式人工批准。",
       "expected_output": "The review records missing independent review and uses Needs Independent Review instead of Approved.",
       "assertions": [
         "Records whether subagents were authorized.",
@@ -26,7 +26,7 @@
     },
     {
       "id": "authorized-independent-review-passes",
-      "prompt": "审查 clarification、goal、plan，用户明确允许 subagents 做独立 control review。",
+      "prompt": "审查 requirements analysis、goal、plan，用户明确允许 subagents 做独立 control review。",
       "expected_output": "The review uses independent reviewer passes for requirement traceability, goal fidelity, sensor governance, execution cadence, and runtime safety before Approved status is allowed.",
       "assertions": [
         "Mentions independent review passes.",
@@ -46,6 +46,18 @@
         "Does not treat lint PASS as semantic or control-policy approval.",
         "Uses Dirty or Needs Re-review instead of Approved.",
         "Requires final independent re-review reporting no Blocking or Major findings before Approved is allowed."
+      ]
+    },
+    {
+      "id": "reviews-design-fidelity",
+      "prompt": "审查 requirements analysis、solution design、goal、plan。plan 把 design 中的实时 pull 信息流改成 push/reporting，并把 tactical UI 组件名当成 semantic invariant。",
+      "expected_output": "Review status is Needs Revision and identifies design fidelity violations.",
+      "assertions": [
+        "Reviews the chain as requirements analysis → design → goal → plan.",
+        "Includes Design Fidelity as a review dimension.",
+        "Flags changing pull information flow to push/reporting as a design fidelity issue.",
+        "Flags tactical UI component naming being frozen as semantic invariant.",
+        "Does not output a final /goal."
       ]
     }
   ]
