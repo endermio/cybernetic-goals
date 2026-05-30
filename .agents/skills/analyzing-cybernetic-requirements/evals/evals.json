@@ -68,6 +68,29 @@
         "Does not define final object structure, interfaces, state flow, or mechanism architecture.",
         "Recommends $designing-cybernetic-solutions before goal writing."
       ]
+    },
+    {
+      "id": "output-contract-gate-for-decision-report",
+      "prompt": "分析需求：核对一组能力是否已闭环，结果要给管理者决策使用，需要证据引用和未决项。",
+      "expected_output": "Identifies Output Contract Gate and records audience, purpose, medium, structure needs, evidence references, and acceptance condition without designing the full report schema.",
+      "assertions": [
+        "Includes Output Contract Gate under Required Gates.",
+        "Identifies audience and purpose.",
+        "Records medium, detail level, evidence-reference needs, machine-readable needs, destination path, and acceptance condition when known or defaultable.",
+        "Does not assume free-form chat is sufficient for a decision report.",
+        "Does not design the full report schema inside requirements analysis."
+      ]
+    },
+    {
+      "id": "simple-task-does-not-ask-output-format-by-default",
+      "prompt": "分析需求：修正一个局部拼写错误并简单说明修改结果。",
+      "expected_output": "Uses a safe default output contract and does not ask output-format questions because the output shape is obvious and low-risk.",
+      "assertions": [
+        "Marks Output Contract Gate as not applicable or satisfied.",
+        "Uses a simple chat summary or equivalent safe default.",
+        "Does not ask the human to choose audience, medium, structure, or destination.",
+        "Does not escalate to solution design for output structure."
+      ]
     }
   ]
 }

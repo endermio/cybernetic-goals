@@ -58,6 +58,19 @@
         "Response-only handoff recommends $orchestrating-cybernetic-pregoal.",
         "Does not recommend $writing-cybernetic-goals as the next action for Level 3 full pre-goal work."
       ]
+    },
+    {
+      "id": "designs-structured-output-when-output-contract-required",
+      "prompt": "根据 requirements analysis 创建 solution design。Output Contract Gate required: final result must be a decision report with summary, status matrix, evidence references, unresolved decisions, and a clear acceptance condition.",
+      "expected_output": "Design includes the output/report structure as part of the solution model and maps it to goal and execution-policy implications.",
+      "assertions": [
+        "Defines the output contract structure.",
+        "Defines required fields, tables, or sections at the design level.",
+        "Defines evidence reference rules.",
+        "Maps output structure to goal implications.",
+        "Maps output structure to execution-policy implications.",
+        "Does not leave runtime to invent the final output shape."
+      ]
     }
   ]
 }

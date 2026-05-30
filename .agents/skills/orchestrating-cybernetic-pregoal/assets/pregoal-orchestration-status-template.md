@@ -10,6 +10,7 @@ State: `RequirementsMissing` / `RequirementsComplete` / `DesignReady` / `GoalRea
 |---|---:|---|---|---|
 | Requirements | yes | `[path]` | `Complete / Incomplete / missing` | `passed / blocked` |
 | Design | `yes/no` | `[path or none]` | `Candidate / Reviewed / Approved / missing / not required` | `passed / blocked` |
+| Output Contract | `yes/no` | `[requirements/design/goal section or none]` | `present / missing / not required` | `passed / blocked` |
 | Goal | yes | `[path or none]` | `present / missing` | `passed / blocked` |
 | Execution Policy | yes | `[path or none]` | `Candidate / Approved / missing` | `passed / blocked` |
 | Control Review | yes | `[path or none]` | `Approved / Needs Revision / Needs Independent Review / Dirty / Needs Re-review / missing` | `passed / blocked` |

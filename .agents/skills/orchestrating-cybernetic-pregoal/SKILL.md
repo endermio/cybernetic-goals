@@ -29,6 +29,7 @@ This skill must not:
 - analyze requirements from scratch
 - invent required solution design inside the execution policy
 - synthesize solution design inside the orchestrator
+- synthesize or revise output contracts inside the orchestrator
 - execute target work
 - start `/goal` execution
 - make requirement decisions for the human
@@ -43,6 +44,7 @@ This skill may:
 - emulate narrow cybernetic formatting only when a downstream cybernetic skill is unavailable and that fallback is explicitly allowed
 - create or update control artifacts under `docs/cybernetics/`
 - invoke, request, or validate a solution design when Design Gate is required
+- propagate and validate output contract presence across downstream artifacts
 - use explicitly authorized subagents as independent reviewers
 - iterate review and revision up to the configured limit
 - compile the final `/goal` command after approval
@@ -54,6 +56,8 @@ Follow `$cybernetic-superpowers-infrastructure`.
 This orchestrator may emulate cybernetic artifact formatting when a downstream cybernetic skill is unavailable. It must not emulate required Superpowers infrastructure.
 
 It must not emulate solution design synthesis. Solution design is a substantive control artifact, not narrow formatting.
+
+It must not synthesize output contracts. Output contract identification belongs to requirements analysis; complex output-structure synthesis belongs to solution design; final output contract preservation belongs to goal writing.
 
 Required infrastructure boundaries:
 
@@ -235,8 +239,11 @@ The orchestrator owns:
 - source-contract checks
 - blocking when design is missing or invalid
 - downstream propagation of the design path
+- downstream propagation and validation of any output contract
 
 The orchestrator does not own solution-model synthesis.
+
+The orchestrator does not own output-contract synthesis.
 
 Do not synthesize solution design inside the orchestrator. Do not treat solution design as narrow formatting fallback.
 
@@ -320,6 +327,7 @@ The goal contract must:
 
 - reference the requirements analysis brief
 - reference the solution design when Design Gate is required or a design exists
+- include `Final Output Contract` when Output Contract Gate was required, satisfied by a requirements/design artifact, or otherwise present upstream
 - preserve all confirmed decisions
 - define success conditions
 - define invariants and forbidden scope
@@ -456,6 +464,7 @@ Before outputting runtime `/goal`, ensure:
 
 - requirements analysis is complete
 - solution design exists when Design Gate was required or a design artifact exists
+- final output contract exists in the goal when Output Contract Gate was required or an output contract exists upstream
 - goal contract exists
 - execution policy exists
 - control review exists
@@ -465,6 +474,7 @@ Before outputting runtime `/goal`, ensure:
 - all files reference the same feature
 - artifact paths use the same date/slug unless the user explicitly specified alternatives
 - the runtime `/goal` references all approved files
+- the runtime `/goal` carries the final output contract from the goal when present or required
 
 If available, run:
 
@@ -502,6 +512,7 @@ It must not instruct Codex to:
 - reinterpret requirements
 - change confirmed semantics
 - rewrite the solution design
+- replace the final output contract
 - replace approved sensors
 - redesign the execution policy
 
@@ -520,6 +531,8 @@ The command must reference:
 - execution policy / plan file
 - control review file
 
+The command must carry the final output contract from the goal when one is present or required.
+
 The command must include this precondition:
 
 ```text
@@ -534,6 +547,7 @@ Stop and report if:
 - requirements analysis has unresolved blocking questions
 - goal changes confirmed semantics
 - required solution design is missing or conflicts with requirements analysis
+- required final output contract is missing from the goal or conflicts with upstream output-contract requirements
 - execution policy changes goal semantics
 - execution policy redesigns the solution model
 - review does not converge after two cycles
@@ -610,6 +624,7 @@ Before responding, verify:
 - [ ] Requirements analysis was complete before creating downstream artifacts.
 - [ ] Required solution design was created by `$designing-cybernetic-solutions` or explicitly provided before goal writing, otherwise blocked.
 - [ ] Existing design artifact paths were propagated to goal, execution policy, review, and runtime compilation.
+- [ ] Output contract presence was propagated and validated; no output contract was synthesized by the orchestrator.
 - [ ] Goal contract preserved confirmed human decisions.
 - [ ] Goal and execution policy preserved required solution design.
 - [ ] Execution policy preserved the goal contract.

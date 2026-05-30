@@ -68,6 +68,18 @@
         "The goal preserves design invariants without turning tactical details into frozen requirements.",
         "Does not output a final executable /goal unless approved plan and review already exist."
       ]
+    },
+    {
+      "id": "goal-preserves-output-contract",
+      "prompt": "Write a goal from requirements and design that define a structured final report output contract for a decision audience.",
+      "expected_output": "Goal includes a Final Output Contract and prevents runtime from substituting another output shape.",
+      "assertions": [
+        "Includes a Final Output Contract section.",
+        "References output audience, purpose, medium, detail level, and acceptance condition.",
+        "Includes required sections, fields, schema, or structure when specified.",
+        "Requires evidence references when specified.",
+        "Forbids replacing the output format without stopping or returning to the appropriate upstream artifact."
+      ]
     }
   ]
 }

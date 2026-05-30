@@ -39,6 +39,12 @@ For evaluation tasks, also ask:
 Is the evaluation function already defined well enough that runtime Codex will not invent what "good", "done", "closed", "usable", "ready", or "passed" means?
 ```
 
+For output-sensitive tasks, also ask:
+
+```text
+Is the final output contract defined well enough that runtime Codex will not invent the audience, purpose, medium, structure, detail level, destination, or machine-readable shape?
+```
+
 Route based on unresolved control decisions, not scary keywords.
 
 ## Core Rule
@@ -68,9 +74,10 @@ Every routing response must include:
 2. `Why`
 3. `Required gates`
 4. `Rubric gate` when the task asks for evaluation, audit, readiness, closure, quality, completeness, correctness, usability, or status classification
-5. `Design gate` when the task may require a solution model before goal writing
-6. `Recommended next step`
-7. `Rejected workflow, if any`
+5. `Output Contract gate` when output shape affects execution, acceptance, handoff, persistence, or downstream consumption
+6. `Design gate` when the task may require a solution model before goal writing
+7. `Recommended next step`
+8. `Rejected workflow, if any`
 
 Do not create files. Do not run target execution. Do not write a goal contract. Do not write an execution policy.
 
@@ -106,6 +113,32 @@ Examples:
 - `Level 3` + `Required gates: Rubric Gate required` means the full requirements analysis phase must explicitly include rubric semantics.
 
 Do not route an unrubriced evaluation task directly to execution merely because execution scope is bounded.
+
+## Output Contract Gate
+
+Before routing tasks whose final result will be consumed for a decision, handoff, audit, record, downstream action, or machine consumption, check whether the output contract is explicit enough that runtime Codex will not invent the final shape.
+
+Output Contract Gate is explicit only when the task or existing artifacts define enough of the relevant:
+
+- audience;
+- purpose;
+- medium;
+- required structure;
+- detail level;
+- evidence-reference needs;
+- machine-readable needs;
+- destination path;
+- acceptance condition.
+
+If output shape is missing or partial and the wrong shape would make the task unusable or change execution/acceptance, keep the execution-complexity level unchanged and add `Output Contract Gate: required` under `Required gates`.
+
+Do not require this gate for simple tasks whose output is obviously a short chat summary or local confirmation. Do not turn output format into a routine question.
+
+Examples:
+
+- `Level 1` + `Output Contract Gate: satisfied` can describe a simple local correction with a brief chat summary.
+- `Level 2` + `Output Contract Gate: required` can describe a bounded audit/report task whose evaluation scope is clear but whose decision-report shape is not defined.
+- `Level 3` + `Output Contract Gate: required` can describe full pre-goal work where downstream runtime must produce a structured artifact bundle or machine-readable handoff.
 
 ## Design Gate
 
@@ -427,7 +460,7 @@ Why:
 - ...
 
 Required gates:
-- None, unless Rubric Gate or Design Gate is required.
+- None, unless Rubric Gate, Output Contract Gate, or Design Gate is required.
 
 Recommended next step:
 Use:
@@ -455,6 +488,9 @@ Rubric gate:
 
 Design gate:
 - Satisfied or not applicable when solution structure is already fixed.
+
+Output Contract gate:
+- Satisfied or not applicable when a simple response or confirmed artifact shape is enough.
 
 Recommended next step:
 Use a bounded repair prompt or small file-based goal:
@@ -486,6 +522,7 @@ Why:
 
 Required gates:
 - Rubric Gate: required.
+- Output Contract Gate: required if the final report shape affects acceptance and is not explicit.
 
 Rubric gate:
 - Missing or partial: status meanings, evidence strength, minimum evidence for the strongest positive status, downgrade rules, and external-dependency handling.
@@ -515,6 +552,7 @@ Why:
 Required gates:
 - Design Gate: required.
 - Rubric Gate: required if the task is evaluative and the rubric is not explicit.
+- Output Contract Gate: required if the final output audience, medium, structure, or acceptance condition is not explicit.
 
 Design gate:
 - Missing or partial: objects/actors/roles, relationships, flow, boundaries, interfaces/contracts, or evidence model.
@@ -543,6 +581,7 @@ Required gates:
 - Semantic Gate: required.
 - Goal Contract Gate: required.
 - Design Gate: required if solution structure is not explicit.
+- Output Contract Gate: required if final output shape affects execution, acceptance, handoff, persistence, or downstream consumption and is not explicit.
 - Execution Policy Gate: required.
 - Control Review Gate: required.
 - Rubric Gate: required if the task is evaluative and the rubric is not explicit.
@@ -569,6 +608,7 @@ Required gates:
 - Explicit Human Approval Gate: required before runtime execution.
 - Rubric Gate: required if the task is evaluative and the rubric is not explicit.
 - Design Gate: required if solution structure is not explicit.
+- Output Contract Gate: required if final output shape affects execution, acceptance, handoff, persistence, or downstream consumption and is not explicit.
 
 Recommended next step:
 Run the full pre-goal pipeline, but require explicit human approval before runtime `/goal`.
@@ -593,6 +633,7 @@ Rejected workflow:
 | Recommending execution policy after a Level 2 bounded file goal | Give the direct `/goal` path unless the user explicitly asks for policy or new control decisions appear |
 | Treating an object checklist as a completed rubric | Check the evaluation function before routing to execution |
 | Treating a requirement list as a completed design | Check whether objects, relationships, flows, boundaries, and evidence model are explicit |
+| Asking every simple task for output format | Use Output Contract Gate only when output shape affects execution, acceptance, handoff, persistence, or downstream consumption |
 | Adding special cases for words like "闭环" | Use the generic Evaluation Function Gate for all evaluative predicates |
 | Encoding gates in the routing level name | Keep `Routing decision: Level N` and list gates under `Required gates` |
 
@@ -607,6 +648,7 @@ Before responding, verify:
 - [ ] The routing decision uses only Level 0/1/2/3/4, without suffixes.
 - [ ] Required gates are listed separately from the routing level.
 - [ ] Evaluation tasks include a rubric gate decision.
+- [ ] Output-sensitive tasks include an output contract gate decision, while simple tasks use safe defaults.
 - [ ] Tasks with unclear solution structure include a design gate decision.
 - [ ] A complete object list is not mistaken for a complete evaluation rubric.
 - [ ] A requirement list is not mistaken for a complete solution design.
@@ -615,5 +657,6 @@ Before responding, verify:
 - [ ] For Level 0/1/2, the response does not recommend full pre-goal pipeline.
 - [ ] For Level 2 bounded file goals, the response does not recommend execution policy by default.
 - [ ] If Rubric Gate is required, the response recommends rubric analysis before execution.
+- [ ] If Output Contract Gate is required, the response routes output-contract definition through requirements analysis and solution design only when structure synthesis is needed.
 - [ ] If Design Gate is required, the response recommends solution design before goal writing or orchestration.
 - [ ] The response includes rejected workflow rationale.

@@ -1,6 +1,6 @@
 ---
 name: designing-cybernetic-solutions
-description: 'Use after requirements analysis when the required solution model is not explicit. Creates a core cybernetic solution model: controlled objects, roles, relationships, flows, boundaries, mechanisms, interfaces/contracts, lifecycle, failure model, evidence model, design decisions, and mappings to control contract and execution policy. Does not write control contracts, execution policies, control reviews, runtime /goal commands, or execute target work.'
+description: 'Use after requirements analysis when the required solution model is not explicit. Creates a core cybernetic solution model: controlled objects, roles, relationships, flows, boundaries, mechanisms, interfaces/contracts, lifecycle, failure model, evidence model, output-structure model when required, design decisions, and mappings to control contract and execution policy. Does not write control contracts, execution policies, control reviews, runtime /goal commands, or execute target work.'
 ---
 
 # Designing Cybernetic Solutions
@@ -42,6 +42,7 @@ This skill may:
 - inspect the completed requirements analysis brief and relevant source artifacts;
 - ask a small number of high-value design questions when solution structure cannot be safely inferred;
 - create or update one solution design artifact;
+- design complex output/report/schema/artifact-bundle structures when Output Contract Gate requires structure synthesis;
 - record open design questions and stop before approval;
 - recommend a route-appropriate response-only handoff when the design is sufficient.
 
@@ -97,6 +98,24 @@ Design Gate is usually not required for:
 
 See `references/design-gate.md` for compact routing guidance.
 
+## Output Contract Design
+
+When the requirements analysis marks `Output Contract Gate: required`, inspect whether the output need is simple or requires structure synthesis.
+
+If the requirements already define a safe simple output shape, preserve it and avoid expanding the design.
+
+If the output requires a table, matrix, schema, evidence index, structured report, artifact bundle, multi-audience split, or machine-readable shape, the design must define:
+
+- output audience and purpose;
+- output medium and destination;
+- required sections, fields, tables, schemas, or artifact bundle parts;
+- evidence-reference rules;
+- detail-level split;
+- acceptance condition;
+- how the output structure maps to goal and execution-policy implications.
+
+Do not leave runtime execution to invent the final output shape. Do not define output shape in the response-only handoff; put the design-owned structure in the design artifact.
+
 ## Required Sections
 
 The design artifact must include:
@@ -108,10 +127,11 @@ The design artifact must include:
 5. Design Substrate
 6. Conceptual Design
 7. Detailed Design
-8. Design-to-Goal Mapping
-9. Design-to-Execution Mapping
-10. Open Design Questions
-11. Design Review Requirements
+8. Output Contract Design, when Output Contract Gate requires structure synthesis
+9. Design-to-Goal Mapping
+10. Design-to-Execution Mapping
+11. Open Design Questions
+12. Design Review Requirements
 
 ## Design Status
 
@@ -134,10 +154,11 @@ Open design questions that affect requirement semantics, controlled relationship
 5. Identify whether `$superpowers:brainstorming` is required, used, blocked, or not required.
 6. Build the conceptual model: core objects/actors/roles, relationships, flows, boundaries, alternatives, invariants.
 7. Build the detailed model: mechanisms, interfaces/contracts, state/lifecycle, failure model, evidence/sensor model, compatibility/integration, decisions.
-8. Separate design invariants from tactical degrees of freedom.
-9. Map design elements to goal implications and execution-policy implications.
-10. If material design questions remain, record them and stop without marking Approved.
-11. Do not create goal, plan, review, runtime `/goal`, or target-work files.
+8. If Output Contract Gate requires structure synthesis, design the output structure and evidence-reference rules.
+9. Separate design invariants from tactical degrees of freedom.
+10. Map design elements to goal implications and execution-policy implications.
+11. If material design questions remain, record them and stop without marking Approved.
+12. Do not create goal, plan, review, runtime `/goal`, or target-work files.
 
 ## Response-Only Handoff Rule
 
@@ -165,6 +186,7 @@ Created or updated solution design:
 Design summary:
 - Core model: ...
 - Key flows: ...
+- Output contract, if designed: ...
 - Boundaries: ...
 - Evidence model: ...
 
@@ -199,6 +221,7 @@ Do not write the goal contract until this design decision is resolved or the hum
 - [ ] Conceptual design and detailed design are both present.
 - [ ] Core objects/actors/roles, relationships, flows, and boundaries are explicit.
 - [ ] Interfaces/contracts, lifecycle/state, failure model, and evidence/sensor model are explicit when relevant.
+- [ ] Output structure, evidence-reference rules, and acceptance condition are explicit when Output Contract Gate requires structure synthesis.
 - [ ] Alternatives and design decisions are recorded where there were plausible options.
 - [ ] Design invariants are separated from tactical degrees of freedom.
 - [ ] Design-to-goal and design-to-execution mappings are present.

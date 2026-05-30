@@ -54,6 +54,24 @@ Artifact checks:
 
 - [evidence artifacts/logs/evaluation reports]
 
+## Final Output Contract
+
+Use this section when output shape affects execution, acceptance, handoff, persistence, or downstream consumption. For simple tasks, record the safe default briefly or mark `Not required; simple response is sufficient`.
+
+| Element | Requirement |
+|---|---|
+| Audience | [who consumes the final output] |
+| Purpose | [decision / execution / audit / record / handoff / publication / simple response] |
+| Medium | [chat / file / markdown report / JSON / table / artifact bundle] |
+| Required structure | [sections, tables, fields, schema, artifact bundle, or simple summary] |
+| Detail level | [brief / standard / exhaustive] |
+| Evidence references required | [yes/no] |
+| Machine-readable required | [yes/no] |
+| Destination path | [path or not required] |
+| Acceptance condition | [what makes the output usable] |
+
+Runtime must not substitute a different audience, purpose, medium, structure, detail level, destination, or machine-readable shape. If this contract is insufficient for execution or acceptance, stop and report the smallest required upstream decision.
+
 ## Evaluation Rubric / Error Function
 
 Use this section for audit, evaluation, readiness, closure, completeness, usability, safety, stability, coverage, correctness, or status-classification goals.
@@ -98,7 +116,6 @@ Each entry must include:
 - commands run
 - result
 - current risk
-- next step
 
 ## Stop Conditions
 

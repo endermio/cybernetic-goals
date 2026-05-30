@@ -51,6 +51,10 @@ def blocked_next_action(errors: list[str]) -> str:
         return "RunDesign"
     if "design status" in joined or "design does not reference" in joined or "design has blocking" in joined:
         return "RunDesign"
+    if "output contract gate" in joined and "design lacks" in joined:
+        return "RunDesign"
+    if "output contract gate" in joined and "goal lacks" in joined:
+        return "RunGoalWriting"
     if "goal contract is required" in joined or "goal does not reference" in joined:
         return "RunGoalWriting"
     if "execution policy is required" in joined or "execution policy status" in joined or "plan does not reference" in joined:
@@ -132,6 +136,23 @@ def design_gate_required(*texts: str | None) -> bool:
         if "required" in lowered:
             return True
     return False
+
+
+def output_contract_gate_required(*texts: str | None) -> bool:
+    combined = "\n".join(text for text in texts if text)
+    for line in combined.splitlines():
+        lowered = line.casefold()
+        if "output contract gate" not in lowered:
+            continue
+        if re.search(r"not\s+required|not\s+applicable|satisfied", lowered):
+            continue
+        if "required" in lowered:
+            return True
+    return False
+
+
+def has_section(text: str | None, heading: str) -> bool:
+    return bool(text and section_body(text, heading) is not None)
 
 
 def meaningful_line(line: str) -> bool:
@@ -240,16 +261,28 @@ def check_design_ready(
     if status not in {"Candidate", "Reviewed", "Approved"}:
         errors.append(f"design status must be Candidate, Reviewed, or Approved: {status!r}")
     require_reference(design, requirements_path, "design", errors)
+    if output_contract_gate_required(requirements, design) and not has_section(design, "Output Contract Design"):
+        errors.append("Output Contract Gate is required but design lacks ## Output Contract Design")
     if has_blocking_design_questions(design):
         errors.append("design has blocking open design questions")
 
 
-def check_goal_ready(requirements_path: str, design_path: str | None, goal_path: str | None, goal: str | None, errors: list[str]) -> None:
+def check_goal_ready(
+    requirements_path: str,
+    requirements: str | None,
+    design: str | None,
+    design_path: str | None,
+    goal_path: str | None,
+    goal: str | None,
+    errors: list[str],
+) -> None:
     if not goal_path or not goal:
         errors.append("goal contract is required")
         return
     require_reference(goal, requirements_path, "goal", errors)
     require_reference(goal, design_path, "goal", errors)
+    if output_contract_gate_required(requirements, design, goal) and not has_section(goal, "Final Output Contract"):
+        errors.append("Output Contract Gate is required but goal lacks ## Final Output Contract")
 
 
 def check_plan_ready(
@@ -326,7 +359,7 @@ def main() -> int:
         check_design_ready(args.requirements, requirements, args.design, design, args.design_skill_path, errors)
 
     if args.state in {"before-policy", "before-review", "before-runtime-compile"}:
-        check_goal_ready(args.requirements, args.design, args.goal, goal, errors)
+        check_goal_ready(args.requirements, requirements, design, args.design, args.goal, goal, errors)
 
     if args.state in {"before-review", "before-runtime-compile"}:
         check_plan_ready(args.requirements, args.design, args.goal, args.plan, plan, errors)

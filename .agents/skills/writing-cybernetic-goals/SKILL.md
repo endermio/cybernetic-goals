@@ -1,6 +1,6 @@
 ---
 name: writing-cybernetic-goals
-description: 'Use after requirements analysis is complete and any required solution design exists, when a router-selected Level 2 bounded task needs a small file goal, or when a low-risk task needs an inline goal. Applies when human semantics, any required design, and any required evaluation rubric are confirmed before execution.'
+description: 'Use after requirements analysis is complete and any required solution design exists, when a router-selected Level 2 bounded task needs a small file goal, or when a low-risk task needs an inline goal. Applies when human semantics, any required design, output contract, and any required evaluation rubric are confirmed before execution.'
 ---
 
 # Writing Cybernetic Goals
@@ -53,6 +53,33 @@ A bounded evaluation goal may be created only if the source semantics define:
 - whether confidence or evidence grade must be reported.
 
 If the rubric is missing or partial, do not create an executable bounded goal and do not output a direct `/goal`. Return a blocked rubric analysis request instead. This is not a reason to recommend execution policy by default; the missing artifact is the evaluation function, not the execution policy.
+
+## Output Contract Gate
+
+Before creating a goal, check whether the final output contract is explicit enough that runtime Codex will not invent the audience, purpose, medium, structure, detail level, destination, evidence-reference requirements, or machine-readable shape.
+
+For simple bounded work, use a safe default and do not ask output-format questions by default:
+
+- short chat summary for simple direct tasks;
+- markdown file for persistent control artifacts;
+- evidence table for bounded audit/evaluation tasks;
+- final report with summary, evidence, and unresolved items for runtime tasks.
+
+For output-sensitive work, the goal must include `## Final Output Contract`.
+
+The `Final Output Contract` must preserve:
+
+- audience;
+- purpose;
+- medium;
+- required structure;
+- detail level;
+- evidence-reference needs;
+- machine-readable needs;
+- destination path;
+- acceptance condition.
+
+If requirements or solution design define a structured output, copy the substance into the goal and forbid runtime substitution. If the output contract affects execution or acceptance and no safe default exists, stop and route back to requirements analysis or solution design instead of guessing.
 
 ## Goal Modes
 
@@ -125,10 +152,13 @@ The goal file must include:
 11. Stop Conditions
 12. Blocked Report Format
 13. Final Report Format
+14. Final Output Contract, when output shape affects execution, acceptance, handoff, persistence, or downstream consumption
 
 The goal must preserve confirmed semantics. It must not reinterpret or downscope them.
 
 When a solution design is present, the goal must reference it under `Source of Truth`, preserve design invariants, and avoid freezing tactical design details as semantic invariants unless the design explicitly marks them as invariant.
+
+When a requirements analysis or solution design contains an output contract, the goal must preserve it under `Final Output Contract` and prevent runtime from substituting another output shape.
 
 For evaluation goals, the goal must also include the confirmed rubric as the error function: status definitions, evidence levels, strongest-positive evidence threshold, downgrade rules, and unobservable/external-dependency handling.
 
@@ -139,6 +169,7 @@ Map requirements analysis to:
 - Objective: observable target state
 - Sensors: approved sensors, checks, evidence channels, and reviews
 - Error function: rubric for interpreting sensor output when the task is evaluative
+- Output contract: final audience, purpose, medium, structure, detail level, evidence references, destination, and acceptance condition
 - Constraints: invariants and non-goals
 - Stop conditions: when Codex must stop instead of guessing
 
@@ -161,6 +192,7 @@ Control map:
 - Constraints: ...
 - Solution design source: ...
 - Stop conditions: ...
+- Final output: ...
 
 Response-only handoff:
 - For Level 3/4 or full pre-goal work: return to `$orchestrating-cybernetic-pregoal` with this goal path.
@@ -181,6 +213,7 @@ Control map:
 - Sensors: ...
 - Constraints: ...
 - Stop conditions: ...
+- Final output: ...
 
 Response-only `/goal` command:
 
@@ -240,6 +273,8 @@ If the user explicitly requests a small inline `/goal` and the task is low-risk,
 - [ ] Success conditions and stop conditions are explicit.
 - [ ] Sensors are named but not treated as the objective.
 - [ ] Evaluation tasks define an explicit rubric before any executable goal is emitted.
+- [ ] Output-sensitive tasks include a `Final Output Contract`.
+- [ ] The goal forbids runtime from substituting another output shape when a final output contract is specified.
 - [ ] For complex work, no final runtime `/goal` was output unless approved plan and review exist.
 - [ ] For Level 2 bounded file goals, the response outputs a direct `/goal` and does not recommend execution policy by default.
 - [ ] Any bounded file `/goal` stops if the goal is insufficient, ambiguous, or requires new requirement/control decisions.

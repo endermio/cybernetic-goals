@@ -90,6 +90,23 @@ def design_gate_required(*texts: str) -> bool:
     return False
 
 
+def output_contract_gate_required(*texts: str) -> bool:
+    combined = "\n".join(texts)
+    for line in combined.splitlines():
+        lowered = line.casefold()
+        if "output contract gate" not in lowered:
+            continue
+        if re.search(r"not\s+required|not\s+applicable|satisfied", lowered):
+            continue
+        if "required" in lowered:
+            return True
+    return False
+
+
+def has_section(text: str, heading: str) -> bool:
+    return section_body(text, heading) is not None
+
+
 def yes_no_value(text: str, label: str) -> str | None:
     pattern = re.compile(YES_NO_LINE_RE.pattern.format(label=re.escape(label)), YES_NO_LINE_RE.flags)
     m = pattern.search(text)
@@ -188,8 +205,13 @@ def main() -> int:
             errors.append(f"design status under ## Design Status must be Candidate, Reviewed, or Approved: {design_status!r}")
         if args.requirements not in design:
             errors.append(f"design does not reference required requirements path: {args.requirements}")
+        if output_contract_gate_required(requirements, design) and not has_section(design, "Output Contract Design"):
+            errors.append("Output Contract Gate is required but design lacks ## Output Contract Design")
     elif design_gate_required(requirements, goal, plan, review):
         errors.append("Design Gate is required but --design was not provided")
+
+    if goal and output_contract_gate_required(requirements, design or "", goal, plan, review) and not has_section(goal, "Final Output Contract"):
+        errors.append("Output Contract Gate is required but goal lacks ## Final Output Contract")
 
     if plan:
         plan_status = section_status(plan, "Execution Policy Status")

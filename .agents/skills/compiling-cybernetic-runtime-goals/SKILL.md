@@ -50,6 +50,7 @@ Do not output `/goal` unless:
 - files reference the same feature and do not visibly conflict;
 - runtime `/goal` will not need to write or approve a new plan.
 - runtime `/goal` will not need to create or revise solution design.
+- runtime `/goal` will not need to invent or replace the final output contract.
 
 ## Runtime Goal Contract
 
@@ -60,9 +61,11 @@ The final `/goal` must:
 - reference the concrete goal path;
 - reference the concrete execution policy path;
 - reference the concrete control review path;
+- carry the final output contract from the goal when one is present or required;
 - forbid reinterpreting requirements;
 - forbid rewriting the control strategy;
 - forbid rewriting the solution design;
+- forbid replacing the final output audience, purpose, medium, structure, detail level, destination, or machine-readable shape;
 - forbid replacing approved sensors without using approved sensor-governance rules;
 - execute serially unless the approved review permits otherwise;
 - use `$superpowers:executing-plans` discipline against the approved execution policy;
@@ -102,6 +105,7 @@ Preflight:
 - Solution design: present or not required
 - Execution policy: present
 - Control review: Approved
+- Final output contract: present when required
 ```
 
 Do not create or modify target-work artifacts.
@@ -112,6 +116,7 @@ Do not create or modify target-work artifacts.
 - [ ] No control artifact was rewritten.
 - [ ] Final Observer Check is present and allows approval.
 - [ ] The final `/goal` references all approved files.
+- [ ] The final `/goal` carries the goal's Final Output Contract when present or required.
 - [ ] The final `/goal` does not ask runtime Codex to write a new plan.
 - [ ] The final `/goal` does not ask runtime Codex to create or revise solution design.
 - [ ] The final `/goal` includes executing, debugging, and completion-verification discipline.

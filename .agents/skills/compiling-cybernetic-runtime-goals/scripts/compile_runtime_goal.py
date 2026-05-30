@@ -3,9 +3,57 @@
 from __future__ import annotations
 
 import argparse
+import re
 import subprocess
 import sys
 from pathlib import Path
+
+
+HEADING_RE = re.compile(r"^(#{1,6})\s+(.+?)\s*$", re.MULTILINE)
+
+
+def section_body(text: str, heading: str) -> str | None:
+    target = heading.casefold()
+    for match in HEADING_RE.finditer(text):
+        title = match.group(2).strip().rstrip("#").strip()
+        if title.casefold() != target:
+            continue
+
+        level = len(match.group(1))
+        start = match.end()
+        end = len(text)
+        for next_match in HEADING_RE.finditer(text, start):
+            if len(next_match.group(1)) <= level:
+                end = next_match.start()
+                break
+        return text[start:end]
+    return None
+
+
+def compact_section(body: str) -> str:
+    lines: list[str] = []
+    for raw_line in body.splitlines():
+        line = raw_line.strip()
+        if not line:
+            continue
+        lines.append(line)
+    return " ".join(lines)
+
+
+def final_output_contract_clause(goal_path: str) -> str:
+    goal = Path(goal_path).read_text(encoding="utf-8")
+    body = section_body(goal, "Final Output Contract")
+    if body is None:
+        return ""
+
+    contract = compact_section(body)
+    if not contract:
+        return ""
+
+    return (
+        f"Follow the Final Output Contract in {goal_path}: {contract} "
+        "Do not substitute a different audience, purpose, medium, structure, detail level, destination, or machine-readable shape. "
+    )
 
 
 def main() -> int:
@@ -53,10 +101,13 @@ def main() -> int:
             f"and the confirmed requirements in {args.requirements}. "
         )
 
+    output_contract_clause = final_output_contract_clause(args.goal)
+
     command = (
         f"/goal Execute the approved execution policy in {args.plan} "
         f"{context_clause}"
         f"Use the approved control review in {args.review} as the phase-gate record. "
+        f"{output_contract_clause}"
         f"Do not reinterpret requirements, {design_boundary}rewrite the control strategy, replace approved sensors, or start unreviewed work. "
         "Use `$superpowers:executing-plans` discipline against the approved plan. "
         "Use `$superpowers:systematic-debugging` for unclear or repeated failures. "

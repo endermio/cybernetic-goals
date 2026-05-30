@@ -1,6 +1,6 @@
 ---
 name: analyzing-cybernetic-requirements
-description: 'Use before solution design, control-contract writing, execution-policy writing, or controlled execution for complex, ambiguous, or evaluative work. Analyzes human purpose, requirement semantics, controlled objects and boundaries, evaluation functions, constraints, non-goals, safe defaults, blocking human decisions, and required gates. Does not create solution designs, control contracts, execution policies, control reviews, runtime /goal commands, or target-work artifacts. Creates a requirements analysis brief under docs/cybernetics/requirements/ when file writing is available.'
+description: 'Use before solution design, control-contract writing, execution-policy writing, or controlled execution for complex, ambiguous, evaluative, or output-sensitive work. Analyzes human purpose, requirement semantics, controlled objects and boundaries, evaluation functions, output-contract needs, constraints, non-goals, safe defaults, blocking human decisions, and required gates. Does not create solution designs, control contracts, execution policies, control reviews, runtime /goal commands, or target-work artifacts. Creates a requirements analysis brief under docs/cybernetics/requirements/ when file writing is available.'
 ---
 
 # Analyzing Cybernetic Requirements
@@ -12,7 +12,7 @@ Turn a human intention into a requirements analysis brief before it becomes a so
 This skill is a pre-goal control loop:
 
 ```text
-human purpose -> AI context scan -> requirement semantics -> rubric/gate analysis -> human decisions/defaults -> goal-ready requirements brief
+human purpose -> AI context scan -> requirement semantics -> rubric/output/gate analysis -> human decisions/defaults -> goal-ready requirements brief
 ```
 
 Requirements analysis is broader than asking clarifying questions. Clarifying questions are one tool inside this skill. The output is not just answers to questions; it is the analyzed setpoint, constraints, evaluation function, and required gates.
@@ -29,7 +29,7 @@ Use `assets/requirements-analysis-template.md`.
 This skill analyzes requirements. It must not:
 
 - design the solution structure;
-- define interfaces, object structures, mechanism architecture, flows, report structures, or lifecycle models as a new solution model;
+- define interfaces, object structures, mechanism architecture, flows, report structures, output schemas, or lifecycle models as a new solution model;
 - write a goal contract;
 - write an execution policy;
 - review the whole control structure;
@@ -41,8 +41,9 @@ This skill may:
 - extract human purpose;
 - identify requirement objects, actors, terms, boundaries, and non-goals;
 - classify success, failure, completion, closure, usability, readiness, or pass/fail semantics;
+- identify the final output audience, purpose, medium, required structure level, detail level, evidence-reference needs, machine-readable needs, destination path, and acceptance condition;
 - identify constraints, invariants, assumptions, and stop conditions;
-- decide whether Semantic, Rubric, Design, Goal Contract, Execution Policy, Control Review, or Risk gates are required;
+- decide whether Semantic, Rubric, Output Contract, Design, Goal Contract, Execution Policy, Control Review, or Risk gates are required;
 - ask high-value human questions;
 - record obvious defaults without blocking progress;
 - recommend `$designing-cybernetic-solutions` when Design Gate is required.
@@ -67,6 +68,50 @@ Ask the human a question only if all are true:
 Do not ask the human about routine execution tactics, obvious resilience behavior, execution mechanics, or design details that belong in `$designing-cybernetic-solutions`.
 
 Use `references/decision-levels.md` for decision classification.
+
+## Output Contract Gate
+
+Output shape is part of the controlled requirement when the final artifact will be used for a decision, handoff, audit, record, downstream action, or machine consumption.
+
+Requirements analysis must identify:
+
+- audience;
+- purpose;
+- medium;
+- required structure;
+- detail level;
+- evidence-reference needs;
+- machine-readable needs;
+- destination path;
+- acceptance condition.
+
+Mark `Output Contract Gate: required` when:
+
+- the output will be consumed by another actor, reviewer, downstream agent, script, or external stakeholder;
+- the task is audit, evaluation, reporting, classification, handoff, or persistent record work;
+- the output must be persisted as an artifact;
+- the output needs a table, schema, matrix, evidence index, structured report, or artifact bundle;
+- multiple audiences need different summaries;
+- a wrong output shape would make the task unusable or change how execution should proceed.
+
+Mark `Output Contract Gate: satisfied` when the output contract is explicit enough to write the goal.
+
+Mark `Output Contract Gate: not applicable` when:
+
+- the user asks a simple question;
+- a direct prompt or local correction only needs a short final note;
+- the output shape is obvious, low-risk, and does not affect execution or acceptance.
+
+Do not ask output-format questions by default for simple tasks. Use safe defaults:
+
+- chat summary for simple direct tasks;
+- markdown file for persistent control artifacts;
+- evidence table for audit or evaluation tasks;
+- final report with summary, evidence, and unresolved items for runtime tasks.
+
+Ask the human only when the output contract changes execution or acceptance and no safe default exists.
+
+Requirements analysis may record that structured output is needed. It must not design complex report schemas, field sets, matrix layouts, or artifact bundles; defer those to `$designing-cybernetic-solutions` when structure synthesis is required.
 
 ## Evaluation Function Gate
 
@@ -121,13 +166,14 @@ When Design Gate is required, record the missing solution-model questions and re
 3. Extract confirmed requirement semantics, terms, objects, boundaries, constraints, and non-goals.
 4. Build a requirements control map: objective, controlled object, candidate sensors, actuators, constraints, disturbances, stop conditions.
 5. If the task is evaluative, identify the rubric/error function and classify missing rubric elements as decisions.
-6. Identify required gates: Semantic, Rubric, Design, Goal Contract, Execution Policy, Control Review, Risk.
-7. Classify uncertainty as blocking human decision, safe default assumption, or deferred design/planning/execution detail.
-8. Ask 3-7 high-value questions, preferably no more than 5.
-9. Create or update the requirements analysis brief.
-10. If the human answers, update `Confirmed Requirement Decisions` and `Requirements Analysis Status`.
-11. Do not create a solution design, goal, plan, control review, runtime `/goal`, or target-work artifacts.
-12. If analysis is complete and the brief path deterministically identifies a date/slug, output queue-friendly next commands as described below.
+6. Identify output-contract needs and whether a safe default is sufficient.
+7. Identify required gates: Semantic, Rubric, Output Contract, Design, Goal Contract, Execution Policy, Control Review, Risk.
+8. Classify uncertainty as blocking human decision, safe default assumption, or deferred design/planning/execution detail.
+9. Ask 3-7 high-value questions, preferably no more than 5.
+10. Create or update the requirements analysis brief.
+11. If the human answers, update `Confirmed Requirement Decisions` and `Requirements Analysis Status`.
+12. Do not create a solution design, goal, plan, control review, runtime `/goal`, or target-work artifacts.
+13. If analysis is complete and the brief path deterministically identifies a date/slug, output queue-friendly next commands as described below.
 
 ## Queue-Friendly Next Commands
 
@@ -215,9 +261,21 @@ Evaluation rubric, if applicable:
 - External/unobservable dependency handling: ...
 - Confidence/evidence grade: ...
 
+Output contract:
+- Audience: ...
+- Purpose: ...
+- Medium: ...
+- Required structure: ...
+- Detail level: ...
+- Evidence references required: ...
+- Machine-readable required: ...
+- Destination path: ...
+- Acceptance condition: ...
+
 Required gates:
 - Semantic Gate: ...
 - Rubric Gate: ...
+- Output Contract Gate: ...
 - Design Gate: ...
 - Risk Gate: ...
 

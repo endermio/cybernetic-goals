@@ -76,12 +76,27 @@ Use this section for audit, evaluation, readiness, closure, completeness, usabil
 | External/unobservable dependency handling | [credentials, production-only, third-party, environment gaps] |
 | Confidence / evidence grade | [whether to report confidence] |
 
+## Output Contract
+
+| Element | Requirement |
+|---|---|
+| Audience | [human / operator / reviewer / downstream agent / external stakeholder / not applicable] |
+| Purpose | [decision / execution / audit / record / handoff / publication / simple response] |
+| Medium | [chat / file / markdown report / JSON / table / artifact bundle / not required] |
+| Required structure | [sections, tables, fields, schema, artifact bundle, or "simple summary"] |
+| Detail level | [brief / standard / exhaustive] |
+| Evidence references required | [yes/no] |
+| Machine-readable required | [yes/no] |
+| Destination path | [path or not required] |
+| Acceptance condition | [what makes the output usable] |
+
 ## Required Gates
 
 | Gate | Status | Reason |
 |---|---|---|
 | Semantic Gate | `required / satisfied / not applicable` | [reason] |
 | Rubric Gate | `required / satisfied / not applicable` | [reason] |
+| Output Contract Gate | `required / satisfied / not applicable` | [reason] |
 | Design Gate | `required / satisfied / not applicable` | [reason] |
 | Goal Contract Gate | `required / satisfied / not applicable` | [reason] |
 | Execution Policy Gate | `required / satisfied / not applicable` | [reason] |

@@ -85,6 +85,21 @@ Outside scope:
 
 [What observations prove the design works and how weak/stale/unobservable evidence is handled.]
 
+### Output Contract Design
+
+Use when Output Contract Gate requires structure synthesis. Otherwise record `Not required; requirements or goal can use a safe simple output contract`.
+
+| Output element | Design |
+|---|---|
+| Audience | [who consumes the final output] |
+| Purpose | [decision, action, audit, record, handoff, or equivalent] |
+| Medium / destination | [chat, file, markdown artifact, structured data, artifact bundle, or path] |
+| Required structure | [sections, tables, fields, schema, artifact bundle parts, or simple summary] |
+| Detail-level split | [brief/standard/exhaustive or audience-specific split] |
+| Evidence-reference rules | [what evidence references must be included and how] |
+| Machine-readable shape | [required schema or not required] |
+| Acceptance condition | [what makes the output usable] |
+
 ### Compatibility / Migration / Integration
 
 [Compatibility, migration, rollout, integration, or coexistence concerns.]
@@ -100,12 +115,14 @@ Outside scope:
 | Design element | Goal implication |
 |---|---|
 | [element] | [goal implication] |
+| Output Contract Design, if present | Goal must preserve the final output contract and forbid runtime substitution. |
 
 ## Design-to-Execution Mapping
 
 | Design element | Execution-policy implication |
 |---|---|
 | [element] | [execution implication] |
+| Output Contract Design, if present | Execution policy must collect and preserve the evidence/output material required by the output contract. |
 
 ## Open Design Questions
 
@@ -118,6 +135,7 @@ Review must check:
 - semantic fidelity to requirements analysis;
 - internal consistency of objects, relationships, flows, and boundaries;
 - evidence/sensor adequacy;
+- output-contract adequacy when Output Contract Gate required structure synthesis;
 - boundary correctness;
 - design invariants versus tactical flexibility;
 - suitability as source input for goal and execution policy.
