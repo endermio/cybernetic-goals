@@ -123,7 +123,53 @@
         "Runs or recommends $designing-cybernetic-solutions before $writing-cybernetic-goals.",
         "Does not create goal and plan by inventing solution structure inside execution policy.",
         "Control review includes the design artifact in its reviewed inputs.",
-        "Final runtime /goal compilation is blocked unless the required design exists and is sufficiently approved or reviewed."
+        "Final runtime /goal compilation is blocked unless the required design exists with Candidate, Reviewed, or Approved status and no blocking open design questions."
+      ]
+    },
+    {
+      "id": "orchestrator-cannot-skip-required-design",
+      "prompt": "Requirements analysis is Complete and says Design Gate: required, but no design artifact exists. Orchestrate pre-goal compilation.",
+      "expected_output": "The orchestrator must stop before goal writing and request or invoke $designing-cybernetic-solutions.",
+      "assertions": [
+        "Does not create a goal contract.",
+        "Does not create an execution policy.",
+        "Does not synthesize solution design internally.",
+        "Reports Design Gate blocked or invokes $designing-cybernetic-solutions.",
+        "Records the next allowed action as RunDesign."
+      ]
+    },
+    {
+      "id": "orchestrator-blocks-when-design-skill-unavailable",
+      "prompt": "Requirements analysis is Complete and says Design Gate: required. $designing-cybernetic-solutions is unavailable. Orchestrate pre-goal compilation.",
+      "expected_output": "The orchestrator must block and report the missing downstream design skill instead of synthesizing solution design internally.",
+      "assertions": [
+        "Does not synthesize solution design inside the orchestrator.",
+        "Does not treat solution design as narrow formatting fallback.",
+        "Reports missing $designing-cybernetic-solutions.",
+        "Does not create goal, execution policy, control review, or runtime /goal."
+      ]
+    },
+    {
+      "id": "existing-design-artifact-propagates-downstream",
+      "prompt": "Requirements analysis, an existing solution design artifact, goal, execution policy, and review are being orchestrated. Design Gate is already satisfied, but the design artifact exists.",
+      "expected_output": "The orchestrator must preserve and propagate the existing design artifact through goal, execution policy, review, and runtime compilation.",
+      "assertions": [
+        "Goal references the design.",
+        "Execution policy references the design.",
+        "Control review inputs include the design.",
+        "Runtime compiler receives --design.",
+        "Does not drop the design because Design Gate is already satisfied."
+      ]
+    },
+    {
+      "id": "orchestrator-cannot-compile-before-review",
+      "prompt": "Requirements, design, goal, and execution policy exist, but control review is Needs Revision. Compile runtime /goal.",
+      "expected_output": "The orchestrator must not compile runtime /goal before control review is Approved and Final Observer allows approval.",
+      "assertions": [
+        "Does not output a final runtime /goal.",
+        "Reports review is not Approved.",
+        "Says next allowed action is control review or revision.",
+        "Does not bypass with lint pass."
       ]
     }
   ]

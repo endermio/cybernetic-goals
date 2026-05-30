@@ -48,6 +48,8 @@ $orchestrating-cybernetic-pregoal
   -> run the remaining pre-goal compilation chain after requirements analysis/design are complete
 ```
 
+Full pre-goal orchestration includes the solution-design stage when Design Gate is required, but solution design remains owned by `$designing-cybernetic-solutions`.
+
 The orchestrator drives the following skills and stops if the review cannot converge:
 
 ```text

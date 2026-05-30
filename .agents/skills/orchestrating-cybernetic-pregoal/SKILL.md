@@ -1,6 +1,6 @@
 ---
 name: orchestrating-cybernetic-pregoal
-description: 'Use after a completed requirements analysis brief to orchestrate the pre-goal compilation chain before launching a Codex /goal. Coordinates existing cybernetic skills to create or update any required solution design, control contract, execution policy, control review, and final runtime /goal command. Requires explicit user authorization before spawning subagents. Does not execute target work and does not start /goal execution.'
+description: 'Use after a completed requirements analysis brief to orchestrate the pre-goal compilation chain before launching a Codex /goal. Coordinates existing cybernetic skills to invoke or validate any required solution design, create or update the control contract, execution policy, control review, and final runtime /goal command. Requires explicit user authorization before spawning subagents. Does not execute target work and does not start /goal execution.'
 ---
 
 # Orchestrating Cybernetic Pre-goal
@@ -28,6 +28,7 @@ This skill must not:
 
 - analyze requirements from scratch
 - invent required solution design inside the execution policy
+- synthesize solution design inside the orchestrator
 - execute target work
 - start `/goal` execution
 - make requirement decisions for the human
@@ -39,9 +40,9 @@ This skill may:
 
 - inspect a completed requirements analysis brief
 - call existing cybernetic skills in the correct order
-- emulate narrow cybernetic formatting only when a downstream cybernetic skill is unavailable
+- emulate narrow cybernetic formatting only when a downstream cybernetic skill is unavailable and that fallback is explicitly allowed
 - create or update control artifacts under `docs/cybernetics/`
-- create or update a solution design when Design Gate is required
+- invoke, request, or validate a solution design when Design Gate is required
 - use explicitly authorized subagents as independent reviewers
 - iterate review and revision up to the configured limit
 - compile the final `/goal` command after approval
@@ -51,6 +52,8 @@ This skill may:
 Follow `$cybernetic-superpowers-infrastructure`.
 
 This orchestrator may emulate cybernetic artifact formatting when a downstream cybernetic skill is unavailable. It must not emulate required Superpowers infrastructure.
+
+It must not emulate solution design synthesis. Solution design is a substantive control artifact, not narrow formatting.
 
 Required infrastructure boundaries:
 
@@ -81,6 +84,7 @@ It should not duplicate their templates or rules unless they are unavailable. If
 
 Never emulate required Superpowers substrates. In particular:
 
+- do not replace `$designing-cybernetic-solutions` with orchestrator-authored solution design when Design Gate is required;
 - do not replace `$superpowers:writing-plans` with ad hoc internal planning for non-trivial execution policies;
 - do not replace independent review discipline with self-review;
 - do not compile a runtime `/goal` that omits required runtime execution, debugging, and verification discipline.
@@ -176,6 +180,14 @@ Read the requirements analysis brief. If available, run:
 python3 ~/.agents/skills/orchestrating-cybernetic-pregoal/scripts/check_pregoal_inputs.py --requirements <path>
 ```
 
+Then, if available, run:
+
+```bash
+python3 .agents/skills/orchestrating-cybernetic-pregoal/scripts/orchestration_guard.py \
+  --state before-design \
+  --requirements <requirements>
+```
+
 If the script path is not available, perform the same checks manually.
 
 The requirements analysis is acceptable only if one of the following is true:
@@ -205,11 +217,80 @@ docs/cybernetics/goals/YYYY-MM-DD-<slug>.md
 docs/cybernetics/plans/YYYY-MM-DD-<slug>.md
 docs/cybernetics/control-reviews/YYYY-MM-DD-<slug>.md
 docs/cybernetics/progress/YYYY-MM-DD-<slug>.md
+docs/cybernetics/orchestrations/YYYY-MM-DD-<slug>.md
 ```
 
 The design, goal, plan, control review, and progress log must use the same derived date/slug. This keeps queue-friendly `/goal` commands emitted by `$analyzing-cybernetic-requirements` stable. If the requested path is ambiguous or does not contain a deterministic date/slug, stop and ask for the smallest path decision instead of inventing a different slug.
 
+Use `assets/pregoal-orchestration-status-template.md` for the orchestration status artifact.
+
+## Design Dispatch Rule
+
+When Design Gate is required, the orchestrator must invoke or request `$designing-cybernetic-solutions` before goal writing.
+
+The orchestrator owns:
+
+- sequencing
+- artifact path derivation
+- lifecycle checks
+- source-contract checks
+- blocking when design is missing or invalid
+- downstream propagation of the design path
+
+The orchestrator does not own solution-model synthesis.
+
+Do not synthesize solution design inside the orchestrator. Do not treat solution design as narrow formatting fallback.
+
+If `$designing-cybernetic-solutions` is unavailable when Design Gate is required, stop and report the missing downstream skill.
+
+Design artifacts with status `Candidate`, `Reviewed`, or `Approved` may enter downstream stages when all are true:
+
+- the artifact was produced by `$designing-cybernetic-solutions` or explicitly provided by the user;
+- it references the requirements analysis in `Source Contracts`;
+- it has no blocking open design questions;
+- final control review will check Design Fidelity.
+
+If any design artifact exists, propagate its path to goal writing, execution-policy writing, control review, and runtime compilation, even when Design Gate is satisfied or no longer required.
+
+## Non-Fallback Rule
+
+The orchestrator may emulate narrow formatting only for downstream cybernetic artifacts where this skill explicitly allows it.
+
+It must not emulate:
+
+- requirements analysis
+- solution design synthesis
+- execution-policy substrate
+- independent review
+- runtime compilation guard
+
+If any non-emulatable stage is required and unavailable, stop and report the missing dependency.
+
+## Orchestration State Machine
+
+Before each stage, run `scripts/orchestration_guard.py` for that stage if available. If the guard fails, stop. Do not continue based on confidence or natural-language reasoning.
+
+| Current State | Required condition | Next Action | Forbidden Action |
+|---|---|---|---|
+| `RequirementsMissing` | requirements absent or incomplete | `Blocked` | design / goal / policy / review / runtime compile |
+| `RequirementsComplete` | Design Gate required and design missing | `RunDesign` | goal writing |
+| `DesignReady` | design exists, references requirements, and has no blocking open questions | `RunGoalWriting` | execution policy |
+| `GoalReady` | goal exists and references requirements plus any design path | `RunExecutionPolicy` | review |
+| `PolicyReady` | execution policy exists and references requirements, goal, and any design path | `RunReview` | runtime compile |
+| `ReviewApproved` | review is Approved and Final Observer allows approval | `RunRuntimeCompile` | execution |
+| `RuntimeGoalReady` | final `/goal` is compiled | output command | start `/goal` |
+| `Blocked` | any required gate fails | report blocker | continue |
+
 ### Step 2: Create or Validate the Solution Design
+
+Before goal writing, if available, run:
+
+```bash
+python3 .agents/skills/orchestrating-cybernetic-pregoal/scripts/orchestration_guard.py \
+  --state before-goal \
+  --requirements <requirements> \
+  --design <design-if-present>
+```
 
 Use `$designing-cybernetic-solutions` when `Design Gate: required` appears in the requirements analysis, router output, user request, or existing artifact chain.
 
@@ -221,6 +302,8 @@ The solution design must:
 - distinguish design invariants from tactical degrees of freedom;
 - map design elements to goal and execution-policy implications;
 - not create goal, plan, review, runtime `/goal`, or target-work artifacts.
+
+The orchestrator must not synthesize these design contents itself. If the design is missing and required, the next allowed action is `RunDesign`.
 
 Expected artifact:
 
@@ -254,6 +337,16 @@ docs/cybernetics/goals/YYYY-MM-DD-<slug>.md
 
 ### Step 4: Create or Update the Execution Policy
 
+Before writing the execution policy, if available, run:
+
+```bash
+python3 .agents/skills/orchestrating-cybernetic-pregoal/scripts/orchestration_guard.py \
+  --state before-policy \
+  --requirements <requirements> \
+  --design <design-if-present> \
+  --goal <goal>
+```
+
 Use `$writing-cybernetic-execution-policies` when available.
 
 The execution policy must:
@@ -281,6 +374,17 @@ docs/cybernetics/plans/YYYY-MM-DD-<slug>.md
 ```
 
 ### Step 5: Review the Control Structure
+
+Before control review, if available, run:
+
+```bash
+python3 .agents/skills/orchestrating-cybernetic-pregoal/scripts/orchestration_guard.py \
+  --state before-review \
+  --requirements <requirements> \
+  --design <design-if-present> \
+  --goal <goal> \
+  --plan <plan>
+```
 
 Use `$reviewing-cybernetic-control-structures` when available.
 
@@ -337,6 +441,18 @@ Do not alter confirmed human decisions. If a revision would change requirement s
 
 Use `$compiling-cybernetic-runtime-goals` when available.
 
+Before runtime compilation, if available, run:
+
+```bash
+python3 .agents/skills/orchestrating-cybernetic-pregoal/scripts/orchestration_guard.py \
+  --state before-runtime-compile \
+  --requirements <requirements> \
+  --design <design-if-present> \
+  --goal <goal> \
+  --plan <plan> \
+  --review <review>
+```
+
 Before outputting runtime `/goal`, ensure:
 
 - requirements analysis is complete
@@ -356,7 +472,7 @@ If available, run:
 ```bash
 python3 ~/.agents/skills/compiling-cybernetic-runtime-goals/scripts/control_chain_guard.py \
   --requirements <requirements> \
-  --design <design-if-required> \
+  --design <design-if-required-or-present> \
   --goal <goal> \
   --plan <plan> \
   --review <review>
@@ -489,8 +605,10 @@ Before responding, verify:
 - [ ] Subagents were used only if explicitly authorized.
 - [ ] Required Superpowers substrate status was checked.
 - [ ] No required Superpowers substrate was silently emulated.
+- [ ] No required solution design synthesis was emulated inside the orchestrator.
 - [ ] Requirements analysis was complete before creating downstream artifacts.
-- [ ] Required solution design was created or validated before goal writing.
+- [ ] Required solution design was created by `$designing-cybernetic-solutions` or explicitly provided before goal writing, otherwise blocked.
+- [ ] Existing design artifact paths were propagated to goal, execution policy, review, and runtime compilation.
 - [ ] Goal contract preserved confirmed human decisions.
 - [ ] Goal and execution policy preserved required solution design.
 - [ ] Execution policy preserved the goal contract.
@@ -514,6 +632,8 @@ Before responding, verify:
 | Spawning subagents without user authorization | Ask for authorization or run candidate-only mode |
 | Creating a final `/goal` from an incomplete requirements analysis | Stop and return to requirements analysis |
 | Skipping design when Design Gate is required | Run `$designing-cybernetic-solutions` before goal writing |
+| Synthesizing solution design inside the orchestrator | Stop; invoke/request `$designing-cybernetic-solutions` or block |
+| Dropping an existing design artifact because Design Gate is satisfied | Propagate the design path downstream |
 | Reviewing only the plan | Review requirements analysis, design when required, goal, plan, and runtime boundary |
 | Replacing missing `$superpowers:writing-plans` with an ad hoc approved plan | Stop and report missing planning infrastructure |
 | Marking Approved after fixing reviewer blockers without final re-review | Mark artifacts Dirty / Needs Re-review and run final independent re-review |
