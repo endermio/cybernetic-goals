@@ -59,6 +59,19 @@
         "Response-only handoff recommends $orchestrating-cybernetic-pregoal.",
         "Does not recommend $reviewing-cybernetic-control-structures as the next user action for Level 3 full pre-goal work."
       ]
+    },
+    {
+      "id": "structured-output-requires-material-collection",
+      "prompt": "根据 requirements、solution design 和 goal 创建 execution policy。Final Output Contract requires a structured decision report with status matrix, evidence references, unresolved decisions, and a markdown destination.",
+      "expected_output": "The execution policy includes Output Material / Evidence Collection defining what must be collected, which batch produces it, where references are stored, readiness before final report generation, and what missing material blocks completion.",
+      "assertions": [
+        "Includes Output Material / Evidence Collection.",
+        "Defines what output material must be collected.",
+        "Defines which batch produces the output material.",
+        "Defines where evidence references are stored.",
+        "Defines what must be ready before final report generation.",
+        "Defines what missing output material blocks completion."
+      ]
     }
   ]
 }

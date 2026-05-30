@@ -24,6 +24,7 @@ Cybernetic constraints supplied to the substrate:
 - dependency matrix;
 - batch cadence;
 - destructive intermediate-state policy;
+- output material/evidence collection;
 - sensor/evidence governance;
 - stale sensor retirement and rewrite policy.
 
@@ -69,6 +70,22 @@ Not allowed even inside a batch:
 Batch-end requirements:
 
 - [openable/verifiable condition]
+
+## Output Material / Evidence Collection
+
+Use when the goal `Final Output Contract` or design `Output Contract Design` requires structured output. Otherwise record `Not required; final output can be produced from ordinary progress and verification evidence`.
+
+| Required output material | Producing batch/checkpoint | Evidence reference location | Ready before final output? | Missing material blocks completion? |
+|---|---|---|---|---|
+| [material] | [batch/checkpoint] | [path/section/log] | [yes/no] | [yes/no and reason] |
+
+Final output readiness:
+
+- [what must be ready before final report/output generation]
+
+Blocking missing material:
+
+- [missing material that forces stop or revision]
 
 ## Sensor / Evidence Governance
 

@@ -103,10 +103,6 @@ def output_contract_gate_required(*texts: str) -> bool:
     return False
 
 
-def has_section(text: str, heading: str) -> bool:
-    return section_body(text, heading) is not None
-
-
 def yes_no_value(text: str, label: str) -> str | None:
     pattern = re.compile(YES_NO_LINE_RE.pattern.format(label=re.escape(label)), YES_NO_LINE_RE.flags)
     m = pattern.search(text)
@@ -140,11 +136,49 @@ def meaningful_line(line: str) -> bool:
         return False
     if text.startswith("-"):
         text = text[1:].strip()
+    lowered = text.casefold()
+    if lowered.startswith(("use when ", "otherwise record", "runtime must not substitute", "if this contract is insufficient")):
+        return False
+    if re.fullmatch(r"\|?\s*:?-{3,}:?\s*(\|\s*:?-{3,}:?\s*)+\|?", text):
+        return False
+    if "|" in text and "element" in lowered and ("requirement" in lowered or "design" in lowered):
+        return False
     if text.startswith("[") and text.endswith("]"):
+        return False
+    if "[" in text and "]" in text:
         return False
     if text in {"yes/no", "yes / no"}:
         return False
     return True
+
+
+def has_section(text: str, heading: str) -> bool:
+    return section_body(text, heading) is not None
+
+
+def section_has_meaningful_content(text: str | None, heading: str) -> bool:
+    if not text:
+        return False
+    body = section_body(text, heading)
+    if body is None:
+        return False
+    return any(meaningful_line(line) for line in body.splitlines())
+
+
+def output_contract_present_upstream(requirements: str | None = None, design: str | None = None, goal: str | None = None) -> bool:
+    return (
+        section_has_meaningful_content(requirements, "Output Contract")
+        or section_has_meaningful_content(design, "Output Contract Design")
+        or section_has_meaningful_content(goal, "Final Output Contract")
+    )
+
+
+def output_contract_required(*texts: str | None) -> bool:
+    return output_contract_gate_required(*(text or "" for text in texts)) or output_contract_present_upstream(
+        requirements=texts[0] if len(texts) > 0 else None,
+        design=texts[1] if len(texts) > 1 else None,
+        goal=texts[2] if len(texts) > 2 else None,
+    )
 
 
 def check_final_observer(review: str, errors: list[str]) -> None:
@@ -205,13 +239,13 @@ def main() -> int:
             errors.append(f"design status under ## Design Status must be Candidate, Reviewed, or Approved: {design_status!r}")
         if args.requirements not in design:
             errors.append(f"design does not reference required requirements path: {args.requirements}")
-        if output_contract_gate_required(requirements, design) and not has_section(design, "Output Contract Design"):
-            errors.append("Output Contract Gate is required but design lacks ## Output Contract Design")
+        if output_contract_gate_required(requirements, design) and not output_contract_present_upstream(requirements, design):
+            errors.append("Output Contract Gate is required but no upstream output contract is present")
     elif design_gate_required(requirements, goal, plan, review):
         errors.append("Design Gate is required but --design was not provided")
 
-    if goal and output_contract_gate_required(requirements, design or "", goal, plan, review) and not has_section(goal, "Final Output Contract"):
-        errors.append("Output Contract Gate is required but goal lacks ## Final Output Contract")
+    if goal and output_contract_required(requirements, design or "", goal) and not section_has_meaningful_content(goal, "Final Output Contract"):
+        errors.append("Output contract is required by gate or upstream artifact, but goal lacks meaningful ## Final Output Contract")
 
     if plan:
         plan_status = section_status(plan, "Execution Policy Status")

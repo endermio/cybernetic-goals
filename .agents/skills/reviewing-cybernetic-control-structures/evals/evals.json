@@ -70,6 +70,19 @@
         "Response-only handoff recommends returning to $orchestrating-cybernetic-pregoal.",
         "Does not recommend $compiling-cybernetic-runtime-goals as the next user action when orchestration owns the full pre-goal chain."
       ]
+    },
+    {
+      "id": "reviews-output-contract-fidelity",
+      "prompt": "审查 requirements analysis、solution design、goal、plan。requirements 定义 Output Contract: management decision report, markdown artifact, status matrix, evidence references, unresolved decisions；design 定义 Output Contract Design；goal 省略 evidence references 和 unresolved decisions；plan 没有收集 final report 所需材料。",
+      "expected_output": "Review status is Needs Revision and identifies Output Contract Fidelity violations.",
+      "assertions": [
+        "Includes Output Contract Fidelity as a review dimension.",
+        "Flags goal omitting or weakening requirements Output Contract.",
+        "Flags goal failing to preserve design Output Contract Design.",
+        "Flags execution policy missing output material or evidence collection needed for the final output.",
+        "Does not mark Approved.",
+        "Does not output a final runtime /goal."
+      ]
     }
   ]
 }

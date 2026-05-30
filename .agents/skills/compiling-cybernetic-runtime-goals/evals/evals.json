@@ -63,6 +63,18 @@
         "Uses executing, debugging, and completion verification discipline.",
         "Stops if artifacts conflict or become insufficient."
       ]
+    },
+    {
+      "id": "requires-final-output-contract-when-upstream-present",
+      "prompt": "requirements analysis Complete，Output Contract Gate: satisfied，并且 requirements 有 ## Output Contract。goal、plan、approved review 都存在，但 goal 没有 ## Final Output Contract。请编译最终 /goal。",
+      "expected_output": "Refuse to compile runtime /goal because upstream output contract exists and the goal failed to preserve it as Final Output Contract.",
+      "assertions": [
+        "Does not output final /goal.",
+        "Treats upstream Output Contract as requiring goal Final Output Contract even when Output Contract Gate is satisfied.",
+        "Reports that goal lacks Final Output Contract.",
+        "Does not let runtime Codex invent or replace the output shape.",
+        "Does not rewrite artifacts."
+      ]
     }
   ]
 }

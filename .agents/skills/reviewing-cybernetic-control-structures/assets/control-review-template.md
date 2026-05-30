@@ -17,6 +17,7 @@ Status: `Needs Revision`
 - Independent review passes completed:
   - Requirement traceability: `yes/no`
   - Design fidelity: `yes/no`
+  - Output contract fidelity: `yes/no`
   - Goal fidelity: `yes/no`
   - Sensor governance: `yes/no`
   - Execution cadence: `yes/no`
@@ -61,6 +62,19 @@ Findings:
 - [finding]
 
 ## Design Fidelity
+
+Findings:
+
+- [finding]
+
+## Output Contract Fidelity
+
+Check:
+
+- requirements `Output Contract` is preserved in goal `Final Output Contract`;
+- design `Output Contract Design`, if present, is preserved in goal and execution policy;
+- execution policy collects material needed for the final output;
+- runtime `/goal` cannot replace audience, purpose, medium, structure, detail level, destination, or machine-readable shape.
 
 Findings:
 
@@ -120,6 +134,7 @@ The control structure may be approved only if:
 - required solution design exists and preserves requirements analysis semantics;
 - goal preserves requirements analysis semantics;
 - goal and execution policy preserve required design invariants;
+- any upstream output contract is preserved in the goal and supported by the execution policy;
 - execution policy preserves goal and requirements analysis;
 - sensor/evidence governance is explicit;
 - batch cadence is explicit;

@@ -30,28 +30,16 @@ def section_body(text: str, heading: str) -> str | None:
     return None
 
 
-def compact_section(body: str) -> str:
-    lines: list[str] = []
-    for raw_line in body.splitlines():
-        line = raw_line.strip()
-        if not line:
-            continue
-        lines.append(line)
-    return " ".join(lines)
-
-
 def final_output_contract_clause(goal_path: str) -> str:
     goal = Path(goal_path).read_text(encoding="utf-8")
     body = section_body(goal, "Final Output Contract")
     if body is None:
         return ""
-
-    contract = compact_section(body)
-    if not contract:
+    if not body.strip():
         return ""
 
     return (
-        f"Follow the Final Output Contract in {goal_path}: {contract} "
+        f"Follow the Final Output Contract section in {goal_path}. "
         "Do not substitute a different audience, purpose, medium, structure, detail level, destination, or machine-readable shape. "
     )
 

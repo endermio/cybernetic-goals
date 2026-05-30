@@ -1,6 +1,6 @@
 ---
 name: writing-cybernetic-execution-policies
-description: 'Use after an approved requirements analysis brief, any required solution design, and control contract exist, before starting an executable /goal. Creates a cybernetic execution policy for controlled execution: dependency matrix, batch cadence, destructive intermediate-state policy, sensor/evidence governance, semantic invariants, design invariants, tactical degrees of freedom, phase gates, and execution rhythm. Does not execute target work and does not start /goal execution.'
+description: 'Use after an approved requirements analysis brief, any required solution design, and control contract exist, before starting an executable /goal. Creates a cybernetic execution policy for controlled execution: dependency matrix, batch cadence, destructive intermediate-state policy, output material/evidence collection, sensor/evidence governance, semantic invariants, design invariants, tactical degrees of freedom, phase gates, and execution rhythm. Does not execute target work and does not start /goal execution.'
 ---
 
 # Writing Cybernetic Execution Policies
@@ -43,6 +43,7 @@ This skill supplies the cybernetic constraints that the planning substrate must 
 - dependency matrix requirement;
 - batch cadence;
 - destructive intermediate-state policy;
+- output material/evidence collection for the final output contract;
 - sensor/evidence governance;
 - stale sensor retirement and rewrite policy.
 
@@ -59,13 +60,14 @@ The execution policy must include:
 5. Dependency Matrix
 6. Batch Cadence
 7. Destructive Intermediate-State Policy
-8. Sensor / Evidence Governance
-9. Stale Sensor Retirement and Rewrite Policy
-10. Phase Gates
-11. Execution Rhythm
-12. Stop Conditions
-13. Progress Log Rules
-14. Candidate Plan Tasks
+8. Output Material / Evidence Collection
+9. Sensor / Evidence Governance
+10. Stale Sensor Retirement and Rewrite Policy
+11. Phase Gates
+12. Execution Rhythm
+13. Stop Conditions
+14. Progress Log Rules
+15. Candidate Plan Tasks
 
 ## Batch Cadence
 
@@ -75,6 +77,18 @@ For large structural changes:
 - each batch must end in an openable or meaningfully verifiable state;
 - batch size should be large enough to avoid sensor-driven local minima;
 - batch size should be small enough that failures remain diagnosable.
+
+## Output Material / Evidence Collection
+
+When the goal `Final Output Contract` or design `Output Contract Design` requires structured output, the execution policy must define:
+
+- what output material must be collected;
+- which batch produces each required material;
+- where evidence references are stored;
+- what must be ready before final output generation;
+- what missing output material blocks completion.
+
+Do not leave final output material discovery until the end of runtime execution.
 
 ## Sensor / Evidence Governance
 
@@ -152,6 +166,7 @@ Response-only handoff:
 - [ ] The plan has batch cadence.
 - [ ] The plan allows destructive intermediate states only within approved batches.
 - [ ] Each batch ends in an openable/verifiable state.
+- [ ] The plan defines output material/evidence collection when the final output contract requires structured output.
 - [ ] The plan treats approved sensors, checks, and evidence channels as sensors, not objectives.
 - [ ] The plan includes stale sensor retirement/rewrite policy.
 - [ ] The plan does not claim to be approved.

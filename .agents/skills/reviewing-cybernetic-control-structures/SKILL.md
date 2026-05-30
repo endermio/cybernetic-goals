@@ -1,6 +1,6 @@
 ---
 name: reviewing-cybernetic-control-structures
-description: 'Use after requirements analysis, any required solution design, control contract, and execution policy files exist, before starting /goal execution. Reviews the whole AI control structure, not only the plan: requirement traceability, design fidelity, goal fidelity, control law quality, sensor/evidence governance, batch cadence, phase gates, stop conditions, and semantic-vs-tactical boundaries. Produces a control review file under docs/cybernetics/control-reviews/ and must mark Approved before runtime /goal may start.'
+description: 'Use after requirements analysis, any required solution design, control contract, and execution policy files exist, before starting /goal execution. Reviews the whole AI control structure, not only the plan: requirement traceability, design fidelity, output contract fidelity, goal fidelity, control law quality, sensor/evidence governance, batch cadence, phase gates, stop conditions, and semantic-vs-tactical boundaries. Produces a control review file under docs/cybernetics/control-reviews/ and must mark Approved before runtime /goal may start.'
 ---
 
 # Reviewing Cybernetic Control Structures
@@ -99,7 +99,17 @@ When a solution design exists or Design Gate was required:
 - tactical degrees of freedom must not be frozen as semantic invariants unless the design explicitly says so;
 - the plan must not redesign the solution model.
 
-### 4. Control Law Quality
+### 4. Output Contract Fidelity
+
+When requirements analysis, solution design, or goal includes an output contract:
+
+- the requirements `Output Contract` must be preserved in the goal `Final Output Contract`;
+- the design `Output Contract Design`, if present, must be preserved in the goal and execution policy;
+- the execution policy must collect the material needed for the final output;
+- evidence-reference, destination, machine-readable, and acceptance-condition requirements must not be weakened;
+- runtime `/goal` must not be able to replace the audience, purpose, medium, structure, detail level, destination, or machine-readable shape.
+
+### 5. Control Law Quality
 
 The execution policy must define a sane control law:
 
@@ -109,7 +119,7 @@ The execution policy must define a sane control law:
 - repair policy
 - stop conditions
 
-### 5. Sensor / Evidence Governance
+### 6. Sensor / Evidence Governance
 
 Approved sensors, checks, and evidence channels are sensors, not objectives.
 
@@ -120,7 +130,7 @@ Flag plans that:
 - lack stale sensor retirement rules;
 - lack target-state evidence.
 
-### 6. Batch Rhythm
+### 7. Batch Rhythm
 
 Flag:
 
@@ -129,15 +139,15 @@ Flag:
 - no batch-end openability requirement;
 - no destructive intermediate-state policy.
 
-### 7. Semantic vs Tactical Boundary
+### 8. Semantic vs Tactical Boundary
 
 Semantic invariants must be frozen. Tactical execution details must remain adjustable.
 
-### 8. Runtime Suitability
+### 9. Runtime Suitability
 
 The runtime `/goal` must be able to execute the approved artifacts without inventing new control structures. Any required runtime Superpowers discipline must be precompiled into the approved plan, review, or final `/goal`.
 
-### 9. Review Independence
+### 10. Review Independence
 
 The review must record:
 
@@ -146,7 +156,7 @@ The review must record:
 - whether approval is allowed;
 - why approval is blocked when independent review is missing.
 
-### 10. Final Observer Check
+### 11. Final Observer Check
 
 The review must record whether any substantive artifact changed after the latest independent review pass and whether a final independent observer confirmed no Blocking or Major findings after that change.
 
@@ -178,6 +188,7 @@ Only mark `Approved` when:
 
 - requirements analysis, required design, goal, and plan are consistent;
 - required design exists and is consistent with requirements analysis, goal, and plan;
+- any upstream output contract is preserved in the goal and supported by the execution policy;
 - no unresolved semantic decision remains;
 - execution policy does not self-authorize uncontrolled changes;
 - sensor/evidence governance is explicit;
@@ -208,6 +219,7 @@ After review status is set:
 - [ ] If any substantive artifact changed after independent review, including required design, status is `Dirty` or `Needs Re-review` until final independent re-review reports no Blocking or Major findings.
 - [ ] Lint PASS is not treated as semantic/control-policy approval.
 - [ ] Critical findings distinguish semantic, design, goal, plan, sensor, and runtime issues.
+- [ ] Output contract fidelity was checked when any upstream output contract exists.
 - [ ] Required revisions are actionable.
 - [ ] Response-only handoff matches the review status and does not bypass `$orchestrating-cybernetic-pregoal` when full pre-goal orchestration owns the chain.
 - [ ] The review did not execute target work.

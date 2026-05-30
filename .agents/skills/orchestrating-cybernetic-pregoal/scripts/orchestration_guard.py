@@ -55,6 +55,8 @@ def blocked_next_action(errors: list[str]) -> str:
         return "RunDesign"
     if "output contract gate" in joined and "goal lacks" in joined:
         return "RunGoalWriting"
+    if "output contract is required" in joined and "goal lacks" in joined:
+        return "RunGoalWriting"
     if "goal contract is required" in joined or "goal does not reference" in joined:
         return "RunGoalWriting"
     if "execution policy is required" in joined or "execution policy status" in joined or "plan does not reference" in joined:
@@ -151,10 +153,6 @@ def output_contract_gate_required(*texts: str | None) -> bool:
     return False
 
 
-def has_section(text: str | None, heading: str) -> bool:
-    return bool(text and section_body(text, heading) is not None)
-
-
 def meaningful_line(line: str) -> bool:
     text = line.strip().strip("`")
     if not text:
@@ -162,11 +160,44 @@ def meaningful_line(line: str) -> bool:
     if text.startswith("-"):
         text = text[1:].strip()
     lowered = text.casefold()
+    if lowered.startswith(("use when ", "otherwise record", "runtime must not substitute", "if this contract is insufficient")):
+        return False
+    if re.fullmatch(r"\|?\s*:?-{3,}:?\s*(\|\s*:?-{3,}:?\s*)+\|?", text):
+        return False
+    if "|" in text and "element" in lowered and ("requirement" in lowered or "design" in lowered):
+        return False
     if text.startswith("[") and text.endswith("]"):
+        return False
+    if "[" in text and "]" in text:
         return False
     if lowered in {"none", "no open questions", "no open design questions", "n/a", "not applicable", "无", "无。", "none."}:
         return False
     return True
+
+
+def has_section(text: str | None, heading: str) -> bool:
+    return bool(text and section_body(text, heading) is not None)
+
+
+def section_has_meaningful_content(text: str | None, heading: str) -> bool:
+    if not text:
+        return False
+    body = section_body(text, heading)
+    if body is None:
+        return False
+    return any(meaningful_line(line) for line in body.splitlines())
+
+
+def output_contract_present_upstream(requirements: str | None = None, design: str | None = None, goal: str | None = None) -> bool:
+    return (
+        section_has_meaningful_content(requirements, "Output Contract")
+        or section_has_meaningful_content(design, "Output Contract Design")
+        or section_has_meaningful_content(goal, "Final Output Contract")
+    )
+
+
+def output_contract_required(requirements: str | None, design: str | None, goal: str | None) -> bool:
+    return output_contract_gate_required(requirements, design, goal) or output_contract_present_upstream(requirements, design, goal)
 
 
 def has_blocking_design_questions(design: str) -> bool:
@@ -261,8 +292,8 @@ def check_design_ready(
     if status not in {"Candidate", "Reviewed", "Approved"}:
         errors.append(f"design status must be Candidate, Reviewed, or Approved: {status!r}")
     require_reference(design, requirements_path, "design", errors)
-    if output_contract_gate_required(requirements, design) and not has_section(design, "Output Contract Design"):
-        errors.append("Output Contract Gate is required but design lacks ## Output Contract Design")
+    if output_contract_gate_required(requirements, design) and not output_contract_present_upstream(requirements, design):
+        errors.append("Output Contract Gate is required but no upstream output contract is present")
     if has_blocking_design_questions(design):
         errors.append("design has blocking open design questions")
 
@@ -281,8 +312,8 @@ def check_goal_ready(
         return
     require_reference(goal, requirements_path, "goal", errors)
     require_reference(goal, design_path, "goal", errors)
-    if output_contract_gate_required(requirements, design, goal) and not has_section(goal, "Final Output Contract"):
-        errors.append("Output Contract Gate is required but goal lacks ## Final Output Contract")
+    if output_contract_required(requirements, design, goal) and not section_has_meaningful_content(goal, "Final Output Contract"):
+        errors.append("Output contract is required by gate or upstream artifact, but goal lacks meaningful ## Final Output Contract")
 
 
 def check_plan_ready(
