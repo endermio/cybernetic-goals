@@ -45,6 +45,19 @@
         "Explains that brainstorming is optional and used only for exploratory design spaces or explicit user request.",
         "Creates a concise design instead of expanding into unnecessary exploration."
       ]
+    },
+    {
+      "id": "level-3-design-handoff-goes-to-orchestrator-not-goal-writer",
+      "prompt": "使用 $designing-cybernetic-solutions 根据 docs/cybernetics/requirements/2026-05-31-complex-control.md 创建 solution design。路由结果是 Level 3 full pre-goal pipeline，Design Gate required，Execution Policy Gate required，Control Review Gate required。",
+      "expected_output": "Create the solution design artifact, then in the response hand off to $orchestrating-cybernetic-pregoal rather than directly to $writing-cybernetic-goals.",
+      "assertions": [
+        "Creates or references docs/cybernetics/designs/2026-05-31-complex-control.md.",
+        "Does not write a goal contract.",
+        "Does not write an execution policy.",
+        "Does not include a Next Step or handoff prompt in the design artifact.",
+        "Response-only handoff recommends $orchestrating-cybernetic-pregoal.",
+        "Does not recommend $writing-cybernetic-goals as the next action for Level 3 full pre-goal work."
+      ]
     }
   ]
 }

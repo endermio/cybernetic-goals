@@ -162,6 +162,8 @@ The predicted `/goal` command must include this precondition:
 If any referenced artifact is missing, not approved, or internally inconsistent, stop and report the smallest required human decision.
 ```
 
+Predicted commands and handoff prompts are response-only. Do not write them into the requirements analysis artifact.
+
 For Level 1/2 work with `Rubric Gate: required`, do not output the pre-goal orchestration command by default after rubric-only analysis. Output the next bounded goal-writing command instead:
 
 ```text
@@ -184,6 +186,8 @@ Mark `Complete` only when:
 - the next step can safely create a solution design or goal contract.
 
 ## Output Format
+
+Output examples in this section are response-only. Do not write `$skill ...` commands, runtime `/goal` prompts, or conversational next-step prompts into the requirements analysis artifact.
 
 If a brief was created or updated:
 
@@ -228,7 +232,7 @@ Questions:
 2. ...
 3. ...
 
-Next action:
+Response choices:
 Reply with one of:
 - `按默认继续`
 - answers to the questions
@@ -244,14 +248,14 @@ Requirements analysis is complete.
 Updated requirements analysis brief:
 `docs/cybernetics/requirements/YYYY-MM-DD-slug.md`
 
-Queue these commands:
+Response-only queue suggestions:
 
 ```text
 $designing-cybernetic-solutions 根据 docs/cybernetics/requirements/YYYY-MM-DD-slug.md 创建 solution design。（仅当 Design Gate: required）
 $orchestrating-cybernetic-pregoal 根据 docs/cybernetics/requirements/YYYY-MM-DD-slug.md 完成 pre-goal 编译，允许使用 subagents review。
 ```
 
-Predicted queue-friendly `/goal`:
+Response-only predicted runtime command:
 
 ```text
 /goal Execute the approved execution policy in docs/cybernetics/plans/YYYY-MM-DD-slug.md under the control contract in docs/cybernetics/goals/YYYY-MM-DD-slug.md, the confirmed requirements in docs/cybernetics/requirements/YYYY-MM-DD-slug.md, and the solution design in docs/cybernetics/designs/YYYY-MM-DD-slug.md when Design Gate is required. Use the approved control review in docs/cybernetics/control-reviews/YYYY-MM-DD-slug.md as the phase-gate record. Do not reinterpret requirements, rewrite the solution design, rewrite the control strategy, replace approved sensors, or start unreviewed work. If any referenced artifact is missing, not approved, or internally inconsistent, stop and report the smallest required human decision.
@@ -274,7 +278,7 @@ Confirmed evaluation rubric:
 - External/unobservable dependency handling: ...
 - Confidence/evidence grade: ...
 
-Ready for bounded goal writing:
+Response-only bounded-goal handoff:
 
 ```text
 $writing-cybernetic-goals 使用 docs/cybernetics/requirements/YYYY-MM-DD-slug.md 中确认的评价口径，为这个 Level 2 有界审计/评估任务创建小型文件 goal，并在完成后给出直接 /goal 执行命令，不要默认建议 execution policy。

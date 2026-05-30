@@ -161,4 +161,3 @@ When complete, report:
 - commands run
 - files changed
 - known residual risks
-- recommended next action

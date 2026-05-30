@@ -8,7 +8,18 @@
       "assertions": [
         "Creates docs/cybernetics/goals path.",
         "Does not output final executable /goal for complex work.",
-        "Mentions next step is writing execution policy."
+        "Mentions that execution policy is still required before runtime execution."
+      ]
+    },
+    {
+      "id": "level-3-goal-handoff-returns-to-orchestrator",
+      "prompt": "根据 complete requirements analysis 和 solution design 创建复杂 goal。路由结果是 Level 3 full pre-goal pipeline，Execution Policy Gate required，Control Review Gate required，$orchestrating-cybernetic-pregoal 可用。",
+      "expected_output": "Create the goal contract, then in the response hand off back to $orchestrating-cybernetic-pregoal rather than directly recommending $writing-cybernetic-execution-policies.",
+      "assertions": [
+        "Creates or references a docs/cybernetics/goals path.",
+        "Does not output a final runtime /goal.",
+        "Response-only handoff recommends $orchestrating-cybernetic-pregoal.",
+        "Does not recommend $writing-cybernetic-execution-policies as the next user action for Level 3 full pre-goal work."
       ]
     },
     {

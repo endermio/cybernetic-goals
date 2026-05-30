@@ -121,7 +121,3 @@ Review must check:
 - boundary correctness;
 - design invariants versus tactical flexibility;
 - suitability as source input for goal and execution policy.
-
-## Next Step
-
-Use `$writing-cybernetic-goals` with this design and the requirements analysis as sources of truth.

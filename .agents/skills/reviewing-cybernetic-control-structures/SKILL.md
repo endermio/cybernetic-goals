@@ -186,6 +186,17 @@ Only mark `Approved` when:
 - no substantive artifact mutation remains unreviewed after the latest independent review.
 - any deterministic-only exception is explicitly recorded and guard-covered.
 
+## Response-Only Handoff Rule
+
+Do not write handoff prompts into the review artifact.
+
+After review status is set:
+
+- If invoked by `$orchestrating-cybernetic-pregoal` or full pre-goal context, return the review path and status to `$orchestrating-cybernetic-pregoal`.
+- If standalone/manual and status is `Approved`, hand off to `$compiling-cybernetic-runtime-goals`.
+- If status is `Needs Revision`, `Dirty`, or `Needs Re-review`, revise the relevant control artifacts and rerun review; do not compile runtime `/goal`.
+- If status is `Needs Independent Review`, obtain independent review or explicit human approval; do not compile runtime `/goal`.
+
 ## Validation Checklist
 
 - [ ] The review file was created.
@@ -198,5 +209,6 @@ Only mark `Approved` when:
 - [ ] Lint PASS is not treated as semantic/control-policy approval.
 - [ ] Critical findings distinguish semantic, design, goal, plan, sensor, and runtime issues.
 - [ ] Required revisions are actionable.
+- [ ] Response-only handoff matches the review status and does not bypass `$orchestrating-cybernetic-pregoal` when full pre-goal orchestration owns the chain.
 - [ ] The review did not execute target work.
 - [ ] The review did not output final runtime `/goal`.

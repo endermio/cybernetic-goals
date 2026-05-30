@@ -43,7 +43,7 @@ This skill may:
 - ask a small number of high-value design questions when solution structure cannot be safely inferred;
 - create or update one solution design artifact;
 - record open design questions and stop before approval;
-- recommend the next goal-writing step when the design is sufficient.
+- recommend a route-appropriate response-only handoff when the design is sufficient.
 
 ## Required Input
 
@@ -112,7 +112,6 @@ The design artifact must include:
 9. Design-to-Execution Mapping
 10. Open Design Questions
 11. Design Review Requirements
-12. Next Step
 
 ## Design Status
 
@@ -130,16 +129,31 @@ Open design questions that affect requirement semantics, controlled relationship
 
 1. Read the completed requirements analysis brief.
 2. Derive the design path from the requirements path.
-3. Inspect only enough context to avoid generic design.
-4. Identify whether `$superpowers:brainstorming` is required, used, blocked, or not required.
-5. Build the conceptual model: core objects/actors/roles, relationships, flows, boundaries, alternatives, invariants.
-6. Build the detailed model: mechanisms, interfaces/contracts, state/lifecycle, failure model, evidence/sensor model, compatibility/integration, decisions.
-7. Separate design invariants from tactical degrees of freedom.
-8. Map design elements to goal implications and execution-policy implications.
-9. If material design questions remain, record them and stop without marking Approved.
-10. Do not create goal, plan, review, runtime `/goal`, or target-work files.
+3. Inspect the routing context from the user request, router output, and requirements gates.
+4. Inspect only enough context to avoid generic design.
+5. Identify whether `$superpowers:brainstorming` is required, used, blocked, or not required.
+6. Build the conceptual model: core objects/actors/roles, relationships, flows, boundaries, alternatives, invariants.
+7. Build the detailed model: mechanisms, interfaces/contracts, state/lifecycle, failure model, evidence/sensor model, compatibility/integration, decisions.
+8. Separate design invariants from tactical degrees of freedom.
+9. Map design elements to goal implications and execution-policy implications.
+10. If material design questions remain, record them and stop without marking Approved.
+11. Do not create goal, plan, review, runtime `/goal`, or target-work files.
+
+## Response-Only Handoff Rule
+
+Do not write handoff prompts into the design artifact.
+
+After design is sufficient, choose the response-only handoff from routing context:
+
+- If the task is Level 3, Level 4, full pre-goal work, or the requirements gates show `Execution Policy Gate: required` or `Control Review Gate: required`, hand off to `$orchestrating-cybernetic-pregoal`.
+- If the task is Level 2 bounded work and no execution-policy or control-review gate is required, hand off to `$writing-cybernetic-goals`.
+- If routing context is absent or contradictory, do not default to `$writing-cybernetic-goals`; report that the original routing decision is needed.
+
+The design-to-goal mapping means the future goal must reference the design. It does not mean this skill should directly dispatch goal writing for full pre-goal work.
 
 ## Output Format
+
+This output format is response-only. Do not write `$skill ...` commands, runtime `/goal` prompts, or conversational next-step prompts into the design artifact.
 
 After creating or updating a design:
 
@@ -158,8 +172,9 @@ Design status:
 - Status: `Candidate`
 - Open design questions: ...
 
-Next step:
-Use `$writing-cybernetic-goals` with the requirements analysis and solution design as sources of truth.
+Response-only handoff:
+- For Level 3/4 or full pre-goal work: use `$orchestrating-cybernetic-pregoal` with the requirements analysis and this design.
+- For Level 2 bounded work only: use `$writing-cybernetic-goals` with the requirements analysis and this design.
 ```
 
 If blocked:
@@ -188,4 +203,6 @@ Do not write the goal contract until this design decision is resolved or the hum
 - [ ] Design invariants are separated from tactical degrees of freedom.
 - [ ] Design-to-goal and design-to-execution mappings are present.
 - [ ] `$superpowers:brainstorming` is used only when required by exploratory design.
+- [ ] The design artifact does not contain a next-step prompt.
+- [ ] Level 3/4 or full pre-goal work hands off to `$orchestrating-cybernetic-pregoal`, not directly to `$writing-cybernetic-goals`.
 - [ ] No goal, execution policy, control review, runtime `/goal`, or target-work artifact was created.

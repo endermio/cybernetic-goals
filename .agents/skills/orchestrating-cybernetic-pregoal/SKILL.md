@@ -165,7 +165,6 @@ If review does not converge after two cycles, stop and report:
 - unresolved conflicts
 - reviewer disagreements
 - exact artifact sections involved
-- recommended next action
 - smallest required human decision
 
 Do not continue self-revising indefinitely.
@@ -549,6 +548,8 @@ Stop and report if:
 
 ## Output Format
 
+These output formats are response-only. Do not write `/goal` prompts, `$skill ...` commands, or conversational next-step prompts into orchestration status, progress, goal, design, plan, review, or requirements artifacts.
+
 ### Approved compilation
 
 ```markdown
@@ -569,7 +570,7 @@ Control summary:
 - Sensors: ...
 - Runtime boundary: ...
 
-Use this `/goal`:
+Response-only runtime `/goal` command:
 
 ```text
 /goal Execute the approved execution policy in ...

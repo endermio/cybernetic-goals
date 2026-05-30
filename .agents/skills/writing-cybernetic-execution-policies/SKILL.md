@@ -104,7 +104,15 @@ The policy may choose tactical execution details, batch cadence, and workstream 
 
 If the design is missing, contradictory, or insufficient for planning, stop and route back to `$designing-cybernetic-solutions` or ask for the smallest design decision.
 
+## Response-Only Handoff Rule
+
+For Level 3, Level 4, or full pre-goal work, hand off back to `$orchestrating-cybernetic-pregoal` after creating the candidate execution policy when it is available or already owns the chain.
+
+Recommend `$reviewing-cybernetic-control-structures` directly only when the user explicitly chose a manual pre-goal chain or `$orchestrating-cybernetic-pregoal` is unavailable.
+
 ## Output Format
+
+The response format below is response-only. Do not write `$skill ...` commands, runtime `/goal` prompts, or conversational next-step prompts into the execution policy artifact.
 
 Create:
 
@@ -127,8 +135,9 @@ Control-law summary:
 - Sensor governance: ...
 - Phase gates: ...
 
-Next step:
-Use `$reviewing-cybernetic-control-structures` before starting runtime /goal.
+Response-only handoff:
+- For Level 3/4 or full pre-goal work: return to `$orchestrating-cybernetic-pregoal` with this execution policy path.
+- For an explicit manual chain only: use `$reviewing-cybernetic-control-structures` before runtime `/goal`.
 ```
 
 ## Validation Checklist

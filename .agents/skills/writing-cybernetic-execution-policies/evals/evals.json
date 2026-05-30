@@ -48,6 +48,17 @@
         "Does not replace design objects, relationships, flows, interfaces, or evidence model.",
         "Routes back to $designing-cybernetic-solutions or asks for the smallest design decision if the design is insufficient."
       ]
+    },
+    {
+      "id": "level-3-policy-handoff-returns-to-orchestrator",
+      "prompt": "根据 requirements、solution design 和 goal 创建 execution policy。路由结果是 Level 3 full pre-goal pipeline，Control Review Gate required，$orchestrating-cybernetic-pregoal 可用。",
+      "expected_output": "Create a candidate execution policy, then in the response hand off back to $orchestrating-cybernetic-pregoal rather than directly recommending $reviewing-cybernetic-control-structures.",
+      "assertions": [
+        "Creates or references a docs/cybernetics/plans path.",
+        "Marks the execution policy Candidate, not Approved.",
+        "Response-only handoff recommends $orchestrating-cybernetic-pregoal.",
+        "Does not recommend $reviewing-cybernetic-control-structures as the next user action for Level 3 full pre-goal work."
+      ]
     }
   ]
 }

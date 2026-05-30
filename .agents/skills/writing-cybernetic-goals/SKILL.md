@@ -25,9 +25,9 @@ For complex controlled work, this skill must not produce an executable `/goal` c
 
 If `Design Gate: required`, do not create the final complex goal contract until a solution design exists or the human explicitly says the Design Gate is unnecessary.
 
-If no approved execution policy exists for complex work, stop after creating the goal contract and instruct the user to use `$writing-cybernetic-execution-policies`.
+For Level 3, Level 4, or full pre-goal work, stop after creating the goal contract and hand off back to `$orchestrating-cybernetic-pregoal` when it is available or already owns the chain.
 
-If no approved control review exists for complex work, instruct the user to use `$reviewing-cybernetic-control-structures`.
+Recommend `$writing-cybernetic-execution-policies` or `$reviewing-cybernetic-control-structures` directly only when the user explicitly chose a manual pre-goal chain or `$orchestrating-cybernetic-pregoal` is unavailable.
 
 Do not put “first write a plan, then execute it” inside an execution `/goal` for complex work.
 
@@ -66,7 +66,7 @@ Behavior:
 2. If required, confirm `docs/cybernetics/designs/YYYY-MM-DD-<slug>.md` or an explicit design source exists.
 3. Create the goal contract under `docs/cybernetics/goals/YYYY-MM-DD-<slug>.md`.
 4. Do not output an executable `/goal` unless an approved execution policy and approved control review already exist.
-5. Recommend `$writing-cybernetic-execution-policies` as the next step when policy is missing.
+5. Use the route-appropriate response-only handoff: return to `$orchestrating-cybernetic-pregoal` for full pre-goal work, or recommend `$writing-cybernetic-execution-policies` only for an explicit manual chain.
 
 ### Mode B: Bounded File Goal / Audit Goal
 
@@ -144,6 +144,8 @@ Map requirements analysis to:
 
 ## Output Format
 
+These output formats are response-only. The direct `/goal` command must be returned to the user in the assistant response, not written into the goal file. Goal files must not contain conversational next-step prompts.
+
 ### Complex control contract
 
 After creating a complex goal file:
@@ -160,8 +162,9 @@ Control map:
 - Solution design source: ...
 - Stop conditions: ...
 
-Next step:
-Use `$writing-cybernetic-execution-policies` to create the approved execution policy.
+Response-only handoff:
+- For Level 3/4 or full pre-goal work: return to `$orchestrating-cybernetic-pregoal` with this goal path.
+- For an explicit manual chain only: use `$writing-cybernetic-execution-policies` to create the execution policy.
 ```
 
 ### Bounded file goal
@@ -179,7 +182,7 @@ Control map:
 - Constraints: ...
 - Stop conditions: ...
 
-Use this `/goal`:
+Response-only `/goal` command:
 
 ```text
 /goal Execute the bounded file goal in docs/cybernetics/goals/YYYY-MM-DD-slug.md as the controlling contract. Do not create an execution policy or control review unless explicitly instructed. Do not reinterpret scope, expand requirements, or modify files outside the goal boundaries. If the goal is insufficient, ambiguous, or requires new requirement/control decisions, stop and report the smallest required human decision.
@@ -200,7 +203,7 @@ Missing rubric elements:
 - Downgrade rules: ...
 - External/unobservable dependency handling: ...
 
-Recommended next step:
+Response-only handoff:
 
 ```text
 $analyzing-cybernetic-requirements 分析这个审计/评估任务的评价口径：...
@@ -217,7 +220,7 @@ Goal contract blocked: solution design required.
 Reason:
 - Design Gate is required, but no solution design artifact or explicit design source was provided.
 
-Recommended next step:
+Response-only handoff:
 
 ```text
 $designing-cybernetic-solutions 根据 docs/cybernetics/requirements/YYYY-MM-DD-slug.md 创建 solution design。

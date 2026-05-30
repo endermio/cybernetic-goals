@@ -10,7 +10,6 @@
   - `rg -n "Design Gate|runtime|review|fallback|state" .agents/skills/orchestrating-cybernetic-pregoal/SKILL.md`
 - Result: Orchestrator now owns sequencing, lifecycle checks, source-contract checks, blocking, and propagation; it must not synthesize solution design.
 - Current risk: Final verification still pending.
-- Next step: Add status artifact structure.
 
 ## 2026-05-31 Checkpoint 2
 
@@ -21,7 +20,6 @@
   - `sed -n '1,180p' .agents/skills/orchestrating-cybernetic-pregoal/assets/pregoal-orchestration-status-template.md`
 - Result: Template now records Current State, Artifact Chain, Next Allowed Action, Blocked Reason, Subagent Authorization, and Guard Evidence.
 - Current risk: Guard behavior still needed executable enforcement.
-- Next step: Add guard script.
 
 ## 2026-05-31 Checkpoint 3
 
@@ -32,7 +30,6 @@
   - `python3 .agents/skills/orchestrating-cybernetic-pregoal/scripts/orchestration_guard.py --help`
 - Result: Guard script exists and supports `before-design`, `before-goal`, `before-policy`, `before-review`, and `before-runtime-compile`.
 - Current risk: Need final behavior checks for blocked transitions.
-- Next step: Add regression evals.
 
 ## 2026-05-31 Checkpoint 4
 
@@ -44,7 +41,6 @@
   - `python3 -m json.tool .agents/skills/orchestrating-cybernetic-pregoal/evals/evals.json >/dev/null`
 - Result: Evals cover skipped required design, unavailable design skill, existing design propagation, and runtime compile before approved review. README notes that solution design remains owned by `$designing-cybernetic-solutions`.
 - Current risk: Final repository verification still pending.
-- Next step: Run final verification and record results.
 
 ## 2026-05-31 Checkpoint 5
 
@@ -71,7 +67,6 @@
   - temporary guard fixture: Needs Revision review before runtime compile returned `FAIL`, `NEXT: RunReview`
 - Result: Verification passed. The malformed design-skill-name search returned no matches. The solution-design fallback search returned only blocking/non-fallback rules and eval assertions.
 - Current risk: None known inside the bounded goal.
-- Next step: Use the direct `/goal` command only if this change should be replayed by a runtime executor.
 
 ## 2026-05-31 Checkpoint 6
 
@@ -100,4 +95,3 @@
   - temporary guard fixture: missing Final Observer returned `FAIL`, `NEXT: RunReview`
 - Result: Audit verification passed with `AUDIT_VERIFICATION_OK`. Runtime compiler handoff now uses `--design <design-if-required-or-present>`, preserving existing design artifact propagation.
 - Current risk: None known inside the bounded goal.
-- Next step: None.

@@ -74,6 +74,8 @@ Every routing response must include:
 
 Do not create files. Do not run target execution. Do not write a goal contract. Do not write an execution policy.
 
+Routing recommendations and handoff prompts are response-only. Do not write them into requirements, design, goal, plan, review, progress, or orchestration-status artifacts.
+
 ## Evaluation Function Gate
 
 Before routing any task that asks Codex to evaluate, audit, assess, verify, check readiness, check closure, judge usability, judge completeness, classify status, or decide whether something is good/safe/stable/correct/covered/usable/ready/passed, check whether the evaluation rubric is explicit.
