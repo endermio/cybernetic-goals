@@ -26,8 +26,8 @@ cp -R .agents/skills/* ~/.agents/skills/
 or into a repository-local skill directory:
 
 ```bash
-mkdir -p .agents/skills
-cp -R cybernetic-skills-pack/.agents/skills/* .agents/skills/
+mkdir -p /path/to/target-repo/.agents/skills
+cp -R .agents/skills/* /path/to/target-repo/.agents/skills/
 ```
 
 ## Recommended workflow
