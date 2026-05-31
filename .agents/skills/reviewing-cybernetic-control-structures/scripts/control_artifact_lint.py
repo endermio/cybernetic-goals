@@ -161,7 +161,7 @@ def main() -> int:
             "Design Status", "Source Contracts", "Human Purpose", "Confirmed Semantics",
             "Design Substrate", "Conceptual Design", "Detailed Design",
             "Design-to-Goal Mapping", "Design-to-Execution Mapping",
-            "Open Design Questions", "Design Review Requirements", "Next Step"
+            "Open Design Questions", "Design Review Requirements"
         ], errors)
         st = section_status(design, "Design Status")
         if st not in {"Candidate", "Reviewed", "Approved"}:

@@ -208,6 +208,28 @@ After review status is set:
 - If status is `Needs Revision`, `Dirty`, or `Needs Re-review`, revise the relevant control artifacts and rerun review; do not compile runtime `/goal`.
 - If status is `Needs Independent Review`, obtain independent review or explicit human approval; do not compile runtime `/goal`.
 
+## Output Format
+
+This output format is response-only. Do not write `$skill ...` commands, runtime `/goal` prompts, or conversational next-step prompts into the review artifact.
+
+```markdown
+Created or updated control review:
+
+`docs/cybernetics/control-reviews/YYYY-MM-DD-slug.md`
+
+Review status:
+- `Approved` / `Needs Revision` / `Needs Independent Review` / `Dirty` / `Needs Re-review`
+
+Key findings:
+- ...
+
+Response-only next step:
+- If full pre-goal orchestration owns the chain: return to `$orchestrating-cybernetic-pregoal` with the review path and status.
+- If standalone/manual and `Approved`: run `$compiling-cybernetic-runtime-goals`.
+- If `Needs Revision`, `Dirty`, or `Needs Re-review`: revise the named artifacts and rerun `$reviewing-cybernetic-control-structures`.
+- If `Needs Independent Review`: obtain independent review or explicit human approval before runtime compilation.
+```
+
 ## Validation Checklist
 
 - [ ] The review file was created.
@@ -222,5 +244,6 @@ After review status is set:
 - [ ] Output contract fidelity was checked when any upstream output contract exists.
 - [ ] Required revisions are actionable.
 - [ ] Response-only handoff matches the review status and does not bypass `$orchestrating-cybernetic-pregoal` when full pre-goal orchestration owns the chain.
+- [ ] The assistant response includes a response-only next step for every review status.
 - [ ] The review did not execute target work.
 - [ ] The review did not output final runtime `/goal`.

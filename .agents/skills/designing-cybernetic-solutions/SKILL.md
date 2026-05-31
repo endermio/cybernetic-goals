@@ -210,6 +210,12 @@ Reason:
 Smallest input needed:
 - ...
 
+Response-only next step:
+- If requirements analysis is incomplete or has blocking human decisions: return to `$analyzing-cybernetic-requirements` with the missing decision.
+- If a design decision is missing: answer the smallest design question, then rerun `$designing-cybernetic-solutions`.
+- For Level 3/4 or full pre-goal work: return this blocked status to `$orchestrating-cybernetic-pregoal`; do not write the goal contract.
+- If the human explicitly says Design Gate is unnecessary: return to the route-appropriate next stage.
+
 Do not write the goal contract until this design decision is resolved or the human explicitly says the Design Gate is unnecessary.
 ```
 
@@ -227,5 +233,6 @@ Do not write the goal contract until this design decision is resolved or the hum
 - [ ] Design-to-goal and design-to-execution mappings are present.
 - [ ] `$superpowers:brainstorming` is used only when required by exploratory design.
 - [ ] The design artifact does not contain a next-step prompt.
+- [ ] If blocked, the assistant response includes a response-only next step.
 - [ ] Level 3/4 or full pre-goal work hands off to `$orchestrating-cybernetic-pregoal`, not directly to `$writing-cybernetic-goals`.
 - [ ] No goal, execution policy, control review, runtime `/goal`, or target-work artifact was created.

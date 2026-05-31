@@ -31,13 +31,14 @@
     {
       "id": "incomplete-requirements-analysis-stops",
       "prompt": "使用 $orchestrating-cybernetic-pregoal 根据 docs/cybernetics/requirements/incomplete-feature.md 自动完成 pre-goal 编译，允许使用 subagents。该 requirements analysis 还有开放的人类问题。",
-      "expected_output": "The skill should stop before creating downstream approved artifacts because requirements analysis is incomplete.",
+      "expected_output": "The skill should stop before creating downstream approved artifacts because requirements analysis is incomplete, and output the next allowed action.",
       "assertions": [
         "The response states that the requirements analysis is incomplete or has open blocking questions.",
         "The response does not create or approve a final goal contract.",
         "The response does not create or approve an execution policy.",
         "The response does not emit a final runtime /goal command.",
-        "The response names the smallest requirements analysis input needed from the human."
+        "The response names the smallest requirements analysis input needed from the human.",
+        "The response includes a response-only next allowed action such as returning to $analyzing-cybernetic-requirements or resolving the smallest requirements decision."
       ]
     },
     {
@@ -69,13 +70,14 @@
     {
       "id": "review-nonconvergence-blocks",
       "prompt": "使用 $orchestrating-cybernetic-pregoal 自动编译，允许 subagents。review 两轮后仍然发现 plan 把 direct-observation semantics 改成 mediated-reporting。",
-      "expected_output": "The skill should block compilation and report the unresolved semantic conflict rather than compiling a runtime /goal.",
+      "expected_output": "The skill should block compilation, report the unresolved semantic conflict, and output the next allowed action rather than compiling a runtime /goal.",
       "assertions": [
         "The response states that review did not converge.",
         "The response identifies the conflict between direct-observation semantics and mediated-reporting.",
         "The response does not emit a final runtime /goal command.",
         "The response points to the artifact sections that conflict.",
-        "The response asks for the smallest human decision or revision needed."
+        "The response asks for the smallest human decision or revision needed.",
+        "The response includes a response-only next allowed action such as revising the conflicting artifact and rerunning review through $orchestrating-cybernetic-pregoal."
       ]
     },
     {
@@ -146,7 +148,21 @@
         "Does not synthesize solution design inside the orchestrator.",
         "Does not treat solution design as narrow formatting fallback.",
         "Reports missing $designing-cybernetic-solutions.",
-        "Does not create goal, execution policy, control review, or runtime /goal."
+        "Does not create goal, execution policy, control review, or runtime /goal.",
+        "Includes a response-only next allowed action marked Blocked or RestoreDesignSkill."
+      ]
+    },
+    {
+      "id": "blocked-compilation-includes-next-allowed-action",
+      "prompt": "Pre-goal orchestration is blocked after guard output says FAIL and NEXT: RunReview because the control review is Needs Revision. Produce the orchestration response.",
+      "expected_output": "The blocked orchestration response includes the blocker, artifact status, unresolved issue, and a response-only next allowed action matching the guard.",
+      "assertions": [
+        "Does not output a final runtime /goal.",
+        "Includes the blocked reason.",
+        "Includes artifacts created or updated.",
+        "Includes the unresolved issue.",
+        "Includes Next Allowed Action or response-only next step: RunReview.",
+        "Does not write the next-step prompt into orchestration status, goal, design, plan, review, or requirements artifacts."
       ]
     },
     {

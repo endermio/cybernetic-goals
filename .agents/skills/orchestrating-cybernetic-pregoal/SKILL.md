@@ -609,6 +609,16 @@ Unresolved issue:
 
 Smallest human decision needed:
 - ...
+
+Next allowed action:
+- `RunDesign` / `RunGoalWriting` / `RunExecutionPolicy` / `RunReview` / `RunRuntimeCompile` / `Blocked`
+
+Response-only next step:
+- Follow the guard's `NEXT:` value when available.
+- If requirements are incomplete: return to `$analyzing-cybernetic-requirements` with the smallest missing decision.
+- If required design is missing: invoke or request `$designing-cybernetic-solutions`; if that skill is unavailable, stay `Blocked`.
+- If goal, execution policy, or review is missing or stale: run the matching next allowed pre-goal stage.
+- If review is not `Approved` or Final Observer blocks approval: rerun or obtain the required review before runtime compilation.
 ```
 
 ## Validation Checklist
@@ -635,6 +645,7 @@ Before responding, verify:
 - [ ] Lint PASS was not used as a substitute for semantic/control-policy re-review.
 - [ ] Review status is `Approved` before final runtime `/goal` is emitted.
 - [ ] If not approved, the response is blocked and asks for the smallest necessary decision.
+- [ ] If blocked, the response includes `Next allowed action` and a response-only next step.
 - [ ] Runtime `/goal` references requirements analysis, required design, goal, plan, and review files.
 - [ ] Runtime `/goal` includes the missing/not-approved/inconsistent artifact precondition.
 - [ ] Runtime `/goal` includes executing, debugging, and completion-verification discipline.

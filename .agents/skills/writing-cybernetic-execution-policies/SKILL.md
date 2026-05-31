@@ -49,6 +49,8 @@ This skill supplies the cybernetic constraints that the planning substrate must 
 
 If `$superpowers:writing-plans` is unavailable for a non-trivial execution policy, stop and report that required planning infrastructure is missing. Do not self-substitute with an unreviewed internal policy.
 
+Blocked responses must still include a response-only next step. For missing planning substrate, the next step is to load/use `$superpowers:writing-plans` or return the blocked status to `$orchestrating-cybernetic-pregoal` when orchestration owns the chain.
+
 ## Required Sections
 
 The execution policy must include:
@@ -154,11 +156,29 @@ Response-only handoff:
 - For an explicit manual chain only: use `$reviewing-cybernetic-control-structures` before runtime `/goal`.
 ```
 
+If blocked:
+
+```markdown
+Execution policy blocked.
+
+Reason:
+- ...
+
+Smallest input or dependency needed:
+- ...
+
+Response-only next step:
+- If required planning substrate is missing: load/use `$superpowers:writing-plans`, or return blocked status to `$orchestrating-cybernetic-pregoal`.
+- If the solution design is missing or insufficient: return to `$designing-cybernetic-solutions` for an explicit manual chain, or return blocked status to `$orchestrating-cybernetic-pregoal` for Level 3/4 or full pre-goal work.
+- Do not run control review or runtime `/goal` until a candidate execution policy exists.
+```
+
 ## Validation Checklist
 
 - [ ] Non-trivial execution policies invoke `$superpowers:writing-plans` or load and follow its `SKILL.md` instructions, otherwise stop/report missing infrastructure.
 - [ ] The plan records planning substrate status.
 - [ ] The plan does not self-substitute for a missing required planning substrate.
+- [ ] If blocked, the assistant response includes a response-only next step.
 - [ ] The plan distinguishes semantic invariants from tactical degrees of freedom.
 - [ ] If Design Gate is required, the plan references the solution design.
 - [ ] The plan does not invent or revise the solution model.

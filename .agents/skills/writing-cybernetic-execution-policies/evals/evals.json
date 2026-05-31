@@ -16,13 +16,26 @@
     {
       "id": "requires-superpowers-planning-substrate",
       "prompt": "根据 requirements analysis 和 goal 为一个非平凡执行任务写 execution policy，但 $superpowers:writing-plans 不可用。",
-      "expected_output": "The skill stops or marks the policy blocked because the required planning substrate is unavailable, instead of drafting an approved ad hoc plan.",
+      "expected_output": "The skill stops or marks the policy blocked because the required planning substrate is unavailable, instead of drafting an approved ad hoc plan, and includes a response-only next step.",
       "assertions": [
         "Mentions $superpowers:writing-plans as the required planning substrate for non-trivial execution policies.",
         "States that merely mentioning $superpowers:writing-plans or imitating generic planning is not sufficient.",
         "Stops or reports missing required planning infrastructure when the substrate is unavailable.",
         "Does not self-substitute with an unreviewed internal plan.",
         "Does not mark the execution policy Approved.",
+        "Does not execute target work.",
+        "Includes a response-only next step to load/use $superpowers:writing-plans or return the blocked status to $orchestrating-cybernetic-pregoal."
+      ]
+    },
+    {
+      "id": "blocked-policy-includes-response-only-next-step",
+      "prompt": "创建 execution policy 时发现 required solution design is insufficient: lifecycle/failure model is missing and planning would have to invent it.",
+      "expected_output": "Stop without redesigning the solution model and include a response-only next step to revise solution design before continuing.",
+      "assertions": [
+        "Does not invent the missing lifecycle or failure model in the execution policy.",
+        "Does not mark the execution policy Approved.",
+        "Reports the smallest missing design decision.",
+        "Includes a response-only next step to $designing-cybernetic-solutions or return to $orchestrating-cybernetic-pregoal for full pre-goal work.",
         "Does not execute target work."
       ]
     },

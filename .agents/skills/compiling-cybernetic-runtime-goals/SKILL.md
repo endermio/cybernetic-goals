@@ -92,6 +92,10 @@ Do not use `--skip-guard` for official runtime `/goal` compilation. It is only f
 
 ## Output Format
 
+These output formats are response-only. Do not write `$skill ...` commands, runtime `/goal` prompts, or conversational next-step prompts into requirements, design, goal, plan, or review artifacts.
+
+### Approved runtime command
+
 ```markdown
 Runtime /goal is ready:
 
@@ -108,6 +112,26 @@ Preflight:
 - Final output contract: present when required
 ```
 
+### Blocked runtime compilation
+
+Use this when `scripts/control_chain_guard.py` fails or any precondition is not satisfied.
+
+```markdown
+Runtime goal compilation blocked.
+
+Reason:
+- ...
+
+Guard result:
+- `FAIL`
+- `NEXT: ...` if emitted by the guard
+
+Response-only next step:
+- For Level 3/4 or full pre-goal work: return to `$orchestrating-cybernetic-pregoal` with the failing guard output.
+- For an explicit manual chain: run the smallest missing upstream step, such as `$designing-cybernetic-solutions`, `$writing-cybernetic-goals`, `$writing-cybernetic-execution-policies`, or `$reviewing-cybernetic-control-structures`.
+- Do not output a runtime `/goal` until the guard passes and review is `Approved`.
+```
+
 Do not create or modify target-work artifacts.
 
 ## Validation Checklist
@@ -120,4 +144,5 @@ Do not create or modify target-work artifacts.
 - [ ] The final `/goal` does not ask runtime Codex to write a new plan.
 - [ ] The final `/goal` does not ask runtime Codex to create or revise solution design.
 - [ ] The final `/goal` includes executing, debugging, and completion-verification discipline.
+- [ ] If guard or preconditions fail, the response includes a response-only next step and no final `/goal`.
 - [ ] The skill did not execute target work.

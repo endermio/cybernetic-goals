@@ -18,12 +18,26 @@
     {
       "id": "blocks-when-requirements-analysis-incomplete",
       "prompt": "使用 $designing-cybernetic-solutions 根据 docs/cybernetics/requirements/incomplete-feature.md 创建 solution design。该 requirements analysis 还有开放的人类问题。",
-      "expected_output": "Stop before creating an approved design because requirement semantics are incomplete.",
+      "expected_output": "Stop before creating an approved design because requirement semantics are incomplete, and include a response-only next step back to requirements analysis.",
       "assertions": [
         "States that requirements analysis must be Complete before design can be approved.",
         "Does not mark design Approved.",
         "Does not create goal or plan artifacts.",
-        "Reports the smallest required human decision or requirements analysis input."
+        "Reports the smallest required human decision or requirements analysis input.",
+        "Includes a response-only next step to $analyzing-cybernetic-requirements or to answer the smallest missing requirements decision.",
+        "Does not write the next-step prompt into the design artifact."
+      ]
+    },
+    {
+      "id": "blocked-design-includes-response-only-next-step",
+      "prompt": "使用 $designing-cybernetic-solutions 创建 solution design，但设计过程中发现一个 blocking open design question：Evidence Channel C 到 Controlled Object A 的关系无法从 requirements 推断。",
+      "expected_output": "Report Solution design blocked with the smallest input needed and a response-only next step that resolves the design decision before rerunning design or returning to orchestration.",
+      "assertions": [
+        "Does not create a goal contract or execution policy.",
+        "Reports the blocking open design question.",
+        "Includes the smallest input needed.",
+        "Includes a response-only next step to answer the design decision and rerun $designing-cybernetic-solutions, or return the blocked status to $orchestrating-cybernetic-pregoal for full pre-goal work.",
+        "Does not write conversational next-step prompts into the design artifact."
       ]
     },
     {

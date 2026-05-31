@@ -204,6 +204,32 @@ def check_final_observer(review: str, errors: list[str]) -> None:
         errors.append("deterministic-only exception lacks guard evidence")
 
 
+def suggest_next_action(errors: list[str]) -> str:
+    joined = "\n".join(errors).casefold()
+
+    if "requirements analysis status is not complete" in joined:
+        return "ReturnToRequirementsAnalysis"
+    if "design gate is required" in joined or "design status" in joined or "design does not reference" in joined:
+        return "RunDesign"
+    if "output contract" in joined or "goal lacks" in joined or "goal contains runtime control-structure" in joined:
+        return "RunGoalWriting"
+    if "execution policy status" in joined or "plan does not reference" in joined:
+        return "RunExecutionPolicy"
+    if (
+        "control review status" in joined
+        or "final observer" in joined
+        or "post-review" in joined
+        or "deterministic-only exception" in joined
+        or "review does not reference" in joined
+    ):
+        return "RunReview"
+    if "missing file" in joined:
+        return "ProvideMissingArtifact"
+    if "does not reference required path" in joined:
+        return "FixSourceContracts"
+    return "Blocked"
+
+
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--requirements", dest="requirements")
@@ -287,10 +313,12 @@ def main() -> int:
 
     if errors:
         print("FAIL")
+        print(f"NEXT: {suggest_next_action(errors)}")
         for e in errors:
             print(f"ERROR: {e}")
         return 2
     print("PASS")
+    print("NEXT: CompileRuntimeGoal")
     return 0
 
 

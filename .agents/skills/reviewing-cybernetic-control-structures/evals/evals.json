@@ -4,24 +4,38 @@
     {
       "id": "reject-unapproved-plan",
       "prompt": "审查 requirements analysis、goal、plan，plan 还没有 sensor governance。",
-      "expected_output": "Review status is Needs Revision and identifies missing sensor governance.",
+      "expected_output": "Review status is Needs Revision, identifies missing sensor governance, and includes a response-only next step for revision and re-review.",
       "assertions": [
         "Does not approve.",
         "Mentions sensor/evidence governance.",
         "Does not output final /goal.",
-        "Does not execute target work."
+        "Does not execute target work.",
+        "Includes a response-only next step to revise the execution policy and rerun review, or return to $orchestrating-cybernetic-pregoal when orchestration owns the chain."
       ]
     },
     {
       "id": "requires-independent-review-for-approval",
       "prompt": "审查 requirements analysis、goal、plan。所有 artifact 一致，但用户没有授权 subagents，也没有显式人工批准。",
-      "expected_output": "The review records missing independent review and uses Needs Independent Review instead of Approved.",
+      "expected_output": "The review records missing independent review, uses Needs Independent Review instead of Approved, and includes the next step to obtain independent review or explicit human approval.",
       "assertions": [
         "Records whether subagents were authorized.",
         "Does not mark self-review as Approved.",
         "Uses Needs Independent Review when no subagent authorization, human approval, or other independent reviewer exists.",
         "Does not run target execution or dispatch execution agents.",
-        "Does not output final /goal."
+        "Does not output final /goal.",
+        "Includes a response-only next step to obtain independent review, get explicit human approval, or return to $orchestrating-cybernetic-pregoal."
+      ]
+    },
+    {
+      "id": "review-status-output-includes-next-step",
+      "prompt": "审查 requirements analysis、solution design、goal、plan，review status is Dirty because plan changed after independent review.",
+      "expected_output": "Create the review artifact with Dirty status and output a response-only next step to rerun independent review before runtime compilation.",
+      "assertions": [
+        "Creates or references a docs/cybernetics/control-reviews path.",
+        "Uses Dirty or Needs Re-review instead of Approved.",
+        "Does not output final runtime /goal.",
+        "Includes a response-only next step to rerun independent review or return to $orchestrating-cybernetic-pregoal.",
+        "Does not write handoff prompts into the review artifact."
       ]
     },
     {
