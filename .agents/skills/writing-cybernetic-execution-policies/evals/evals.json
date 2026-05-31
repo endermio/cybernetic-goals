@@ -74,6 +74,19 @@
       ]
     },
     {
+      "id": "avoids-micro-batch-overcontrol",
+      "prompt": "Create an execution policy for a complex controlled change. The tempting plan splits every tiny edit into its own batch and requires broad verification after each edit.",
+      "expected_output": "The execution policy groups work into coherent target-state slices, allows approved intermediate breakage inside batches, and uses batch-end verification rather than micro-step verification.",
+      "assertions": [
+        "Includes Execution Granularity and Sensor Budget.",
+        "Rejects mechanical micro-batches.",
+        "Allows intermediate broken states inside approved batches.",
+        "Requires each batch to end in an openable or meaningfully verifiable state.",
+        "Uses broad verification only at integration or final gates unless justified.",
+        "Chooses the largest coherent batch that remains diagnosable."
+      ]
+    },
+    {
       "id": "structured-output-requires-material-collection",
       "prompt": "根据 requirements、solution design 和 goal 创建 execution policy。Final Output Contract requires a structured decision report with status matrix, evidence references, unresolved decisions, and a markdown destination.",
       "expected_output": "The execution policy includes Output Material / Evidence Collection defining what must be collected, which batch produces it, where references are stored, readiness before final report generation, and what missing material blocks completion.",

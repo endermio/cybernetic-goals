@@ -8,6 +8,10 @@
 - the goal omits a confirmed decision;
 - the runtime goal would need to write or approve a plan;
 - approved sensors, checks, or evidence channels are treated as the objective;
+- batches are mechanical micro-steps rather than coherent target-state slices;
+- broad verification is required after every small edit without justification;
+- sensor cost dominates execution cost;
+- stale sensors can block approved structural change;
 - no stale-sensor policy exists;
 - batch cadence is missing;
 - destructive intermediate-state policy is missing;

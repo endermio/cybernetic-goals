@@ -19,6 +19,7 @@ Status: `Needs Revision`
   - Design fidelity: `yes/no`
   - Output contract fidelity: `yes/no`
   - Goal fidelity: `yes/no`
+  - Execution granularity / sensor load: `yes/no`
   - Sensor governance: `yes/no`
   - Execution cadence: `yes/no`
   - Runtime safety: `yes/no`
@@ -86,6 +87,20 @@ Findings:
 
 - [finding]
 
+## Execution Granularity / Sensor Load
+
+Check:
+
+- batches are coherent target-state slices, not mechanical micro-steps;
+- the plan chooses the largest coherent batch that remains diagnosable;
+- broad verification is assigned to integration or final gates unless justified;
+- sensor cost does not dominate execution cost;
+- stale sensors cannot block approved structural change without sensor-governance review.
+
+Findings:
+
+- [finding]
+
 ## Sensor / Evidence Governance
 
 Findings:
@@ -136,6 +151,7 @@ The control structure may be approved only if:
 - goal and execution policy preserve required design invariants;
 - any upstream output contract is preserved in the goal and supported by the execution policy;
 - execution policy preserves goal and requirements analysis;
+- execution granularity and sensor load do not create micro-step overcontrol or sensor overcoupling;
 - sensor/evidence governance is explicit;
 - batch cadence is explicit;
 - runtime execution does not need to synthesize a new plan.

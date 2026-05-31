@@ -41,6 +41,7 @@ This skill supplies the cybernetic constraints that the planning substrate must 
 - solution-design invariants and interfaces/contracts;
 - tactical degrees of freedom;
 - dependency matrix requirement;
+- execution granularity and sensor budget;
 - batch cadence;
 - destructive intermediate-state policy;
 - output material/evidence collection for the final output contract;
@@ -60,16 +61,41 @@ The execution policy must include:
 3. Confirmed Semantic Invariants
 4. Tactical Degrees of Freedom
 5. Dependency Matrix
-6. Batch Cadence
-7. Destructive Intermediate-State Policy
-8. Output Material / Evidence Collection
-9. Sensor / Evidence Governance
-10. Stale Sensor Retirement and Rewrite Policy
-11. Phase Gates
-12. Execution Rhythm
-13. Stop Conditions
-14. Progress Log Rules
-15. Candidate Plan Tasks
+6. Execution Granularity and Sensor Budget
+7. Batch Cadence
+8. Destructive Intermediate-State Policy
+9. Output Material / Evidence Collection
+10. Sensor / Evidence Governance
+11. Stale Sensor Retirement and Rewrite Policy
+12. Phase Gates
+13. Execution Rhythm
+14. Stop Conditions
+15. Progress Log Rules
+16. Candidate Plan Tasks
+
+## Execution Granularity and Sensor Budget
+
+The execution policy must choose the largest coherent batch that remains diagnosable.
+
+Each batch must represent a coherent target-state slice, not a mechanical micro-step. Do not split work merely so every tiny edit is separately openable.
+
+For each batch, define:
+
+- the coherent target-state slice;
+- why this is one batch;
+- which too-small split was avoided;
+- what intermediate breakage is allowed inside the batch;
+- what batch-end state is openable or meaningfully verifiable;
+- the smallest necessary sensor set for that batch;
+- which broad checks are deferred to integration or final gates.
+
+Sensor budget rules:
+
+- use the smallest sensor set that can detect semantic or structural drift;
+- do not run expensive broad checks at every batch unless they are the only reliable drift sensor;
+- treat broad verification as integration-gate or completion-gate work by default;
+- weak or stale sensors must not block approved structural change without sensor-governance review;
+- if many sensors encode old semantics, preserve the target state and record stale-sensor retirement or rewrite.
 
 ## Batch Cadence
 
@@ -78,7 +104,9 @@ For large structural changes:
 - intermediate steps inside a batch may temporarily break local observability or artifact consistency;
 - each batch must end in an openable or meaningfully verifiable state;
 - batch size should be large enough to avoid sensor-driven local minima;
-- batch size should be small enough that failures remain diagnosable.
+- batch size should be small enough that failures remain diagnosable;
+- if a batch cannot be verified meaningfully, merge it with the next batch or redefine the gate;
+- if a batch is too large to diagnose failures, split by dependency boundary or sensor boundary.
 
 ## Output Material / Evidence Collection
 
@@ -148,6 +176,7 @@ Control-law summary:
 - Semantic invariants: ...
 - Design source: ...
 - Batch cadence: ...
+- Sensor budget: ...
 - Sensor governance: ...
 - Phase gates: ...
 
@@ -183,9 +212,13 @@ Response-only next step:
 - [ ] If Design Gate is required, the plan references the solution design.
 - [ ] The plan does not invent or revise the solution model.
 - [ ] The plan has dependency matrix.
+- [ ] The plan includes Execution Granularity and Sensor Budget.
+- [ ] Batches are coherent target-state slices, not mechanical micro-steps.
+- [ ] The plan chooses the largest coherent batch that remains diagnosable.
 - [ ] The plan has batch cadence.
 - [ ] The plan allows destructive intermediate states only within approved batches.
 - [ ] Each batch ends in an openable/verifiable state.
+- [ ] Broad verification is assigned to integration/final gates unless justified per batch.
 - [ ] The plan defines output material/evidence collection when the final output contract requires structured output.
 - [ ] The plan treats approved sensors, checks, and evidence channels as sensors, not objectives.
 - [ ] The plan includes stale sensor retirement/rewrite policy.

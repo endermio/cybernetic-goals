@@ -22,6 +22,7 @@ Cybernetic constraints supplied to the substrate:
 - approved or candidate solution-design invariants;
 - tactical degrees of freedom;
 - dependency matrix;
+- execution granularity and sensor budget;
 - batch cadence;
 - destructive intermediate-state policy;
 - output material/evidence collection;
@@ -49,6 +50,37 @@ These may change during execution if invariants are preserved.
 | Workstream | Owns | Depends on | Can run in parallel with | Gate |
 |---|---|---|---|---|
 | A | [area] | [dependency] | [parallel work] | [gate] |
+
+## Execution Granularity and Sensor Budget
+
+### Batch Granularity
+
+Each batch must represent a coherent target-state slice, not a mechanical micro-step.
+
+| Batch | Coherent target-state slice | Why this is one batch | Too-small split avoided |
+|---|---|---|---|
+| Batch 1 | [slice] | [reason] | [micro-split avoided] |
+
+Rules:
+
+- Do not require every micro-step to be openable.
+- Intermediate states inside a batch may be broken when this policy explicitly allows it.
+- Each batch must end in an openable or meaningfully verifiable state.
+- If a batch cannot be verified meaningfully, merge it with the next batch or redefine the gate.
+- If a batch is too large to diagnose failures, split by dependency boundary or sensor boundary.
+
+### Sensor Budget
+
+| Batch | Required strong sensors | Optional/weak sensors | Deferred sensors | Final-only sensors |
+|---|---|---|---|---|
+| Batch 1 | [sensors] | [sensors] | [sensors] | [sensors] |
+
+Rules:
+
+- Use the smallest sensor set that can detect semantic or structural drift.
+- Do not run expensive broad checks at every batch unless they are the only reliable drift sensor.
+- Treat broad verification as integration-gate or completion-gate work by default.
+- If many sensors fail because they encode old semantics, preserve the target state and record stale-sensor retirement or rewrite.
 
 ## Batch Cadence
 
@@ -125,6 +157,8 @@ Before execution:
 Before moving to next batch:
 
 - current batch-end condition met;
+- required strong sensors for this batch have been interpreted;
+- deferred and final-only sensors remain deferred by policy, not by omission;
 - progress log updated;
 - no confirmed semantic invariant violated.
 
@@ -181,6 +215,11 @@ Allowed intermediate breakage:
 Batch-end gate:
 
 - [gate]
+
+Batch sensors:
+
+- Required strong sensors: [sensors]
+- Deferred/final-only sensors: [sensors]
 
 Steps:
 

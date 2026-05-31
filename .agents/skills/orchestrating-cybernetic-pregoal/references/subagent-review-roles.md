@@ -42,10 +42,12 @@ Input: solution design when present, goal contract, and execution policy.
 Check:
 
 - Plan contains dependency matrix.
+- Plan defines execution granularity and sensor budget.
 - Plan defines batch cadence.
 - Plan defines destructive intermediate-state policy.
 - Plan defines batch-end openable or verifiable state.
 - Plan avoids both tiny sensor-bound steps and huge unobservable batches.
+- Broad verification is assigned to integration or final gates unless justified.
 
 ## Sensor / Evidence Governance Reviewer
 

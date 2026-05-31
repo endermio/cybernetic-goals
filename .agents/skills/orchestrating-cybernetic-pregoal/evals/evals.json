@@ -187,6 +187,18 @@
         "Says next allowed action is control review or revision.",
         "Does not bypass with lint pass."
       ]
+    },
+    {
+      "id": "orchestrator-returns-granularity-findings-to-policy-revision",
+      "prompt": "Control review flags execution granularity and sensor load as Major because the plan uses mechanical micro-batches and broad verification after every small edit. Orchestrate the next step.",
+      "expected_output": "The orchestrator must not tune batch granularity itself or compile runtime /goal; it returns to execution-policy revision and then review.",
+      "assertions": [
+        "Does not compile a runtime /goal.",
+        "Does not adjust batch granularity or sensor budget inside the orchestrator.",
+        "Returns to $writing-cybernetic-execution-policies or execution-policy revision.",
+        "Requires re-review before runtime compilation.",
+        "Treats execution granularity or sensor load Major/Blocking findings as blockers for runtime compilation."
+      ]
     }
   ]
 }

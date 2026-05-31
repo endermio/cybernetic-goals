@@ -363,6 +363,7 @@ The execution policy must:
 - record `$superpowers:writing-plans` substrate status for non-trivial execution policies
 - include a dependency matrix
 - distinguish semantic invariants from tactical degrees of freedom
+- define execution granularity and sensor budget
 - define batch cadence
 - define destructive intermediate-state policy
 - define batch-end openable/verifiable requirements
@@ -422,6 +423,8 @@ docs/cybernetics/control-reviews/YYYY-MM-DD-<slug>.md
 
 If independent review discipline is missing and no explicit human approval exists, the review status must be `Needs Independent Review`, not `Approved`.
 
+If review flags execution granularity or sensor load as Major or Blocking, return to execution-policy revision. The orchestrator must not tune batch granularity or sensor budget itself, and must not compile runtime `/goal` until review no longer reports that issue as Major or Blocking.
+
 Apply the Final Observer Rule:
 
 - If a reviewer reports a Blocking or Major finding and the orchestrator changes any control artifact to address it, the modified artifact is `Dirty`.
@@ -437,10 +440,11 @@ If review status is `Needs Revision`:
 
 1. Apply only the required revisions.
 2. Avoid over-correcting non-critical suggestions.
-3. Mark changed control artifacts `Dirty` unless every change is deterministic-only and guard-covered.
-4. Re-run independent review for substantive changes, focused on the changed sections and prior blockers.
-5. Record the final observer check in the control review.
-6. Stop after two review-revision cycles if not approved.
+3. If the revision concerns execution granularity or sensor load, route it to `$writing-cybernetic-execution-policies`; do not repair it inside the orchestrator.
+4. Mark changed control artifacts `Dirty` unless every change is deterministic-only and guard-covered.
+5. Re-run independent review for substantive changes, focused on the changed sections and prior blockers.
+6. Record the final observer check in the control review.
+7. Stop after two review-revision cycles if not approved.
 
 Do not alter confirmed human decisions. If a revision would change requirement semantics, stop and ask for human input.
 

@@ -86,6 +86,19 @@
       ]
     },
     {
+      "id": "flags-overheavy-sensor-plan",
+      "prompt": "Review a plan where every tiny step requires broad verification and stale sensors can block approved structural change.",
+      "expected_output": "The review flags sensor overcoupling and excessive granularity as Major or Blocking, and requires execution-policy revision before runtime compilation.",
+      "assertions": [
+        "Flags excessive micro-step granularity.",
+        "Flags sensor load as too heavy.",
+        "Explains that sensors are not objectives.",
+        "Requires revising the execution policy.",
+        "Does not approve runtime /goal compilation.",
+        "Does not adjust batch granularity inside the orchestrator."
+      ]
+    },
+    {
       "id": "reviews-output-contract-fidelity",
       "prompt": "审查 requirements analysis、solution design、goal、plan。requirements 定义 Output Contract: management decision report, markdown artifact, status matrix, evidence references, unresolved decisions；design 定义 Output Contract Design；goal 省略 evidence references 和 unresolved decisions；plan 没有收集 final report 所需材料。",
       "expected_output": "Review status is Needs Revision and identifies Output Contract Fidelity violations.",

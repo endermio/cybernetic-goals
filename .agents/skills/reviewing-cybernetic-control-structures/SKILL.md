@@ -130,7 +130,22 @@ Flag plans that:
 - lack stale sensor retirement rules;
 - lack target-state evidence.
 
-### 7. Batch Rhythm
+### 7. Execution Granularity / Sensor Load
+
+Flag as Major or Blocking when:
+
+- batches are mechanical micro-steps rather than coherent target-state slices;
+- every step requires full observability;
+- sensor cost dominates execution cost;
+- broad verification is required after every small edit;
+- stale sensors can block approved structural change;
+- batch-end gates are too weak to detect drift;
+- batch-end gates are so heavy that they prevent progress;
+- the plan does not explain why batch size is diagnosable.
+
+Use `Major` when execution-policy revision can repair the control law. Use `Blocking` when the granularity or sensor load would prevent runtime completion or let sensors override confirmed semantics.
+
+### 8. Batch Rhythm
 
 Flag:
 
@@ -139,15 +154,15 @@ Flag:
 - no batch-end openability requirement;
 - no destructive intermediate-state policy.
 
-### 8. Semantic vs Tactical Boundary
+### 9. Semantic vs Tactical Boundary
 
 Semantic invariants must be frozen. Tactical execution details must remain adjustable.
 
-### 9. Runtime Suitability
+### 10. Runtime Suitability
 
 The runtime `/goal` must be able to execute the approved artifacts without inventing new control structures. Any required runtime Superpowers discipline must be precompiled into the approved plan, review, or final `/goal`.
 
-### 10. Review Independence
+### 11. Review Independence
 
 The review must record:
 
@@ -156,7 +171,7 @@ The review must record:
 - whether approval is allowed;
 - why approval is blocked when independent review is missing.
 
-### 11. Final Observer Check
+### 12. Final Observer Check
 
 The review must record whether any substantive artifact changed after the latest independent review pass and whether a final independent observer confirmed no Blocking or Major findings after that change.
 
@@ -191,6 +206,7 @@ Only mark `Approved` when:
 - any upstream output contract is preserved in the goal and supported by the execution policy;
 - no unresolved semantic decision remains;
 - execution policy does not self-authorize uncontrolled changes;
+- execution granularity and sensor load do not create micro-step overcontrol or sensor overcoupling;
 - sensor/evidence governance is explicit;
 - runtime `/goal` can execute without writing or approving a new plan.
 - independent review discipline was satisfied or explicit human approval exists.
@@ -242,6 +258,7 @@ Response-only next step:
 - [ ] Lint PASS is not treated as semantic/control-policy approval.
 - [ ] Critical findings distinguish semantic, design, goal, plan, sensor, and runtime issues.
 - [ ] Output contract fidelity was checked when any upstream output contract exists.
+- [ ] Execution granularity and sensor load were checked.
 - [ ] Required revisions are actionable.
 - [ ] Response-only handoff matches the review status and does not bypass `$orchestrating-cybernetic-pregoal` when full pre-goal orchestration owns the chain.
 - [ ] The assistant response includes a response-only next step for every review status.

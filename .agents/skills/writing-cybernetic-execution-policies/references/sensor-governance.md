@@ -19,3 +19,5 @@ A check that contradicts confirmed semantics or blocks necessary structural chan
 ## Rule
 
 If a sensor conflicts with confirmed semantics, do not blindly satisfy it. Either replace it with a target-state evidence channel or stop and ask for a decision if the conflict is semantic.
+
+Use the smallest sensor set that can detect semantic or structural drift at each batch gate. Expensive broad checks should usually be deferred to integration or final gates. Do not let sensor cost dominate execution cost.
