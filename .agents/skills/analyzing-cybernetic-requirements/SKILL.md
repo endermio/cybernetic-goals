@@ -46,7 +46,7 @@ This skill may:
 - decide whether Semantic, Rubric, Output Contract, Design, Goal Contract, Execution Policy, Control Review, or Risk gates are required;
 - ask high-value human questions;
 - record obvious defaults without blocking progress;
-- recommend `$designing-cybernetic-solutions` when Design Gate is required.
+- recommend the appropriate handoff for Design Gate: direct `$designing-cybernetic-solutions` for bounded/manual chains, or `$orchestrating-cybernetic-pregoal` for Level 3/4 full pre-goal work.
 
 Requirement object lists are not solution designs. They name what the human is talking about; they do not prescribe mechanisms, interfaces, lifecycle, state flow, or execution batches.
 
@@ -157,7 +157,11 @@ Mark `Design Gate: required` when:
 - several subsystems or roles must coordinate around one model;
 - runtime execution would otherwise invent objects, boundaries, sensors, or flow.
 
-When Design Gate is required, record the missing solution-model questions and recommend `$designing-cybernetic-solutions`. Do not answer those questions inside the requirements analysis unless they are already confirmed human semantics.
+When Design Gate is required, record the missing solution-model questions. Do not answer those questions inside the requirements analysis unless they are already confirmed human semantics.
+
+For Level 1/2 bounded work or manual downstream chains, recommend `$designing-cybernetic-solutions` before goal writing.
+
+For Level 3/4 or full pre-goal work, pass Design Gate to `$orchestrating-cybernetic-pregoal` and state that the orchestrator must invoke or request `$designing-cybernetic-solutions` before goal writing. Do not output a standalone `$designing-cybernetic-solutions` command as a separate pre-orchestration next step.
 
 ## Process
 
@@ -181,9 +185,10 @@ When requirements analysis is complete, choose the next command from the intende
 
 For Level 3/4 or full pre-goal work, and when the requirements path is deterministic, output:
 
-1. A solution-design command when `Design Gate: required`.
-2. A pre-goal orchestration command using the concrete requirements path.
-3. A predicted queue-friendly `/goal` command using the expected artifact paths for the same date/slug.
+1. A pre-goal orchestration command using the concrete requirements path.
+2. A predicted queue-friendly `/goal` command using the expected artifact paths for the same date/slug.
+
+If `Design Gate: required`, state that `$orchestrating-cybernetic-pregoal` must invoke or request `$designing-cybernetic-solutions` before goal writing. Do not output `$designing-cybernetic-solutions` as a standalone command before orchestration for Level 3/4 or full pre-goal work.
 
 The predicted `/goal` is not the final approved runtime command. Label it as predicted or queue-friendly, and make it depend on artifacts that the pre-goal orchestrator must create and approve.
 
@@ -309,9 +314,10 @@ Updated requirements analysis brief:
 Response-only queue suggestions:
 
 ```text
-$designing-cybernetic-solutions 根据 docs/cybernetics/requirements/YYYY-MM-DD-slug.md 创建 solution design。（仅当 Design Gate: required）
 $orchestrating-cybernetic-pregoal 根据 docs/cybernetics/requirements/YYYY-MM-DD-slug.md 完成 pre-goal 编译，允许使用 subagents review。
 ```
+
+Design dispatch: when `Design Gate: required`, `$orchestrating-cybernetic-pregoal` must invoke or request `$designing-cybernetic-solutions` before goal writing.
 
 Response-only predicted runtime command:
 
@@ -357,4 +363,4 @@ $writing-cybernetic-goals 使用 docs/cybernetics/requirements/YYYY-MM-DD-slug.m
 - [ ] No solution design, goal, plan, control review, or approved runtime `/goal` was created.
 - [ ] Level 1/2 work with `Rubric Gate: required` routes to `$writing-cybernetic-goals`, not full pre-goal orchestration by default.
 - [ ] Any predicted queue-friendly `/goal` is clearly labeled as predicted and includes the missing/not-approved/inconsistent artifact precondition.
-- [ ] If Design Gate is required, next commands include `$designing-cybernetic-solutions` before pre-goal orchestration.
+- [ ] For Level 3/4 or full pre-goal work, `Design Gate: required` is passed to `$orchestrating-cybernetic-pregoal`; requirements analysis does not output standalone `$designing-cybernetic-solutions` before orchestration.

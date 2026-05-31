@@ -314,19 +314,27 @@ Recommended next step:
 $analyzing-cybernetic-requirements <需求>
 ```
 
-If requirements analysis completes and `Design Gate: required`, run:
-
-```text
-$designing-cybernetic-solutions 根据 <requirements-path> 创建 solution design。
-```
-
 After requirements analysis is complete:
 
 ```text
 $orchestrating-cybernetic-pregoal 根据 <requirements-path> 完成 pre-goal 编译，允许使用 subagents review。
 ```
 
-If orchestration is unavailable, manually run:
+If `Design Gate: required`, do not recommend a standalone design step before orchestration for Level 3/4 work. The orchestrator must invoke or request `$designing-cybernetic-solutions` before goal writing.
+
+If orchestration is unavailable, manually run the downstream sequence. In that manual fallback only, run solution design before goal writing when Design Gate is required:
+
+```text
+$designing-cybernetic-solutions
+$writing-cybernetic-goals
+$writing-cybernetic-execution-policies
+$reviewing-cybernetic-control-structures
+$compiling-cybernetic-runtime-goals
+```
+
+If Design Gate is not required or an existing design artifact is already valid, pass that state or artifact path into orchestration instead of redoing solution design.
+
+If orchestration is unavailable and Design Gate is not required, manually run:
 
 ```text
 $writing-cybernetic-goals
@@ -588,8 +596,9 @@ Required gates:
 
 Recommended next step:
 1. `$analyzing-cybernetic-requirements <需求>`
-2. If Design Gate is required: `$designing-cybernetic-solutions 根据 <requirements-path> 创建 solution design。`
-3. After requirements analysis/design are ready: `$orchestrating-cybernetic-pregoal 根据 <requirements-path> 完成 pre-goal 编译，允许使用 subagents review。`
+2. After requirements analysis is complete: `$orchestrating-cybernetic-pregoal 根据 <requirements-path> 完成 pre-goal 编译，允许使用 subagents review。`
+
+If Design Gate is required, keep it listed under Required gates. The orchestrator must invoke or request `$designing-cybernetic-solutions` before goal writing; do not list solution design as a separate manual step before orchestration for Level 3/4 work.
 
 Rejected workflow:
 - Level 0/1/2 would force runtime agent to invent unresolved control decisions.
@@ -629,6 +638,7 @@ Rejected workflow:
 | Recommending full pipeline for local display/fixture cleanup | Use Level 1/2 |
 | Ignoring approved requirements analysis/design/goal/plan artifacts | Downgrade when semantics and solution structure are already frozen |
 | Listing five manual pre-goal skills when orchestrator exists | Prefer `$analyzing-cybernetic-requirements` then `$orchestrating-cybernetic-pregoal` |
+| Listing `$designing-cybernetic-solutions` as a separate Level 3/4 next step before orchestration | Keep Design Gate in Required gates and let `$orchestrating-cybernetic-pregoal` dispatch design before goal writing |
 | Letting small tasks use the full workflow because the user asked | Explain that the workflow is over-control and propose a lighter route |
 | Recommending execution policy after a Level 2 bounded file goal | Give the direct `/goal` path unless the user explicitly asks for policy or new control decisions appear |
 | Treating an object checklist as a completed rubric | Check the evaluation function before routing to execution |
@@ -653,10 +663,10 @@ Before responding, verify:
 - [ ] A complete object list is not mistaken for a complete evaluation rubric.
 - [ ] A requirement list is not mistaken for a complete solution design.
 - [ ] The recommended next step is the lightest safe workflow.
-- [ ] For Level 3, the response recommends `$analyzing-cybernetic-requirements`, then `$designing-cybernetic-solutions` when Design Gate is required, then `$orchestrating-cybernetic-pregoal`.
+- [ ] For Level 3/4, the response recommends `$analyzing-cybernetic-requirements`, then `$orchestrating-cybernetic-pregoal`; Design Gate remains explicit and design dispatch is owned by the orchestrator.
 - [ ] For Level 0/1/2, the response does not recommend full pre-goal pipeline.
 - [ ] For Level 2 bounded file goals, the response does not recommend execution policy by default.
 - [ ] If Rubric Gate is required, the response recommends rubric analysis before execution.
 - [ ] If Output Contract Gate is required, the response routes output-contract definition through requirements analysis and solution design only when structure synthesis is needed.
-- [ ] If Design Gate is required, the response recommends solution design before goal writing or orchestration.
+- [ ] If Design Gate is required for Level 3/4 full pre-goal work, the response says orchestration must invoke or request solution design before goal writing; direct solution design is still valid for Level 2 with Design Gate or manual fallback.
 - [ ] The response includes rejected workflow rationale.

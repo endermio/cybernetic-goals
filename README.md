@@ -41,11 +41,8 @@ $routing-cybernetic-workflows
 $analyzing-cybernetic-requirements
   -> docs/cybernetics/requirements/YYYY-MM-DD-feature.md
 
-$designing-cybernetic-solutions
-  -> docs/cybernetics/designs/YYYY-MM-DD-feature.md when Design Gate is required
-
 $orchestrating-cybernetic-pregoal
-  -> run the remaining pre-goal compilation chain after requirements analysis/design are complete
+  -> run pre-goal compilation after requirements analysis, invoking solution design when Design Gate is required
 ```
 
 Full pre-goal orchestration includes the solution-design stage when Design Gate is required, but solution design remains owned by `$designing-cybernetic-solutions`.
@@ -77,7 +74,7 @@ For simple work, the router should reject the full pipeline and recommend an inl
 - `analyzing-cybernetic-requirements`: analyze human intent and create a requirements analysis brief.
 - `clarifying-cybernetic-tasks`: deprecated compatibility alias for `analyzing-cybernetic-requirements`.
 - `designing-cybernetic-solutions`: create a general solution/system model when Design Gate is required.
-- `orchestrating-cybernetic-pregoal`: orchestrate the pre-goal compilation chain after requirements analysis/design.
+- `orchestrating-cybernetic-pregoal`: orchestrate the pre-goal compilation chain after requirements analysis, including design dispatch when required.
 - `cybernetic-superpowers-infrastructure`: define stage-specific Superpowers substrate dependencies and non-substitution rules.
 - `writing-cybernetic-goals`: create a control contract, not a runtime `/goal`, for complex work.
 - `writing-cybernetic-execution-policies`: create an execution policy / plan as a control law.

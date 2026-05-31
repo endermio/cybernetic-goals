@@ -143,12 +143,15 @@
     {
       "id": "new-feature-with-unclear-solution-structure-needs-design-gate",
       "prompt": "使用 $routing-cybernetic-workflows 分析任务：需求语义已经确认，要建立新的控制关系，但还没有 solution design；Actor A、Group B、Entity C、identifier 关系、记录实时观测的信息流、观察表面中的概念边界都需要形成结构模型。",
-      "expected_output": "Classify as Level 3 and list Design Gate required, recommending solution design before goal and execution policy.",
+      "expected_output": "Classify as Level 3 and list Design Gate required. Recommend requirements analysis and then pre-goal orchestration; the orchestrator must invoke or request solution design before goal writing.",
       "assertions": [
         "Classifies the task as Level 3.",
         "Includes Required gates with Design Gate required.",
         "Explains that the execution agent would otherwise need to invent the solution structure.",
-        "Recommends $designing-cybernetic-solutions after requirements analysis and before goal writing.",
+        "Recommends $analyzing-cybernetic-requirements before pre-goal orchestration.",
+        "Recommends $orchestrating-cybernetic-pregoal after requirements analysis is complete.",
+        "Does not recommend $designing-cybernetic-solutions as a standalone manual step before orchestration for Level 3 full pre-goal work.",
+        "Explains that the orchestrator invokes or requests $designing-cybernetic-solutions when Design Gate is required.",
         "Keeps the routing decision as Level 3 without encoding a suffix such as Level 3D."
       ]
     },
