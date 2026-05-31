@@ -197,6 +197,7 @@ Each entry must include:
 - commands run
 - result
 - sensor interpretation
+- deferred/final-only sensors and reason
 - current risk
 - next step
 

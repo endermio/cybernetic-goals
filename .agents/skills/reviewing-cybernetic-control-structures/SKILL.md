@@ -114,6 +114,8 @@ When requirements analysis, solution design, or goal includes an output contract
 The execution policy must define a sane control law:
 
 - dependency matrix
+- execution granularity
+- sensor budget
 - batch cadence
 - phase gates
 - repair policy
