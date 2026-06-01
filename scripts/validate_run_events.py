@@ -136,6 +136,9 @@ SAFE_REPO_PRIVATE_METADATA_KEYS = {
     "repoidhash",
     "repositorycount",
 }
+SAFE_SLASH_METADATA_KEYS = {
+    "compile/unit",
+}
 SYNC_EXPORT_PACKAGE_KEYS = {
     "destination_hash",
     "event_count",
@@ -344,11 +347,14 @@ def unsafe_dynamic_key_reason(
     in_repo_context: bool = False,
 ) -> str | None:
     string_key = str(key)
+    if string_key in SAFE_SLASH_METADATA_KEYS:
+        return None
     string_pattern_reason = unsafe_metadata_value_reason(string_key)
     if string_pattern_reason:
         return string_pattern_reason
-    if in_repo_context or (parent_key is not None and is_likely_repo_context_key(parent_key)):
-        return short_repo_identifier_reason(string_key)
+    short_repo_reason = short_repo_identifier_reason(string_key)
+    if short_repo_reason:
+        return short_repo_reason
     return None
 
 
@@ -427,9 +433,6 @@ def unsafe_metadata_key_reason(
     raw_reason = raw_content_descendant_reason(key, in_raw_context)
     if raw_reason:
         return raw_reason
-    dynamic_reason = unsafe_dynamic_key_reason(key, parent_key, in_repo_context)
-    if dynamic_reason:
-        return dynamic_reason
     normalized = normalize_metadata_key(key)
     if normalized in NORMALIZED_UNSAFE_METADATA_ONLY_KEYS:
         return str(key)
@@ -437,6 +440,9 @@ def unsafe_metadata_key_reason(
     if phrase_reason:
         reason, _is_composite = phrase_reason
         return reason
+    dynamic_reason = unsafe_dynamic_key_reason(key, parent_key, in_repo_context)
+    if dynamic_reason:
+        return dynamic_reason
     repo_private_reason = conservative_repo_private_key_reason(key)
     if repo_private_reason:
         return repo_private_reason
@@ -458,16 +464,21 @@ def unsafe_metadata_key_diagnostic(
         return None
     if raw_content_descendant_reason(key, in_raw_context):
         return reason
-    if unsafe_dynamic_key_reason(key, parent_key, in_repo_context):
-        return f"unsafe dynamic key ({reason})"
-    if unsafe_metadata_key_fragment_reason(key):
-        return f"unsafe key ({reason})"
     phrase_reason = unsafe_metadata_key_phrase_reason(key)
     if phrase_reason:
         _phrase_label, is_composite = phrase_reason
         if is_composite and unsafe_metadata_key_phrase_requires_sanitized_diagnostic(key):
             return f"unsafe key ({reason})"
-    if conservative_repo_private_key_reason(key) == reason:
+    if (
+        conservative_repo_private_key_reason(key) == reason
+        and not in_repo_context
+        and not (parent_key is not None and is_likely_repo_context_key(parent_key))
+        and not unsafe_metadata_value_reason(str(key))
+    ):
+        return f"unsafe key ({reason})"
+    if unsafe_dynamic_key_reason(key, parent_key, in_repo_context):
+        return f"unsafe dynamic key ({reason})"
+    if unsafe_metadata_key_fragment_reason(key):
         return f"unsafe key ({reason})"
     return str(key)
 

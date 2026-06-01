@@ -303,6 +303,33 @@ class AggregateRunEventsTest(unittest.TestCase):
         self.assertNotIn("private-repo", output)
         self.assertNotIn("/home", output)
 
+    def test_dry_run_sanitizes_general_short_repo_event_key(self):
+        event = json.loads(SAMPLE.read_text(encoding="utf-8"))
+        event["acme/service"] = {"details": "/home/ender/private/work"}
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            event_path = Path(tmpdir) / "event.json"
+            summary = Path(tmpdir) / "aggregation-summary.json"
+            candidates = Path(tmpdir) / "eval-candidates.json"
+            event_path.write_text(json.dumps(event), encoding="utf-8")
+            result = self.run_aggregate(
+                "--input",
+                str(event_path),
+                "--out",
+                str(summary),
+                "--eval-candidates-out",
+                str(candidates),
+                "--dry-run",
+            )
+
+        output = result.stdout + result.stderr
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("unsafe field unsafe dynamic key (real_repo)", output)
+        self.assertIn("unsafe metadata-only value at $.<unsafe-key>.details", output)
+        self.assertNotIn("acme/service", output)
+        self.assertNotIn("service", output)
+        self.assertNotIn("/home", output)
+
 
 if __name__ == "__main__":
     unittest.main()

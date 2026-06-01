@@ -55,6 +55,34 @@ class ValidateRunEventsTest(unittest.TestCase):
         self.assertIn("package contains unknown top-level field raw_response", output)
         self.assertNotIn("private model response", output)
 
+    def test_sync_export_package_sanitizes_short_repo_unknown_top_level_field(self):
+        package = {
+            "mode": "export",
+            "event_count": 0,
+            "event_ids": [],
+            "package_id": "pkg_" + "a" * 64,
+            "destination_hash": None,
+            "taxonomy_counts": {},
+            "would_upload": False,
+            "events": [],
+            "acme/service": "diagnostic metadata",
+        }
+
+        with tempfile.NamedTemporaryFile("w", suffix=".json", delete=False) as tmp:
+            json.dump(package, tmp)
+            tmp_path = tmp.name
+
+        try:
+            result = self.run_validator(tmp_path)
+        finally:
+            Path(tmp_path).unlink(missing_ok=True)
+
+        output = result.stdout + result.stderr
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("package contains unknown top-level field unsafe dynamic key (real_repo)", output)
+        self.assertNotIn("acme/service", output)
+        self.assertNotIn("service", output)
+
     def test_valid_sync_export_package_validates(self):
         event = json.loads(SAMPLE.read_text(encoding="utf-8"))
         package = {
@@ -347,6 +375,38 @@ class ValidateRunEventsTest(unittest.TestCase):
             self.assertNotIn("repositoryAcmePrivateRepo", output)
             self.assertNotIn("private-repo", output)
             self.assertNotIn("/home", output)
+
+    def test_metadata_only_sanitizes_short_repo_event_key_without_parent_context(self):
+        unsafe = {
+            "schema_version": "1.0.0",
+            "event_id": "evt_short_repo_event_key",
+            "event": "skill_invoked",
+            "timestamp": "2026-06-01T00:00:00Z",
+            "privacy_mode": "metadata_only",
+            "machine_id": "anon-12345678",
+            "skill_pack": {"source_commit": "abc1234"},
+            "skill": "routing-cybernetic-workflows",
+            "status": "success",
+            "task_hash": "sha256:" + "6" * 64,
+            "acme/service": {"details": "/home/ender/private/work"},
+        }
+
+        with tempfile.NamedTemporaryFile("w", suffix=".json", delete=False) as tmp:
+            json.dump(unsafe, tmp)
+            tmp_path = tmp.name
+
+        try:
+            result = self.run_validator(tmp_path)
+        finally:
+            Path(tmp_path).unlink(missing_ok=True)
+
+        output = result.stdout + result.stderr
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("unsafe field unsafe dynamic key (real_repo)", output)
+        self.assertIn("unsafe metadata-only value at $.<unsafe-key>.details", output)
+        self.assertNotIn("acme/service", output)
+        self.assertNotIn("service", output)
+        self.assertNotIn("/home", output)
 
     def test_metadata_only_sanitizes_composite_unsafe_key_in_value_path(self):
         unsafe = {
