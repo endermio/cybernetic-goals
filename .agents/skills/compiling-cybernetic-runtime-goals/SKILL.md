@@ -46,6 +46,8 @@ Do not output `/goal` unless:
 - solution design exists when Design Gate was required or a design artifact exists;
 - execution policy exists;
 - control review status is Approved;
+- control review records `Context management / execution topology: yes` in Review Independence;
+- control review includes meaningful `Context Management / Execution Topology` findings;
 - control review includes `Final Observer Check`;
 - final observer check allows approval;
 - any substantive post-review change has final re-review recorded;
@@ -144,6 +146,8 @@ Do not create or modify target-work artifacts.
 
 - [ ] Guard passed or equivalent checks passed.
 - [ ] No control artifact was rewritten.
+- [ ] Control review records `Context management / execution topology: yes` in Review Independence.
+- [ ] Control review includes meaningful `Context Management / Execution Topology` findings.
 - [ ] Final Observer Check is present and allows approval.
 - [ ] The final `/goal` references all approved files.
 - [ ] The final `/goal` carries the goal's Final Output Contract when present or required.

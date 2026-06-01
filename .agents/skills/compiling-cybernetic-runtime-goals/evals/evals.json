@@ -28,6 +28,19 @@
       ]
     },
     {
+      "id": "requires-review-of-execution-topology",
+      "prompt": "requirements analysis Complete，goal exists，execution policy status Candidate 且选择 Serial subagent-driven topology，control review 写了 Status: Approved 和 Final Observer Check，但没有 Review Independence 里的 Context management / execution topology: yes，也没有 Context Management / Execution Topology review section。请编译最终 /goal。",
+      "expected_output": "Refuse to compile runtime /goal because the approved review did not record review of execution topology, and route back to control review.",
+      "assertions": [
+        "Does not output final /goal.",
+        "Requires Review Independence to record Context management / execution topology: yes.",
+        "Requires a meaningful ## Context Management / Execution Topology review section.",
+        "Reports missing review of execution topology.",
+        "Routes back to control review or orchestration.",
+        "Does not treat Review Status: Approved and Final Observer Check alone as sufficient."
+      ]
+    },
+    {
       "id": "compiles-runtime-goal",
       "prompt": "requirements analysis Complete, goal exists, execution policy status Candidate, control review Approved, Final Observer Check allows approval；编译最终 /goal。",
       "expected_output": "Outputs a final /goal referencing requirements analysis, goal, plan, and review paths.",

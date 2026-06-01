@@ -370,8 +370,28 @@ def check_final_observer(review: str, errors: list[str]) -> None:
         errors.append("deterministic-only exception lacks guard evidence")
 
 
+def check_review_context_topology(review: str, errors: list[str]) -> None:
+    independence = section_body(review, "Review Independence")
+    if independence is None:
+        errors.append("control review missing ## Review Independence for Context Management / Execution Topology")
+    else:
+        topology_reviewed = yes_no_value(independence, "Context management / execution topology")
+        if topology_reviewed != "yes":
+            errors.append(
+                "control review did not record Context management / execution topology: yes in ## Review Independence"
+            )
+
+    body = section_body(review, "Context Management / Execution Topology")
+    if body is None:
+        errors.append("control review missing ## Context Management / Execution Topology")
+        return
+    if not labeled_block_has_content(body, "Findings"):
+        errors.append("control review Context Management / Execution Topology section has no meaningful findings")
+
+
 def suggest_next_action(errors: list[str]) -> str:
     joined = "\n".join(errors).casefold()
+    lowered_errors = [error.casefold() for error in errors]
 
     if "requirements analysis status is not complete" in joined:
         return "ReturnToRequirementsAnalysis"
@@ -379,7 +399,21 @@ def suggest_next_action(errors: list[str]) -> str:
         return "RunDesign"
     if "output contract" in joined or "goal lacks" in joined or "goal contains runtime control-structure" in joined:
         return "RunGoalWriting"
-    if "execution policy status" in joined or "execution topology" in joined or "plan does not reference" in joined:
+    if (
+        "execution policy status" in joined
+        or "plan does not reference" in joined
+        or any(
+            error.startswith(
+                (
+                    "execution topology",
+                    "subagent-driven topology",
+                    "level 3/4 main-only",
+                    "parallel execution topology",
+                )
+            )
+            for error in lowered_errors
+        )
+    ):
         return "RunExecutionPolicy"
     if (
         "control review status" in joined
@@ -387,6 +421,10 @@ def suggest_next_action(errors: list[str]) -> str:
         or "post-review" in joined
         or "deterministic-only exception" in joined
         or "review does not reference" in joined
+        or "control review missing ## review independence" in joined
+        or "control review missing ## context management / execution topology" in joined
+        or "context management / execution topology section has no meaningful findings" in joined
+        or "did not record context management / execution topology" in joined
     ):
         return "RunReview"
     if "missing file" in joined:
@@ -450,6 +488,7 @@ def main() -> int:
         if review_status != "Approved":
             errors.append(f"control review status under ## Review Status is not Approved: {review_status!r}")
         check_final_observer(review, errors)
+        check_review_context_topology(review, errors)
 
     for path, text, label in [
         (args.requirements, goal, "goal"),

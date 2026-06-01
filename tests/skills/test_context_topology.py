@@ -63,7 +63,14 @@ class ContextTopologySkillTest(unittest.TestCase):
             ]
         )
 
-    def write_artifact_chain(self, tmp: Path, topology_body: str) -> tuple[Path, Path, Path, Path]:
+    def write_artifact_chain(
+        self,
+        tmp: Path,
+        topology_body: str,
+        *,
+        include_review_topology: bool = True,
+        review_topology_independence: str = "yes",
+    ) -> tuple[Path, Path, Path, Path]:
         requirements = tmp / "requirements.md"
         goal = tmp / "goal.md"
         plan = tmp / "plan.md"
@@ -99,20 +106,49 @@ class ContextTopologySkillTest(unittest.TestCase):
             ),
             encoding="utf-8",
         )
-        review.write_text(
-            f"# Review\n\n## Review Status\n\nStatus: `Approved`\n\nReviewed `{requirements}`, `{goal}`, and `{plan}`.\n\n"
-            "## Final Observer Check\n\n"
-            "- Last independent review completed at: `test`\n"
-            "- Substantive artifact changes after last independent review: `no`\n"
-            "- If yes, final re-review performed: `no`\n"
-            "- Final reviewers confirming no Blocking/Major findings:\n"
-            "  - test reviewer\n"
-            "- Deterministic-only exception used: `no`\n"
-            "- Deterministic guard covering exception:\n"
-            "  - not used\n"
-            "- Approval allowed after final observer check: `yes`\n",
-            encoding="utf-8",
+        review_parts = [
+            "# Review",
+            "",
+            "## Review Status",
+            "",
+            "Status: `Approved`",
+            "",
+            f"Reviewed `{requirements}`, `{goal}`, and `{plan}`.",
+            "",
+        ]
+        if include_review_topology:
+            review_parts.extend(
+                [
+                    "## Review Independence",
+                    "",
+                    "- Requirements analysis: `yes`",
+                    "- Goal contract: `yes`",
+                    "- Execution policy: `yes`",
+                    f"- Context management / execution topology: `{review_topology_independence}`",
+                    "",
+                    "## Context Management / Execution Topology",
+                    "",
+                    "Findings:",
+                    "- Reviewed selected topology, context pack requirements, delegation substrate, context compression, and integration gates; no Blocking/Major findings.",
+                    "",
+                ]
+            )
+        review_parts.extend(
+            [
+                "## Final Observer Check",
+                "",
+                "- Last independent review completed at: `test`",
+                "- Substantive artifact changes after last independent review: `no`",
+                "- If yes, final re-review performed: `no`",
+                "- Final reviewers confirming no Blocking/Major findings:",
+                "  - test reviewer",
+                "- Deterministic-only exception used: `no`",
+                "- Deterministic guard covering exception:",
+                "  - not used",
+                "- Approval allowed after final observer check: `yes`",
+            ]
         )
+        review.write_text("\n".join(review_parts) + "\n", encoding="utf-8")
         return requirements, goal, plan, review
 
     def test_execution_policy_requires_context_topology(self):
@@ -198,6 +234,40 @@ class ContextTopologySkillTest(unittest.TestCase):
         self.assertIn("main agent coordinates", result.stdout)
         self.assertIn("Subagent outputs are candidate results until the main agent integrates them", result.stdout)
         self.assertNotIn("Execute serially according to the approved batch rhythm", result.stdout)
+
+    def test_control_chain_guard_requires_review_of_context_topology(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            requirements, goal, plan, review = self.write_artifact_chain(
+                Path(tmpdir),
+                self.complete_serial_topology(),
+                include_review_topology=False,
+            )
+
+            result = subprocess.run(
+                [
+                    sys.executable,
+                    str(
+                        ROOT
+                        / ".agents/skills/compiling-cybernetic-runtime-goals/scripts/control_chain_guard.py"
+                    ),
+                    "--requirements",
+                    str(requirements),
+                    "--goal",
+                    str(goal),
+                    "--plan",
+                    str(plan),
+                    "--review",
+                    str(review),
+                ],
+                cwd=ROOT,
+                text=True,
+                capture_output=True,
+            )
+
+        output = result.stdout + result.stderr
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("NEXT: RunReview", output)
+        self.assertIn("Context Management / Execution Topology", output)
 
     def test_control_chain_guard_rejects_incomplete_subagent_topology(self):
         with tempfile.TemporaryDirectory() as tmpdir:
