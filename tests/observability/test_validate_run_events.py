@@ -246,7 +246,9 @@ class ValidateRunEventsTest(unittest.TestCase):
         output = result.stdout + result.stderr
         self.assertNotEqual(result.returncode, 0)
         self.assertIn("metadata_only", output)
-        self.assertIn("/home/ender/work/private-project/file.txt", output)
+        self.assertIn("unsafe dynamic key (real_path)", output)
+        self.assertNotIn("/home/ender/work/private-project/file.txt", output)
+        self.assertNotIn("private-project", output)
 
     def test_redacted_content_opt_in_rejects_dynamic_key_that_is_hosted_repo_identifier(self):
         unsafe = {
@@ -276,7 +278,9 @@ class ValidateRunEventsTest(unittest.TestCase):
         output = result.stdout + result.stderr
         self.assertNotEqual(result.returncode, 0)
         self.assertIn("redacted_content_opt_in", output)
-        self.assertIn("github.com/acme/private-repo", output)
+        self.assertIn("unsafe dynamic key (real_repo)", output)
+        self.assertNotIn("github.com/acme/private-repo", output)
+        self.assertNotIn("private-repo", output)
 
     def test_redacted_content_opt_in_rejects_raw_unsafe_fields(self):
         unsafe = {

@@ -259,8 +259,12 @@ class RunEventScriptsTest(unittest.TestCase):
         self.assertEqual(redacted_event["repositories"]["repository_count"], 1)
         self.assertEqual(
             set(payload["redacted_fields"]),
-            {"/home/ender/private/repo/file.txt", "github.com/acme/private-repo"},
+            {"unsafe dynamic key (real_path)", "unsafe dynamic key (real_repo)"},
         )
+        output = result.stdout + result.stderr
+        self.assertNotIn("/home/ender/private/repo/file.txt", output)
+        self.assertNotIn("github.com/acme/private-repo", output)
+        self.assertNotIn("private-repo", output)
 
     def test_redactor_removes_raw_prompt_in_redacted_content_opt_in_mode(self):
         unsafe = json.loads(SAMPLE.read_text(encoding="utf-8"))
@@ -413,7 +417,10 @@ class RunEventScriptsTest(unittest.TestCase):
                 export_path,
             )
             self.assertNotEqual(result.returncode, 0)
-            self.assertIn("/home/ender/private/repo/file.txt", result.stdout + result.stderr)
+            output = result.stdout + result.stderr
+            self.assertIn("unsafe dynamic key (real_path)", output)
+            self.assertNotIn("/home/ender/private/repo/file.txt", output)
+            self.assertNotIn("private/repo", output)
             self.assertFalse(Path(export_path).exists())
         finally:
             Path(input_path).unlink(missing_ok=True)

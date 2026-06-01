@@ -210,6 +210,15 @@ def unsafe_metadata_key_reason(key: Any) -> str | None:
     return None
 
 
+def unsafe_metadata_key_diagnostic(key: Any) -> str | None:
+    reason = unsafe_metadata_key_reason(key)
+    if not reason:
+        return None
+    if unsafe_metadata_value_reason(str(key)):
+        return f"unsafe dynamic key ({reason})"
+    return str(key)
+
+
 def unsafe_metadata_value_reason(value: Any) -> str | None:
     if not isinstance(value, str):
         return None
@@ -219,11 +228,17 @@ def unsafe_metadata_value_reason(value: Any) -> str | None:
     return None
 
 
+def safe_metadata_path_key(key: Any) -> str:
+    if unsafe_metadata_value_reason(str(key)):
+        return "<unsafe-key>"
+    return str(key)
+
+
 def iter_string_values(value: Any, path: str = "$") -> list[tuple[str, str]]:
     values: list[tuple[str, str]] = []
     if isinstance(value, dict):
         for key, child in value.items():
-            values.extend(iter_string_values(child, f"{path}.{key}"))
+            values.extend(iter_string_values(child, f"{path}.{safe_metadata_path_key(key)}"))
     elif isinstance(value, list):
         for index, child in enumerate(value):
             values.extend(iter_string_values(child, f"{path}[{index}]"))
@@ -309,9 +324,9 @@ def validate_event(event: dict[str, Any], taxonomy: set[str], prefix: str) -> li
 
     privacy_mode = event.get("privacy_mode")
     if privacy_mode in {"metadata_only", "redacted_content_opt_in"}:
-        unsafe = sorted({key for key in iter_keys(event) if unsafe_metadata_key_reason(key)})
-        for key in unsafe:
-            errors.append(f"{prefix}: {privacy_mode} event contains unsafe field {key}")
+        unsafe = sorted({diagnostic for key in iter_keys(event) if (diagnostic := unsafe_metadata_key_diagnostic(key))})
+        for diagnostic in unsafe:
+            errors.append(f"{prefix}: {privacy_mode} event contains unsafe field {diagnostic}")
         for path, value in iter_string_values(event):
             reason = unsafe_metadata_value_reason(value)
             if reason:
