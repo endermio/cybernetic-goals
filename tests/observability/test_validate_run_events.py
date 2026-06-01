@@ -314,6 +314,40 @@ class ValidateRunEventsTest(unittest.TestCase):
         self.assertNotIn("acme/private-repo", output)
         self.assertNotIn("private-repo", output)
 
+    def test_metadata_only_rejects_nested_dynamic_key_that_is_short_repo_identifier(self):
+        unsafe = {
+            "schema_version": "1.0.0",
+            "event_id": "evt_unsafe_nested_short_repo_key",
+            "event": "runtime_outcome",
+            "timestamp": "2026-06-01T00:00:00Z",
+            "privacy_mode": "metadata_only",
+            "machine_id": "anon-12345678",
+            "skill_pack": {"source_commit": "abc1234"},
+            "status": "success",
+            "task_hash": "sha256:" + "8" * 64,
+            "repositories": {
+                "by_status": {
+                    "acme/private-repo": {"status": "recorded"},
+                },
+            },
+        }
+
+        with tempfile.NamedTemporaryFile("w", suffix=".json", delete=False) as tmp:
+            json.dump(unsafe, tmp)
+            tmp_path = tmp.name
+
+        try:
+            result = self.run_validator(tmp_path)
+        finally:
+            Path(tmp_path).unlink(missing_ok=True)
+
+        output = result.stdout + result.stderr
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("metadata_only", output)
+        self.assertIn("unsafe dynamic key (real_repo)", output)
+        self.assertNotIn("acme/private-repo", output)
+        self.assertNotIn("private-repo", output)
+
     def test_metadata_only_rejects_short_repo_identifier_value_under_repo_field(self):
         unsafe = {
             "schema_version": "1.0.0",

@@ -196,30 +196,43 @@ def short_repo_identifier_reason(value: Any) -> str | None:
     return "real_repo"
 
 
-def unsafe_dynamic_key_reason(key: Any, parent_key: Any | None = None) -> str | None:
+def unsafe_dynamic_key_reason(
+    key: Any,
+    parent_key: Any | None = None,
+    in_repo_context: bool = False,
+) -> str | None:
     string_key = str(key)
     string_pattern_reason = unsafe_metadata_value_reason(string_key)
     if string_pattern_reason:
         return string_pattern_reason
-    if parent_key is not None and is_likely_repo_context_key(parent_key):
+    if in_repo_context or (parent_key is not None and is_likely_repo_context_key(parent_key)):
         return short_repo_identifier_reason(string_key)
     return None
 
 
-def iter_key_contexts(value: Any, parent_key: Any | None = None) -> list[tuple[str, Any | None]]:
-    keys: list[tuple[str, Any | None]] = []
+def iter_key_contexts(
+    value: Any,
+    parent_key: Any | None = None,
+    in_repo_context: bool = False,
+) -> list[tuple[str, Any | None, bool]]:
+    keys: list[tuple[str, Any | None, bool]] = []
     if isinstance(value, dict):
         for key, child in value.items():
-            keys.append((str(key), parent_key))
-            keys.extend(iter_key_contexts(child, key))
+            keys.append((str(key), parent_key, in_repo_context))
+            child_repo_context = in_repo_context or is_likely_repo_context_key(key)
+            keys.extend(iter_key_contexts(child, key, child_repo_context))
     elif isinstance(value, list):
         for child in value:
-            keys.extend(iter_key_contexts(child, parent_key))
+            keys.extend(iter_key_contexts(child, parent_key, in_repo_context))
     return keys
 
 
-def unsafe_metadata_key_reason(key: Any, parent_key: Any | None = None) -> str | None:
-    dynamic_reason = unsafe_dynamic_key_reason(key, parent_key)
+def unsafe_metadata_key_reason(
+    key: Any,
+    parent_key: Any | None = None,
+    in_repo_context: bool = False,
+) -> str | None:
+    dynamic_reason = unsafe_dynamic_key_reason(key, parent_key, in_repo_context)
     if dynamic_reason:
         return dynamic_reason
     normalized = normalize_metadata_key(key)
@@ -236,11 +249,15 @@ def unsafe_metadata_key_reason(key: Any, parent_key: Any | None = None) -> str |
     return None
 
 
-def unsafe_metadata_key_diagnostic(key: Any, parent_key: Any | None = None) -> str | None:
-    reason = unsafe_metadata_key_reason(key, parent_key)
+def unsafe_metadata_key_diagnostic(
+    key: Any,
+    parent_key: Any | None = None,
+    in_repo_context: bool = False,
+) -> str | None:
+    reason = unsafe_metadata_key_reason(key, parent_key, in_repo_context)
     if not reason:
         return None
-    if unsafe_dynamic_key_reason(key, parent_key):
+    if unsafe_dynamic_key_reason(key, parent_key, in_repo_context):
         return f"unsafe dynamic key ({reason})"
     return str(key)
 
@@ -256,8 +273,12 @@ def unsafe_metadata_value_reason(value: Any, field_name: Any | None = None, in_r
     return None
 
 
-def safe_metadata_path_key(key: Any, parent_key: Any | None = None) -> str:
-    if unsafe_dynamic_key_reason(key, parent_key):
+def safe_metadata_path_key(
+    key: Any,
+    parent_key: Any | None = None,
+    in_repo_context: bool = False,
+) -> str:
+    if unsafe_dynamic_key_reason(key, parent_key, in_repo_context):
         return "<unsafe-key>"
     return str(key)
 
@@ -273,7 +294,12 @@ def iter_string_values(
         for key, child in value.items():
             child_repo_context = in_repo_context or is_likely_repo_context_key(key)
             values.extend(
-                iter_string_values(child, f"{path}.{safe_metadata_path_key(key, field_name)}", key, child_repo_context)
+                iter_string_values(
+                    child,
+                    f"{path}.{safe_metadata_path_key(key, field_name, in_repo_context)}",
+                    key,
+                    child_repo_context,
+                )
             )
     elif isinstance(value, list):
         for index, child in enumerate(value):
@@ -363,8 +389,8 @@ def validate_event(event: dict[str, Any], taxonomy: set[str], prefix: str) -> li
         unsafe = sorted(
             {
                 diagnostic
-                for key, parent_key in iter_key_contexts(event)
-                if (diagnostic := unsafe_metadata_key_diagnostic(key, parent_key))
+                for key, parent_key, in_repo_context in iter_key_contexts(event)
+                if (diagnostic := unsafe_metadata_key_diagnostic(key, parent_key, in_repo_context))
             }
         )
         for diagnostic in unsafe:

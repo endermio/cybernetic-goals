@@ -30,13 +30,13 @@ def redact_value(
     if isinstance(value, dict):
         clean: dict[str, Any] = {}
         for key, child in value.items():
-            if unsafe_metadata_key_reason(key, field_name):
-                redacted_fields.add(unsafe_metadata_key_diagnostic(key, field_name) or "unsafe field")
+            if unsafe_metadata_key_reason(key, field_name, in_repo_context):
+                redacted_fields.add(unsafe_metadata_key_diagnostic(key, field_name, in_repo_context) or "unsafe field")
                 continue
             child_repo_context = in_repo_context or is_likely_repo_context_key(key)
             clean_child = redact_value(child, redacted_fields, key, child_repo_context)
             if clean_child is REDACTED:
-                redacted_fields.add(unsafe_metadata_key_diagnostic(key, field_name) or str(key))
+                redacted_fields.add(unsafe_metadata_key_diagnostic(key, field_name, in_repo_context) or str(key))
                 continue
             clean[key] = clean_child
         return clean
