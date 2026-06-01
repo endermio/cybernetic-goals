@@ -158,6 +158,45 @@ class ValidateRunEventsTest(unittest.TestCase):
             self.assertNotIn("acme_private_repo", output)
             self.assertNotIn("/home", output)
 
+    def test_metadata_only_sanitizes_hyphen_and_camel_composite_unsafe_key_diagnostics(self):
+        for key, reason in (
+            ("repoName-acme-private-repo", "repo_name"),
+            ("repositoryName-acme-private-repo", "repository_name"),
+            ("rawResponse-acme-private-repo", "raw_response"),
+            ("repoNameAcmePrivateRepo", "repo_name"),
+        ):
+            unsafe = {
+                "schema_version": "1.0.0",
+                "event_id": "evt_hyphen_camel_composite_unsafe_key",
+                "event": "skill_invoked",
+                "timestamp": "2026-06-01T00:00:00Z",
+                "privacy_mode": "metadata_only",
+                "machine_id": "anon-12345678",
+                "skill_pack": {"source_commit": "abc1234"},
+                "skill": "routing-cybernetic-workflows",
+                "status": "success",
+                "task_hash": "sha256:" + "6" * 64,
+                key: {"details": "/home/ender/private/repo"},
+            }
+
+            with tempfile.NamedTemporaryFile("w", suffix=".json", delete=False) as tmp:
+                json.dump(unsafe, tmp)
+                tmp_path = tmp.name
+
+            try:
+                result = self.run_validator(tmp_path)
+            finally:
+                Path(tmp_path).unlink(missing_ok=True)
+
+            output = result.stdout + result.stderr
+            self.assertNotEqual(result.returncode, 0)
+            self.assertIn(f"unsafe field unsafe key ({reason})", output)
+            self.assertIn("unsafe metadata-only value at $.<unsafe-key>.details", output)
+            self.assertNotIn(key, output)
+            self.assertNotIn("acme-private-repo", output)
+            self.assertNotIn("AcmePrivateRepo", output)
+            self.assertNotIn("/home", output)
+
     def test_metadata_only_sanitizes_composite_unsafe_key_in_value_path(self):
         unsafe = {
             "schema_version": "1.0.0",

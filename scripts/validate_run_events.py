@@ -281,6 +281,18 @@ def unsafe_metadata_key_phrase_reason(key: Any) -> tuple[str, bool] | None:
     return None
 
 
+def unsafe_metadata_key_phrase_requires_sanitized_diagnostic(key: Any) -> bool:
+    tokens = tokenize_metadata_key(key)
+    for phrase, _reason in UNSAFE_METADATA_ONLY_KEY_PHRASES:
+        for index in range(0, len(tokens) - len(phrase) + 1):
+            if tuple(tokens[index : index + len(phrase)]) != phrase:
+                continue
+            suffix_tokens = tokens[:index] + tokens[index + len(phrase) :]
+            if suffix_tokens and any(token in REPO_CONTEXT_TOKENS or token == "private" for token in suffix_tokens):
+                return True
+    return False
+
+
 def iter_key_contexts(
     value: Any,
     parent_key: Any | None = None,
@@ -344,7 +356,7 @@ def unsafe_metadata_key_diagnostic(
     phrase_reason = unsafe_metadata_key_phrase_reason(key)
     if phrase_reason:
         _phrase_label, is_composite = phrase_reason
-        if is_composite and "_" in str(key):
+        if is_composite and unsafe_metadata_key_phrase_requires_sanitized_diagnostic(key):
             return f"unsafe key ({reason})"
     return str(key)
 
@@ -510,7 +522,7 @@ def main() -> int:
 
     for path in args.paths:
         try:
-            events = load_events(path)
+            events = load_event_input(path, package_error_prefix=path)
         except (OSError, ValueError, json.JSONDecodeError) as exc:
             all_errors.append(f"{path}: {exc}")
             continue

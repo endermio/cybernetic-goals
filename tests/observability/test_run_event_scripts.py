@@ -215,6 +215,50 @@ class RunEventScriptsTest(unittest.TestCase):
         self.assertNotIn("rawResponse_acme_private_repo", output)
         self.assertNotIn("acme_private_repo", output)
 
+    def test_redactor_sanitizes_hyphen_and_camel_composite_unsafe_key_redacted_fields(self):
+        unsafe = json.loads(SAMPLE.read_text(encoding="utf-8"))
+        for key in (
+            "repoName-acme-private-repo",
+            "repositoryName-acme-private-repo",
+            "rawResponse-acme-private-repo",
+            "repoNameAcmePrivateRepo",
+        ):
+            unsafe[key] = {"details": "/home/ender/private/repo"}
+
+        with tempfile.NamedTemporaryFile("w", suffix=".json", delete=False) as tmp:
+            json.dump(unsafe, tmp)
+            tmp_path = tmp.name
+        try:
+            result = self.run_script(
+                "redact_run_event.py",
+                tmp_path,
+                "--mode",
+                "metadata_only",
+                "--dry-run",
+            )
+        finally:
+            Path(tmp_path).unlink(missing_ok=True)
+
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        payload = json.loads(result.stdout)
+        redacted_event = payload["events"][0]
+        for key in (
+            "repoName-acme-private-repo",
+            "repositoryName-acme-private-repo",
+            "rawResponse-acme-private-repo",
+            "repoNameAcmePrivateRepo",
+        ):
+            self.assertNotIn(key, redacted_event)
+        self.assertEqual(set(payload["redacted_fields"]), {"unsafe key (repo_name)", "unsafe key (repository_name)", "unsafe key (raw_response)"})
+        output = result.stdout + result.stderr
+        self.assertNotIn("repoName-acme-private-repo", output)
+        self.assertNotIn("repositoryName-acme-private-repo", output)
+        self.assertNotIn("rawResponse-acme-private-repo", output)
+        self.assertNotIn("repoNameAcmePrivateRepo", output)
+        self.assertNotIn("acme-private-repo", output)
+        self.assertNotIn("AcmePrivateRepo", output)
+        self.assertNotIn("/home", output)
+
     def test_redactor_removes_derivative_unsafe_field_variants_in_metadata_only_mode(self):
         unsafe = json.loads(SAMPLE.read_text(encoding="utf-8"))
         unsafe["prompt_text"] = "private task prompt"
@@ -793,6 +837,50 @@ class RunEventScriptsTest(unittest.TestCase):
             Path(input_path).unlink(missing_ok=True)
             Path(export_path).unlink(missing_ok=True)
 
+    def test_sync_export_sanitizes_hyphen_and_camel_composite_unsafe_keys(self):
+        unsafe = json.loads(SAMPLE.read_text(encoding="utf-8"))
+        unsafe["privacy_mode"] = "metadata_only"
+        for key in (
+            "repoName-acme-private-repo",
+            "repositoryName-acme-private-repo",
+            "rawResponse-acme-private-repo",
+            "repoNameAcmePrivateRepo",
+        ):
+            unsafe[key] = {"details": "/home/ender/private/repo"}
+
+        with tempfile.NamedTemporaryFile("w", suffix=".json", delete=False) as tmp:
+            json.dump(unsafe, tmp)
+            input_path = tmp.name
+        with tempfile.NamedTemporaryFile("w", suffix=".json", delete=False) as tmp:
+            export_path = tmp.name
+        Path(export_path).unlink(missing_ok=True)
+
+        try:
+            result = self.run_script(
+                "sync_run_events_to_github.py",
+                "--input",
+                input_path,
+                "--export-out",
+                export_path,
+            )
+            self.assertNotEqual(result.returncode, 0)
+            output = result.stdout + result.stderr
+            self.assertIn("unsafe field unsafe key (repo_name)", output)
+            self.assertIn("unsafe field unsafe key (repository_name)", output)
+            self.assertIn("unsafe field unsafe key (raw_response)", output)
+            self.assertIn("unsafe metadata-only value at $.<unsafe-key>.details", output)
+            self.assertNotIn("repoName-acme-private-repo", output)
+            self.assertNotIn("repositoryName-acme-private-repo", output)
+            self.assertNotIn("rawResponse-acme-private-repo", output)
+            self.assertNotIn("repoNameAcmePrivateRepo", output)
+            self.assertNotIn("acme-private-repo", output)
+            self.assertNotIn("AcmePrivateRepo", output)
+            self.assertNotIn("/home", output)
+            self.assertFalse(Path(export_path).exists())
+        finally:
+            Path(input_path).unlink(missing_ok=True)
+            Path(export_path).unlink(missing_ok=True)
+
     def test_sync_dry_run_reports_counts_without_upload(self):
         result = self.run_script(
             "sync_run_events_to_github.py",
@@ -846,6 +934,42 @@ class RunEventScriptsTest(unittest.TestCase):
         self.assertFalse(stdout_payload["would_upload"])
         self.assertEqual(export_payload["event_count"], 2)
         self.assertEqual(len(export_payload["events"]), 2)
+
+    def test_sync_export_package_validates_then_aggregates(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            input_path = Path(tmpdir) / "events.jsonl"
+            export_path = Path(tmpdir) / "export.json"
+            summary_path = Path(tmpdir) / "summary.json"
+            candidates_path = Path(tmpdir) / "candidates.json"
+            self.write_two_event_jsonl(input_path)
+
+            export = self.run_script(
+                "sync_run_events_to_github.py",
+                "--input",
+                str(input_path),
+                "--export-out",
+                str(export_path),
+            )
+            self.assertEqual(export.returncode, 0, export.stdout + export.stderr)
+
+            validation = self.run_script("validate_run_events.py", str(export_path))
+            self.assertEqual(validation.returncode, 0, validation.stdout + validation.stderr)
+            self.assertIn("validated 2 events", validation.stdout)
+
+            aggregate = self.run_script(
+                "aggregate_run_events.py",
+                "--input",
+                str(export_path),
+                "--out",
+                str(summary_path),
+                "--eval-candidates-out",
+                str(candidates_path),
+                "--dry-run",
+            )
+            self.assertEqual(aggregate.returncode, 0, aggregate.stdout + aggregate.stderr)
+            summary_payload = json.loads(summary_path.read_text(encoding="utf-8"))
+
+        self.assertEqual(summary_payload["event_count"], 2)
 
     def test_sync_dry_run_dominates_simulated_upload_without_ledger_writes(self):
         with tempfile.TemporaryDirectory() as tmpdir:

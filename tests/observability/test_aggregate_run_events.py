@@ -161,6 +161,42 @@ class AggregateRunEventsTest(unittest.TestCase):
         self.assertNotIn("acme_private_repo", output)
         self.assertNotIn("/home", output)
 
+    def test_dry_run_sanitizes_hyphen_and_camel_composite_unsafe_key_validation_output(self):
+        event = json.loads(SAMPLE.read_text(encoding="utf-8"))
+        event["repoName-acme-private-repo"] = {"details": "/home/ender/private/repo"}
+        event["repositoryName-acme-private-repo"] = {"details": "/home/ender/private/repo"}
+        event["rawResponse-acme-private-repo"] = {"details": "/home/ender/private/repo"}
+        event["repoNameAcmePrivateRepo"] = {"details": "/home/ender/private/repo"}
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            event_path = Path(tmpdir) / "event.json"
+            summary = Path(tmpdir) / "aggregation-summary.json"
+            candidates = Path(tmpdir) / "eval-candidates.json"
+            event_path.write_text(json.dumps(event), encoding="utf-8")
+            result = self.run_aggregate(
+                "--input",
+                str(event_path),
+                "--out",
+                str(summary),
+                "--eval-candidates-out",
+                str(candidates),
+                "--dry-run",
+            )
+
+        output = result.stdout + result.stderr
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("unsafe field unsafe key (repo_name)", output)
+        self.assertIn("unsafe field unsafe key (repository_name)", output)
+        self.assertIn("unsafe field unsafe key (raw_response)", output)
+        self.assertIn("unsafe metadata-only value at $.<unsafe-key>.details", output)
+        self.assertNotIn("repoName-acme-private-repo", output)
+        self.assertNotIn("repositoryName-acme-private-repo", output)
+        self.assertNotIn("rawResponse-acme-private-repo", output)
+        self.assertNotIn("repoNameAcmePrivateRepo", output)
+        self.assertNotIn("acme-private-repo", output)
+        self.assertNotIn("AcmePrivateRepo", output)
+        self.assertNotIn("/home", output)
+
 
 if __name__ == "__main__":
     unittest.main()
