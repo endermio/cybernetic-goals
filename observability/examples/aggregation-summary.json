@@ -1,0 +1,22 @@
+{
+  "candidate_count": 0,
+  "dry_run": true,
+  "event_count": 1,
+  "event_type_counts": {
+    "skill_invoked": 1
+  },
+  "generated_at": "2026-06-01T07:05:24Z",
+  "schema_version": "1.0.0",
+  "skill_counts": {
+    "routing-cybernetic-workflows": 1
+  },
+  "skill_pack_versions": [
+    "commit:unknown"
+  ],
+  "status_counts": {
+    "success": 1
+  },
+  "taxonomy_counts": {
+    "observability.metadata_only_recorded": 1
+  }
+}

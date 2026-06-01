@@ -75,11 +75,26 @@ For simple work, the router should reject the full pipeline and recommend an inl
 - `clarifying-cybernetic-tasks`: deprecated compatibility alias for `analyzing-cybernetic-requirements`.
 - `designing-cybernetic-solutions`: create a general solution/system model when Design Gate is required.
 - `orchestrating-cybernetic-pregoal`: orchestrate the pre-goal compilation chain after requirements analysis, including design dispatch when required.
+- `recording-cybernetic-run-outcomes`: record local metadata-only cybernetic run outcomes without upload or self-modification.
 - `cybernetic-superpowers-infrastructure`: define stage-specific Superpowers substrate dependencies and non-substitution rules.
 - `writing-cybernetic-goals`: create a control contract, not a runtime `/goal`, for complex work.
 - `writing-cybernetic-execution-policies`: create an execution policy / plan as a control law.
 - `reviewing-cybernetic-control-structures`: review requirements analysis, design when required, goal, and plan as a coherent control system.
 - `compiling-cybernetic-runtime-goals`: compile the final runtime `/goal` command only after approval gates pass.
+
+## Observability / meta-control
+
+The pack includes an optional local-first observability layer under `observability/`.
+
+Defaults:
+
+- local recording only;
+- `metadata_only` mode;
+- no raw prompt, content summary/excerpt, artifact body, code/log excerpt, credential, customer data, real path, or real repository name upload by default;
+- no network sync from ordinary skill execution;
+- no automatic skill modification, release publishing, or machine update.
+
+Manual sync and aggregation are script-driven. Cloud-side outputs are candidates for review, not accepted control-law changes.
 
 ## Scripts
 
@@ -89,6 +104,11 @@ The scripts are intentionally small and deterministic. They check structure and 
 - `check_pregoal_inputs.py`: check that orchestration starts from the expected requirements analysis input.
 - `control_chain_guard.py`: block premature runtime goal compilation.
 - `compile_runtime_goal.py`: compile the final executable `/goal` command from approved artifacts.
+- `validate_run_events.py`: validate metadata-only run-event files and taxonomy codes.
+- `record_run_event.py`: write or dry-run local metadata-only JSONL run events.
+- `redact_run_event.py`: remove unsafe fields before export.
+- `sync_run_events_to_github.py`: dry-run/export by default and refuse real upload unless explicitly configured.
+- `aggregate_run_events.py`: create non-live machine-readable aggregation summaries and eval-candidate packages.
 
 ## Why this structure exists
 

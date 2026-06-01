@@ -1,0 +1,76 @@
+import json
+import subprocess
+import sys
+import tempfile
+import unittest
+from pathlib import Path
+
+
+ROOT = Path(__file__).resolve().parents[2]
+SAMPLE = ROOT / "observability" / "examples" / "metadata-only-event.json"
+
+
+class AggregateRunEventsTest(unittest.TestCase):
+    def run_aggregate(self, *args):
+        return subprocess.run(
+            [sys.executable, str(ROOT / "scripts" / "aggregate_run_events.py"), *args],
+            cwd=ROOT,
+            text=True,
+            capture_output=True,
+        )
+
+    def test_dry_run_writes_machine_readable_summary_and_eval_candidates(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            summary = Path(tmpdir) / "aggregation-summary.json"
+            candidates = Path(tmpdir) / "eval-candidates.json"
+            result = self.run_aggregate(
+                "--input",
+                str(SAMPLE),
+                "--out",
+                str(summary),
+                "--eval-candidates-out",
+                str(candidates),
+                "--dry-run",
+            )
+            self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+
+            summary_payload = json.loads(summary.read_text(encoding="utf-8"))
+            candidates_payload = json.loads(candidates.read_text(encoding="utf-8"))
+
+        self.assertEqual(summary_payload["event_count"], 1)
+        self.assertEqual(summary_payload["taxonomy_counts"]["observability.metadata_only_recorded"], 1)
+        self.assertIn("skill_pack_versions", summary_payload)
+        self.assertEqual(candidates_payload["schema_version"], "1.0.0")
+        self.assertIn("candidates", candidates_payload)
+
+    def test_failure_taxonomy_code_generates_eval_candidate(self):
+        event = json.loads(SAMPLE.read_text(encoding="utf-8"))
+        event["event_id"] = "evt_failure_candidate"
+        event["event"] = "blocked"
+        event["status"] = "blocked"
+        event["taxonomy_codes"] = ["routing.over_control"]
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            event_path = Path(tmpdir) / "event.json"
+            summary = Path(tmpdir) / "aggregation-summary.json"
+            candidates = Path(tmpdir) / "eval-candidates.json"
+            event_path.write_text(json.dumps(event), encoding="utf-8")
+            result = self.run_aggregate(
+                "--input",
+                str(event_path),
+                "--out",
+                str(summary),
+                "--eval-candidates-out",
+                str(candidates),
+                "--dry-run",
+            )
+            self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+            candidates_payload = json.loads(candidates.read_text(encoding="utf-8"))
+
+        self.assertEqual(len(candidates_payload["candidates"]), 1)
+        self.assertEqual(candidates_payload["candidates"][0]["taxonomy_code"], "routing.over_control")
+        self.assertIn("assertions", candidates_payload["candidates"][0])
+
+
+if __name__ == "__main__":
+    unittest.main()

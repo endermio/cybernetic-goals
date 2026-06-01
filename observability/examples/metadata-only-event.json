@@ -1,0 +1,21 @@
+{
+  "schema_version": "1.0.0",
+  "event_id": "evt_20260601_metadata_only_sample",
+  "event": "skill_invoked",
+  "timestamp": "2026-06-01T00:00:00Z",
+  "privacy_mode": "metadata_only",
+  "machine_id": "anon-7f3a2c1d",
+  "skill_pack": {
+    "release": null,
+    "source_commit": "unknown"
+  },
+  "skill": "routing-cybernetic-workflows",
+  "status": "success",
+  "task_hash": "sha256:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
+  "input_class": "routing",
+  "explicit_user_invocation": true,
+  "taxonomy_codes": [
+    "observability.metadata_only_recorded"
+  ],
+  "created_artifacts": []
+}

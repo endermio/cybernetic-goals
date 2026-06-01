@@ -1,0 +1,98 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/cybernetic-goals/run-event.schema.json",
+  "title": "Cybernetic Run Event",
+  "type": "object",
+  "additionalProperties": true,
+  "required": [
+    "schema_version",
+    "event_id",
+    "event",
+    "timestamp",
+    "privacy_mode",
+    "machine_id",
+    "skill_pack",
+    "task_hash"
+  ],
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "const": "1.0.0"
+    },
+    "event_id": {
+      "type": "string",
+      "pattern": "^evt_[A-Za-z0-9_.-]+$"
+    },
+    "event": {
+      "type": "string",
+      "enum": [
+        "skill_invoked",
+        "route_decided",
+        "artifact_created",
+        "blocked",
+        "human_feedback",
+        "runtime_outcome"
+      ]
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "privacy_mode": {
+      "type": "string",
+      "enum": [
+        "metadata_only",
+        "redacted_content_opt_in"
+      ]
+    },
+    "machine_id": {
+      "type": "string",
+      "pattern": "^anon-[A-Za-z0-9_.-]+$"
+    },
+    "skill_pack": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "release": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "source_commit": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "anyOf": [
+        {
+          "required": [
+            "release"
+          ]
+        },
+        {
+          "required": [
+            "source_commit"
+          ]
+        }
+      ]
+    },
+    "skill": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string"
+    },
+    "task_hash": {
+      "type": "string",
+      "pattern": "^sha256:[a-f0-9]{64}$"
+    },
+    "taxonomy_codes": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "uniqueItems": true
+    }
+  }
+}

@@ -1,0 +1,60 @@
+# Cybernetic run outcome failure taxonomy.
+#
+# This file is intentionally simple YAML so repository-local scripts can parse it
+# without third-party dependencies. Codes are stable process-improvement labels.
+
+routing:
+  - over_control
+  - under_control
+  - wrong_level
+  - missing_gate
+  - unnecessary_gate
+
+requirements:
+  - asked_low_value_questions
+  - missed_rubric
+  - missed_design_gate
+  - missed_output_contract
+  - mixed_design_into_requirements
+
+design:
+  - adapter_terms_leaked_into_core
+  - design_missing_evidence_model
+  - design_over_specified_tactics
+  - design_under_specified_boundaries
+
+goal:
+  - emitted_runtime_goal_too_early
+  - missing_stop_conditions
+  - missing_source_contracts
+  - bounded_goal_over_escalated
+  - output_contract_weakened
+
+execution_policy:
+  - missing_planning_substrate
+  - redesigned_solution
+  - sensor_governance_missing
+  - batch_cadence_too_small
+  - batch_cadence_too_large
+  - sensor_overcoupled
+
+review:
+  - self_approved
+  - missing_final_observer
+  - lint_treated_as_semantic_review
+  - review_not_converged
+
+runtime:
+  - reinterpreted_requirements
+  - rewrote_control_strategy
+  - replaced_sensors
+  - completed_without_verification
+  - side_observer_needed
+
+observability:
+  - metadata_only_recorded
+  - unsafe_content_rejected
+  - redaction_required
+  - sync_blocked_missing_config
+  - duplicate_sync_refused
+  - aggregation_candidate_created
