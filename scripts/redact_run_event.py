@@ -59,7 +59,7 @@ def main() -> int:
     redacted_fields: set[str] = set()
     clean_events: list[dict[str, Any]] = []
     for event in events:
-        clean = redact_value(event, redacted_fields) if args.mode == "metadata_only" else event
+        clean = redact_value(event, redacted_fields)
         clean["privacy_mode"] = args.mode
         errors = validate_event(clean, set(), "event")
         if errors:

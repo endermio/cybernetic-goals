@@ -293,14 +293,18 @@ def validate_event(event: dict[str, Any], taxonomy: set[str], prefix: str) -> li
         for code in unknown:
             errors.append(f"{prefix}: unknown taxonomy code {code}")
 
-    if event.get("privacy_mode") == "metadata_only":
+    privacy_mode = event.get("privacy_mode")
+    if privacy_mode in {"metadata_only", "redacted_content_opt_in"}:
         unsafe = sorted({key for key in iter_keys(event) if unsafe_metadata_key_reason(key)})
         for key in unsafe:
-            errors.append(f"{prefix}: metadata_only event contains unsafe field {key}")
+            errors.append(f"{prefix}: {privacy_mode} event contains unsafe field {key}")
         for path, value in iter_string_values(event):
             reason = unsafe_metadata_value_reason(value)
             if reason:
-                errors.append(f"{prefix}: unsafe metadata-only value at {path} ({reason})")
+                if privacy_mode == "metadata_only":
+                    errors.append(f"{prefix}: unsafe metadata-only value at {path} ({reason})")
+                else:
+                    errors.append(f"{prefix}: unsafe redacted_content_opt_in value at {path} ({reason})")
 
     return errors
 

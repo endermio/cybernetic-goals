@@ -215,6 +215,35 @@ class ValidateRunEventsTest(unittest.TestCase):
         self.assertNotEqual(result.returncode, 0)
         self.assertIn("unsafe metadata-only value", output)
 
+    def test_redacted_content_opt_in_rejects_raw_unsafe_fields(self):
+        unsafe = {
+            "schema_version": "1.0.0",
+            "event_id": "evt_unsafe_redacted_opt_in",
+            "event": "skill_invoked",
+            "timestamp": "2026-06-01T00:00:00Z",
+            "privacy_mode": "redacted_content_opt_in",
+            "machine_id": "anon-12345678",
+            "skill_pack": {"source_commit": "abc1234"},
+            "skill": "routing-cybernetic-workflows",
+            "status": "success",
+            "task_hash": "sha256:" + "1" * 64,
+            "raw_prompt": "private task prompt",
+        }
+
+        with tempfile.NamedTemporaryFile("w", suffix=".json", delete=False) as tmp:
+            json.dump(unsafe, tmp)
+            tmp_path = tmp.name
+
+        try:
+            result = self.run_validator(tmp_path)
+        finally:
+            Path(tmp_path).unlink(missing_ok=True)
+
+        output = result.stdout + result.stderr
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("redacted_content_opt_in", output)
+        self.assertIn("raw_prompt", output)
+
     def test_rejects_hostname_like_machine_id(self):
         unsafe = {
             "schema_version": "1.0.0",

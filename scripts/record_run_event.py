@@ -73,6 +73,9 @@ def default_task_hash(args: argparse.Namespace) -> str:
 
 def build_event(args: argparse.Namespace) -> dict[str, Any]:
     state_dir = Path(args.state_dir) if args.state_dir else default_state_dir()
+    skill_pack = {"source_commit": args.source_commit or git_source_commit()}
+    if args.release:
+        skill_pack["release"] = args.release
     event: dict[str, Any] = {
         "schema_version": "1.0.0",
         "event_id": args.event_id or f"evt_{datetime.now(timezone.utc).strftime('%Y%m%d%H%M%S')}_{uuid.uuid4().hex[:8]}",
@@ -80,10 +83,7 @@ def build_event(args: argparse.Namespace) -> dict[str, Any]:
         "timestamp": args.timestamp or utc_now(),
         "privacy_mode": "metadata_only",
         "machine_id": args.machine_id or load_or_create_machine_id(state_dir, args.dry_run),
-        "skill_pack": {
-            "release": args.release,
-            "source_commit": args.source_commit or git_source_commit(),
-        },
+        "skill_pack": skill_pack,
         "task_hash": args.task_hash or default_task_hash(args),
     }
     if args.skill:
