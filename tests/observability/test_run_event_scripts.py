@@ -148,6 +148,9 @@ class RunEventScriptsTest(unittest.TestCase):
         unsafe["rawPromptText"] = "private raw task prompt"
         unsafe["contentSummaries"] = ["private summary"]
         unsafe["contentExcerptText"] = "private excerpt"
+        unsafe["promptExamples"] = ["private prompt example"]
+        unsafe["contentExamples"] = ["private content example"]
+        unsafe["artifactExamples"] = ["private artifact example"]
         unsafe["codeSnippet"] = "private code"
         unsafe["logExcerptText"] = "private log"
         unsafe["artifactBodyText"] = "private artifact body"
@@ -180,6 +183,9 @@ class RunEventScriptsTest(unittest.TestCase):
             "rawPromptText",
             "contentSummaries",
             "contentExcerptText",
+            "promptExamples",
+            "contentExamples",
+            "artifactExamples",
             "codeSnippet",
             "logExcerptText",
             "artifactBodyText",

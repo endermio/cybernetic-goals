@@ -75,15 +75,18 @@ UNSAFE_METADATA_ONLY_KEY_TOKENS = {
 
 UNSAFE_METADATA_ONLY_KEY_PHRASES = (
     (("artifact", "body"), "artifact_body"),
+    (("artifact", "example"), "artifact_example"),
     (("code", "excerpt"), "code_excerpt"),
     (("code", "snippet"), "code_snippet"),
     (("code", "text"), "code"),
     (("content", "excerpt"), "content_excerpt"),
+    (("content", "example"), "content_example"),
     (("content", "summary"), "content_summary"),
     (("customer", "data"), "customer_data"),
     (("log", "excerpt"), "log_excerpt"),
     (("log", "text"), "log"),
     (("prompt", "text"), "prompt"),
+    (("prompt", "example"), "prompt_example"),
     (("raw", "prompt"), "raw_prompt"),
     (("real", "path"), "real_path"),
     (("real", "repo"), "real_repo"),
