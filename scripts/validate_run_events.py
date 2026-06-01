@@ -193,6 +193,9 @@ def iter_keys(value: Any) -> list[str]:
 
 
 def unsafe_metadata_key_reason(key: Any) -> str | None:
+    string_pattern_reason = unsafe_metadata_value_reason(str(key))
+    if string_pattern_reason:
+        return string_pattern_reason
     normalized = normalize_metadata_key(key)
     if normalized in NORMALIZED_UNSAFE_METADATA_ONLY_KEYS:
         return str(key)

@@ -225,6 +225,43 @@ class RunEventScriptsTest(unittest.TestCase):
         self.assertNotIn("details", redacted_event)
         self.assertEqual(payload["redacted_fields"], ["details"])
 
+    def test_redactor_removes_dynamic_keys_that_match_unsafe_string_patterns(self):
+        unsafe = json.loads(SAMPLE.read_text(encoding="utf-8"))
+        unsafe["artifacts"] = {
+            "/home/ender/private/repo/file.txt": {"kind": "summary"},
+            "safe_artifact_count": 1,
+        }
+        unsafe["repositories"] = {
+            "github.com/acme/private-repo": {"status": "recorded"},
+            "repository_count": 1,
+        }
+
+        with tempfile.NamedTemporaryFile("w", suffix=".json", delete=False) as tmp:
+            json.dump(unsafe, tmp)
+            tmp_path = tmp.name
+        try:
+            result = self.run_script(
+                "redact_run_event.py",
+                tmp_path,
+                "--mode",
+                "redacted_content_opt_in",
+                "--dry-run",
+            )
+        finally:
+            Path(tmp_path).unlink(missing_ok=True)
+
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        payload = json.loads(result.stdout)
+        redacted_event = payload["events"][0]
+        self.assertNotIn("/home/ender/private/repo/file.txt", redacted_event["artifacts"])
+        self.assertEqual(redacted_event["artifacts"]["safe_artifact_count"], 1)
+        self.assertNotIn("github.com/acme/private-repo", redacted_event["repositories"])
+        self.assertEqual(redacted_event["repositories"]["repository_count"], 1)
+        self.assertEqual(
+            set(payload["redacted_fields"]),
+            {"/home/ender/private/repo/file.txt", "github.com/acme/private-repo"},
+        )
+
     def test_redactor_removes_raw_prompt_in_redacted_content_opt_in_mode(self):
         unsafe = json.loads(SAMPLE.read_text(encoding="utf-8"))
         unsafe["raw_prompt"] = "private task prompt"
@@ -348,6 +385,35 @@ class RunEventScriptsTest(unittest.TestCase):
             )
             self.assertNotEqual(result.returncode, 0)
             self.assertIn("raw_response", result.stdout + result.stderr)
+            self.assertFalse(Path(export_path).exists())
+        finally:
+            Path(input_path).unlink(missing_ok=True)
+            Path(export_path).unlink(missing_ok=True)
+
+    def test_sync_export_refuses_unredacted_event_with_dynamic_unsafe_key(self):
+        unsafe = json.loads(SAMPLE.read_text(encoding="utf-8"))
+        unsafe["privacy_mode"] = "metadata_only"
+        unsafe["artifacts"] = {
+            "/home/ender/private/repo/file.txt": {"kind": "summary"},
+        }
+
+        with tempfile.NamedTemporaryFile("w", suffix=".json", delete=False) as tmp:
+            json.dump(unsafe, tmp)
+            input_path = tmp.name
+        with tempfile.NamedTemporaryFile("w", suffix=".json", delete=False) as tmp:
+            export_path = tmp.name
+        Path(export_path).unlink(missing_ok=True)
+
+        try:
+            result = self.run_script(
+                "sync_run_events_to_github.py",
+                "--input",
+                input_path,
+                "--export-out",
+                export_path,
+            )
+            self.assertNotEqual(result.returncode, 0)
+            self.assertIn("/home/ender/private/repo/file.txt", result.stdout + result.stderr)
             self.assertFalse(Path(export_path).exists())
         finally:
             Path(input_path).unlink(missing_ok=True)
