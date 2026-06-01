@@ -19,6 +19,16 @@ class AggregateRunEventsTest(unittest.TestCase):
             capture_output=True,
         )
 
+    def write_two_event_jsonl(self, path):
+        first = json.loads(SAMPLE.read_text(encoding="utf-8"))
+        second = dict(first)
+        second["event_id"] = "evt_jsonl_second"
+        second["event"] = "runtime_outcome"
+        path.write_text(
+            "\n".join(json.dumps(event) for event in (first, second)) + "\n",
+            encoding="utf-8",
+        )
+
     def test_dry_run_writes_machine_readable_summary_and_eval_candidates(self):
         with tempfile.TemporaryDirectory() as tmpdir:
             summary = Path(tmpdir) / "aggregation-summary.json"
@@ -42,6 +52,29 @@ class AggregateRunEventsTest(unittest.TestCase):
         self.assertIn("skill_pack_versions", summary_payload)
         self.assertEqual(candidates_payload["schema_version"], "1.0.0")
         self.assertIn("candidates", candidates_payload)
+
+    def test_dry_run_accepts_two_line_jsonl(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            input_path = Path(tmpdir) / "events.jsonl"
+            summary = Path(tmpdir) / "aggregation-summary.json"
+            candidates = Path(tmpdir) / "eval-candidates.json"
+            self.write_two_event_jsonl(input_path)
+
+            result = self.run_aggregate(
+                "--input",
+                str(input_path),
+                "--out",
+                str(summary),
+                "--eval-candidates-out",
+                str(candidates),
+                "--dry-run",
+            )
+            self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+            summary_payload = json.loads(summary.read_text(encoding="utf-8"))
+
+        self.assertEqual(summary_payload["event_count"], 2)
+        self.assertEqual(summary_payload["event_type_counts"]["runtime_outcome"], 1)
+        self.assertEqual(summary_payload["event_type_counts"]["skill_invoked"], 1)
 
     def test_generated_at_can_be_set_for_deterministic_outputs(self):
         generated_at = "2026-01-02T03:04:05Z"

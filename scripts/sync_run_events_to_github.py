@@ -16,7 +16,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
-from validate_run_events import load_events, validate_event
+from validate_run_events import load_event_input, validate_event
 
 
 def utc_now() -> str:
@@ -28,14 +28,7 @@ def default_state_dir() -> Path:
 
 
 def load_input(path: str) -> list[dict[str, Any]]:
-    text = Path(path).read_text(encoding="utf-8")
-    value = json.loads(text)
-    if isinstance(value, dict) and "events" in value:
-        events = value["events"]
-        if not isinstance(events, list) or not all(isinstance(event, dict) for event in events):
-            raise ValueError("package events must be an array of objects")
-        return events
-    return load_events(path)
+    return load_event_input(path)
 
 
 def validate_events(events: list[dict[str, Any]]) -> list[str]:

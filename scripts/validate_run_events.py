@@ -168,6 +168,16 @@ def load_taxonomy(path: str | None) -> set[str]:
     return taxonomy
 
 
+def events_from_json_value(path: str, value: Any) -> list[dict[str, Any]]:
+    if isinstance(value, list):
+        if not all(isinstance(item, dict) for item in value):
+            raise ValueError(f"{path}: all array items must be event objects")
+        return value
+    if isinstance(value, dict):
+        return [value]
+    raise ValueError(f"{path}: event file must contain an object or array")
+
+
 def load_events(path: str) -> list[dict[str, Any]]:
     text = Path(path).read_text(encoding="utf-8")
     if not text.strip():
@@ -183,14 +193,22 @@ def load_events(path: str) -> list[dict[str, Any]]:
             events.append(value)
         return events
 
+    return events_from_json_value(path, json.loads(text))
+
+
+def load_event_input(path: str, package_error_prefix: str | None = None) -> list[dict[str, Any]]:
+    if path.endswith(".jsonl"):
+        return load_events(path)
+
+    text = Path(path).read_text(encoding="utf-8")
     value = json.loads(text)
-    if isinstance(value, list):
-        if not all(isinstance(item, dict) for item in value):
-            raise ValueError(f"{path}: all array items must be event objects")
-        return value
-    if isinstance(value, dict):
-        return [value]
-    raise ValueError(f"{path}: event file must contain an object or array")
+    if isinstance(value, dict) and "events" in value:
+        events = value["events"]
+        if not isinstance(events, list) or not all(isinstance(event, dict) for event in events):
+            prefix = f"{package_error_prefix}: " if package_error_prefix else ""
+            raise ValueError(f"{prefix}package events must be an array of objects")
+        return events
+    return events_from_json_value(path, value)
 
 
 def is_likely_repo_context_key(key: Any) -> bool:

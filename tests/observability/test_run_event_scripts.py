@@ -24,6 +24,16 @@ class RunEventScriptsTest(unittest.TestCase):
             env=merged_env,
         )
 
+    def write_two_event_jsonl(self, path):
+        first = json.loads(SAMPLE.read_text(encoding="utf-8"))
+        second = dict(first)
+        second["event_id"] = "evt_jsonl_second"
+        second["event"] = "runtime_outcome"
+        path.write_text(
+            "\n".join(json.dumps(event) for event in (first, second)) + "\n",
+            encoding="utf-8",
+        )
+
     def test_record_run_event_dry_run_outputs_valid_metadata_only_event(self):
         result = self.run_script(
             "record_run_event.py",
@@ -727,6 +737,47 @@ class RunEventScriptsTest(unittest.TestCase):
         self.assertEqual(payload["mode"], "dry_run")
         self.assertEqual(payload["event_count"], 1)
         self.assertFalse(payload["would_upload"])
+
+    def test_sync_dry_run_accepts_two_line_jsonl_without_upload(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            input_path = Path(tmpdir) / "events.jsonl"
+            self.write_two_event_jsonl(input_path)
+
+            result = self.run_script(
+                "sync_run_events_to_github.py",
+                "--dry-run",
+                "--input",
+                str(input_path),
+            )
+            self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+            payload = json.loads(result.stdout)
+
+        self.assertEqual(payload["mode"], "dry_run")
+        self.assertEqual(payload["event_count"], 2)
+        self.assertFalse(payload["would_upload"])
+
+    def test_sync_export_accepts_two_line_jsonl_without_upload(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            input_path = Path(tmpdir) / "events.jsonl"
+            export_path = Path(tmpdir) / "export.json"
+            self.write_two_event_jsonl(input_path)
+
+            result = self.run_script(
+                "sync_run_events_to_github.py",
+                "--input",
+                str(input_path),
+                "--export-out",
+                str(export_path),
+            )
+            self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+            stdout_payload = json.loads(result.stdout)
+            export_payload = json.loads(export_path.read_text(encoding="utf-8"))
+
+        self.assertEqual(stdout_payload["mode"], "export")
+        self.assertEqual(stdout_payload["event_count"], 2)
+        self.assertFalse(stdout_payload["would_upload"])
+        self.assertEqual(export_payload["event_count"], 2)
+        self.assertEqual(len(export_payload["events"]), 2)
 
     def test_sync_dry_run_dominates_simulated_upload_without_ledger_writes(self):
         with tempfile.TemporaryDirectory() as tmpdir:

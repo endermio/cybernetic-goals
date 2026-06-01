@@ -14,7 +14,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
-from validate_run_events import load_taxonomy, load_events, validate_event
+from validate_run_events import load_event_input, load_taxonomy, validate_event
 
 
 DEFAULT_TAXONOMY = Path("observability/taxonomies/failure-taxonomy.yaml")
@@ -34,14 +34,7 @@ def utc_now() -> str:
 
 
 def load_input(path: str) -> list[dict[str, Any]]:
-    text = Path(path).read_text(encoding="utf-8")
-    value = json.loads(text)
-    if isinstance(value, dict) and "events" in value:
-        events = value["events"]
-        if not isinstance(events, list) or not all(isinstance(event, dict) for event in events):
-            raise ValueError(f"{path}: package events must be an array of objects")
-        return events
-    return load_events(path)
+    return load_event_input(path, package_error_prefix=path)
 
 
 def count_by(events: list[dict[str, Any]], field: str) -> dict[str, int]:
