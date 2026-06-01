@@ -77,7 +77,9 @@ UNSAFE_METADATA_ONLY_KEY_TOKENS = {
 RAW_CONTEXT_KEYS = {"raw"}
 RAW_CONTENT_DESCENDANT_KEYS = {
     "body",
+    "completion",
     "content",
+    "input",
     "message",
     "output",
     "request",
@@ -295,7 +297,7 @@ def load_event_input(path: str, package_error_prefix: str | None = None) -> list
 
     text = Path(path).read_text(encoding="utf-8")
     value = json.loads(text)
-    if isinstance(value, dict) and "events" in value:
+    if isinstance(value, dict) and "events" in value and not REQUIRED_FIELDS <= set(value):
         return validate_event_package(value, package_error_prefix)
     return events_from_json_value(path, value)
 
@@ -623,7 +625,8 @@ def validate_event(event: dict[str, Any], taxonomy: set[str], prefix: str) -> li
     privacy_mode = event.get("privacy_mode")
     if privacy_mode in {"metadata_only", "redacted_content_opt_in"}:
         unsafe = sorted(
-            {
+            ({"events"} if "events" in event else set())
+            | {
                 diagnostic
                 for key, parent_key, in_repo_context, in_raw_context in iter_key_contexts(event)
                 if (diagnostic := unsafe_metadata_key_diagnostic(key, parent_key, in_repo_context, in_raw_context))

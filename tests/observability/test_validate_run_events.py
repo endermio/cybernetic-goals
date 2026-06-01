@@ -605,6 +605,38 @@ class ValidateRunEventsTest(unittest.TestCase):
         self.assertIn("raw_response", output)
         self.assertNotIn("private", output)
 
+    def test_metadata_only_rejects_nested_raw_input_and_completion_without_echoing_values(self):
+        unsafe = {
+            "schema_version": "1.0.0",
+            "event_id": "evt_unsafe_nested_raw_input_completion",
+            "event": "skill_invoked",
+            "timestamp": "2026-06-01T00:00:00Z",
+            "privacy_mode": "metadata_only",
+            "machine_id": "anon-12345678",
+            "skill_pack": {"source_commit": "abc1234"},
+            "skill": "routing-cybernetic-workflows",
+            "status": "success",
+            "task_hash": "sha256:" + "d" * 64,
+            "raw": {"input": "private input", "completion": "private completion"},
+        }
+
+        with tempfile.NamedTemporaryFile("w", suffix=".json", delete=False) as tmp:
+            json.dump(unsafe, tmp)
+            tmp_path = tmp.name
+
+        try:
+            result = self.run_validator(tmp_path)
+        finally:
+            Path(tmp_path).unlink(missing_ok=True)
+
+        output = result.stdout + result.stderr
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("metadata_only", output)
+        self.assertIn("raw_input", output)
+        self.assertIn("raw_completion", output)
+        self.assertNotIn("private input", output)
+        self.assertNotIn("private completion", output)
+
     def test_redacted_content_opt_in_rejects_nested_raw_response_without_echoing_value(self):
         unsafe = {
             "schema_version": "1.0.0",
@@ -634,6 +666,26 @@ class ValidateRunEventsTest(unittest.TestCase):
         self.assertIn("redacted_content_opt_in", output)
         self.assertIn("raw_response", output)
         self.assertNotIn("private", output)
+
+    def test_top_level_events_metadata_key_rejected_consistently_for_json_and_jsonl(self):
+        event = json.loads(SAMPLE.read_text(encoding="utf-8"))
+        event["event_id"] = "evt_unsafe_events_metadata"
+        event["events"] = [{"count": 1}]
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            json_path = Path(tmpdir) / "event.json"
+            jsonl_path = Path(tmpdir) / "event.jsonl"
+            json_path.write_text(json.dumps(event), encoding="utf-8")
+            jsonl_path.write_text(json.dumps(event) + "\n", encoding="utf-8")
+
+            json_result = self.run_validator(str(json_path))
+            jsonl_result = self.run_validator(str(jsonl_path))
+
+        for result in (json_result, jsonl_result):
+            output = result.stdout + result.stderr
+            self.assertNotEqual(result.returncode, 0)
+            self.assertIn("metadata_only", output)
+            self.assertIn("unsafe field events", output)
 
     def test_metadata_only_rejects_unsafe_values_under_neutral_keys(self):
         unsafe = {
