@@ -97,7 +97,7 @@ Default topology rules:
 - Level 0/1: use `Main-only`.
 - Level 2: use `Main-only` unless the work is a wide inspection, audit, or verification pass; then use `Serial subagent-driven`.
 - Level 3: use `Serial subagent-driven` by default unless `Main-only` has an explicit context-load justification.
-- Level 4: use `Serial subagent-driven` by default. Use `Parallel subagent-driven` only with explicit human approval, dependency-matrix independence, and control-review approval.
+- Level 4: use `Serial subagent-driven` by default. Use `Parallel subagent-driven` only when human approval, dependency-matrix independence, and control-review approval are explicitly `yes` or `approved`.
 
 For every delegated work package, define:
 
@@ -276,7 +276,7 @@ Response-only next step:
 - [ ] Serial or parallel subagent-driven topology records an approved bounded subagent delegation substrate.
 - [ ] Serial or parallel subagent-driven topology does not use `Selected delegation substrate: none`.
 - [ ] `$superpowers:subagent-driven-development` is used only when `Selected delegation substrate` is `superpowers-subagent-driven-development` for compatible implementation-plan, current-session work packages.
-- [ ] Parallel subagent-driven execution has explicit human approval, dependency independence, and review approval.
+- [ ] Parallel subagent-driven execution records human approval, dependency independence, and review approval as explicitly `yes` or `approved`.
 - [ ] The plan includes Execution Granularity and Sensor Budget.
 - [ ] Batches are coherent target-state slices, not mechanical micro-steps.
 - [ ] The plan chooses the largest coherent batch that remains diagnosable.

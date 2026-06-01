@@ -235,6 +235,26 @@ def task_level(plan: str | None) -> int | None:
     return int(match.group(1))
 
 
+APPROVAL_YES_VALUES = {"yes", "y", "true", "approved", "是", "已批准", "批准"}
+
+
+def labeled_value(text: str, label: str) -> str | None:
+    patterns = [
+        rf"(?im)^\s*-\s*{re.escape(label)}\s*:\s*`?([^`\n]+?)`?\s*$",
+        rf"(?im)^\s*{re.escape(label)}\s*:\s*`?([^`\n]+?)`?\s*$",
+    ]
+    for pattern in patterns:
+        match = re.search(pattern, text)
+        if match:
+            return match.group(1).strip().strip("`")
+    return None
+
+
+def approval_value_is_yes(text: str, label: str) -> bool:
+    value = labeled_value(text, label)
+    return value is not None and value.casefold() in APPROVAL_YES_VALUES
+
+
 def labeled_block_has_content(text: str, label: str) -> bool:
     lines = text.splitlines()
     pattern = re.compile(rf"^\s*{re.escape(label)}\s*:\s*(.*?)\s*$", re.IGNORECASE)
@@ -350,6 +370,8 @@ def check_execution_topology(plan: str | None, errors: list[str]) -> None:
         errors.append("execution topology missing main-agent ownership")
 
     level = task_level(plan)
+    if level is None:
+        errors.append("execution topology missing Task level")
     if topology == "Main-only" and level in {3, 4} and not labeled_block_has_content(body, "Main-only context-load justification"):
         errors.append("Level 3/4 Main-only execution topology missing Main-only context-load justification")
 
@@ -370,8 +392,8 @@ def check_execution_topology(plan: str | None, errors: list[str]) -> None:
 
     if topology == "Parallel subagent-driven":
         for label in ("Human approval", "Dependency independence", "Control-review approval"):
-            if not labeled_block_has_content(body, label):
-                errors.append(f"parallel execution topology missing {label}")
+            if not approval_value_is_yes(body, label):
+                errors.append(f"parallel execution topology requires {label}: yes/approved")
 
 
 def check_final_observer(review: str, errors: list[str]) -> None:

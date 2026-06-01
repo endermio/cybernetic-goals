@@ -76,6 +76,75 @@ class ContextTopologySkillTest(unittest.TestCase):
             ]
         )
 
+    def complete_parallel_topology(
+        self,
+        *,
+        human_approval: str = "yes",
+        dependency_independence: str = "yes",
+        control_review_approval: str = "yes",
+    ) -> str:
+        return "\n".join(
+            [
+                "Selected topology: `Parallel subagent-driven`",
+                "",
+                "Task level: `Level 3`",
+                "",
+                "Selected delegation substrate: `bounded-protocol`",
+                "",
+                "Topology rationale:",
+                "",
+                "- Independent packages can run in parallel without shared control artifacts.",
+                "",
+                "Main agent owns:",
+                "",
+                "- approved control artifacts",
+                "- dispatch",
+                "- integration",
+                "- progress log",
+                "- stop-condition detection",
+                "",
+                "Delegation matrix:",
+                "",
+                "| Work package | Executor | Context pack | Allowed actions | Return format | Integration gate |",
+                "|---|---|---|---|---|---|",
+                "| Package A | parallel subagent | requirements, goal, plan | inspect area A | findings and evidence | main integrates result |",
+                "| Package B | parallel subagent | requirements, goal, plan | inspect area B | findings and evidence | main integrates result |",
+                "",
+                "Context Pack Requirements:",
+                "",
+                "| Field | Content |",
+                "|---|---|",
+                "| Relevant control excerpts | requirements success conditions, goal invariants, execution policy stop conditions |",
+                "| Current batch objective | complete independent bounded inspections |",
+                "| Allowed artifacts/surfaces | target files listed in each package scope |",
+                "| Forbidden changes | control artifacts, scope, topology, unrelated files |",
+                "| Required sensors/evidence | command output and evidence references |",
+                "| Stop conditions | missing context, invariant conflict, unauthorized scope change |",
+                "| Expected return format | summary, files inspected, evidence, blockers, next integration note |",
+                "",
+                "Subagent delegation substrate:",
+                "",
+                "- Approved bounded subagent delegation protocol for parallel bounded work packages.",
+                "",
+                "Parallel approval record:",
+                "",
+                f"- Human approval: `{human_approval}`",
+                f"- Dependency independence: `{dependency_independence}`",
+                f"- Control-review approval: `{control_review_approval}`",
+                "",
+                "Context Compression Rule:",
+                "",
+                "- Active control summary: summarize current requirements, goal invariants, topology, and stop conditions.",
+                "- Completed work packages: record packages integrated at the boundary.",
+                "- Subagent outputs integrated: record candidate outputs accepted into main progress state.",
+                "- Evidence produced: record evidence references and sensor interpretation.",
+                "- Deferred sensors and reasons: preserve policy-approved deferrals.",
+                "- Unresolved blockers: record blockers requiring revision or human input.",
+                "- Deviations from policy: record deviations and whether execution must stop.",
+                "- Next allowed action: record the next policy-approved action.",
+            ]
+        )
+
     def write_artifact_chain(
         self,
         tmp: Path,
@@ -583,6 +652,198 @@ class ContextTopologySkillTest(unittest.TestCase):
             output = result.stdout + result.stderr
             self.assertNotEqual(result.returncode, 0)
             self.assertIn("Main-only context-load justification", output)
+
+    def test_guards_reject_missing_task_level(self):
+        topology_body = "\n".join(
+            [
+                "Selected topology: `Main-only`",
+                "",
+                "Selected delegation substrate: `none`",
+                "",
+                "Topology rationale:",
+                "",
+                "- local bounded work",
+                "",
+                "Main agent owns:",
+                "",
+                "- approved control artifacts",
+                "- dispatch",
+                "- integration",
+                "- progress log",
+                "- stop-condition detection",
+                "",
+                "Context Compression Rule:",
+                "",
+                "- Active control summary: present.",
+                "- Completed work packages: present.",
+                "- Subagent outputs integrated: present.",
+                "- Evidence produced: present.",
+                "- Deferred sensors and reasons: present.",
+                "- Unresolved blockers: present.",
+                "- Deviations from policy: present.",
+                "- Next allowed action: present.",
+            ]
+        )
+        with tempfile.TemporaryDirectory() as tmpdir:
+            requirements, goal, plan, review = self.write_artifact_chain(Path(tmpdir), topology_body)
+
+            control_guard = subprocess.run(
+                [
+                    sys.executable,
+                    str(
+                        ROOT
+                        / ".agents/skills/compiling-cybernetic-runtime-goals/scripts/control_chain_guard.py"
+                    ),
+                    "--requirements",
+                    str(requirements),
+                    "--goal",
+                    str(goal),
+                    "--plan",
+                    str(plan),
+                    "--review",
+                    str(review),
+                ],
+                cwd=ROOT,
+                text=True,
+                capture_output=True,
+            )
+            orchestration_guard = subprocess.run(
+                [
+                    sys.executable,
+                    str(
+                        ROOT
+                        / ".agents/skills/orchestrating-cybernetic-pregoal/scripts/orchestration_guard.py"
+                    ),
+                    "--state",
+                    "before-review",
+                    "--requirements",
+                    str(requirements),
+                    "--goal",
+                    str(goal),
+                    "--plan",
+                    str(plan),
+                ],
+                cwd=ROOT,
+                text=True,
+                capture_output=True,
+            )
+
+        for result in (control_guard, orchestration_guard):
+            output = result.stdout + result.stderr
+            self.assertNotEqual(result.returncode, 0)
+            self.assertIn("Task level", output)
+
+    def test_guards_reject_parallel_approval_no_values(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            requirements, goal, plan, review = self.write_artifact_chain(
+                Path(tmpdir),
+                self.complete_parallel_topology(
+                    human_approval="no",
+                    dependency_independence="no",
+                    control_review_approval="no",
+                ).replace("- Human approval:", "Human approval:")
+                .replace("- Dependency independence:", "Dependency independence:")
+                .replace("- Control-review approval:", "Control-review approval:"),
+            )
+
+            control_guard = subprocess.run(
+                [
+                    sys.executable,
+                    str(
+                        ROOT
+                        / ".agents/skills/compiling-cybernetic-runtime-goals/scripts/control_chain_guard.py"
+                    ),
+                    "--requirements",
+                    str(requirements),
+                    "--goal",
+                    str(goal),
+                    "--plan",
+                    str(plan),
+                    "--review",
+                    str(review),
+                ],
+                cwd=ROOT,
+                text=True,
+                capture_output=True,
+            )
+            orchestration_guard = subprocess.run(
+                [
+                    sys.executable,
+                    str(
+                        ROOT
+                        / ".agents/skills/orchestrating-cybernetic-pregoal/scripts/orchestration_guard.py"
+                    ),
+                    "--state",
+                    "before-review",
+                    "--requirements",
+                    str(requirements),
+                    "--goal",
+                    str(goal),
+                    "--plan",
+                    str(plan),
+                ],
+                cwd=ROOT,
+                text=True,
+                capture_output=True,
+            )
+
+        for result in (control_guard, orchestration_guard):
+            output = result.stdout + result.stderr
+            self.assertNotEqual(result.returncode, 0)
+            self.assertIn("Human approval", output)
+            self.assertIn("Dependency independence", output)
+            self.assertIn("Control-review approval", output)
+
+    def test_guards_accept_parallel_approval_yes_values(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            requirements, goal, plan, review = self.write_artifact_chain(
+                Path(tmpdir),
+                self.complete_parallel_topology(),
+            )
+
+            control_guard = subprocess.run(
+                [
+                    sys.executable,
+                    str(
+                        ROOT
+                        / ".agents/skills/compiling-cybernetic-runtime-goals/scripts/control_chain_guard.py"
+                    ),
+                    "--requirements",
+                    str(requirements),
+                    "--goal",
+                    str(goal),
+                    "--plan",
+                    str(plan),
+                    "--review",
+                    str(review),
+                ],
+                cwd=ROOT,
+                text=True,
+                capture_output=True,
+            )
+            orchestration_guard = subprocess.run(
+                [
+                    sys.executable,
+                    str(
+                        ROOT
+                        / ".agents/skills/orchestrating-cybernetic-pregoal/scripts/orchestration_guard.py"
+                    ),
+                    "--state",
+                    "before-review",
+                    "--requirements",
+                    str(requirements),
+                    "--goal",
+                    str(goal),
+                    "--plan",
+                    str(plan),
+                ],
+                cwd=ROOT,
+                text=True,
+                capture_output=True,
+            )
+
+        self.assertEqual(control_guard.returncode, 0, control_guard.stdout + control_guard.stderr)
+        self.assertEqual(orchestration_guard.returncode, 0, orchestration_guard.stdout + orchestration_guard.stderr)
 
     def test_guards_reject_weak_context_pack_requirements(self):
         weak_topology = "\n".join(

@@ -111,15 +111,15 @@ Subagent delegation substrate:
 
 Parallel approval record:
 
-- Human approval: `[required only for Parallel subagent-driven]`
-- Dependency independence: `[required only for Parallel subagent-driven]`
-- Control-review approval: `[required only for Parallel subagent-driven]`
+- Human approval: `[yes/no; yes or approved required for Parallel subagent-driven]`
+- Dependency independence: `[yes/no; yes or approved required for Parallel subagent-driven]`
+- Control-review approval: `[yes/no; yes or approved required for Parallel subagent-driven]`
 
 Rules:
 
 - Use `Main-only` for small, local, low-context work.
 - Use `Serial subagent-driven` when Level 2 wide inspection or Level 3/4 context load would overload the main agent.
-- Use `Parallel subagent-driven` only when dependency independence is explicit and human + control-review approval exists.
+- Use `Parallel subagent-driven` only when Human approval, Dependency independence, and Control-review approval are explicitly `yes` or `approved`.
 - The main agent must coordinate, integrate, maintain the progress log, and detect stop conditions.
 - A subagent must not modify control artifacts, widen scope, replace topology, or bypass the integration gate.
 - Do not treat `$superpowers:subagent-driven-development` as the generic delegation substrate; it applies only when `Selected delegation substrate` is `superpowers-subagent-driven-development` for compatible implementation-plan work packages.

@@ -145,6 +145,30 @@
         "Keeps the main agent responsible for coordination, integration, progress log, and stop-condition detection.",
         "States that subagent outputs are candidate results until main-agent integration."
       ]
+    },
+    {
+      "id": "guard-rejects-missing-task-level-in-topology",
+      "prompt": "requirements analysis Complete, goal exists, execution policy selects Main-only topology but omits Task level. control review Approved and Final Observer Check allows approval；编译最终 /goal。",
+      "expected_output": "Refuse to compile runtime /goal because the execution topology does not record Task level, and route back to execution-policy revision.",
+      "assertions": [
+        "Does not output final /goal.",
+        "Reports missing Task level in Context Management / Execution Topology.",
+        "Does not let missing Task level bypass Level 3/4 Main-only context-load justification.",
+        "Includes a response-only next step to revise the execution policy."
+      ]
+    },
+    {
+      "id": "guard-rejects-parallel-approval-no-values",
+      "prompt": "requirements analysis Complete, goal exists, execution policy selects Parallel subagent-driven topology and records Human approval: no, Dependency independence: no, and Control-review approval: no. control review Approved and Final Observer Check allows approval；编译最终 /goal。",
+      "expected_output": "Refuse to compile runtime /goal because parallel topology requires Human approval, Dependency independence, and Control-review approval to be explicitly yes or approved.",
+      "assertions": [
+        "Does not output final /goal.",
+        "Reports Human approval is not yes/approved.",
+        "Reports Dependency independence is not yes/approved.",
+        "Reports Control-review approval is not yes/approved.",
+        "Does not treat non-empty approval fields as approval.",
+        "Includes a response-only next step to revise the execution policy or choose serial topology."
+      ]
     }
   ]
 }
