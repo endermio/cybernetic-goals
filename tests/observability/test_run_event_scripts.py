@@ -142,6 +142,46 @@ class RunEventScriptsTest(unittest.TestCase):
             {"Raw_Prompt", "rawPrompt", "contentSummary", "Repository_Name"},
         )
 
+    def test_redactor_removes_derivative_unsafe_field_variants_in_metadata_only_mode(self):
+        unsafe = json.loads(SAMPLE.read_text(encoding="utf-8"))
+        unsafe["prompt_text"] = "private task prompt"
+        unsafe["rawPromptText"] = "private raw task prompt"
+        unsafe["contentSummaries"] = ["private summary"]
+        unsafe["contentExcerptText"] = "private excerpt"
+        unsafe["codeSnippet"] = "private code"
+        unsafe["logExcerptText"] = "private log"
+        unsafe["artifactBodyText"] = "private artifact body"
+
+        with tempfile.NamedTemporaryFile("w", suffix=".json", delete=False) as tmp:
+            json.dump(unsafe, tmp)
+            tmp_path = tmp.name
+        try:
+            result = self.run_script(
+                "redact_run_event.py",
+                tmp_path,
+                "--mode",
+                "metadata_only",
+                "--dry-run",
+            )
+        finally:
+            Path(tmp_path).unlink(missing_ok=True)
+
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        payload = json.loads(result.stdout)
+        redacted_event = payload["events"][0]
+        expected_fields = {
+            "prompt_text",
+            "rawPromptText",
+            "contentSummaries",
+            "contentExcerptText",
+            "codeSnippet",
+            "logExcerptText",
+            "artifactBodyText",
+        }
+        for key in expected_fields:
+            self.assertNotIn(key, redacted_event)
+        self.assertEqual(set(payload["redacted_fields"]), expected_fields)
+
     def test_redactor_removes_unsafe_values_under_neutral_keys(self):
         unsafe = json.loads(SAMPLE.read_text(encoding="utf-8"))
         unsafe["details"] = "failed while reading /home/ender/private/repo"

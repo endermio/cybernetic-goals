@@ -66,6 +66,20 @@ NORMALIZED_UNSAFE_METADATA_ONLY_KEYS = {
     re.sub(r"[^0-9a-z]+", "", key.casefold()) for key in UNSAFE_METADATA_ONLY_KEYS
 }
 
+UNSAFE_METADATA_ONLY_KEY_STEMS = (
+    ("artifactbod", "artifact_body"),
+    ("codeexcerpt", "code_excerpt"),
+    ("codesnippet", "code_snippet"),
+    ("contentexcerpt", "content_excerpt"),
+    ("contentsummar", "content_summary"),
+    ("credential", "credential"),
+    ("logexcerpt", "log_excerpt"),
+    ("rawprompt", "raw_prompt"),
+    ("repositoryname", "repository_name"),
+    ("reponame", "repo_name"),
+    ("prompt", "prompt"),
+)
+
 TASK_HASH_RE = re.compile(r"^sha256:[a-f0-9]{64}$")
 EVENT_ID_RE = re.compile(r"^evt_[A-Za-z0-9_.-]+$")
 MACHINE_ID_RE = re.compile(r"^anon-[A-Za-z0-9_.-]+$")
@@ -140,6 +154,9 @@ def unsafe_metadata_key_reason(key: Any) -> str | None:
     normalized = normalize_metadata_key(key)
     if normalized in NORMALIZED_UNSAFE_METADATA_ONLY_KEYS:
         return str(key)
+    for stem, reason in UNSAFE_METADATA_ONLY_KEY_STEMS:
+        if stem in normalized:
+            return reason
     return None
 
 

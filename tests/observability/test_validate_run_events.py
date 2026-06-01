@@ -90,6 +90,80 @@ class ValidateRunEventsTest(unittest.TestCase):
         self.assertIn("contentSummary", output)
         self.assertIn("Repository_Name", output)
 
+    def test_metadata_only_rejects_derivative_unsafe_field_variants(self):
+        unsafe = {
+            "schema_version": "1.0.0",
+            "event_id": "evt_unsafe_derivative_key_variants",
+            "event": "skill_invoked",
+            "timestamp": "2026-06-01T00:00:00Z",
+            "privacy_mode": "metadata_only",
+            "machine_id": "anon-12345678",
+            "skill_pack": {"source_commit": "abc1234"},
+            "skill": "routing-cybernetic-workflows",
+            "status": "success",
+            "task_hash": "sha256:" + "9" * 64,
+            "prompt_text": "private task prompt",
+            "rawPromptText": "private raw task prompt",
+            "contentSummaries": ["private summary"],
+            "contentExcerptText": "private excerpt",
+            "codeSnippet": "private code",
+            "logExcerptText": "private log",
+            "artifactBodyText": "private artifact body",
+        }
+
+        with tempfile.NamedTemporaryFile("w", suffix=".json", delete=False) as tmp:
+            json.dump(unsafe, tmp)
+            tmp_path = tmp.name
+
+        try:
+            result = self.run_validator(tmp_path)
+        finally:
+            Path(tmp_path).unlink(missing_ok=True)
+
+        output = result.stdout + result.stderr
+        self.assertNotEqual(result.returncode, 0)
+        for key in (
+            "prompt_text",
+            "rawPromptText",
+            "contentSummaries",
+            "contentExcerptText",
+            "codeSnippet",
+            "logExcerptText",
+            "artifactBodyText",
+        ):
+            self.assertIn(key, output)
+
+    def test_metadata_only_accepts_safe_structured_keys_with_new_derivative_logic(self):
+        safe = {
+            "schema_version": "1.0.0",
+            "event_id": "evt_safe_structured_keys",
+            "event": "runtime_outcome",
+            "timestamp": "2026-06-01T00:00:00Z",
+            "privacy_mode": "metadata_only",
+            "machine_id": "anon-12345678",
+            "skill_pack": {"source_commit": "abc1234"},
+            "status": "success",
+            "task_hash": "sha256:" + "8" * 64,
+            "failure_taxonomy": "sync.transport.timeout",
+            "event_id_alias": "evt_alias",
+            "skill_pack_alias": {"release": "v1.2.3"},
+            "created_artifacts": [{"kind": "summary", "count": 1}],
+            "blocked_reason": "waiting_for_review",
+            "final_state": "recorded",
+            "required_gates": ["compile", "unit"],
+        }
+
+        with tempfile.NamedTemporaryFile("w", suffix=".json", delete=False) as tmp:
+            json.dump(safe, tmp)
+            tmp_path = tmp.name
+
+        try:
+            result = self.run_validator(tmp_path)
+        finally:
+            Path(tmp_path).unlink(missing_ok=True)
+
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+
     def test_metadata_only_rejects_unsafe_values_under_neutral_keys(self):
         unsafe = {
             "schema_version": "1.0.0",
