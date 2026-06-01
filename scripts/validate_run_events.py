@@ -62,6 +62,10 @@ UNSAFE_METADATA_ONLY_KEYS = {
     "token",
 }
 
+NORMALIZED_UNSAFE_METADATA_ONLY_KEYS = {
+    re.sub(r"[^0-9a-z]+", "", key.casefold()) for key in UNSAFE_METADATA_ONLY_KEYS
+}
+
 TASK_HASH_RE = re.compile(r"^sha256:[a-f0-9]{64}$")
 EVENT_ID_RE = re.compile(r"^evt_[A-Za-z0-9_.-]+$")
 MACHINE_ID_RE = re.compile(r"^anon-[A-Za-z0-9_.-]+$")
@@ -71,6 +75,10 @@ UNSAFE_METADATA_ONLY_VALUE_PATTERNS = (
     ("real_path", re.compile(r"(?<![A-Za-z0-9])(?:/home/|/Users/|/private/|/var/log/|/etc/|[A-Za-z]:\\)[^\s,;]*")),
     ("real_repo", re.compile(r"\b(?:github|gitlab|bitbucket)\.com[:/][A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+")),
 )
+
+
+def normalize_metadata_key(key: Any) -> str:
+    return re.sub(r"[^0-9a-z]+", "", str(key).casefold())
 
 
 def load_taxonomy(path: str | None) -> set[str]:
@@ -126,6 +134,13 @@ def iter_keys(value: Any) -> list[str]:
         for child in value:
             keys.extend(iter_keys(child))
     return keys
+
+
+def unsafe_metadata_key_reason(key: Any) -> str | None:
+    normalized = normalize_metadata_key(key)
+    if normalized in NORMALIZED_UNSAFE_METADATA_ONLY_KEYS:
+        return str(key)
+    return None
 
 
 def unsafe_metadata_value_reason(value: Any) -> str | None:
@@ -225,7 +240,7 @@ def validate_event(event: dict[str, Any], taxonomy: set[str], prefix: str) -> li
             errors.append(f"{prefix}: unknown taxonomy code {code}")
 
     if event.get("privacy_mode") == "metadata_only":
-        unsafe = sorted(set(iter_keys(event)) & UNSAFE_METADATA_ONLY_KEYS)
+        unsafe = sorted({key for key in iter_keys(event) if unsafe_metadata_key_reason(key)})
         for key in unsafe:
             errors.append(f"{prefix}: metadata_only event contains unsafe field {key}")
         for path, value in iter_string_values(event):

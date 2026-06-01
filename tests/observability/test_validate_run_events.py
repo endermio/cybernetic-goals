@@ -56,6 +56,40 @@ class ValidateRunEventsTest(unittest.TestCase):
         self.assertIn("content_summary", result.stdout + result.stderr)
         self.assertIn("real_path", result.stdout + result.stderr)
 
+    def test_metadata_only_rejects_normalized_unsafe_field_variants(self):
+        unsafe = {
+            "schema_version": "1.0.0",
+            "event_id": "evt_unsafe_key_variants",
+            "event": "skill_invoked",
+            "timestamp": "2026-06-01T00:00:00Z",
+            "privacy_mode": "metadata_only",
+            "machine_id": "anon-12345678",
+            "skill_pack": {"source_commit": "abc1234"},
+            "skill": "routing-cybernetic-workflows",
+            "status": "success",
+            "task_hash": "sha256:" + "f" * 64,
+            "Raw_Prompt": "private task prompt",
+            "rawPrompt": "private task prompt",
+            "contentSummary": "private summary",
+            "Repository_Name": "customer/repo",
+        }
+
+        with tempfile.NamedTemporaryFile("w", suffix=".json", delete=False) as tmp:
+            json.dump(unsafe, tmp)
+            tmp_path = tmp.name
+
+        try:
+            result = self.run_validator(tmp_path)
+        finally:
+            Path(tmp_path).unlink(missing_ok=True)
+
+        output = result.stdout + result.stderr
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("Raw_Prompt", output)
+        self.assertIn("rawPrompt", output)
+        self.assertIn("contentSummary", output)
+        self.assertIn("Repository_Name", output)
+
     def test_metadata_only_rejects_unsafe_values_under_neutral_keys(self):
         unsafe = {
             "schema_version": "1.0.0",

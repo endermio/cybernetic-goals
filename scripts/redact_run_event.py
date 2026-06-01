@@ -8,7 +8,7 @@ import json
 from pathlib import Path
 from typing import Any
 
-from validate_run_events import UNSAFE_METADATA_ONLY_KEYS, load_events, unsafe_metadata_value_reason, validate_event
+from validate_run_events import load_events, unsafe_metadata_key_reason, unsafe_metadata_value_reason, validate_event
 
 
 REDACTED = object()
@@ -18,7 +18,7 @@ def redact_value(value: Any, redacted_fields: set[str], field_name: str | None =
     if isinstance(value, dict):
         clean: dict[str, Any] = {}
         for key, child in value.items():
-            if key in UNSAFE_METADATA_ONLY_KEYS:
+            if unsafe_metadata_key_reason(key):
                 redacted_fields.add(key)
                 continue
             clean_child = redact_value(child, redacted_fields, key)
