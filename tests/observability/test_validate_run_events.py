@@ -90,6 +90,37 @@ class ValidateRunEventsTest(unittest.TestCase):
         self.assertIn("contentSummary", output)
         self.assertIn("Repository_Name", output)
 
+    def test_metadata_only_sanitizes_composite_unsafe_key_diagnostics(self):
+        for key in ("repoName_acme/private-repo", "repositoryName_acme/private-repo", "rawResponse_acme/private-repo"):
+            unsafe = {
+                "schema_version": "1.0.0",
+                "event_id": "evt_composite_unsafe_key",
+                "event": "skill_invoked",
+                "timestamp": "2026-06-01T00:00:00Z",
+                "privacy_mode": "metadata_only",
+                "machine_id": "anon-12345678",
+                "skill_pack": {"source_commit": "abc1234"},
+                "skill": "routing-cybernetic-workflows",
+                "status": "success",
+                "task_hash": "sha256:" + "6" * 64,
+                key: "private metadata",
+            }
+
+            with tempfile.NamedTemporaryFile("w", suffix=".json", delete=False) as tmp:
+                json.dump(unsafe, tmp)
+                tmp_path = tmp.name
+
+            try:
+                result = self.run_validator(tmp_path)
+            finally:
+                Path(tmp_path).unlink(missing_ok=True)
+
+            output = result.stdout + result.stderr
+            self.assertNotEqual(result.returncode, 0)
+            self.assertIn("unsafe field", output)
+            self.assertNotIn("acme/private-repo", output)
+            self.assertNotIn("private-repo", output)
+
     def test_metadata_only_rejects_derivative_unsafe_field_variants(self):
         unsafe = {
             "schema_version": "1.0.0",

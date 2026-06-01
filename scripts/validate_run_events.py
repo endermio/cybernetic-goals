@@ -220,6 +220,17 @@ def short_repo_identifier_reason(value: Any) -> str | None:
     return "real_repo"
 
 
+def short_repo_identifier_fragment_reason(value: Any) -> str | None:
+    if not isinstance(value, str):
+        return None
+    match = SHORT_REPO_IDENTIFIER_RE.search(value)
+    if not match:
+        return None
+    if not re.search(r"[A-Za-z]", match.group(0)):
+        return None
+    return "real_repo"
+
+
 def unsafe_dynamic_key_reason(
     key: Any,
     parent_key: Any | None = None,
@@ -232,6 +243,14 @@ def unsafe_dynamic_key_reason(
     if in_repo_context or (parent_key is not None and is_likely_repo_context_key(parent_key)):
         return short_repo_identifier_reason(string_key)
     return None
+
+
+def unsafe_metadata_key_fragment_reason(key: Any) -> str | None:
+    string_key = str(key)
+    for reason, pattern in UNSAFE_METADATA_ONLY_VALUE_PATTERNS:
+        if pattern.search(string_key):
+            return reason
+    return short_repo_identifier_fragment_reason(string_key)
 
 
 def iter_key_contexts(
@@ -292,6 +311,8 @@ def unsafe_metadata_key_diagnostic(
         return reason
     if unsafe_dynamic_key_reason(key, parent_key, in_repo_context):
         return f"unsafe dynamic key ({reason})"
+    if unsafe_metadata_key_fragment_reason(key):
+        return f"unsafe key ({reason})"
     return str(key)
 
 

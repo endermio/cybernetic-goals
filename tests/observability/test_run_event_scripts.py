@@ -143,6 +143,37 @@ class RunEventScriptsTest(unittest.TestCase):
             {"Raw_Prompt", "rawPrompt", "contentSummary", "Repository_Name"},
         )
 
+    def test_redactor_sanitizes_composite_unsafe_key_redacted_fields(self):
+        unsafe = json.loads(SAMPLE.read_text(encoding="utf-8"))
+        for key in ("repoName_acme/private-repo", "repositoryName_acme/private-repo", "rawResponse_acme/private-repo"):
+            unsafe[key] = "private metadata"
+
+        with tempfile.NamedTemporaryFile("w", suffix=".json", delete=False) as tmp:
+            json.dump(unsafe, tmp)
+            tmp_path = tmp.name
+        try:
+            result = self.run_script(
+                "redact_run_event.py",
+                tmp_path,
+                "--mode",
+                "metadata_only",
+                "--dry-run",
+            )
+        finally:
+            Path(tmp_path).unlink(missing_ok=True)
+
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        payload = json.loads(result.stdout)
+        redacted_event = payload["events"][0]
+        for key in ("repoName_acme/private-repo", "repositoryName_acme/private-repo", "rawResponse_acme/private-repo"):
+            self.assertNotIn(key, redacted_event)
+        output = result.stdout + result.stderr
+        self.assertIn("repo_name", output)
+        self.assertIn("repository_name", output)
+        self.assertIn("raw_response", output)
+        self.assertNotIn("acme/private-repo", output)
+        self.assertNotIn("private-repo", output)
+
     def test_redactor_removes_derivative_unsafe_field_variants_in_metadata_only_mode(self):
         unsafe = json.loads(SAMPLE.read_text(encoding="utf-8"))
         unsafe["prompt_text"] = "private task prompt"
@@ -611,6 +642,39 @@ class RunEventScriptsTest(unittest.TestCase):
             self.assertNotEqual(result.returncode, 0)
             output = result.stdout + result.stderr
             self.assertIn("unsafe dynamic key (real_repo)", output)
+            self.assertNotIn("acme/private-repo", output)
+            self.assertNotIn("private-repo", output)
+            self.assertFalse(Path(export_path).exists())
+        finally:
+            Path(input_path).unlink(missing_ok=True)
+            Path(export_path).unlink(missing_ok=True)
+
+    def test_sync_export_refuses_composite_unsafe_keys_without_repo_fragment(self):
+        unsafe = json.loads(SAMPLE.read_text(encoding="utf-8"))
+        unsafe["privacy_mode"] = "metadata_only"
+        for key in ("repoName_acme/private-repo", "repositoryName_acme/private-repo", "rawResponse_acme/private-repo"):
+            unsafe[key] = "private metadata"
+
+        with tempfile.NamedTemporaryFile("w", suffix=".json", delete=False) as tmp:
+            json.dump(unsafe, tmp)
+            input_path = tmp.name
+        with tempfile.NamedTemporaryFile("w", suffix=".json", delete=False) as tmp:
+            export_path = tmp.name
+        Path(export_path).unlink(missing_ok=True)
+
+        try:
+            result = self.run_script(
+                "sync_run_events_to_github.py",
+                "--input",
+                input_path,
+                "--export-out",
+                export_path,
+            )
+            self.assertNotEqual(result.returncode, 0)
+            output = result.stdout + result.stderr
+            self.assertIn("repo_name", output)
+            self.assertIn("repository_name", output)
+            self.assertIn("raw_response", output)
             self.assertNotIn("acme/private-repo", output)
             self.assertNotIn("private-repo", output)
             self.assertFalse(Path(export_path).exists())
