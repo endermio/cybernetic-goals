@@ -109,6 +109,12 @@ class ValidateRunEventsTest(unittest.TestCase):
             "codeSnippet": "private code",
             "logExcerptText": "private log",
             "artifactBodyText": "private artifact body",
+            "apiToken": "private token",
+            "token_value": "private token",
+            "secretKey": "private secret",
+            "customerDataText": "private customer data",
+            "codeText": "private code",
+            "logText": "private log",
         }
 
         with tempfile.NamedTemporaryFile("w", suffix=".json", delete=False) as tmp:
@@ -130,6 +136,12 @@ class ValidateRunEventsTest(unittest.TestCase):
             "codeSnippet",
             "logExcerptText",
             "artifactBodyText",
+            "apiToken",
+            "token_value",
+            "secretKey",
+            "customerDataText",
+            "codeText",
+            "logText",
         ):
             self.assertIn(key, output)
 
@@ -151,6 +163,10 @@ class ValidateRunEventsTest(unittest.TestCase):
             "blocked_reason": "waiting_for_review",
             "final_state": "recorded",
             "required_gates": ["compile", "unit"],
+            "impromptu_status": "not a prompt",
+            "task_hash_alias": "sha256:" + "7" * 64,
+            "machine_id_alias": "anon-machine",
+            "privacy_mode_alias": "metadata_only",
         }
 
         with tempfile.NamedTemporaryFile("w", suffix=".json", delete=False) as tmp:

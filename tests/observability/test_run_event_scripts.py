@@ -151,6 +151,12 @@ class RunEventScriptsTest(unittest.TestCase):
         unsafe["codeSnippet"] = "private code"
         unsafe["logExcerptText"] = "private log"
         unsafe["artifactBodyText"] = "private artifact body"
+        unsafe["apiToken"] = "private token"
+        unsafe["token_value"] = "private token"
+        unsafe["secretKey"] = "private secret"
+        unsafe["customerDataText"] = "private customer data"
+        unsafe["codeText"] = "private code"
+        unsafe["logText"] = "private log"
 
         with tempfile.NamedTemporaryFile("w", suffix=".json", delete=False) as tmp:
             json.dump(unsafe, tmp)
@@ -177,6 +183,12 @@ class RunEventScriptsTest(unittest.TestCase):
             "codeSnippet",
             "logExcerptText",
             "artifactBodyText",
+            "apiToken",
+            "token_value",
+            "secretKey",
+            "customerDataText",
+            "codeText",
+            "logText",
         }
         for key in expected_fields:
             self.assertNotIn(key, redacted_event)

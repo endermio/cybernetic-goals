@@ -66,18 +66,29 @@ NORMALIZED_UNSAFE_METADATA_ONLY_KEYS = {
     re.sub(r"[^0-9a-z]+", "", key.casefold()) for key in UNSAFE_METADATA_ONLY_KEYS
 }
 
-UNSAFE_METADATA_ONLY_KEY_STEMS = (
-    ("artifactbod", "artifact_body"),
-    ("codeexcerpt", "code_excerpt"),
-    ("codesnippet", "code_snippet"),
-    ("contentexcerpt", "content_excerpt"),
-    ("contentsummar", "content_summary"),
-    ("credential", "credential"),
-    ("logexcerpt", "log_excerpt"),
-    ("rawprompt", "raw_prompt"),
-    ("repositoryname", "repository_name"),
-    ("reponame", "repo_name"),
-    ("prompt", "prompt"),
+UNSAFE_METADATA_ONLY_KEY_TOKENS = {
+    "credential": "credential",
+    "credentials": "credential",
+    "secret": "secret",
+    "token": "token",
+}
+
+UNSAFE_METADATA_ONLY_KEY_PHRASES = (
+    (("artifact", "body"), "artifact_body"),
+    (("code", "excerpt"), "code_excerpt"),
+    (("code", "snippet"), "code_snippet"),
+    (("code", "text"), "code"),
+    (("content", "excerpt"), "content_excerpt"),
+    (("content", "summary"), "content_summary"),
+    (("customer", "data"), "customer_data"),
+    (("log", "excerpt"), "log_excerpt"),
+    (("log", "text"), "log"),
+    (("prompt", "text"), "prompt"),
+    (("raw", "prompt"), "raw_prompt"),
+    (("real", "path"), "real_path"),
+    (("real", "repo"), "real_repo"),
+    (("repo", "name"), "repo_name"),
+    (("repository", "name"), "repository_name"),
 )
 
 TASK_HASH_RE = re.compile(r"^sha256:[a-f0-9]{64}$")
@@ -93,6 +104,24 @@ UNSAFE_METADATA_ONLY_VALUE_PATTERNS = (
 
 def normalize_metadata_key(key: Any) -> str:
     return re.sub(r"[^0-9a-z]+", "", str(key).casefold())
+
+
+def tokenize_metadata_key(key: Any) -> list[str]:
+    tokens: list[str] = []
+    for part in re.sub(r"[^0-9A-Za-z]+", " ", str(key)).split():
+        tokens.extend(
+            match.group(0).casefold()
+            for match in re.finditer(r"[A-Z]+(?=[A-Z][a-z]|\d|$)|[A-Z]?[a-z]+|\d+", part)
+        )
+    return [_singularize_token(token) for token in tokens]
+
+
+def _singularize_token(token: str) -> str:
+    if token.endswith("ies") and len(token) > 3:
+        return f"{token[:-3]}y"
+    if token.endswith("s") and len(token) > 1 and token not in {"credentials"}:
+        return token[:-1]
+    return token
 
 
 def load_taxonomy(path: str | None) -> set[str]:
@@ -154,9 +183,14 @@ def unsafe_metadata_key_reason(key: Any) -> str | None:
     normalized = normalize_metadata_key(key)
     if normalized in NORMALIZED_UNSAFE_METADATA_ONLY_KEYS:
         return str(key)
-    for stem, reason in UNSAFE_METADATA_ONLY_KEY_STEMS:
-        if stem in normalized:
-            return reason
+    tokens = tokenize_metadata_key(key)
+    for phrase, reason in UNSAFE_METADATA_ONLY_KEY_PHRASES:
+        for index in range(0, len(tokens) - len(phrase) + 1):
+            if tuple(tokens[index : index + len(phrase)]) == phrase:
+                return reason
+    for token in tokens:
+        if token in UNSAFE_METADATA_ONLY_KEY_TOKENS:
+            return UNSAFE_METADATA_ONLY_KEY_TOKENS[token]
     return None
 
 
