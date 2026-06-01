@@ -110,6 +110,20 @@
         "Does not mark Approved.",
         "Does not output a final runtime /goal."
       ]
+    },
+    {
+      "id": "flags-main-agent-context-overload",
+      "prompt": "Review a Level 3 execution policy that assigns coordination, investigation, execution, verification, and integration to the main agent, has no selected topology, and defines no context packs or subagent return formats.",
+      "expected_output": "The review flags Context Management / Execution Topology as Major or Blocking, requires execution-policy revision, and does not approve runtime compilation.",
+      "assertions": [
+        "Includes Context Management / Execution Topology as a review dimension.",
+        "Flags missing selected topology.",
+        "Flags Level 3 main-agent context overload.",
+        "Requires Context pack, Return format, and Integration gate for delegated work.",
+        "Requires revising the execution policy.",
+        "Does not approve runtime /goal compilation.",
+        "Does not decide the execution topology inside the orchestrator."
+      ]
     }
   ]
 }

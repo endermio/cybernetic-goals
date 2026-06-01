@@ -90,6 +90,19 @@
         "Does not let runtime Codex invent or replace the output shape.",
         "Does not rewrite artifacts."
       ]
+    },
+    {
+      "id": "preserves-approved-subagent-topology",
+      "prompt": "requirements analysis Complete, goal exists, execution policy status Candidate and selects Serial subagent-driven topology, control review Approved and Final Observer Check allows approval；编译最终 /goal。",
+      "expected_output": "Outputs a final /goal that preserves the approved execution topology, requires $superpowers:subagent-driven-development discipline, keeps only one execution subagent active at a time, and makes the main agent coordinate and integrate rather than absorb delegated work.",
+      "assertions": [
+        "References the approved execution topology from the execution policy.",
+        "Mentions $superpowers:subagent-driven-development when serial subagent-driven topology is selected.",
+        "Requires only one execution subagent active at a time for serial topology.",
+        "Says the main agent coordinates, integrates, maintains progress log, and detects stop conditions.",
+        "Does not replace the approved topology with generic serial main-agent execution.",
+        "Stops if runtime would need to invent or replace execution topology."
+      ]
     }
   ]
 }

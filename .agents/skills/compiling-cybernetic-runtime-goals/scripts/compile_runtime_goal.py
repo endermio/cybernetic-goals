@@ -44,6 +44,58 @@ def final_output_contract_clause(goal_path: str) -> str:
     )
 
 
+def selected_execution_topology(plan_path: str) -> str | None:
+    plan = Path(plan_path).read_text(encoding="utf-8")
+    body = section_body(plan, "Context Management / Execution Topology")
+    if body is None:
+        return None
+
+    match = re.search(r"(?im)^\s*Selected topology\s*:\s*`?([^`\n]+?)`?\s*$", body)
+    if not match:
+        return None
+
+    value = match.group(1).strip().strip("`")
+    lowered = value.casefold()
+    if "/" in value:
+        return None
+    if "parallel" in lowered and "subagent" in lowered:
+        return "Parallel subagent-driven"
+    if "serial" in lowered and "subagent" in lowered:
+        return "Serial subagent-driven"
+    if "main-only" in lowered or "main only" in lowered:
+        return "Main-only"
+    return None
+
+
+def execution_topology_clause(plan_path: str) -> str:
+    topology = selected_execution_topology(plan_path)
+    base = f"Use the approved execution topology defined in {plan_path}. "
+
+    if topology == "Serial subagent-driven":
+        return (
+            base +
+            "Because the approved topology is Serial subagent-driven, use `$superpowers:subagent-driven-development` discipline with only one execution subagent active at a time. "
+            "The main agent coordinates, integrates, maintains the progress log, and detects stop conditions; it must not personally absorb delegated bounded work packages. "
+            "Subagents may execute only the bounded work packages, context packs, allowed actions, return formats, and integration gates defined in the approved plan. "
+        )
+
+    if topology == "Parallel subagent-driven":
+        return (
+            base +
+            "Because the approved topology is Parallel subagent-driven, use `$superpowers:subagent-driven-development` discipline and spawn subagents only for work packages explicitly marked independent by the dependency matrix and approved control review. "
+            "The main agent coordinates, integrates, maintains the progress log, and detects stop conditions; it must not personally absorb delegated bounded work packages. "
+            "Subagents may execute only the bounded work packages, context packs, allowed actions, return formats, and integration gates defined in the approved plan. "
+        )
+
+    if topology == "Main-only":
+        return (
+            base +
+            "Because the approved topology is Main-only, do not dispatch target-work subagents unless the execution policy is revised and reviewed. "
+        )
+
+    return base
+
+
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--requirements", dest="requirements")
@@ -90,6 +142,7 @@ def main() -> int:
         )
 
     output_contract_clause = final_output_contract_clause(args.goal)
+    topology_clause = execution_topology_clause(args.plan)
 
     command = (
         f"/goal Execute the approved execution policy in {args.plan} "
@@ -101,7 +154,8 @@ def main() -> int:
         "Use `$superpowers:systematic-debugging` for unclear or repeated failures. "
         "Use `$superpowers:verification-before-completion` before claiming completion. "
         "If runtime cannot load these skills, follow the equivalent discipline already written in the approved plan and control review. "
-        "Execute serially according to the approved batch rhythm. "
+        f"{topology_clause}"
+        "Follow the approved batch rhythm. "
         "Intermediate states inside a batch may be broken if the approved plan allows it, but each batch must end in the approved openable/verifiable state. "
         f"Treat approved sensors, checks, and evidence channels as sensors, not objectives; if an evidence channel conflicts with confirmed requirements{design_sensor_clause}, stop or follow the approved sensor-governance rule. "
         "If any referenced artifact is missing, not approved, or internally inconsistent, stop and report the smallest required human decision. "

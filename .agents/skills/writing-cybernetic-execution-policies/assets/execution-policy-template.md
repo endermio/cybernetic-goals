@@ -22,6 +22,7 @@ Cybernetic constraints supplied to the substrate:
 - approved or candidate solution-design invariants;
 - tactical degrees of freedom;
 - dependency matrix;
+- context management / execution topology;
 - execution granularity and sensor budget;
 - batch cadence;
 - destructive intermediate-state policy;
@@ -50,6 +51,44 @@ These may change during execution if invariants are preserved.
 | Workstream | Owns | Depends on | Can run in parallel with | Gate |
 |---|---|---|---|---|
 | A | [area] | [dependency] | [parallel work] | [gate] |
+
+## Context Management / Execution Topology
+
+Selected topology: `Main-only / Serial subagent-driven / Parallel subagent-driven`
+
+Topology rationale:
+
+- [why this topology fits the task level, context load, dependency matrix, and review constraints]
+
+Main agent owns:
+
+- approved control artifacts
+- current batch state
+- dispatch
+- integration
+- progress log
+- stop-condition detection
+
+Subagent owns:
+
+- one bounded work package
+- one bounded investigation
+- one bounded verification pass
+
+Delegation matrix:
+
+| Work package | Executor | Context pack | Allowed actions | Return format | Integration gate |
+|---|---|---|---|---|---|
+| [package] | `main / serial subagent / parallel subagent` | [artifact paths, files, constraints, stop conditions] | [bounded actions] | [required summary/evidence format] | [main-agent integration condition] |
+
+Rules:
+
+- Use `Main-only` for small, local, low-context work.
+- Use `Serial subagent-driven` when Level 2 wide inspection or Level 3/4 context load would overload the main agent.
+- Use `Parallel subagent-driven` only when dependency independence is explicit and human + control-review approval exists.
+- The main agent must coordinate, integrate, maintain the progress log, and detect stop conditions.
+- A subagent must not modify control artifacts, widen scope, replace topology, or bypass the integration gate.
+- If the selected topology becomes insufficient, stop and revise the execution policy; do not let runtime improvise a new topology.
 
 ## Execution Granularity and Sensor Budget
 
@@ -169,8 +208,10 @@ Before completion:
 
 ## Execution Rhythm
 
-- Execute serially unless review explicitly approves parallel subagents.
-- If subagents are used, only one execution subagent is active at a time unless approved.
+- Execute according to the selected Context Management / Execution Topology.
+- For `Main-only`, keep all target work in the main agent only when the context-load rationale remains valid.
+- For `Serial subagent-driven`, only one execution subagent is active at a time.
+- For `Parallel subagent-driven`, dispatch only work packages marked independent by the dependency matrix and approved by control review.
 - Do not let runtime `/goal` rewrite this policy.
 
 ## Stop Conditions
@@ -181,6 +222,7 @@ Stop if:
 - the plan conflicts with required solution design;
 - confirmed semantics appear wrong or insufficient;
 - sensor governance is insufficient for a failing check;
+- the approved execution topology cannot be followed;
 - executing further requires a new human decision;
 - the approved batch cadence cannot be followed.
 

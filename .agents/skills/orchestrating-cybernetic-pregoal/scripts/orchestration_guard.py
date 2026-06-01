@@ -59,7 +59,7 @@ def blocked_next_action(errors: list[str]) -> str:
         return "RunGoalWriting"
     if "goal contract is required" in joined or "goal does not reference" in joined:
         return "RunGoalWriting"
-    if "execution policy is required" in joined or "execution policy status" in joined or "plan does not reference" in joined:
+    if "execution policy is required" in joined or "execution policy status" in joined or "execution topology" in joined or "plan does not reference" in joined:
         return "RunExecutionPolicy"
     if (
         "control review" in joined
@@ -200,6 +200,28 @@ def output_contract_required(requirements: str | None, design: str | None, goal:
     return output_contract_gate_required(requirements, design, goal) or output_contract_present_upstream(requirements, design, goal)
 
 
+def selected_execution_topology(plan: str | None) -> str | None:
+    if not plan:
+        return None
+    body = section_body(plan, "Context Management / Execution Topology")
+    if body is None:
+        return None
+    match = re.search(r"(?im)^\s*Selected topology\s*:\s*`?([^`\n]+?)`?\s*$", body)
+    if not match:
+        return None
+    value = match.group(1).strip().strip("`")
+    lowered = value.casefold()
+    if "/" in value:
+        return None
+    if "main-only" in lowered or "main only" in lowered:
+        return "Main-only"
+    if "serial" in lowered and "subagent" in lowered:
+        return "Serial subagent-driven"
+    if "parallel" in lowered and "subagent" in lowered:
+        return "Parallel subagent-driven"
+    return None
+
+
 def has_blocking_design_questions(design: str) -> bool:
     body = section_body(design, "Open Design Questions")
     if body is None:
@@ -333,6 +355,8 @@ def check_plan_ready(
     require_reference(plan, requirements_path, "plan", errors)
     require_reference(plan, design_path, "plan", errors)
     require_reference(plan, goal_path, "plan", errors)
+    if selected_execution_topology(plan) is None:
+        errors.append("execution policy is required to define a selected Context Management / Execution Topology")
 
 
 def check_review_ready(

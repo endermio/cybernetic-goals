@@ -199,6 +199,18 @@
         "Requires re-review before runtime compilation.",
         "Treats execution granularity or sensor load Major/Blocking findings as blockers for runtime compilation."
       ]
+    },
+    {
+      "id": "orchestrator-propagates-execution-topology-without-deciding-it",
+      "prompt": "Execution policy selects Serial subagent-driven topology and control review approves it. Orchestrate runtime compilation.",
+      "expected_output": "The orchestrator verifies and propagates the selected execution topology to runtime compilation without choosing or rewriting topology itself.",
+      "assertions": [
+        "Does not decide execution topology inside the orchestrator.",
+        "Requires the execution policy to contain selected execution topology.",
+        "Propagates the execution policy path to runtime compilation.",
+        "Does not replace Serial subagent-driven topology with generic main-agent serial execution.",
+        "Blocks runtime compilation if selected execution topology is missing."
+      ]
     }
   ]
 }

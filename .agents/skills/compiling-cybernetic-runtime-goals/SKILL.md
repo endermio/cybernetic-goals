@@ -30,6 +30,8 @@ This skill does not invoke runtime execution. It compiles runtime discipline int
 The final command must instruct runtime Codex to:
 
 - use `$superpowers:executing-plans` discipline against the approved plan;
+- use the approved execution topology defined in the execution policy;
+- use `$superpowers:subagent-driven-development` when the approved topology selects serial or parallel subagent-driven execution;
 - use `$superpowers:systematic-debugging` for unclear or repeated failures;
 - use `$superpowers:verification-before-completion` before claiming completion;
 - if runtime cannot load these skills, follow the equivalent discipline already written in the approved plan and control review.
@@ -51,6 +53,7 @@ Do not output `/goal` unless:
 - runtime `/goal` will not need to write or approve a new plan.
 - runtime `/goal` will not need to create or revise solution design.
 - runtime `/goal` will not need to invent or replace the final output contract.
+- runtime `/goal` will not need to invent or replace execution topology.
 
 ## Runtime Goal Contract
 
@@ -67,8 +70,9 @@ The final `/goal` must:
 - forbid rewriting the solution design;
 - forbid replacing the final output audience, purpose, medium, structure, detail level, destination, or machine-readable shape;
 - forbid replacing approved sensors without using approved sensor-governance rules;
-- execute serially unless the approved review permits otherwise;
+- use the approved execution topology defined in the execution policy;
 - use `$superpowers:executing-plans` discipline against the approved execution policy;
+- use `$superpowers:subagent-driven-development` when the approved execution topology selects serial or parallel subagent-driven execution;
 - use `$superpowers:systematic-debugging` for unclear or repeated failures;
 - use `$superpowers:verification-before-completion` before claiming completion;
 - follow equivalent discipline already written in the approved plan and control review if runtime cannot load those skills;
@@ -141,6 +145,7 @@ Do not create or modify target-work artifacts.
 - [ ] Final Observer Check is present and allows approval.
 - [ ] The final `/goal` references all approved files.
 - [ ] The final `/goal` carries the goal's Final Output Contract when present or required.
+- [ ] The final `/goal` preserves the approved execution topology.
 - [ ] The final `/goal` does not ask runtime Codex to write a new plan.
 - [ ] The final `/goal` does not ask runtime Codex to create or revise solution design.
 - [ ] The final `/goal` includes executing, debugging, and completion-verification discipline.

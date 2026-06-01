@@ -181,6 +181,28 @@ def output_contract_required(*texts: str | None) -> bool:
     )
 
 
+def selected_execution_topology(plan: str | None) -> str | None:
+    if not plan:
+        return None
+    body = section_body(plan, "Context Management / Execution Topology")
+    if body is None:
+        return None
+    m = re.search(r"(?im)^\s*Selected topology\s*:\s*`?([^`\n]+?)`?\s*$", body)
+    if not m:
+        return None
+    value = m.group(1).strip().strip("`")
+    lowered = value.casefold()
+    if "/" in value:
+        return None
+    if "main-only" in lowered or "main only" in lowered:
+        return "Main-only"
+    if "serial" in lowered and "subagent" in lowered:
+        return "Serial subagent-driven"
+    if "parallel" in lowered and "subagent" in lowered:
+        return "Parallel subagent-driven"
+    return None
+
+
 def check_final_observer(review: str, errors: list[str]) -> None:
     body = section_body(review, "Final Observer Check")
     if body is None:
@@ -213,7 +235,7 @@ def suggest_next_action(errors: list[str]) -> str:
         return "RunDesign"
     if "output contract" in joined or "goal lacks" in joined or "goal contains runtime control-structure" in joined:
         return "RunGoalWriting"
-    if "execution policy status" in joined or "plan does not reference" in joined:
+    if "execution policy status" in joined or "execution topology" in joined or "plan does not reference" in joined:
         return "RunExecutionPolicy"
     if (
         "control review status" in joined
@@ -277,6 +299,8 @@ def main() -> int:
         plan_status = section_status(plan, "Execution Policy Status")
         if plan_status != "Candidate":
             errors.append(f"execution policy status under ## Execution Policy Status must be Candidate: {plan_status!r}")
+        if selected_execution_topology(plan) is None:
+            errors.append("execution policy must define a selected Context Management / Execution Topology")
 
     if review:
         review_status = section_status(review, "Review Status")

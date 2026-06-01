@@ -282,7 +282,7 @@ Before each stage, run `scripts/orchestration_guard.py` for that stage if availa
 | `RequirementsComplete` | Design Gate required and design missing | `RunDesign` | goal writing |
 | `DesignReady` | design exists, references requirements, and has no blocking open questions | `RunGoalWriting` | execution policy |
 | `GoalReady` | goal exists and references requirements plus any design path | `RunExecutionPolicy` | review |
-| `PolicyReady` | execution policy exists and references requirements, goal, and any design path | `RunReview` | runtime compile |
+| `PolicyReady` | execution policy exists, references requirements, goal, any design path, and records selected execution topology | `RunReview` | runtime compile |
 | `ReviewApproved` | review is Approved and Final Observer allows approval | `RunRuntimeCompile` | execution |
 | `RuntimeGoalReady` | final `/goal` is compiled | output command | start `/goal` |
 | `Blocked` | any required gate fails | report blocker | continue |
@@ -362,6 +362,7 @@ The execution policy must:
 - reference the solution design when Design Gate is required or a design exists
 - record `$superpowers:writing-plans` substrate status for non-trivial execution policies
 - include a dependency matrix
+- select and justify Context Management / Execution Topology
 - distinguish semantic invariants from tactical degrees of freedom
 - define execution granularity and sensor budget
 - define batch cadence
@@ -374,6 +375,8 @@ The execution policy must:
 - define progress log rules
 
 If `$superpowers:writing-plans` is required but unavailable, stop and report missing planning infrastructure. Do not write an ad hoc approved plan as a substitute.
+
+The orchestrator does not choose runtime topology. It only verifies that the execution policy selected one of `Main-only`, `Serial subagent-driven`, or `Parallel subagent-driven` and passes that policy downstream.
 
 Expected artifact:
 
@@ -440,7 +443,7 @@ If review status is `Needs Revision`:
 
 1. Apply only the required revisions.
 2. Avoid over-correcting non-critical suggestions.
-3. If the revision concerns execution granularity or sensor load, route it to `$writing-cybernetic-execution-policies`; do not repair it inside the orchestrator.
+3. If the revision concerns execution granularity, sensor load, or execution topology, route it to `$writing-cybernetic-execution-policies`; do not repair it inside the orchestrator.
 4. Mark changed control artifacts `Dirty` unless every change is deterministic-only and guard-covered.
 5. Re-run independent review for substantive changes, focused on the changed sections and prior blockers.
 6. Record the final observer check in the control review.
@@ -471,6 +474,7 @@ Before outputting runtime `/goal`, ensure:
 - final output contract exists in the goal when Output Contract Gate was required or an output contract exists upstream
 - goal contract exists
 - execution policy exists
+- execution policy records selected execution topology
 - control review exists
 - control review is `Approved`
 - no substantive post-review artifact mutation remains unobserved by final independent re-review

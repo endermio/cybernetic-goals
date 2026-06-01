@@ -20,6 +20,12 @@ State: `RequirementsMissing` / `RequirementsComplete` / `DesignReady` / `GoalRea
 
 `RunDesign` / `RunGoalWriting` / `RunExecutionPolicy` / `RunReview` / `RunRuntimeCompile` / `OutputRuntimeGoal` / `Blocked`
 
+## Execution Topology
+
+- Selected topology: `Main-only / Serial subagent-driven / Parallel subagent-driven / not selected`
+- Topology source: `[execution policy path]`
+- Orchestrator decision made: `no`
+
 ## Blocked Reason
 
 - `[reason or "None"]`

@@ -1,6 +1,6 @@
 ---
 name: writing-cybernetic-execution-policies
-description: 'Use after an approved requirements analysis brief, any required solution design, and control contract exist, before starting an executable /goal. Creates a cybernetic execution policy for controlled execution: dependency matrix, batch cadence, destructive intermediate-state policy, output material/evidence collection, sensor/evidence governance, semantic invariants, design invariants, tactical degrees of freedom, phase gates, and execution rhythm. Does not execute target work and does not start /goal execution.'
+description: 'Use after an approved requirements analysis brief, any required solution design, and control contract exist, before starting an executable /goal. Creates a cybernetic execution policy for controlled execution: dependency matrix, execution topology, batch cadence, output material/evidence collection, sensor/evidence governance, semantic invariants, design invariants, tactical degrees of freedom, phase gates, and execution rhythm. Does not execute target work and does not start /goal execution.'
 ---
 
 # Writing Cybernetic Execution Policies
@@ -41,6 +41,7 @@ This skill supplies the cybernetic constraints that the planning substrate must 
 - solution-design invariants and interfaces/contracts;
 - tactical degrees of freedom;
 - dependency matrix requirement;
+- context management / execution topology;
 - execution granularity and sensor budget;
 - batch cadence;
 - destructive intermediate-state policy;
@@ -61,17 +62,46 @@ The execution policy must include:
 3. Confirmed Semantic Invariants
 4. Tactical Degrees of Freedom
 5. Dependency Matrix
-6. Execution Granularity and Sensor Budget
-7. Batch Cadence
-8. Destructive Intermediate-State Policy
-9. Output Material / Evidence Collection
-10. Sensor / Evidence Governance
-11. Stale Sensor Retirement and Rewrite Policy
-12. Phase Gates
-13. Execution Rhythm
-14. Stop Conditions
-15. Progress Log Rules
-16. Candidate Plan Tasks
+6. Context Management / Execution Topology
+7. Execution Granularity and Sensor Budget
+8. Batch Cadence
+9. Destructive Intermediate-State Policy
+10. Output Material / Evidence Collection
+11. Sensor / Evidence Governance
+12. Stale Sensor Retirement and Rewrite Policy
+13. Phase Gates
+14. Execution Rhythm
+15. Stop Conditions
+16. Progress Log Rules
+17. Candidate Plan Tasks
+
+## Context Management / Execution Topology
+
+The execution policy must choose one approved topology:
+
+- `Main-only`
+- `Serial subagent-driven`
+- `Parallel subagent-driven`
+
+Default topology rules:
+
+- Level 0/1: use `Main-only`.
+- Level 2: use `Main-only` unless the work is a wide inspection, audit, or verification pass; then use `Serial subagent-driven`.
+- Level 3: use `Serial subagent-driven` by default unless `Main-only` has an explicit context-load justification.
+- Level 4: use `Serial subagent-driven` by default. Use `Parallel subagent-driven` only with explicit human approval, dependency-matrix independence, and control-review approval.
+
+For every delegated work package, define:
+
+- Work package
+- Executor
+- Context pack
+- Allowed actions
+- Return format
+- Integration gate
+
+The main agent owns approved control artifacts, current batch state, dispatch, integration, progress log, and stop-condition detection.
+
+A subagent owns one bounded work package, bounded investigation, or bounded verification pass. A subagent must not change control artifacts, widen scope, replace the execution topology, or bypass integration gates.
 
 ## Execution Granularity and Sensor Budget
 
@@ -176,6 +206,7 @@ Control-law summary:
 - Semantic invariants: ...
 - Design source: ...
 - Batch cadence: ...
+- Execution topology: ...
 - Sensor budget: ...
 - Sensor governance: ...
 - Phase gates: ...
@@ -212,6 +243,11 @@ Response-only next step:
 - [ ] If Design Gate is required, the plan references the solution design.
 - [ ] The plan does not invent or revise the solution model.
 - [ ] The plan has dependency matrix.
+- [ ] The plan includes Context Management / Execution Topology.
+- [ ] The plan selects `Main-only`, `Serial subagent-driven`, or `Parallel subagent-driven`.
+- [ ] Level 3/4 main-only execution has an explicit context-load justification.
+- [ ] Delegated work packages define Context pack, Return format, and Integration gate.
+- [ ] Parallel subagent-driven execution has explicit human approval, dependency independence, and review approval.
 - [ ] The plan includes Execution Granularity and Sensor Budget.
 - [ ] Batches are coherent target-state slices, not mechanical micro-steps.
 - [ ] The plan chooses the largest coherent batch that remains diagnosable.

@@ -15,6 +15,7 @@ Cybernetic skills compile solution designs and control structures: requirements 
 | Execution policy generation | `$superpowers:writing-plans` | Required for non-trivial execution policies | Cybernetic execution-policy skills provide semantic invariants, tactical freedom, dependency matrix, batch cadence, sensor/evidence governance, and stale-sensor policy as inputs. |
 | Control structure review | Independent subagent review discipline | Required for `Approved` unless explicit human approval exists | This is review discipline, not the full execution workflow from `$superpowers:subagent-driven-development`. |
 | Runtime execution | `$superpowers:executing-plans` discipline | Required | Execute the approved plan; do not create or approve a new plan at runtime. |
+| Runtime target-work delegation | `$superpowers:subagent-driven-development` discipline | Required when execution policy selects serial or parallel subagent-driven topology | Main agent coordinates and integrates; delegated work packages stay bounded by the approved execution policy. |
 | Runtime debugging | `$superpowers:systematic-debugging` | Required for unclear or repeated failures | Investigate before changing behavior. |
 | Completion claim | `$superpowers:verification-before-completion` | Required | Completion requires fresh verification evidence. |
 
@@ -29,6 +30,7 @@ Do not silently replace:
 - `$superpowers:writing-plans` with ad hoc plan writing;
 - independent subagent review with self-review;
 - `$superpowers:executing-plans` with runtime replanning;
+- `$superpowers:subagent-driven-development` with ad hoc context delegation when subagent-driven topology is selected;
 - `$superpowers:systematic-debugging` with speculative fixes;
 - `$superpowers:verification-before-completion` with confidence statements.
 
@@ -61,6 +63,7 @@ Runtime `/goal` execution must not create, approve, or rewrite its own control s
 Compiled runtime `/goal` commands must instruct Codex to use:
 
 - `$superpowers:executing-plans` discipline for execution against the approved plan;
+- `$superpowers:subagent-driven-development` when the approved execution policy selects serial or parallel subagent-driven topology;
 - `$superpowers:systematic-debugging` for unclear or repeated failures;
 - `$superpowers:verification-before-completion` before claiming completion.
 

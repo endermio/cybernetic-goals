@@ -1,6 +1,6 @@
 ---
 name: reviewing-cybernetic-control-structures
-description: 'Use after requirements analysis, any required solution design, control contract, and execution policy files exist, before starting /goal execution. Reviews the whole AI control structure, not only the plan: requirement traceability, design fidelity, output contract fidelity, goal fidelity, control law quality, sensor/evidence governance, batch cadence, phase gates, stop conditions, and semantic-vs-tactical boundaries. Produces a control review file under docs/cybernetics/control-reviews/ and must mark Approved before runtime /goal may start.'
+description: 'Use after requirements analysis, any required solution design, control contract, and execution policy files exist, before starting /goal execution. Reviews the whole AI control structure, not only the plan: traceability, design fidelity, output contract fidelity, goal fidelity, control law quality, context topology, sensor/evidence governance, batch cadence, phase gates, stop conditions, and semantic-vs-tactical boundaries. Produces a control review file under docs/cybernetics/control-reviews/ and must mark Approved before runtime /goal may start.'
 ---
 
 # Reviewing Cybernetic Control Structures
@@ -61,6 +61,7 @@ Substantive changes include changes to:
 - goal success conditions;
 - scope, boundaries, or invariants;
 - execution policy or batch cadence;
+- context management / execution topology;
 - sensor or evidence structure;
 - progress log required fields;
 - stop conditions;
@@ -114,6 +115,8 @@ When requirements analysis, solution design, or goal includes an output contract
 The execution policy must define a sane control law:
 
 - dependency matrix
+- context management / execution topology
+- context budget
 - execution granularity
 - sensor budget
 - batch cadence
@@ -147,7 +150,22 @@ Flag as Major or Blocking when:
 
 Use `Major` when execution-policy revision can repair the control law. Use `Blocking` when the granularity or sensor load would prevent runtime completion or let sensors override confirmed semantics.
 
-### 8. Batch Rhythm
+### 8. Context Management / Execution Topology
+
+Flag as Major or Blocking when:
+
+- no selected topology exists;
+- Level 3/4 work assigns all target work to the main agent without a context-load justification;
+- the plan creates context overload by making the main agent coordinator, worker, integrator, and verifier for context-heavy work;
+- delegated work packages lack Context pack, Allowed actions, Return format, or Integration gate;
+- parallel subagent-driven execution lacks explicit human approval, dependency independence, or control-review approval;
+- a subagent may modify control artifacts, widen scope, replace topology, or bypass integration gates;
+- progress-log ownership or stop-condition detection is unclear;
+- context compression or bounded return material is missing for delegated work.
+
+Use `Major` when execution-policy revision can repair topology. Use `Blocking` when context overload would likely make runtime lose requirements, design invariants, output contract, stop conditions, or approval boundaries.
+
+### 9. Batch Rhythm
 
 Flag:
 
@@ -156,15 +174,15 @@ Flag:
 - no batch-end openability requirement;
 - no destructive intermediate-state policy.
 
-### 9. Semantic vs Tactical Boundary
+### 10. Semantic vs Tactical Boundary
 
 Semantic invariants must be frozen. Tactical execution details must remain adjustable.
 
-### 10. Runtime Suitability
+### 11. Runtime Suitability
 
-The runtime `/goal` must be able to execute the approved artifacts without inventing new control structures. Any required runtime Superpowers discipline must be precompiled into the approved plan, review, or final `/goal`.
+The runtime `/goal` must be able to execute the approved artifacts without inventing new control structures. Any required runtime Superpowers discipline, including approved execution topology and subagent-driven execution discipline, must be precompiled into the approved plan, review, or final `/goal`.
 
-### 11. Review Independence
+### 12. Review Independence
 
 The review must record:
 
@@ -173,7 +191,7 @@ The review must record:
 - whether approval is allowed;
 - why approval is blocked when independent review is missing.
 
-### 12. Final Observer Check
+### 13. Final Observer Check
 
 The review must record whether any substantive artifact changed after the latest independent review pass and whether a final independent observer confirmed no Blocking or Major findings after that change.
 
@@ -208,6 +226,7 @@ Only mark `Approved` when:
 - any upstream output contract is preserved in the goal and supported by the execution policy;
 - no unresolved semantic decision remains;
 - execution policy does not self-authorize uncontrolled changes;
+- execution topology is explicit and does not create main-agent context overload;
 - execution granularity and sensor load do not create micro-step overcontrol or sensor overcoupling;
 - sensor/evidence governance is explicit;
 - runtime `/goal` can execute without writing or approving a new plan.

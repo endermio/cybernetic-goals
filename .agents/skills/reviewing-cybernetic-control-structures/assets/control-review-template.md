@@ -19,6 +19,7 @@ Status: `Needs Revision`
   - Design fidelity: `yes/no`
   - Output contract fidelity: `yes/no`
   - Goal fidelity: `yes/no`
+  - Context management / execution topology: `yes/no`
   - Execution granularity / sensor load: `yes/no`
   - Sensor governance: `yes/no`
   - Execution cadence: `yes/no`
@@ -82,6 +83,22 @@ Findings:
 - [finding]
 
 ## Control Law Quality
+
+Findings:
+
+- [finding]
+
+## Context Management / Execution Topology
+
+Check:
+
+- selected topology is explicit;
+- Level 3/4 main-only execution has a context-load justification;
+- delegated work packages define Context pack, Allowed actions, Return format, and Integration gate;
+- parallel subagent-driven execution has explicit human approval, dependency independence, and control-review approval;
+- subagents cannot modify control artifacts, widen scope, replace topology, or bypass integration gates;
+- main agent owns dispatch, integration, progress log, and stop-condition detection;
+- context overload is not assigned to the main agent.
 
 Findings:
 
@@ -151,6 +168,7 @@ The control structure may be approved only if:
 - goal and execution policy preserve required design invariants;
 - any upstream output contract is preserved in the goal and supported by the execution policy;
 - execution policy preserves goal and requirements analysis;
+- execution topology is explicit and does not create main-agent context overload;
 - execution granularity and sensor load do not create micro-step overcontrol or sensor overcoupling;
 - sensor/evidence governance is explicit;
 - batch cadence is explicit;

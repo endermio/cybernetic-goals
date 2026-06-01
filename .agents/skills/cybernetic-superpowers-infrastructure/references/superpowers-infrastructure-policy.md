@@ -15,6 +15,7 @@ Cybernetic skills compile control structures. Superpowers provide planning, exec
 | Execution policy generation | `$superpowers:writing-plans` | Required for non-trivial execution policies | The cybernetic skill supplies control constraints to the planning substrate. |
 | Control structure review | Independent subagent review discipline | Required for `Approved` unless explicit human approval exists | Do not run target execution or dispatch execution agents during pre-goal review. |
 | Runtime execution | `$superpowers:executing-plans` discipline | Required | Execute approved artifacts only; do not create a new plan at runtime. |
+| Runtime target-work delegation | `$superpowers:subagent-driven-development` discipline | Required when execution policy selects serial or parallel subagent-driven topology | Main agent coordinates and integrates; delegated work packages stay bounded by the approved execution policy. |
 | Runtime debugging | `$superpowers:systematic-debugging` | Required for unclear or repeated failures | Do not random-walk fixes. |
 | Completion claim | `$superpowers:verification-before-completion` | Required | No completion claim without recorded evidence. |
 
@@ -29,6 +30,7 @@ Do not silently replace:
 - `$superpowers:writing-plans` with ad hoc plan writing;
 - independent subagent review discipline with self-review;
 - `$superpowers:executing-plans` with runtime replanning;
+- `$superpowers:subagent-driven-development` with ad hoc context delegation when subagent-driven topology is selected;
 - `$superpowers:systematic-debugging` with speculative fixes;
 - `$superpowers:verification-before-completion` with confidence statements.
 
@@ -65,6 +67,7 @@ The runtime `/goal` must not create, approve, or rewrite its own control structu
 Final runtime `/goal` commands must name the runtime disciplines:
 
 - `$superpowers:executing-plans` for approved-plan execution;
+- `$superpowers:subagent-driven-development` when the approved execution policy selects serial or parallel subagent-driven topology;
 - `$superpowers:systematic-debugging` for unclear or repeated failures;
 - `$superpowers:verification-before-completion` before completion claims.
 
