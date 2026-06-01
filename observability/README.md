@@ -44,11 +44,12 @@ python3 scripts/aggregate_run_events.py \
   --input observability/examples/metadata-only-event.json \
   --out observability/examples/aggregation-summary.json \
   --eval-candidates-out observability/examples/eval-candidates.json \
+  --generated-at 2026-01-02T03:04:05Z \
   --dry-run
 ```
 
 The generated JSON files are process-improvement candidates. They are not
-accepted rules.
+accepted rules. Checked-in examples use a fixed timestamp to avoid churn.
 
 ## Release Boundary
 
