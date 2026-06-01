@@ -129,6 +129,20 @@
         "Defines Context Compression Rule for batch boundaries.",
         "Does not use a vague rationale such as only 'simpler'."
       ]
+    },
+    {
+      "id": "execution-policy-prevents-repeated-full-raw-evidence",
+      "prompt": "Create an execution policy for a long controlled change whose sensor emits about 20k raw JSONL hits per scan. The tempting plan stores a full raw scan after baseline, every batch, and final verification.",
+      "expected_output": "The execution policy includes Evidence Lifecycle / Evidence Budget, permits at most one full baseline and one final full scan unless justified, stores intermediate evidence as summary + delta with raw pointers, and keeps tracked evidence reviewable.",
+      "assertions": [
+        "Includes Evidence Lifecycle / Evidence Budget.",
+        "Defines Evidence channel, Raw allowed?, Baseline policy, Per-batch retention, Delta required?, Summary required?, Max tracked size, Git policy, and Raw pointer.",
+        "Keeps at most one full baseline and one final full scan unless explicitly justified.",
+        "Requires intermediate scans to store summary + delta instead of repeated full raw hits.",
+        "Requires raw pointers or hashes when raw output exists.",
+        "Keeps full raw sensor output out of tracked review artifacts unless the goal explicitly requires it.",
+        "Stops or revises the execution policy if evidence artifacts exceed the approved evidence budget."
+      ]
     }
   ]
 }

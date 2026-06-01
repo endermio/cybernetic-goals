@@ -27,6 +27,7 @@ Cybernetic constraints supplied to the substrate:
 - batch cadence;
 - destructive intermediate-state policy;
 - output material/evidence collection;
+- evidence lifecycle / evidence budget;
 - sensor/evidence governance;
 - stale sensor retirement and rewrite policy.
 
@@ -207,6 +208,31 @@ Blocking missing material:
 
 - [missing material that forces stop or revision]
 
+## Evidence Lifecycle / Evidence Budget
+
+The evidence lifecycle must keep tracked evidence reviewable and prevent repeated full raw sensor output from outgrowing the controlled work.
+
+| Evidence channel | Raw allowed? | Baseline policy | Per-batch retention | Delta required? | Summary required? | Max tracked size | Git policy | Raw pointer |
+|---|---|---|---|---|---|---|---|---|
+| [channel] | [yes/no and where raw may live] | [one full baseline / none / external] | [summary + delta / pointer only / retained full with reason] | [yes/no] | [yes/no] | [reviewable budget, cap, or project policy] | [tracked summary/delta only / ignored raw / external artifact] | [path/hash/command when raw exists] |
+
+Rules:
+
+- Keep at most one full baseline and one final full scan unless explicitly justified.
+- Intermediate scans should store summary + delta, not repeated full raw hits.
+- Full raw sensor output belongs in local cache, ignored artifacts, compressed retained-full artifacts, or external artifact storage unless the goal explicitly requires tracked raw output.
+- Tracked evidence must be reviewable without reading all raw sensor output.
+- Repeated full snapshots of the same sensor are forbidden unless this policy explains why delta is impossible.
+- Each batch must record evidence summary, delta, top offenders or representative samples, and raw pointer when raw output exists.
+- Evidence artifacts must not exceed the approved evidence budget without stopping or revising the execution policy.
+
+Evidence levels:
+
+- Level 0 transient raw: local sensor output, ignored by default, may be overwritten.
+- Level 1 raw pointer: path, hash, command, timestamp, and retention location.
+- Level 2 reviewable summary/delta: tracked summary, delta, top offenders, representative samples, and manifest.
+- Level 3 retained full evidence: full baseline or final full scan only when explicitly justified.
+
 ## Sensor / Evidence Governance
 
 Approved sensors, checks, and evidence channels are sensors, not objectives.
@@ -293,6 +319,12 @@ Each entry must include:
 - completed work packages
 - subagent outputs integrated
 - evidence produced
+- evidence budget status
+- raw evidence generated yes/no
+- delta/summary path
+- raw pointer/hash
+- reason for full snapshot if taken
+- tracked evidence size estimate
 - unresolved blockers
 - deviations from policy
 - current risk

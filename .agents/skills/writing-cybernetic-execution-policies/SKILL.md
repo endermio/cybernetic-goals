@@ -1,6 +1,6 @@
 ---
 name: writing-cybernetic-execution-policies
-description: 'Use after an approved requirements analysis brief, any required solution design, and control contract exist, before starting an executable /goal. Creates a cybernetic execution policy for controlled execution: dependency matrix, execution topology, batch cadence, output material/evidence collection, sensor/evidence governance, semantic invariants, design invariants, tactical degrees of freedom, phase gates, and execution rhythm. Does not execute target work and does not start /goal execution.'
+description: 'Use after an approved requirements analysis brief, any required solution design, and control contract exist, before starting an executable /goal. Creates a cybernetic execution policy for controlled execution: dependency matrix, execution topology, batch cadence, output material/evidence collection, evidence lifecycle/budget, sensor/evidence governance, semantic invariants, design invariants, tactical degrees of freedom, phase gates, and execution rhythm. Does not execute target work and does not start /goal execution.'
 ---
 
 # Writing Cybernetic Execution Policies
@@ -46,6 +46,7 @@ This skill supplies the cybernetic constraints that the planning substrate must 
 - batch cadence;
 - destructive intermediate-state policy;
 - output material/evidence collection for the final output contract;
+- evidence lifecycle / evidence budget for sensor output retention;
 - sensor/evidence governance;
 - stale sensor retirement and rewrite policy.
 
@@ -67,13 +68,14 @@ The execution policy must include:
 8. Batch Cadence
 9. Destructive Intermediate-State Policy
 10. Output Material / Evidence Collection
-11. Sensor / Evidence Governance
-12. Stale Sensor Retirement and Rewrite Policy
-13. Phase Gates
-14. Execution Rhythm
-15. Stop Conditions
-16. Progress Log Rules
-17. Candidate Plan Tasks
+11. Evidence Lifecycle / Evidence Budget
+12. Sensor / Evidence Governance
+13. Stale Sensor Retirement and Rewrite Policy
+14. Phase Gates
+15. Execution Rhythm
+16. Stop Conditions
+17. Progress Log Rules
+18. Candidate Plan Tasks
 
 ## Context Management / Execution Topology
 
@@ -173,6 +175,32 @@ When the goal `Final Output Contract` or design `Output Contract Design` require
 
 Do not leave final output material discovery until the end of runtime execution.
 
+## Evidence Lifecycle / Evidence Budget
+
+The execution policy must prevent evidence artifacts from outgrowing the controlled work.
+
+For each evidence channel, define:
+
+- Evidence channel
+- Raw allowed?
+- Baseline policy
+- Per-batch retention
+- Delta required?
+- Summary required?
+- Max tracked size
+- Git policy
+- Raw pointer
+
+Evidence lifecycle rules:
+
+- keep at most one full baseline and one final full scan unless explicitly justified;
+- intermediate scans should store summary + delta, not repeated full raw hits;
+- full raw sensor output belongs in local cache, ignored artifacts, compressed retained-full artifacts, or external artifact storage unless the goal explicitly requires tracked raw output;
+- tracked evidence must be reviewable without reading all raw sensor output;
+- repeated full snapshots of the same sensor are forbidden unless the policy explains why delta is impossible;
+- each batch must record evidence summary, delta, top offenders or representative samples, and raw pointer when raw output exists;
+- evidence artifacts must not exceed the approved evidence budget without stopping or revising the execution policy.
+
 ## Sensor / Evidence Governance
 
 Approved sensors, checks, and evidence channels are sensors, not objectives.
@@ -231,6 +259,7 @@ Control-law summary:
 - Batch cadence: ...
 - Execution topology: ...
 - Sensor budget: ...
+- Evidence lifecycle: ...
 - Sensor governance: ...
 - Phase gates: ...
 
@@ -285,6 +314,10 @@ Response-only next step:
 - [ ] Each batch ends in an openable/verifiable state.
 - [ ] Broad verification is assigned to integration/final gates unless justified per batch.
 - [ ] The plan defines output material/evidence collection when the final output contract requires structured output.
+- [ ] The plan includes Evidence Lifecycle / Evidence Budget.
+- [ ] Repeated full raw evidence snapshots are forbidden unless explicitly justified.
+- [ ] Intermediate sensor output defaults to summary + delta with raw pointer when raw exists.
+- [ ] Tracked evidence remains reviewable.
 - [ ] The plan treats approved sensors, checks, and evidence channels as sensors, not objectives.
 - [ ] The plan includes stale sensor retirement/rewrite policy.
 - [ ] The plan does not claim to be approved.

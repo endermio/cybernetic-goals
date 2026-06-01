@@ -1,6 +1,6 @@
 ---
 name: reviewing-cybernetic-control-structures
-description: 'Use after requirements analysis, any required solution design, control contract, and execution policy files exist, before starting /goal execution. Reviews the whole AI control structure, not only the plan: traceability, design fidelity, output contract fidelity, goal fidelity, control law quality, context topology, sensor/evidence governance, batch cadence, phase gates, stop conditions, and semantic-vs-tactical boundaries. Produces a control review file under docs/cybernetics/control-reviews/ and must mark Approved before runtime /goal may start.'
+description: 'Use after requirements analysis, any required solution design, control contract, and execution policy files exist, before starting /goal execution. Reviews the whole AI control structure, not only the plan: traceability, design fidelity, output contract fidelity, goal fidelity, control law quality, context topology, evidence lifecycle/budget, sensor/evidence governance, batch cadence, phase gates, stop conditions, and semantic-vs-tactical boundaries. Produces a control review file under docs/cybernetics/control-reviews/ and must mark Approved before runtime /goal may start.'
 ---
 
 # Reviewing Cybernetic Control Structures
@@ -63,6 +63,7 @@ Substantive changes include changes to:
 - execution policy or batch cadence;
 - context management / execution topology;
 - sensor or evidence structure;
+- evidence lifecycle, retention, budget, or tracked-evidence policy;
 - progress log required fields;
 - stop conditions;
 - runtime boundary;
@@ -119,6 +120,7 @@ The execution policy must define a sane control law:
 - context budget
 - execution granularity
 - sensor budget
+- evidence lifecycle / evidence budget
 - batch cadence
 - phase gates
 - repair policy
@@ -135,7 +137,23 @@ Flag plans that:
 - lack stale sensor retirement rules;
 - lack target-state evidence.
 
-### 7. Execution Granularity / Sensor Load
+### 7. Evidence Lifecycle / Evidence Budget
+
+Flag as Major or Blocking when:
+
+- the execution policy stores repeated full raw sensor outputs per batch;
+- raw evidence volume can exceed the controlled work size without justification;
+- intermediate evidence lacks summary or delta;
+- tracked evidence is not reviewable;
+- no raw, pointer, summary/delta, and retained-full retention policy exists;
+- evidence files are used as context instead of indexed references;
+- reviewers would need to read raw evidence to approve;
+- evidence artifacts are not separated into transient raw, raw pointer, reviewable summary/delta, and retained full classes;
+- repeated full snapshots of the same sensor are allowed without explaining why delta is impossible.
+
+Use `Major` when execution-policy revision can repair evidence lifecycle. Use `Blocking` when sensor output would likely swamp review, context management, or runtime completion.
+
+### 8. Execution Granularity / Sensor Load
 
 Flag as Major or Blocking when:
 
@@ -150,7 +168,7 @@ Flag as Major or Blocking when:
 
 Use `Major` when execution-policy revision can repair the control law. Use `Blocking` when the granularity or sensor load would prevent runtime completion or let sensors override confirmed semantics.
 
-### 8. Context Management / Execution Topology
+### 9. Context Management / Execution Topology
 
 Flag as Major or Blocking when:
 
@@ -167,7 +185,7 @@ Flag as Major or Blocking when:
 
 Use `Major` when execution-policy revision can repair topology. Use `Blocking` when context overload would likely make runtime lose requirements, design invariants, output contract, stop conditions, or approval boundaries.
 
-### 9. Batch Rhythm
+### 10. Batch Rhythm
 
 Flag:
 
@@ -176,15 +194,15 @@ Flag:
 - no batch-end openability requirement;
 - no destructive intermediate-state policy.
 
-### 10. Semantic vs Tactical Boundary
+### 11. Semantic vs Tactical Boundary
 
 Semantic invariants must be frozen. Tactical execution details must remain adjustable.
 
-### 11. Runtime Suitability
+### 12. Runtime Suitability
 
 The runtime `/goal` must be able to execute the approved artifacts without inventing new control structures. Any required runtime discipline, including approved execution topology, bounded subagent delegation protocol, and conditionally selected Superpowers substrate, must be precompiled into the approved plan, review, or final `/goal`.
 
-### 12. Review Independence
+### 13. Review Independence
 
 The review must record:
 
@@ -193,7 +211,7 @@ The review must record:
 - whether approval is allowed;
 - why approval is blocked when independent review is missing.
 
-### 13. Final Observer Check
+### 14. Final Observer Check
 
 The review must record whether any substantive artifact changed after the latest independent review pass and whether a final independent observer confirmed no Blocking or Major findings after that change.
 
@@ -230,6 +248,7 @@ Only mark `Approved` when:
 - execution policy does not self-authorize uncontrolled changes;
 - execution topology is explicit and does not create main-agent context overload;
 - execution granularity and sensor load do not create micro-step overcontrol or sensor overcoupling;
+- evidence lifecycle keeps tracked evidence reviewable and prevents raw sensor output explosion;
 - sensor/evidence governance is explicit;
 - runtime `/goal` can execute without writing or approving a new plan.
 - independent review discipline was satisfied or explicit human approval exists.
@@ -281,6 +300,7 @@ Response-only next step:
 - [ ] Lint PASS is not treated as semantic/control-policy approval.
 - [ ] Critical findings distinguish semantic, design, goal, plan, sensor, and runtime issues.
 - [ ] Output contract fidelity was checked when any upstream output contract exists.
+- [ ] Evidence lifecycle and evidence budget were checked.
 - [ ] Execution granularity and sensor load were checked.
 - [ ] Required revisions are actionable.
 - [ ] Response-only handoff matches the review status and does not bypass `$orchestrating-cybernetic-pregoal` when full pre-goal orchestration owns the chain.

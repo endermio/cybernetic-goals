@@ -127,6 +127,24 @@ Findings:
 
 - [finding]
 
+## Evidence Lifecycle / Evidence Budget
+
+Check:
+
+- execution policy does not store repeated full raw sensor outputs per batch;
+- raw evidence volume cannot exceed the controlled work size without justification;
+- intermediate evidence records summary and delta instead of only full raw output;
+- tracked evidence is reviewable;
+- raw, pointer, summary/delta, and retained-full retention policy exists;
+- evidence files are referenced by indexed summaries or raw pointer rather than loaded as context;
+- reviewers do not need to read raw evidence to approve;
+- evidence artifacts are separated into transient raw, raw pointer, reviewable summary/delta, and retained full classes;
+- repeated full snapshots of the same sensor are justified only when delta is impossible.
+
+Findings:
+
+- [finding]
+
 ## Batch Rhythm
 
 Findings:
@@ -173,6 +191,7 @@ The control structure may be approved only if:
 - execution policy preserves goal and requirements analysis;
 - execution topology is explicit and does not create main-agent context overload;
 - execution granularity and sensor load do not create micro-step overcontrol or sensor overcoupling;
+- evidence lifecycle keeps tracked evidence reviewable and prevents raw sensor output explosion;
 - sensor/evidence governance is explicit;
 - batch cadence is explicit;
 - runtime execution does not need to synthesize a new plan.

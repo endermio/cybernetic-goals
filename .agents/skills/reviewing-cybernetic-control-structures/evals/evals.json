@@ -139,6 +139,22 @@
         "Requires context compression at batch boundaries.",
         "Does not mark Approved."
       ]
+    },
+    {
+      "id": "review-flags-evidence-explosion",
+      "prompt": "Review an execution policy that stores a full raw residual JSONL scan after baseline and every batch, producing about 20k lines per scan and over 1M evidence lines, with no summary/delta retention policy and tracked raw evidence required for approval.",
+      "expected_output": "The review flags Evidence Lifecycle / Evidence Budget as Major or Blocking, requires execution-policy revision, and does not approve runtime compilation.",
+      "assertions": [
+        "Includes Evidence Lifecycle / Evidence Budget as a review dimension.",
+        "Flags repeated full raw sensor outputs per batch.",
+        "Flags raw evidence volume exceeding controlled work size without justification.",
+        "Requires summary and delta for intermediate evidence.",
+        "Requires raw pointers instead of loading raw evidence as context.",
+        "Flags tracked evidence that is not reviewable.",
+        "Requires revising the execution policy.",
+        "Does not mark Approved.",
+        "Does not output a final runtime /goal."
+      ]
     }
   ]
 }
