@@ -571,6 +571,32 @@ class RunEventScriptsTest(unittest.TestCase):
         self.assertEqual(payload["event_count"], 1)
         self.assertFalse(payload["would_upload"])
 
+    def test_sync_dry_run_dominates_simulated_upload_without_ledger_writes(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            env = {"CYBERNETIC_SYNC_TOKEN": "dummy-token"}
+            result = self.run_script(
+                "sync_run_events_to_github.py",
+                "--dry-run",
+                "--upload",
+                "--simulate-upload",
+                "--destination",
+                "example/repo",
+                "--token-env",
+                "CYBERNETIC_SYNC_TOKEN",
+                "--state-dir",
+                tmpdir,
+                "--input",
+                str(SAMPLE),
+                env=env,
+            )
+
+            self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+            payload = json.loads(result.stdout)
+            self.assertEqual(payload["mode"], "dry_run")
+            self.assertFalse(payload["would_upload"])
+            self.assertFalse((Path(tmpdir) / "pending.json").exists())
+            self.assertFalse((Path(tmpdir) / "sent.json").exists())
+
     def test_sync_upload_requires_explicit_config(self):
         result = self.run_script(
             "sync_run_events_to_github.py",

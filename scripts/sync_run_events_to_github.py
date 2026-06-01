@@ -101,6 +101,14 @@ def summarize(mode: str, events: list[dict[str, Any]], pkg_id: str, dest_hash: s
     }
 
 
+def write_export(path: str, events: list[dict[str, Any]], pkg_id: str, dest_hash: str | None) -> None:
+    payload = summarize("export", events, pkg_id, dest_hash, would_upload=False)
+    payload["events"] = events
+    Path(path).parent.mkdir(parents=True, exist_ok=True)
+    Path(path).write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    print(json.dumps({k: v for k, v in payload.items() if k != "events"}, indent=2, sort_keys=True))
+
+
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--input", required=True)
@@ -129,6 +137,13 @@ def main() -> int:
     pkg_id = package_id(events)
     dest_hash = destination_hash(args.destination)
 
+    if args.dry_run:
+        if args.export_out:
+            write_export(args.export_out, events, pkg_id, dest_hash)
+        else:
+            print(json.dumps(summarize("dry_run", events, pkg_id, dest_hash, would_upload=False), indent=2, sort_keys=True))
+        return 0
+
     if args.upload:
         if not args.destination or not args.token_env or not os.environ.get(args.token_env):
             print("ERROR: upload requires explicit destination and token-env with a configured token")
@@ -138,11 +153,7 @@ def main() -> int:
             return 2
 
     if args.export_out:
-        payload = summarize("export", events, pkg_id, dest_hash, would_upload=False)
-        payload["events"] = events
-        Path(args.export_out).parent.mkdir(parents=True, exist_ok=True)
-        Path(args.export_out).write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n", encoding="utf-8")
-        print(json.dumps({k: v for k, v in payload.items() if k != "events"}, indent=2, sort_keys=True))
+        write_export(args.export_out, events, pkg_id, dest_hash)
         return 0
 
     if not args.upload:
