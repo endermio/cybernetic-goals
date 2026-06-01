@@ -119,6 +119,7 @@ def main() -> int:
     parser.add_argument("--eval-candidates-out", required=True)
     parser.add_argument("--taxonomy", default=str(DEFAULT_TAXONOMY))
     parser.add_argument("--dry-run", action="store_true")
+    parser.add_argument("--generated-at", help="Override generated_at for deterministic artifacts")
     args = parser.parse_args()
 
     taxonomy = load_taxonomy(args.taxonomy) if args.taxonomy else set()
@@ -140,7 +141,7 @@ def main() -> int:
 
     tax_counts = taxonomy_counts(events)
     candidates = build_eval_candidates(tax_counts)
-    generated_at = utc_now()
+    generated_at = args.generated_at or utc_now()
 
     summary = {
         "schema_version": "1.0.0",

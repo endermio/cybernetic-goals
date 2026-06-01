@@ -14,19 +14,38 @@ permissions:
 jobs:
   aggregate:
     runs-on: ubuntu-latest
+    env:
+      EVENT_PATH: ${{ inputs.event_path }}
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
 
+      - name: Validate requested event path
+        run: |
+          case "$EVENT_PATH" in
+            ""|/*|*..*)
+              echo "event_path must be a non-empty repository-relative JSON/JSONL path"
+              exit 2
+              ;;
+          esac
+          if [[ ! "$EVENT_PATH" =~ ^[A-Za-z0-9][A-Za-z0-9._/-]*\.(json|jsonl)$ ]]; then
+            echo "event_path contains unsupported characters or file extension"
+            exit 2
+          fi
+          if [ ! -f "$EVENT_PATH" ]; then
+            echo "event_path does not exist in the repository"
+            exit 2
+          fi
+
       - name: Validate event package
         run: |
-          python3 scripts/validate_run_events.py --taxonomy observability/taxonomies/failure-taxonomy.yaml "${{ inputs.event_path }}"
+          python3 scripts/validate_run_events.py --taxonomy observability/taxonomies/failure-taxonomy.yaml "$EVENT_PATH"
 
       - name: Aggregate metadata-only outcomes
         run: |
           mkdir -p observability/generated
           python3 scripts/aggregate_run_events.py \
-            --input "${{ inputs.event_path }}" \
+            --input "$EVENT_PATH" \
             --out observability/generated/aggregation-summary.json \
             --eval-candidates-out observability/generated/eval-candidates.json \
             --dry-run

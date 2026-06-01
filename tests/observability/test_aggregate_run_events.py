@@ -43,6 +43,30 @@ class AggregateRunEventsTest(unittest.TestCase):
         self.assertEqual(candidates_payload["schema_version"], "1.0.0")
         self.assertIn("candidates", candidates_payload)
 
+    def test_generated_at_can_be_set_for_deterministic_outputs(self):
+        generated_at = "2026-01-02T03:04:05Z"
+        with tempfile.TemporaryDirectory() as tmpdir:
+            summary = Path(tmpdir) / "aggregation-summary.json"
+            candidates = Path(tmpdir) / "eval-candidates.json"
+            result = self.run_aggregate(
+                "--input",
+                str(SAMPLE),
+                "--out",
+                str(summary),
+                "--eval-candidates-out",
+                str(candidates),
+                "--dry-run",
+                "--generated-at",
+                generated_at,
+            )
+            self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+
+            summary_payload = json.loads(summary.read_text(encoding="utf-8"))
+            candidates_payload = json.loads(candidates.read_text(encoding="utf-8"))
+
+        self.assertEqual(summary_payload["generated_at"], generated_at)
+        self.assertEqual(candidates_payload["generated_at"], generated_at)
+
     def test_failure_taxonomy_code_generates_eval_candidate(self):
         event = json.loads(SAMPLE.read_text(encoding="utf-8"))
         event["event_id"] = "evt_failure_candidate"
