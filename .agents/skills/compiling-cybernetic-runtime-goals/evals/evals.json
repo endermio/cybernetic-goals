@@ -111,7 +111,7 @@
       "assertions": [
         "References the approved execution topology from the execution policy.",
         "Mentions the approved bounded subagent delegation protocol when serial subagent-driven topology is selected.",
-        "Does not require $superpowers:subagent-driven-development unless the approved execution policy explicitly selected it for compatible implementation-plan work packages.",
+        "Does not require $superpowers:subagent-driven-development unless the approved execution policy records Selected delegation substrate: superpowers-subagent-driven-development for compatible implementation-plan work packages.",
         "Requires only one execution subagent active at a time for serial topology.",
         "Says the main agent coordinates, integrates, maintains progress log, and detects stop conditions.",
         "States that subagent outputs are candidate results until main-agent integration against approved artifacts, progress log, evidence requirements, and stop conditions.",
@@ -136,12 +136,12 @@
     },
     {
       "id": "uses-subagent-driven-development-only-when-selected",
-      "prompt": "requirements analysis Complete, goal exists, execution policy status Candidate and selects Serial subagent-driven topology with an approved bounded delegation protocol but does not select $superpowers:subagent-driven-development. control review Approved and Final Observer Check allows approval；编译最终 /goal。",
+      "prompt": "requirements analysis Complete, goal exists, execution policy status Candidate and selects Serial subagent-driven topology with Selected delegation substrate: bounded-protocol and an approved bounded delegation protocol. control review Approved and Final Observer Check allows approval；编译最终 /goal。",
       "expected_output": "Outputs a final /goal that preserves serial subagent-driven topology and uses the approved bounded delegation protocol without adding $superpowers:subagent-driven-development.",
       "assertions": [
         "References the approved execution topology from the execution policy.",
         "Uses the approved bounded subagent delegation protocol recorded in the plan.",
-        "Does not add $superpowers:subagent-driven-development when the plan did not explicitly select it.",
+        "Does not add $superpowers:subagent-driven-development when the plan does not record Selected delegation substrate: superpowers-subagent-driven-development.",
         "Keeps the main agent responsible for coordination, integration, progress log, and stop-condition detection.",
         "States that subagent outputs are candidate results until main-agent integration."
       ]

@@ -203,6 +203,28 @@ def selected_execution_topology(plan: str | None) -> str | None:
     return None
 
 
+def selected_delegation_substrate(plan: str | None) -> str | None:
+    body = section_body(plan or "", "Context Management / Execution Topology")
+    if body is None:
+        return None
+    match = re.search(r"(?im)^\s*Selected delegation substrate\s*:\s*`?([^`\n]+?)`?\s*$", body)
+    if not match:
+        return None
+
+    value = match.group(1).strip().strip("`").casefold()
+    if "/" in value:
+        return None
+    if value in {"bounded-protocol", "bounded protocol"}:
+        return "bounded-protocol"
+    if value in {"superpowers-subagent-driven-development", "$superpowers:subagent-driven-development"}:
+        return "superpowers-subagent-driven-development"
+    if value in {"adapter-specific", "adapter specific"}:
+        return "adapter-specific"
+    if value == "none":
+        return "none"
+    return None
+
+
 def task_level(plan: str | None) -> int | None:
     body = section_body(plan or "", "Context Management / Execution Topology")
     if body is None:
@@ -335,6 +357,11 @@ def check_execution_topology(plan: str | None, errors: list[str]) -> None:
         if not has_meaningful_delegation_matrix(body):
             errors.append("execution topology missing meaningful delegation matrix with Context pack, Allowed actions, Return format, and Integration gate")
         check_labeled_requirements(body, "Context Pack Requirements", CONTEXT_PACK_FIELDS, errors)
+        substrate = selected_delegation_substrate(plan)
+        if substrate is None:
+            errors.append("subagent-driven topology missing valid Selected delegation substrate")
+        elif substrate == "none":
+            errors.append("subagent-driven topology cannot use Selected delegation substrate: none")
         if not labeled_block_has_content(body, "Subagent delegation substrate"):
             errors.append("subagent-driven topology missing approved bounded subagent delegation substrate")
 

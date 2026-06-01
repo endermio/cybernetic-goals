@@ -34,9 +34,9 @@ This skill requires independent review discipline before it may mark a control s
 
 Do not self-review and mark `Approved`. Do not run target execution. Do not dispatch execution agents during pre-goal control review.
 
-If subagents are explicitly authorized, use independent reviewer passes for the control structure. This is not the full `$superpowers:subagent-driven-development` execution workflow; it is independent review discipline only.
+If pre-goal review subagents are explicitly authorized, use independent reviewer passes for the control structure. This is not the full `$superpowers:subagent-driven-development` execution workflow; it is independent review discipline only.
 
-If subagents are not authorized and no explicit human approval or other independent reviewer exists, produce a review marked `Needs Independent Review`. Do not mark `Approved`.
+If pre-goal review subagents are not authorized and no explicit human approval or other independent reviewer exists, produce a review marked `Needs Independent Review`. Do not mark `Approved`.
 
 ## Final Observer Rule
 

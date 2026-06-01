@@ -106,6 +106,7 @@
       "assertions": [
         "Includes Context Management / Execution Topology.",
         "Selects Main-only, Serial subagent-driven, or Parallel subagent-driven explicitly.",
+        "Records Selected delegation substrate.",
         "Defaults Level 3 high-context work to Serial subagent-driven unless Main-only has a context-load justification.",
         "Defines Context pack for each delegated work package.",
         "Defines Context Pack Requirements including relevant control excerpts, current batch objective, allowed artifacts/surfaces, forbidden changes, required sensors/evidence, stop conditions, and expected return format.",
@@ -122,6 +123,7 @@
       "assertions": [
         "Records Task level as Level 3.",
         "Selects Main-only explicitly if that topology is used.",
+        "Records Selected delegation substrate as none or another justified non-delegating value for Main-only.",
         "Includes Main-only context-load justification.",
         "Explains why bounded subagents are not needed or would be counterproductive.",
         "Defines Context Compression Rule for batch boundaries.",

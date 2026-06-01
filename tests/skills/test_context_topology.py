@@ -9,14 +9,26 @@ ROOT = Path(__file__).resolve().parents[2]
 
 
 class ContextTopologySkillTest(unittest.TestCase):
-    def complete_serial_topology(self, delegation_substrate: str | None = None) -> str:
+    def complete_serial_topology(
+        self,
+        delegation_substrate: str | None = None,
+        *,
+        selected_delegation_substrate: str | None = "bounded-protocol",
+    ) -> str:
         substrate = delegation_substrate or "Approved bounded subagent delegation protocol for serial bounded work packages."
+        selected_substrate_lines = []
+        if selected_delegation_substrate is not None:
+            selected_substrate_lines = [
+                f"Selected delegation substrate: `{selected_delegation_substrate}`",
+                "",
+            ]
         return "\n".join(
             [
                 "Selected topology: `Serial subagent-driven`",
                 "",
                 "Task level: `Level 3`",
                 "",
+                *selected_substrate_lines,
                 "Topology rationale:",
                 "",
                 "- Level 3 context load needs bounded delegation.",
@@ -173,6 +185,7 @@ class ContextTopologySkillTest(unittest.TestCase):
             self.assertIn("Task level", text)
             self.assertIn("Context Pack Requirements", text)
             self.assertIn("Context Compression Rule", text)
+            self.assertIn("Selected delegation substrate", text)
 
         self.assertIn("main agent owns", template.casefold())
         self.assertIn("subagent owns", template.casefold())
@@ -196,6 +209,20 @@ class ContextTopologySkillTest(unittest.TestCase):
 
         self.assertIn("Level 3/4", skill)
         self.assertIn("context overload", skill.casefold())
+
+    def test_subagent_authorization_distinguishes_review_and_runtime_execution(self):
+        orchestrator = (
+            ROOT / ".agents/skills/orchestrating-cybernetic-pregoal/SKILL.md"
+        ).read_text(encoding="utf-8")
+        infrastructure = (
+            ROOT / ".agents/skills/cybernetic-superpowers-infrastructure/references/superpowers-infrastructure-policy.md"
+        ).read_text(encoding="utf-8")
+
+        for text in (orchestrator, infrastructure):
+            self.assertIn("pre-goal review subagents", text.casefold())
+            self.assertIn("runtime target-work subagents", text.casefold())
+            self.assertIn("user launches that `/goal`", text)
+            self.assertIn("parallel runtime subagents", text.casefold())
 
     def test_runtime_compiler_preserves_serial_subagent_topology(self):
         with tempfile.TemporaryDirectory() as tmpdir:
@@ -243,7 +270,8 @@ class ContextTopologySkillTest(unittest.TestCase):
             requirements, goal, plan, review = self.write_artifact_chain(
                 tmp,
                 self.complete_serial_topology(
-                    "Implementation-plan same-session delegation uses `$superpowers:subagent-driven-development` discipline for independent bounded development tasks."
+                    "Implementation-plan same-session delegation uses `$superpowers:subagent-driven-development` discipline for independent bounded development tasks.",
+                    selected_delegation_substrate="superpowers-subagent-driven-development",
                 ),
             )
 
@@ -273,6 +301,44 @@ class ContextTopologySkillTest(unittest.TestCase):
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
         self.assertIn("$superpowers:subagent-driven-development", result.stdout)
         self.assertIn("only when the approved plan's work packages match that workflow", result.stdout)
+
+    def test_runtime_compiler_does_not_infer_superpowers_substrate_from_notes(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            tmp = Path(tmpdir)
+            requirements, goal, plan, review = self.write_artifact_chain(
+                tmp,
+                self.complete_serial_topology(
+                    "Reference note: `$superpowers:subagent-driven-development` is an implementation-plan substrate, but this task uses the plan-local bounded delegation protocol.",
+                    selected_delegation_substrate="bounded-protocol",
+                ),
+            )
+
+            result = subprocess.run(
+                [
+                    sys.executable,
+                    str(
+                        ROOT
+                        / ".agents/skills/compiling-cybernetic-runtime-goals/scripts/compile_runtime_goal.py"
+                    ),
+                    "--requirements",
+                    str(requirements),
+                    "--goal",
+                    str(goal),
+                    "--plan",
+                    str(plan),
+                    "--review",
+                    str(review),
+                    "--skip-guard",
+                    "--i-understand-this-bypasses-phase-gates",
+                ],
+                cwd=ROOT,
+                text=True,
+                capture_output=True,
+            )
+
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        self.assertNotIn("$superpowers:subagent-driven-development", result.stdout)
+        self.assertIn("approved bounded subagent delegation protocol", result.stdout)
 
     def test_control_chain_guard_requires_review_of_context_topology(self):
         with tempfile.TemporaryDirectory() as tmpdir:
@@ -342,6 +408,112 @@ class ContextTopologySkillTest(unittest.TestCase):
         self.assertIn("Context pack", output)
         self.assertIn("Return format", output)
         self.assertIn("Integration gate", output)
+
+    def test_guards_reject_missing_selected_delegation_substrate(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            requirements, goal, plan, review = self.write_artifact_chain(
+                Path(tmpdir),
+                self.complete_serial_topology(selected_delegation_substrate=None),
+            )
+
+            control_guard = subprocess.run(
+                [
+                    sys.executable,
+                    str(
+                        ROOT
+                        / ".agents/skills/compiling-cybernetic-runtime-goals/scripts/control_chain_guard.py"
+                    ),
+                    "--requirements",
+                    str(requirements),
+                    "--goal",
+                    str(goal),
+                    "--plan",
+                    str(plan),
+                    "--review",
+                    str(review),
+                ],
+                cwd=ROOT,
+                text=True,
+                capture_output=True,
+            )
+            orchestration_guard = subprocess.run(
+                [
+                    sys.executable,
+                    str(
+                        ROOT
+                        / ".agents/skills/orchestrating-cybernetic-pregoal/scripts/orchestration_guard.py"
+                    ),
+                    "--state",
+                    "before-review",
+                    "--requirements",
+                    str(requirements),
+                    "--goal",
+                    str(goal),
+                    "--plan",
+                    str(plan),
+                ],
+                cwd=ROOT,
+                text=True,
+                capture_output=True,
+            )
+
+        for result in (control_guard, orchestration_guard):
+            output = result.stdout + result.stderr
+            self.assertNotEqual(result.returncode, 0)
+            self.assertIn("Selected delegation substrate", output)
+
+    def test_guards_reject_none_selected_delegation_substrate_for_subagent_topology(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            requirements, goal, plan, review = self.write_artifact_chain(
+                Path(tmpdir),
+                self.complete_serial_topology(selected_delegation_substrate="none"),
+            )
+
+            control_guard = subprocess.run(
+                [
+                    sys.executable,
+                    str(
+                        ROOT
+                        / ".agents/skills/compiling-cybernetic-runtime-goals/scripts/control_chain_guard.py"
+                    ),
+                    "--requirements",
+                    str(requirements),
+                    "--goal",
+                    str(goal),
+                    "--plan",
+                    str(plan),
+                    "--review",
+                    str(review),
+                ],
+                cwd=ROOT,
+                text=True,
+                capture_output=True,
+            )
+            orchestration_guard = subprocess.run(
+                [
+                    sys.executable,
+                    str(
+                        ROOT
+                        / ".agents/skills/orchestrating-cybernetic-pregoal/scripts/orchestration_guard.py"
+                    ),
+                    "--state",
+                    "before-review",
+                    "--requirements",
+                    str(requirements),
+                    "--goal",
+                    str(goal),
+                    "--plan",
+                    str(plan),
+                ],
+                cwd=ROOT,
+                text=True,
+                capture_output=True,
+            )
+
+        for result in (control_guard, orchestration_guard):
+            output = result.stdout + result.stderr
+            self.assertNotEqual(result.returncode, 0)
+            self.assertIn("Selected delegation substrate", output)
 
     def test_guards_reject_level_3_main_only_without_context_load_justification(self):
         topology_body = "\n".join(

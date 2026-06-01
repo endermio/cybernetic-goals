@@ -16,7 +16,7 @@ Cybernetic skills compile control structures. Superpowers provide planning, exec
 | Control structure review | Independent subagent review discipline | Required for `Approved` unless explicit human approval exists | Do not run target execution or dispatch execution agents during pre-goal review. |
 | Runtime execution | `$superpowers:executing-plans` discipline | Required | Execute approved artifacts only; do not create a new plan at runtime. |
 | Runtime target-work delegation | Approved bounded subagent delegation protocol | Required when execution policy selects serial or parallel subagent-driven topology | Main agent coordinates and integrates; delegated work packages stay bounded by the approved execution policy. |
-| Runtime implementation-plan delegation | `$superpowers:subagent-driven-development` discipline | Conditional | Use only when the approved execution policy explicitly selects it for implementation-plan, current-session work packages that fit that workflow. |
+| Runtime implementation-plan delegation | `$superpowers:subagent-driven-development` discipline | Conditional | Use only when the approved execution policy records `Selected delegation substrate: superpowers-subagent-driven-development` for implementation-plan, current-session work packages that fit that workflow. |
 | Runtime debugging | `$superpowers:systematic-debugging` | Required for unclear or repeated failures | Do not random-walk fixes. |
 | Completion claim | `$superpowers:verification-before-completion` | Required | No completion claim without recorded evidence. |
 
@@ -32,19 +32,25 @@ Do not silently replace:
 - independent subagent review discipline with self-review;
 - `$superpowers:executing-plans` with runtime replanning;
 - an approved bounded subagent delegation protocol with ad hoc context delegation when subagent-driven topology is selected;
-- `$superpowers:subagent-driven-development` with generic subagent delegation for work that does not fit that implementation-plan, current-session workflow;
+- `$superpowers:subagent-driven-development` with generic subagent delegation or without `Selected delegation substrate: superpowers-subagent-driven-development`;
 - `$superpowers:systematic-debugging` with speculative fixes;
 - `$superpowers:verification-before-completion` with confidence statements.
 
 ## Subagent Authorization Rule
 
-Subagents require explicit user authorization.
+Pre-goal review subagents and runtime target-work subagents use different authorization semantics.
 
-If subagents are not authorized:
+Pre-goal review subagents require explicit authorization in the current orchestration request.
+
+If pre-goal review subagents are not authorized:
 
 - produce candidate artifacts when useful;
 - mark control review status as `Needs Independent Review`;
 - do not mark the control structure `Approved` unless explicit human approval or another independent reviewer already exists.
+
+Runtime target-work subagents are authorized only when the final `/goal` explicitly contains the approved subagent-driven execution topology and the user launches that `/goal`. Compiling or displaying the final `/goal` does not itself start runtime target-work subagents.
+
+Parallel runtime subagents require explicit human approval recorded in the execution policy and control review before the final `/goal` is compiled.
 
 ## Final Observer Rule
 
@@ -70,7 +76,7 @@ Final runtime `/goal` commands must name the runtime disciplines:
 
 - `$superpowers:executing-plans` for approved-plan execution;
 - the approved bounded subagent delegation protocol when the approved execution policy selects serial or parallel subagent-driven topology;
-- `$superpowers:subagent-driven-development` only when the approved execution policy explicitly selects it for compatible implementation-plan, current-session work packages;
+- `$superpowers:subagent-driven-development` only when the approved execution policy records `Selected delegation substrate: superpowers-subagent-driven-development` for compatible implementation-plan, current-session work packages;
 - `$superpowers:systematic-debugging` for unclear or repeated failures;
 - `$superpowers:verification-before-completion` before completion claims.
 

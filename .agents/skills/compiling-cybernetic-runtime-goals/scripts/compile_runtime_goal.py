@@ -72,24 +72,31 @@ def topology_section(plan_path: str) -> str:
     return section_body(plan, "Context Management / Execution Topology") or ""
 
 
-def selected_superpowers_subagent_workflow(plan_path: str) -> bool:
-    for line in topology_section(plan_path).splitlines():
-        lowered = line.casefold()
-        if "subagent-driven-development" not in lowered:
-            continue
-        if "[" in line and "]" in line:
-            continue
-        if "do not" in lowered or "does not" in lowered or "not use" in lowered:
-            continue
-        return True
-    return False
+def selected_delegation_substrate(plan_path: str) -> str | None:
+    body = topology_section(plan_path)
+    match = re.search(r"(?im)^\s*Selected delegation substrate\s*:\s*`?([^`\n]+?)`?\s*$", body)
+    if not match:
+        return None
+
+    value = match.group(1).strip().strip("`").casefold()
+    if "/" in value:
+        return None
+    if value in {"bounded-protocol", "bounded protocol"}:
+        return "bounded-protocol"
+    if value in {"superpowers-subagent-driven-development", "$superpowers:subagent-driven-development"}:
+        return "superpowers-subagent-driven-development"
+    if value in {"adapter-specific", "adapter specific"}:
+        return "adapter-specific"
+    if value == "none":
+        return "none"
+    return None
 
 
 def conditional_subagent_workflow_clause(plan_path: str) -> str:
-    if not selected_superpowers_subagent_workflow(plan_path):
+    if selected_delegation_substrate(plan_path) != "superpowers-subagent-driven-development":
         return ""
     return (
-        "The approved plan explicitly selects `$superpowers:subagent-driven-development`; use it only when the approved plan's work packages match that workflow. "
+        "The approved plan records `Selected delegation substrate: superpowers-subagent-driven-development`; use `$superpowers:subagent-driven-development` only when the approved plan's work packages match that workflow. "
     )
 
 

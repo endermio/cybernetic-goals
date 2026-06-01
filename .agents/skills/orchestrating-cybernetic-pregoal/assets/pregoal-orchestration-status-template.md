@@ -32,7 +32,11 @@ State: `RequirementsMissing` / `RequirementsComplete` / `DesignReady` / `GoalRea
 
 ## Subagent Authorization
 
-Subagents authorized: `yes` / `no`
+Pre-goal review subagents authorized: `yes` / `no`
+
+Runtime target-work subagents authorized by final `/goal` launch: `not compiled / compiled but not launched / launched`
+
+Parallel runtime subagents approved in execution policy and review: `yes / no / not applicable`
 
 Evidence:
 

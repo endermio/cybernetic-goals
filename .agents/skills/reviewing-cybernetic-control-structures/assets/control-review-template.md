@@ -13,7 +13,7 @@ Status: `Needs Revision`
 
 ## Review Independence
 
-- Subagents authorized: `yes/no`
+- Pre-goal review subagents authorized: `yes/no`
 - Independent review passes completed:
   - Requirement traceability: `yes/no`
   - Design fidelity: `yes/no`

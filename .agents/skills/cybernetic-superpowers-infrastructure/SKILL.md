@@ -27,6 +27,8 @@ When a required substrate applies:
 
 Approval requires a final observer pass after the last substantive mutation to the reviewed control artifacts, including required solution design. An older review result must not be transferred to a changed control structure unless the change is deterministic-only and guard-covered.
 
+Pre-goal review subagents require explicit authorization in the orchestration request. Runtime target-work subagents are authorized only when the final `/goal` explicitly contains the approved subagent-driven execution topology and the user launches that `/goal`; parallel runtime subagents still require explicit human approval recorded in the execution policy and control review.
+
 ## Stage Summary
 
 | Stage | Superpowers substrate | Required? |
@@ -37,7 +39,7 @@ Approval requires a final observer pass after the last substantive mutation to t
 | Control review approval | Independent subagent review discipline | Required for `Approved` unless explicit human approval exists |
 | Runtime execution | `$superpowers:executing-plans` discipline | Required |
 | Runtime target-work delegation | Approved bounded subagent delegation protocol | Required when execution policy selects serial or parallel subagent-driven topology |
-| Runtime implementation-plan delegation | `$superpowers:subagent-driven-development` discipline | Conditional: use only when the approved execution policy explicitly selects it for implementation-plan, current-session work packages that fit that workflow |
+| Runtime implementation-plan delegation | `$superpowers:subagent-driven-development` discipline | Conditional: use only when the approved execution policy records `Selected delegation substrate: superpowers-subagent-driven-development` for implementation-plan, current-session work packages that fit that workflow |
 | Unclear or repeated runtime failure | `$superpowers:systematic-debugging` | Required |
 | Completion claim | `$superpowers:verification-before-completion` | Required |
 

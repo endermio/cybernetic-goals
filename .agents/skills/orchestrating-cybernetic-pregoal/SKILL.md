@@ -111,7 +111,13 @@ $orchestrating-cybernetic-pregoal 根据 docs/cybernetics/requirements/2026-05-2
 
 ## Subagent Authorization Rule
 
-Do not spawn subagents unless the user explicitly authorizes subagents in the same request.
+Pre-goal review subagents and runtime target-work subagents use different authorization semantics.
+
+Pre-goal review subagents require explicit authorization in the same orchestration request. Do not spawn pre-goal review subagents unless the user explicitly authorizes subagents in that request.
+
+Runtime target-work subagents are authorized only when the final `/goal` explicitly contains the approved subagent-driven execution topology and the user launches that `/goal`. Compiling or displaying the final `/goal` does not itself start runtime target-work subagents.
+
+Parallel runtime subagents require explicit human approval recorded in the execution policy and control review before the final `/goal` is compiled.
 
 Phrases that count as authorization include:
 
@@ -121,18 +127,18 @@ Phrases that count as authorization include:
 - `spawn subagents`
 - `use independent subagent reviewers`
 
-If subagents are not authorized:
+If pre-goal review subagents are not authorized:
 
 - You may create candidate design, goal, and execution policy files.
 - You may create a draft control review marked `Needs Independent Review`.
 - You must not claim independent review or mark the control structure `Approved` unless a separate reviewer, explicit human approval, or an authorized subagent review exists.
-- Ask the user to authorize subagent review or manually approve the artifacts before compiling a final runtime `/goal`.
+- Ask the user to authorize pre-goal review subagents or manually approve the artifacts before compiling a final runtime `/goal`.
 
 ## Pre-goal Orchestration Modes
 
 ### Mode A: Candidate-Only Mode
 
-Use when subagents are not authorized.
+Use when pre-goal review subagents are not authorized.
 
 Behavior:
 
@@ -145,7 +151,7 @@ Behavior:
 
 ### Mode B: Subagent-Reviewed Compilation Mode
 
-Use when subagents are explicitly authorized.
+Use when pre-goal review subagents are explicitly authorized.
 
 Behavior:
 
@@ -363,6 +369,7 @@ The execution policy must:
 - record `$superpowers:writing-plans` substrate status for non-trivial execution policies
 - include a dependency matrix
 - select and justify Context Management / Execution Topology
+- record `Selected delegation substrate`
 - distinguish semantic invariants from tactical degrees of freedom
 - define execution granularity and sensor budget
 - define batch cadence
@@ -399,7 +406,7 @@ python3 .agents/skills/orchestrating-cybernetic-pregoal/scripts/orchestration_gu
 
 Use `$reviewing-cybernetic-control-structures` when available.
 
-If subagents are authorized, use independent reviewer roles. At minimum:
+If pre-goal review subagents are authorized, use independent reviewer roles. At minimum:
 
 1. Requirement Traceability Reviewer
 2. Solution Design Fidelity Reviewer
@@ -485,7 +492,7 @@ Before outputting runtime `/goal`, ensure:
 - the runtime `/goal` carries the final output contract from the goal when present or required
 - the runtime `/goal` preserves the approved execution topology
 - the runtime `/goal` uses the approved bounded subagent delegation protocol when the topology delegates work
-- the runtime `/goal` uses `$superpowers:subagent-driven-development` only when the execution policy explicitly selects it for compatible implementation-plan work packages
+- the runtime `/goal` uses `$superpowers:subagent-driven-development` only when the execution policy records `Selected delegation substrate: superpowers-subagent-driven-development` for compatible implementation-plan work packages
 
 If available, run:
 
@@ -532,7 +539,7 @@ It must instruct Codex to:
 - use `$superpowers:executing-plans` discipline against the approved plan;
 - use the approved execution topology from the execution policy;
 - use the approved bounded subagent delegation protocol when the approved topology selects serial or parallel subagent-driven execution;
-- use `$superpowers:subagent-driven-development` only when the execution policy explicitly selects it for compatible implementation-plan, current-session work packages;
+- use `$superpowers:subagent-driven-development` only when the execution policy records `Selected delegation substrate: superpowers-subagent-driven-development` for compatible implementation-plan, current-session work packages;
 - keep the main agent responsible for coordination, integration, progress log ownership, and stop-condition detection when work is delegated;
 - treat subagent outputs as candidate results until main-agent integration;
 - not replace the approved execution topology during runtime;
@@ -569,7 +576,7 @@ Stop and report if:
 - execution policy redesigns the solution model
 - review does not converge after two cycles
 - reviewer disagreements imply a requirement decision
-- subagents are needed but not authorized
+- pre-goal review subagents are needed but not authorized
 - required Superpowers planning substrate is unavailable
 - independent review discipline is missing and no explicit human approval exists
 - any substantive post-review artifact mutation remains dirty or lacks final independent re-review
@@ -644,7 +651,7 @@ Before responding, verify:
 
 - [ ] This skill did not execute target work.
 - [ ] This skill did not start `/goal`.
-- [ ] Subagents were used only if explicitly authorized.
+- [ ] Pre-goal review subagents were used only if explicitly authorized.
 - [ ] Required Superpowers substrate status was checked.
 - [ ] No required Superpowers substrate was silently emulated.
 - [ ] No required solution design synthesis was emulated inside the orchestrator.
