@@ -109,6 +109,30 @@ class RunEventScriptsTest(unittest.TestCase):
         self.assertNotIn("artifact_body", redacted_event)
         self.assertEqual(set(payload["redacted_fields"]), {"artifact_body", "content_summary", "real_path"})
 
+    def test_redactor_removes_unsafe_values_under_neutral_keys(self):
+        unsafe = json.loads(SAMPLE.read_text(encoding="utf-8"))
+        unsafe["details"] = "failed while reading /home/ender/private/repo"
+
+        with tempfile.NamedTemporaryFile("w", suffix=".json", delete=False) as tmp:
+            json.dump(unsafe, tmp)
+            tmp_path = tmp.name
+        try:
+            result = self.run_script(
+                "redact_run_event.py",
+                tmp_path,
+                "--mode",
+                "metadata_only",
+                "--dry-run",
+            )
+        finally:
+            Path(tmp_path).unlink(missing_ok=True)
+
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        payload = json.loads(result.stdout)
+        redacted_event = payload["events"][0]
+        self.assertNotIn("details", redacted_event)
+        self.assertEqual(payload["redacted_fields"], ["details"])
+
     def test_sync_dry_run_reports_counts_without_upload(self):
         result = self.run_script(
             "sync_run_events_to_github.py",

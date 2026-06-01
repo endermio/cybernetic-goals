@@ -56,6 +56,34 @@ class ValidateRunEventsTest(unittest.TestCase):
         self.assertIn("content_summary", result.stdout + result.stderr)
         self.assertIn("real_path", result.stdout + result.stderr)
 
+    def test_metadata_only_rejects_unsafe_values_under_neutral_keys(self):
+        unsafe = {
+            "schema_version": "1.0.0",
+            "event_id": "evt_unsafe_value",
+            "event": "skill_invoked",
+            "timestamp": "2026-06-01T00:00:00Z",
+            "privacy_mode": "metadata_only",
+            "machine_id": "anon-12345678",
+            "skill_pack": {"source_commit": "abc1234"},
+            "skill": "routing-cybernetic-workflows",
+            "status": "success",
+            "task_hash": "sha256:" + "e" * 64,
+            "details": "failed while reading /home/ender/customer/repo",
+        }
+
+        with tempfile.NamedTemporaryFile("w", suffix=".json", delete=False) as tmp:
+            json.dump(unsafe, tmp)
+            tmp_path = tmp.name
+
+        try:
+            result = self.run_validator(tmp_path)
+        finally:
+            Path(tmp_path).unlink(missing_ok=True)
+
+        output = result.stdout + result.stderr
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("unsafe metadata-only value", output)
+
     def test_rejects_hostname_like_machine_id(self):
         unsafe = {
             "schema_version": "1.0.0",

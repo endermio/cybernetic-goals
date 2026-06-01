@@ -8,20 +8,37 @@ import json
 from pathlib import Path
 from typing import Any
 
-from validate_run_events import UNSAFE_METADATA_ONLY_KEYS, load_events, validate_event
+from validate_run_events import UNSAFE_METADATA_ONLY_KEYS, load_events, unsafe_metadata_value_reason, validate_event
 
 
-def redact_value(value: Any, redacted_fields: set[str]) -> Any:
+REDACTED = object()
+
+
+def redact_value(value: Any, redacted_fields: set[str], field_name: str | None = None) -> Any:
     if isinstance(value, dict):
         clean: dict[str, Any] = {}
         for key, child in value.items():
             if key in UNSAFE_METADATA_ONLY_KEYS:
                 redacted_fields.add(key)
                 continue
-            clean[key] = redact_value(child, redacted_fields)
+            clean_child = redact_value(child, redacted_fields, key)
+            if clean_child is REDACTED:
+                redacted_fields.add(key)
+                continue
+            clean[key] = clean_child
         return clean
     if isinstance(value, list):
-        return [redact_value(item, redacted_fields) for item in value]
+        clean_items: list[Any] = []
+        for item in value:
+            clean_item = redact_value(item, redacted_fields, field_name)
+            if clean_item is REDACTED:
+                if field_name:
+                    redacted_fields.add(field_name)
+                continue
+            clean_items.append(clean_item)
+        return clean_items
+    if unsafe_metadata_value_reason(value):
+        return REDACTED
     return value
 
 

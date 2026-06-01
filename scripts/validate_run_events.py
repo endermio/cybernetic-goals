@@ -65,6 +65,12 @@ UNSAFE_METADATA_ONLY_KEYS = {
 TASK_HASH_RE = re.compile(r"^sha256:[a-f0-9]{64}$")
 EVENT_ID_RE = re.compile(r"^evt_[A-Za-z0-9_.-]+$")
 MACHINE_ID_RE = re.compile(r"^anon-[A-Za-z0-9_.-]+$")
+UNSAFE_METADATA_ONLY_VALUE_PATTERNS = (
+    ("credential_url", re.compile(r"://[^/\s:@]+:[^@\s]+@")),
+    ("credential", re.compile(r"\b(?:gh[pousr]_[A-Za-z0-9_]{20,}|sk-[A-Za-z0-9_-]{20,})\b")),
+    ("real_path", re.compile(r"(?<![A-Za-z0-9])(?:/home/|/Users/|/private/|/var/log/|/etc/|[A-Za-z]:\\)[^\s,;]*")),
+    ("real_repo", re.compile(r"\b(?:github|gitlab|bitbucket)\.com[:/][A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+")),
+)
 
 
 def load_taxonomy(path: str | None) -> set[str]:
@@ -120,6 +126,28 @@ def iter_keys(value: Any) -> list[str]:
         for child in value:
             keys.extend(iter_keys(child))
     return keys
+
+
+def unsafe_metadata_value_reason(value: Any) -> str | None:
+    if not isinstance(value, str):
+        return None
+    for reason, pattern in UNSAFE_METADATA_ONLY_VALUE_PATTERNS:
+        if pattern.search(value):
+            return reason
+    return None
+
+
+def iter_string_values(value: Any, path: str = "$") -> list[tuple[str, str]]:
+    values: list[tuple[str, str]] = []
+    if isinstance(value, dict):
+        for key, child in value.items():
+            values.extend(iter_string_values(child, f"{path}.{key}"))
+    elif isinstance(value, list):
+        for index, child in enumerate(value):
+            values.extend(iter_string_values(child, f"{path}[{index}]"))
+    elif isinstance(value, str):
+        values.append((path, value))
+    return values
 
 
 def validate_timestamp(value: Any, errors: list[str], prefix: str) -> None:
@@ -200,6 +228,10 @@ def validate_event(event: dict[str, Any], taxonomy: set[str], prefix: str) -> li
         unsafe = sorted(set(iter_keys(event)) & UNSAFE_METADATA_ONLY_KEYS)
         for key in unsafe:
             errors.append(f"{prefix}: metadata_only event contains unsafe field {key}")
+        for path, value in iter_string_values(event):
+            reason = unsafe_metadata_value_reason(value)
+            if reason:
+                errors.append(f"{prefix}: unsafe metadata-only value at {path} ({reason})")
 
     return errors
 
