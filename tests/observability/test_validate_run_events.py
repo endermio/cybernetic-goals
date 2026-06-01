@@ -176,6 +176,8 @@ class ValidateRunEventsTest(unittest.TestCase):
             "privacy_mode_alias": "metadata_only",
             "raw_event_count": 3,
             "raw_metric_name": "duration_ms",
+            "raw_counts": {"events": 3},
+            "raw_metrics": {"duration_ms": 120},
         }
 
         with tempfile.NamedTemporaryFile("w", suffix=".json", delete=False) as tmp:
@@ -188,6 +190,66 @@ class ValidateRunEventsTest(unittest.TestCase):
             Path(tmp_path).unlink(missing_ok=True)
 
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+
+    def test_metadata_only_rejects_nested_raw_response_without_echoing_value(self):
+        unsafe = {
+            "schema_version": "1.0.0",
+            "event_id": "evt_unsafe_nested_raw_response",
+            "event": "skill_invoked",
+            "timestamp": "2026-06-01T00:00:00Z",
+            "privacy_mode": "metadata_only",
+            "machine_id": "anon-12345678",
+            "skill_pack": {"source_commit": "abc1234"},
+            "skill": "routing-cybernetic-workflows",
+            "status": "success",
+            "task_hash": "sha256:" + "a" * 64,
+            "raw": {"response": "private"},
+        }
+
+        with tempfile.NamedTemporaryFile("w", suffix=".json", delete=False) as tmp:
+            json.dump(unsafe, tmp)
+            tmp_path = tmp.name
+
+        try:
+            result = self.run_validator(tmp_path)
+        finally:
+            Path(tmp_path).unlink(missing_ok=True)
+
+        output = result.stdout + result.stderr
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("metadata_only", output)
+        self.assertIn("raw_response", output)
+        self.assertNotIn("private", output)
+
+    def test_redacted_content_opt_in_rejects_nested_raw_response_without_echoing_value(self):
+        unsafe = {
+            "schema_version": "1.0.0",
+            "event_id": "evt_unsafe_opt_in_nested_raw_response",
+            "event": "skill_invoked",
+            "timestamp": "2026-06-01T00:00:00Z",
+            "privacy_mode": "redacted_content_opt_in",
+            "machine_id": "anon-12345678",
+            "skill_pack": {"source_commit": "abc1234"},
+            "skill": "routing-cybernetic-workflows",
+            "status": "success",
+            "task_hash": "sha256:" + "b" * 64,
+            "raw": {"response": "private"},
+        }
+
+        with tempfile.NamedTemporaryFile("w", suffix=".json", delete=False) as tmp:
+            json.dump(unsafe, tmp)
+            tmp_path = tmp.name
+
+        try:
+            result = self.run_validator(tmp_path)
+        finally:
+            Path(tmp_path).unlink(missing_ok=True)
+
+        output = result.stdout + result.stderr
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("redacted_content_opt_in", output)
+        self.assertIn("raw_response", output)
+        self.assertNotIn("private", output)
 
     def test_metadata_only_rejects_unsafe_values_under_neutral_keys(self):
         unsafe = {

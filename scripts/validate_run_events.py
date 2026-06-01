@@ -74,6 +74,17 @@ UNSAFE_METADATA_ONLY_KEY_TOKENS = {
     "token": "token",
 }
 
+RAW_CONTEXT_KEYS = {"raw"}
+RAW_CONTENT_DESCENDANT_KEYS = {
+    "body",
+    "content",
+    "message",
+    "output",
+    "request",
+    "response",
+    "text",
+}
+
 UNSAFE_METADATA_ONLY_KEY_PHRASES = (
     (("artifact", "body"), "artifact_body"),
     (("artifact", "example"), "artifact_example"),
@@ -186,6 +197,19 @@ def is_likely_repo_context_key(key: Any) -> bool:
     return any(token in REPO_CONTEXT_TOKENS for token in tokenize_metadata_key(key))
 
 
+def is_raw_context_key(key: Any) -> bool:
+    return normalize_metadata_key(key) in RAW_CONTEXT_KEYS
+
+
+def raw_content_descendant_reason(key: Any, in_raw_context: bool = False) -> str | None:
+    if not in_raw_context:
+        return None
+    tokens = tokenize_metadata_key(key)
+    if len(tokens) == 1 and tokens[0] in RAW_CONTENT_DESCENDANT_KEYS:
+        return f"raw_{tokens[0]}"
+    return None
+
+
 def short_repo_identifier_reason(value: Any) -> str | None:
     if not isinstance(value, str):
         return None
@@ -214,16 +238,18 @@ def iter_key_contexts(
     value: Any,
     parent_key: Any | None = None,
     in_repo_context: bool = False,
-) -> list[tuple[str, Any | None, bool]]:
-    keys: list[tuple[str, Any | None, bool]] = []
+    in_raw_context: bool = False,
+) -> list[tuple[str, Any | None, bool, bool]]:
+    keys: list[tuple[str, Any | None, bool, bool]] = []
     if isinstance(value, dict):
         for key, child in value.items():
-            keys.append((str(key), parent_key, in_repo_context))
+            keys.append((str(key), parent_key, in_repo_context, in_raw_context))
             child_repo_context = in_repo_context or is_likely_repo_context_key(key)
-            keys.extend(iter_key_contexts(child, key, child_repo_context))
+            child_raw_context = in_raw_context or is_raw_context_key(key)
+            keys.extend(iter_key_contexts(child, key, child_repo_context, child_raw_context))
     elif isinstance(value, list):
         for child in value:
-            keys.extend(iter_key_contexts(child, parent_key, in_repo_context))
+            keys.extend(iter_key_contexts(child, parent_key, in_repo_context, in_raw_context))
     return keys
 
 
@@ -231,7 +257,11 @@ def unsafe_metadata_key_reason(
     key: Any,
     parent_key: Any | None = None,
     in_repo_context: bool = False,
+    in_raw_context: bool = False,
 ) -> str | None:
+    raw_reason = raw_content_descendant_reason(key, in_raw_context)
+    if raw_reason:
+        return raw_reason
     dynamic_reason = unsafe_dynamic_key_reason(key, parent_key, in_repo_context)
     if dynamic_reason:
         return dynamic_reason
@@ -253,10 +283,13 @@ def unsafe_metadata_key_diagnostic(
     key: Any,
     parent_key: Any | None = None,
     in_repo_context: bool = False,
+    in_raw_context: bool = False,
 ) -> str | None:
-    reason = unsafe_metadata_key_reason(key, parent_key, in_repo_context)
+    reason = unsafe_metadata_key_reason(key, parent_key, in_repo_context, in_raw_context)
     if not reason:
         return None
+    if raw_content_descendant_reason(key, in_raw_context):
+        return reason
     if unsafe_dynamic_key_reason(key, parent_key, in_repo_context):
         return f"unsafe dynamic key ({reason})"
     return str(key)
@@ -288,24 +321,27 @@ def iter_string_values(
     path: str = "$",
     field_name: Any | None = None,
     in_repo_context: bool = False,
-) -> list[tuple[str, str, Any | None, bool]]:
-    values: list[tuple[str, str, Any | None, bool]] = []
+    in_raw_context: bool = False,
+) -> list[tuple[str, str, Any | None, bool, bool]]:
+    values: list[tuple[str, str, Any | None, bool, bool]] = []
     if isinstance(value, dict):
         for key, child in value.items():
             child_repo_context = in_repo_context or is_likely_repo_context_key(key)
+            child_raw_context = in_raw_context or is_raw_context_key(key)
             values.extend(
                 iter_string_values(
                     child,
                     f"{path}.{safe_metadata_path_key(key, field_name, in_repo_context)}",
                     key,
                     child_repo_context,
+                    child_raw_context,
                 )
             )
     elif isinstance(value, list):
         for index, child in enumerate(value):
-            values.extend(iter_string_values(child, f"{path}[{index}]", field_name, in_repo_context))
+            values.extend(iter_string_values(child, f"{path}[{index}]", field_name, in_repo_context, in_raw_context))
     elif isinstance(value, str):
-        values.append((path, value, field_name, in_repo_context))
+        values.append((path, value, field_name, in_repo_context, in_raw_context))
     return values
 
 
@@ -389,13 +425,13 @@ def validate_event(event: dict[str, Any], taxonomy: set[str], prefix: str) -> li
         unsafe = sorted(
             {
                 diagnostic
-                for key, parent_key, in_repo_context in iter_key_contexts(event)
-                if (diagnostic := unsafe_metadata_key_diagnostic(key, parent_key, in_repo_context))
+                for key, parent_key, in_repo_context, in_raw_context in iter_key_contexts(event)
+                if (diagnostic := unsafe_metadata_key_diagnostic(key, parent_key, in_repo_context, in_raw_context))
             }
         )
         for diagnostic in unsafe:
             errors.append(f"{prefix}: {privacy_mode} event contains unsafe field {diagnostic}")
-        for path, value, field_name, in_repo_context in iter_string_values(event):
+        for path, value, field_name, in_repo_context, _in_raw_context in iter_string_values(event):
             reason = unsafe_metadata_value_reason(value, field_name, in_repo_context)
             if reason:
                 if privacy_mode == "metadata_only":

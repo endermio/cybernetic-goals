@@ -381,6 +381,37 @@ class RunEventScriptsTest(unittest.TestCase):
         self.assertNotIn("raw_response", redacted_event)
         self.assertEqual(payload["redacted_fields"], ["raw_response"])
 
+    def test_redactor_removes_nested_raw_response_without_echoing_value(self):
+        unsafe = json.loads(SAMPLE.read_text(encoding="utf-8"))
+        unsafe["raw"] = {
+            "response": "private model response",
+            "content": "private content",
+            "message_count": 2,
+        }
+
+        with tempfile.NamedTemporaryFile("w", suffix=".json", delete=False) as tmp:
+            json.dump(unsafe, tmp)
+            tmp_path = tmp.name
+        try:
+            result = self.run_script(
+                "redact_run_event.py",
+                tmp_path,
+                "--mode",
+                "metadata_only",
+                "--dry-run",
+            )
+        finally:
+            Path(tmp_path).unlink(missing_ok=True)
+
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        payload = json.loads(result.stdout)
+        redacted_event = payload["events"][0]
+        self.assertEqual(redacted_event["raw"], {"message_count": 2})
+        self.assertEqual(set(payload["redacted_fields"]), {"raw_content", "raw_response"})
+        output = result.stdout + result.stderr
+        self.assertNotIn("private model response", output)
+        self.assertNotIn("private content", output)
+
     def test_redactor_removes_raw_response_in_redacted_content_opt_in_mode(self):
         unsafe = json.loads(SAMPLE.read_text(encoding="utf-8"))
         unsafe["raw_response"] = "private model response"
@@ -455,6 +486,35 @@ class RunEventScriptsTest(unittest.TestCase):
             )
             self.assertNotEqual(result.returncode, 0)
             self.assertIn("raw_response", result.stdout + result.stderr)
+            self.assertFalse(Path(export_path).exists())
+        finally:
+            Path(input_path).unlink(missing_ok=True)
+            Path(export_path).unlink(missing_ok=True)
+
+    def test_sync_export_refuses_unredacted_event_with_nested_raw_response(self):
+        unsafe = json.loads(SAMPLE.read_text(encoding="utf-8"))
+        unsafe["privacy_mode"] = "metadata_only"
+        unsafe["raw"] = {"response": "private model response"}
+
+        with tempfile.NamedTemporaryFile("w", suffix=".json", delete=False) as tmp:
+            json.dump(unsafe, tmp)
+            input_path = tmp.name
+        with tempfile.NamedTemporaryFile("w", suffix=".json", delete=False) as tmp:
+            export_path = tmp.name
+        Path(export_path).unlink(missing_ok=True)
+
+        try:
+            result = self.run_script(
+                "sync_run_events_to_github.py",
+                "--input",
+                input_path,
+                "--export-out",
+                export_path,
+            )
+            self.assertNotEqual(result.returncode, 0)
+            output = result.stdout + result.stderr
+            self.assertIn("raw_response", output)
+            self.assertNotIn("private model response", output)
             self.assertFalse(Path(export_path).exists())
         finally:
             Path(input_path).unlink(missing_ok=True)

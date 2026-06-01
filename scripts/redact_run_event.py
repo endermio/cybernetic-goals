@@ -10,6 +10,7 @@ from typing import Any
 
 from validate_run_events import (
     is_likely_repo_context_key,
+    is_raw_context_key,
     load_events,
     unsafe_metadata_key_diagnostic,
     unsafe_metadata_key_reason,
@@ -26,24 +27,28 @@ def redact_value(
     redacted_fields: set[str],
     field_name: str | None = None,
     in_repo_context: bool = False,
+    in_raw_context: bool = False,
 ) -> Any:
     if isinstance(value, dict):
         clean: dict[str, Any] = {}
         for key, child in value.items():
-            if unsafe_metadata_key_reason(key, field_name, in_repo_context):
-                redacted_fields.add(unsafe_metadata_key_diagnostic(key, field_name, in_repo_context) or "unsafe field")
+            if unsafe_metadata_key_reason(key, field_name, in_repo_context, in_raw_context):
+                redacted_fields.add(
+                    unsafe_metadata_key_diagnostic(key, field_name, in_repo_context, in_raw_context) or "unsafe field"
+                )
                 continue
             child_repo_context = in_repo_context or is_likely_repo_context_key(key)
-            clean_child = redact_value(child, redacted_fields, key, child_repo_context)
+            child_raw_context = in_raw_context or is_raw_context_key(key)
+            clean_child = redact_value(child, redacted_fields, key, child_repo_context, child_raw_context)
             if clean_child is REDACTED:
-                redacted_fields.add(unsafe_metadata_key_diagnostic(key, field_name, in_repo_context) or str(key))
+                redacted_fields.add(unsafe_metadata_key_diagnostic(key, field_name, in_repo_context, in_raw_context) or str(key))
                 continue
             clean[key] = clean_child
         return clean
     if isinstance(value, list):
         clean_items: list[Any] = []
         for item in value:
-            clean_item = redact_value(item, redacted_fields, field_name, in_repo_context)
+            clean_item = redact_value(item, redacted_fields, field_name, in_repo_context, in_raw_context)
             if clean_item is REDACTED:
                 if field_name:
                     redacted_fields.add(unsafe_metadata_key_diagnostic(field_name) or field_name)
