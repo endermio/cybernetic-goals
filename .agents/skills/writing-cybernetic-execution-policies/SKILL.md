@@ -247,6 +247,7 @@ Response-only next step:
 - [ ] The plan selects `Main-only`, `Serial subagent-driven`, or `Parallel subagent-driven`.
 - [ ] Level 3/4 main-only execution has an explicit context-load justification.
 - [ ] Delegated work packages define Context pack, Return format, and Integration gate.
+- [ ] Serial or parallel subagent-driven topology records `$superpowers:subagent-driven-development` or equivalent delegation substrate.
 - [ ] Parallel subagent-driven execution has explicit human approval, dependency independence, and review approval.
 - [ ] The plan includes Execution Granularity and Sensor Budget.
 - [ ] Batches are coherent target-state slices, not mechanical micro-steps.

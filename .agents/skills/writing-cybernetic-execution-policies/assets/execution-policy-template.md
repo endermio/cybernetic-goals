@@ -81,6 +81,16 @@ Delegation matrix:
 |---|---|---|---|---|---|
 | [package] | `main / serial subagent / parallel subagent` | [artifact paths, files, constraints, stop conditions] | [bounded actions] | [required summary/evidence format] | [main-agent integration condition] |
 
+Subagent delegation substrate:
+
+- [Use `$superpowers:subagent-driven-development` for serial or parallel subagent-driven topology, or record equivalent approved delegation substrate.]
+
+Parallel approval record:
+
+- Human approval: `[required only for Parallel subagent-driven]`
+- Dependency independence: `[required only for Parallel subagent-driven]`
+- Control-review approval: `[required only for Parallel subagent-driven]`
+
 Rules:
 
 - Use `Main-only` for small, local, low-context work.

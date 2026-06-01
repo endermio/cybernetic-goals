@@ -203,6 +203,83 @@ def selected_execution_topology(plan: str | None) -> str | None:
     return None
 
 
+def labeled_block_has_content(text: str, label: str) -> bool:
+    lines = text.splitlines()
+    pattern = re.compile(rf"^\s*{re.escape(label)}\s*:\s*(.*?)\s*$", re.IGNORECASE)
+    for index, line in enumerate(lines):
+        match = pattern.match(line)
+        if not match:
+            continue
+        if meaningful_line(match.group(1)):
+            return True
+        for following in lines[index + 1 :]:
+            stripped = following.strip()
+            if not stripped:
+                continue
+            if re.match(r"^[A-Za-z][A-Za-z0-9 /-]+:\s*$", stripped):
+                break
+            if meaningful_line(stripped):
+                return True
+        return False
+    return False
+
+
+def has_meaningful_delegation_matrix(body: str) -> bool:
+    lowered = body.casefold()
+    required_columns = [
+        "work package",
+        "executor",
+        "context pack",
+        "allowed actions",
+        "return format",
+        "integration gate",
+    ]
+    if not all(column in lowered for column in required_columns):
+        return False
+
+    for line in body.splitlines():
+        stripped = line.strip()
+        if "|" not in stripped:
+            continue
+        if re.fullmatch(r"\|?\s*:?-{3,}:?\s*(\|\s*:?-{3,}:?\s*)+\|?", stripped):
+            continue
+        row_lowered = stripped.casefold()
+        if all(column in row_lowered for column in required_columns):
+            continue
+        cells = [cell.strip() for cell in stripped.strip("|").split("|")]
+        if len(cells) >= len(required_columns) and all(meaningful_line(cell) for cell in cells):
+            return True
+    return False
+
+
+def check_execution_topology(plan: str | None, errors: list[str]) -> None:
+    body = section_body(plan or "", "Context Management / Execution Topology")
+    if body is None:
+        errors.append("execution policy missing ## Context Management / Execution Topology")
+        return
+
+    topology = selected_execution_topology(plan)
+    if topology is None:
+        errors.append("execution policy must define a selected Context Management / Execution Topology")
+        return
+
+    if not labeled_block_has_content(body, "Topology rationale"):
+        errors.append("execution topology missing Topology rationale")
+    if not labeled_block_has_content(body, "Main agent owns"):
+        errors.append("execution topology missing main-agent ownership")
+
+    if topology in {"Serial subagent-driven", "Parallel subagent-driven"}:
+        if not has_meaningful_delegation_matrix(body):
+            errors.append("execution topology missing meaningful delegation matrix with Context pack, Allowed actions, Return format, and Integration gate")
+        if "subagent-driven-development" not in body.casefold() and "runtime target-work delegation" not in body.casefold():
+            errors.append("subagent-driven topology missing $superpowers:subagent-driven-development or equivalent delegation substrate")
+
+    if topology == "Parallel subagent-driven":
+        for label in ("Human approval", "Dependency independence", "Control-review approval"):
+            if not labeled_block_has_content(body, label):
+                errors.append(f"parallel execution topology missing {label}")
+
+
 def check_final_observer(review: str, errors: list[str]) -> None:
     body = section_body(review, "Final Observer Check")
     if body is None:
@@ -299,8 +376,7 @@ def main() -> int:
         plan_status = section_status(plan, "Execution Policy Status")
         if plan_status != "Candidate":
             errors.append(f"execution policy status under ## Execution Policy Status must be Candidate: {plan_status!r}")
-        if selected_execution_topology(plan) is None:
-            errors.append("execution policy must define a selected Context Management / Execution Topology")
+        check_execution_topology(plan, errors)
 
     if review:
         review_status = section_status(review, "Review Status")

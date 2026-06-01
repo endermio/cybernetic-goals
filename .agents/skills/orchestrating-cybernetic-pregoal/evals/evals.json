@@ -211,6 +211,19 @@
         "Does not replace Serial subagent-driven topology with generic main-agent serial execution.",
         "Blocks runtime compilation if selected execution topology is missing."
       ]
+    },
+    {
+      "id": "orchestrator-blocks-incomplete-subagent-topology",
+      "prompt": "Execution policy selects Serial subagent-driven topology but omits Context pack, Allowed actions, Return format, Integration gate, main-agent ownership, and delegation substrate. Orchestrate the transition to control review or runtime compilation.",
+      "expected_output": "The orchestrator must block and return to execution-policy revision rather than letting an incomplete topology reach review/runtime compilation.",
+      "assertions": [
+        "Does not choose or repair topology inside the orchestrator.",
+        "Reports incomplete Context Management / Execution Topology.",
+        "Requires Context pack, Allowed actions, Return format, and Integration gate for subagent-driven topology.",
+        "Requires main-agent ownership.",
+        "Returns to $writing-cybernetic-execution-policies or execution-policy revision.",
+        "Does not compile a runtime /goal."
+      ]
     }
   ]
 }
