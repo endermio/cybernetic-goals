@@ -108,6 +108,32 @@ class ValidateRunEventsTest(unittest.TestCase):
         self.assertIn("missing required field status", output)
         self.assertIn("must not be unknown", output)
 
+    def test_rejects_null_status(self):
+        unsafe = {
+            "schema_version": "1.0.0",
+            "event_id": "evt_null_status",
+            "event": "skill_invoked",
+            "timestamp": "2026-06-01T00:00:00Z",
+            "privacy_mode": "metadata_only",
+            "machine_id": "anon-12345678",
+            "skill_pack": {"source_commit": "abc1234"},
+            "status": None,
+            "task_hash": "sha256:" + "d" * 64,
+        }
+
+        with tempfile.NamedTemporaryFile("w", suffix=".json", delete=False) as tmp:
+            json.dump(unsafe, tmp)
+            tmp_path = tmp.name
+
+        try:
+            result = self.run_validator(tmp_path)
+        finally:
+            Path(tmp_path).unlink(missing_ok=True)
+
+        output = result.stdout + result.stderr
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("status", output)
+
 
 if __name__ == "__main__":
     unittest.main()

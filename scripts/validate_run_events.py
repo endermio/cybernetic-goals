@@ -179,6 +179,9 @@ def validate_event(event: dict[str, Any], taxonomy: set[str], prefix: str) -> li
     validate_machine_id(event.get("machine_id"), errors, prefix)
     validate_skill_pack(event.get("skill_pack"), errors, prefix)
 
+    if not isinstance(event.get("status"), str):
+        errors.append(f"{prefix}: status must be a string")
+
     task_hash = event.get("task_hash")
     if not isinstance(task_hash, str) or not TASK_HASH_RE.match(task_hash):
         errors.append(f"{prefix}: task_hash must match sha256:<64 lowercase hex>")
