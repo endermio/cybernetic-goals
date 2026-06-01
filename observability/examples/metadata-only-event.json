@@ -6,8 +6,7 @@
   "privacy_mode": "metadata_only",
   "machine_id": "anon-7f3a2c1d",
   "skill_pack": {
-    "release": null,
-    "source_commit": "unknown"
+    "release": "cybernetic-observability-contract-v1.0.0"
   },
   "skill": "routing-cybernetic-workflows",
   "status": "success",

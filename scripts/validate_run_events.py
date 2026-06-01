@@ -35,6 +35,7 @@ REQUIRED_FIELDS = {
     "privacy_mode",
     "machine_id",
     "skill_pack",
+    "status",
     "task_hash",
 }
 
@@ -140,6 +141,14 @@ def validate_skill_pack(value: Any, errors: list[str], prefix: str) -> None:
     source_commit = value.get("source_commit")
     if not release and not source_commit:
         errors.append(f"{prefix}: skill_pack requires release or source_commit")
+        return
+    for field_name, field_value in (("release", release), ("source_commit", source_commit)):
+        if field_value is None:
+            continue
+        if not isinstance(field_value, str) or not field_value.strip():
+            errors.append(f"{prefix}: skill_pack {field_name} must be a non-empty string")
+        elif field_value == "unknown":
+            errors.append(f"{prefix}: skill_pack {field_name} must not be unknown")
 
 
 def validate_machine_id(value: Any, errors: list[str], prefix: str) -> None:

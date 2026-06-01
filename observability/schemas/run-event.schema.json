@@ -12,6 +12,7 @@
     "privacy_mode",
     "machine_id",
     "skill_pack",
+    "status",
     "task_hash"
   ],
   "properties": {
@@ -54,14 +55,18 @@
       "additionalProperties": false,
       "properties": {
         "release": {
-          "type": [
-            "string",
-            "null"
-          ]
+          "type": "string",
+          "minLength": 1,
+          "not": {
+            "const": "unknown"
+          }
         },
         "source_commit": {
           "type": "string",
-          "minLength": 1
+          "minLength": 1,
+          "not": {
+            "const": "unknown"
+          }
         }
       },
       "anyOf": [
