@@ -197,6 +197,50 @@ class ValidateRunEventsTest(unittest.TestCase):
             self.assertNotIn("AcmePrivateRepo", output)
             self.assertNotIn("/home", output)
 
+    def test_metadata_only_sanitizes_repo_private_event_keys_without_parent_context(self):
+        for key in (
+            "acme/private-repo",
+            "acme_private_repo",
+            "privateRepo",
+            "repoAcmePrivateRepo",
+            "repositoryAcmePrivateRepo",
+        ):
+            unsafe = {
+                "schema_version": "1.0.0",
+                "event_id": "evt_repo_private_event_key",
+                "event": "skill_invoked",
+                "timestamp": "2026-06-01T00:00:00Z",
+                "privacy_mode": "metadata_only",
+                "machine_id": "anon-12345678",
+                "skill_pack": {"source_commit": "abc1234"},
+                "skill": "routing-cybernetic-workflows",
+                "status": "success",
+                "task_hash": "sha256:" + "6" * 64,
+                key: {"details": "/home/ender/private/repo"},
+            }
+
+            with tempfile.NamedTemporaryFile("w", suffix=".json", delete=False) as tmp:
+                json.dump(unsafe, tmp)
+                tmp_path = tmp.name
+
+            try:
+                result = self.run_validator(tmp_path)
+            finally:
+                Path(tmp_path).unlink(missing_ok=True)
+
+            output = result.stdout + result.stderr
+            self.assertNotEqual(result.returncode, 0)
+            self.assertIn("unsafe field unsafe key (real_repo)", output)
+            self.assertIn("unsafe metadata-only value at $.<unsafe-key>.details", output)
+            self.assertNotIn(key, output)
+            self.assertNotIn("acme/private-repo", output)
+            self.assertNotIn("acme_private_repo", output)
+            self.assertNotIn("privateRepo", output)
+            self.assertNotIn("repoAcmePrivateRepo", output)
+            self.assertNotIn("repositoryAcmePrivateRepo", output)
+            self.assertNotIn("private-repo", output)
+            self.assertNotIn("/home", output)
+
     def test_metadata_only_sanitizes_composite_unsafe_key_in_value_path(self):
         unsafe = {
             "schema_version": "1.0.0",
@@ -347,6 +391,10 @@ class ValidateRunEventsTest(unittest.TestCase):
             "raw_metric_name": "duration_ms",
             "raw_counts": {"events": 3},
             "raw_metrics": {"duration_ms": 120},
+            "repo_hash": "sha256:" + "1" * 64,
+            "repo_id_hash": "sha256:" + "2" * 64,
+            "repository_count": 1,
+            "private_event_count": 0,
         }
 
         with tempfile.NamedTemporaryFile("w", suffix=".json", delete=False) as tmp:

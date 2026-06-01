@@ -126,6 +126,14 @@ UNSAFE_METADATA_ONLY_VALUE_PATTERNS = (
     ("real_repo", re.compile(r"\b(?:github|gitlab|bitbucket)\.com[:/][A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+")),
 )
 REPO_CONTEXT_TOKENS = {"repo", "repository", "remote", "origin", "upstream"}
+REPO_PRIVATE_KEY_TOKENS = {"repo", "repository", "private"}
+SAFE_REPO_PRIVATE_METADATA_KEYS = {
+    "repositories",
+    "privateeventcount",
+    "repohash",
+    "repoidhash",
+    "repositorycount",
+}
 
 
 def normalize_metadata_key(key: Any) -> str:
@@ -271,6 +279,23 @@ def unsafe_metadata_key_fragment_reason(key: Any) -> str | None:
     return short_repo_identifier_fragment_reason(string_key)
 
 
+def conservative_repo_private_key_reason(key: Any) -> str | None:
+    if normalize_metadata_key(key) in SAFE_REPO_PRIVATE_METADATA_KEYS:
+        return None
+    tokens = tokenize_metadata_key(key)
+    if not any(token in REPO_PRIVATE_KEY_TOKENS for token in tokens):
+        return None
+    string_key = str(key)
+    for reason, pattern in UNSAFE_METADATA_ONLY_VALUE_PATTERNS:
+        if pattern.search(string_key):
+            return reason
+    if short_repo_identifier_fragment_reason(string_key):
+        return "real_repo"
+    if "repo" in tokens or "repository" in tokens:
+        return "real_repo"
+    return "private"
+
+
 def unsafe_metadata_key_phrase_reason(key: Any) -> tuple[str, bool] | None:
     tokens = tokenize_metadata_key(key)
     for phrase, reason in UNSAFE_METADATA_ONLY_KEY_PHRASES:
@@ -331,6 +356,9 @@ def unsafe_metadata_key_reason(
     if phrase_reason:
         reason, _is_composite = phrase_reason
         return reason
+    repo_private_reason = conservative_repo_private_key_reason(key)
+    if repo_private_reason:
+        return repo_private_reason
     tokens = tokenize_metadata_key(key)
     for token in tokens:
         if token in UNSAFE_METADATA_ONLY_KEY_TOKENS:
@@ -358,6 +386,8 @@ def unsafe_metadata_key_diagnostic(
         _phrase_label, is_composite = phrase_reason
         if is_composite and unsafe_metadata_key_phrase_requires_sanitized_diagnostic(key):
             return f"unsafe key ({reason})"
+    if conservative_repo_private_key_reason(key) == reason:
+        return f"unsafe key ({reason})"
     return str(key)
 
 

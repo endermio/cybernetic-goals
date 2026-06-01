@@ -259,6 +259,52 @@ class RunEventScriptsTest(unittest.TestCase):
         self.assertNotIn("AcmePrivateRepo", output)
         self.assertNotIn("/home", output)
 
+    def test_redactor_sanitizes_repo_private_event_keys_without_parent_context(self):
+        unsafe = json.loads(SAMPLE.read_text(encoding="utf-8"))
+        for key in (
+            "acme/private-repo",
+            "acme_private_repo",
+            "privateRepo",
+            "repoAcmePrivateRepo",
+            "repositoryAcmePrivateRepo",
+        ):
+            unsafe[key] = {"details": "/home/ender/private/repo"}
+
+        with tempfile.NamedTemporaryFile("w", suffix=".json", delete=False) as tmp:
+            json.dump(unsafe, tmp)
+            tmp_path = tmp.name
+        try:
+            result = self.run_script(
+                "redact_run_event.py",
+                tmp_path,
+                "--mode",
+                "metadata_only",
+                "--dry-run",
+            )
+        finally:
+            Path(tmp_path).unlink(missing_ok=True)
+
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        payload = json.loads(result.stdout)
+        redacted_event = payload["events"][0]
+        for key in (
+            "acme/private-repo",
+            "acme_private_repo",
+            "privateRepo",
+            "repoAcmePrivateRepo",
+            "repositoryAcmePrivateRepo",
+        ):
+            self.assertNotIn(key, redacted_event)
+        self.assertEqual(payload["redacted_fields"], ["unsafe key (real_repo)"])
+        output = result.stdout + result.stderr
+        self.assertNotIn("acme/private-repo", output)
+        self.assertNotIn("acme_private_repo", output)
+        self.assertNotIn("privateRepo", output)
+        self.assertNotIn("repoAcmePrivateRepo", output)
+        self.assertNotIn("repositoryAcmePrivateRepo", output)
+        self.assertNotIn("private-repo", output)
+        self.assertNotIn("/home", output)
+
     def test_redactor_removes_derivative_unsafe_field_variants_in_metadata_only_mode(self):
         unsafe = json.loads(SAMPLE.read_text(encoding="utf-8"))
         unsafe["prompt_text"] = "private task prompt"
@@ -875,6 +921,49 @@ class RunEventScriptsTest(unittest.TestCase):
             self.assertNotIn("repoNameAcmePrivateRepo", output)
             self.assertNotIn("acme-private-repo", output)
             self.assertNotIn("AcmePrivateRepo", output)
+            self.assertNotIn("/home", output)
+            self.assertFalse(Path(export_path).exists())
+        finally:
+            Path(input_path).unlink(missing_ok=True)
+            Path(export_path).unlink(missing_ok=True)
+
+    def test_sync_export_sanitizes_repo_private_event_keys_without_parent_context(self):
+        unsafe = json.loads(SAMPLE.read_text(encoding="utf-8"))
+        unsafe["privacy_mode"] = "metadata_only"
+        for key in (
+            "acme/private-repo",
+            "acme_private_repo",
+            "privateRepo",
+            "repoAcmePrivateRepo",
+            "repositoryAcmePrivateRepo",
+        ):
+            unsafe[key] = {"details": "/home/ender/private/repo"}
+
+        with tempfile.NamedTemporaryFile("w", suffix=".json", delete=False) as tmp:
+            json.dump(unsafe, tmp)
+            input_path = tmp.name
+        with tempfile.NamedTemporaryFile("w", suffix=".json", delete=False) as tmp:
+            export_path = tmp.name
+        Path(export_path).unlink(missing_ok=True)
+
+        try:
+            result = self.run_script(
+                "sync_run_events_to_github.py",
+                "--input",
+                input_path,
+                "--export-out",
+                export_path,
+            )
+            self.assertNotEqual(result.returncode, 0)
+            output = result.stdout + result.stderr
+            self.assertIn("unsafe field unsafe key (real_repo)", output)
+            self.assertIn("unsafe metadata-only value at $.<unsafe-key>.details", output)
+            self.assertNotIn("acme/private-repo", output)
+            self.assertNotIn("acme_private_repo", output)
+            self.assertNotIn("privateRepo", output)
+            self.assertNotIn("repoAcmePrivateRepo", output)
+            self.assertNotIn("repositoryAcmePrivateRepo", output)
+            self.assertNotIn("private-repo", output)
             self.assertNotIn("/home", output)
             self.assertFalse(Path(export_path).exists())
         finally:
