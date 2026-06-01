@@ -682,6 +682,39 @@ class RunEventScriptsTest(unittest.TestCase):
             Path(input_path).unlink(missing_ok=True)
             Path(export_path).unlink(missing_ok=True)
 
+    def test_sync_export_sanitizes_composite_unsafe_key_in_value_path(self):
+        unsafe = json.loads(SAMPLE.read_text(encoding="utf-8"))
+        unsafe["privacy_mode"] = "metadata_only"
+        unsafe["repoName_acme/private-repo"] = {"details": "/home/ender/private/repo"}
+
+        with tempfile.NamedTemporaryFile("w", suffix=".json", delete=False) as tmp:
+            json.dump(unsafe, tmp)
+            input_path = tmp.name
+        with tempfile.NamedTemporaryFile("w", suffix=".json", delete=False) as tmp:
+            export_path = tmp.name
+        Path(export_path).unlink(missing_ok=True)
+
+        try:
+            result = self.run_script(
+                "sync_run_events_to_github.py",
+                "--input",
+                input_path,
+                "--export-out",
+                export_path,
+            )
+            self.assertNotEqual(result.returncode, 0)
+            output = result.stdout + result.stderr
+            self.assertIn("unsafe field unsafe key (repo_name)", output)
+            self.assertIn("unsafe metadata-only value at $.<unsafe-key>.details", output)
+            self.assertNotIn("repoName_acme/private-repo", output)
+            self.assertNotIn("acme/private-repo", output)
+            self.assertNotIn("private-repo", output)
+            self.assertNotIn("/home", output)
+            self.assertFalse(Path(export_path).exists())
+        finally:
+            Path(input_path).unlink(missing_ok=True)
+            Path(export_path).unlink(missing_ok=True)
+
     def test_sync_dry_run_reports_counts_without_upload(self):
         result = self.run_script(
             "sync_run_events_to_github.py",

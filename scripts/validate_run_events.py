@@ -331,8 +331,10 @@ def safe_metadata_path_key(
     key: Any,
     parent_key: Any | None = None,
     in_repo_context: bool = False,
+    in_raw_context: bool = False,
 ) -> str:
-    if unsafe_dynamic_key_reason(key, parent_key, in_repo_context):
+    diagnostic = unsafe_metadata_key_diagnostic(key, parent_key, in_repo_context, in_raw_context)
+    if diagnostic and diagnostic != str(key):
         return "<unsafe-key>"
     return str(key)
 
@@ -352,7 +354,7 @@ def iter_string_values(
             values.extend(
                 iter_string_values(
                     child,
-                    f"{path}.{safe_metadata_path_key(key, field_name, in_repo_context)}",
+                    f"{path}.{safe_metadata_path_key(key, field_name, in_repo_context, in_raw_context)}",
                     key,
                     child_repo_context,
                     child_raw_context,
