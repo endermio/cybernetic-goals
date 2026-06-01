@@ -128,6 +128,39 @@ class AggregateRunEventsTest(unittest.TestCase):
         self.assertEqual(candidates_payload["candidates"][0]["taxonomy_code"], "routing.over_control")
         self.assertIn("assertions", candidates_payload["candidates"][0])
 
+    def test_dry_run_sanitizes_underscore_composite_unsafe_key_validation_output(self):
+        event = json.loads(SAMPLE.read_text(encoding="utf-8"))
+        event["repoName_acme_private_repo"] = {"details": "/home/ender/private/repo"}
+        event["repositoryName_acme_private_repo"] = {"details": "/home/ender/private/repo"}
+        event["rawResponse_acme_private_repo"] = {"details": "/home/ender/private/repo"}
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            event_path = Path(tmpdir) / "event.json"
+            summary = Path(tmpdir) / "aggregation-summary.json"
+            candidates = Path(tmpdir) / "eval-candidates.json"
+            event_path.write_text(json.dumps(event), encoding="utf-8")
+            result = self.run_aggregate(
+                "--input",
+                str(event_path),
+                "--out",
+                str(summary),
+                "--eval-candidates-out",
+                str(candidates),
+                "--dry-run",
+            )
+
+        output = result.stdout + result.stderr
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("unsafe field unsafe key (repo_name)", output)
+        self.assertIn("unsafe field unsafe key (repository_name)", output)
+        self.assertIn("unsafe field unsafe key (raw_response)", output)
+        self.assertIn("unsafe metadata-only value at $.<unsafe-key>.details", output)
+        self.assertNotIn("repoName_acme_private_repo", output)
+        self.assertNotIn("repositoryName_acme_private_repo", output)
+        self.assertNotIn("rawResponse_acme_private_repo", output)
+        self.assertNotIn("acme_private_repo", output)
+        self.assertNotIn("/home", output)
+
 
 if __name__ == "__main__":
     unittest.main()

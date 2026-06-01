@@ -271,6 +271,16 @@ def unsafe_metadata_key_fragment_reason(key: Any) -> str | None:
     return short_repo_identifier_fragment_reason(string_key)
 
 
+def unsafe_metadata_key_phrase_reason(key: Any) -> tuple[str, bool] | None:
+    tokens = tokenize_metadata_key(key)
+    for phrase, reason in UNSAFE_METADATA_ONLY_KEY_PHRASES:
+        for index in range(0, len(tokens) - len(phrase) + 1):
+            if tuple(tokens[index : index + len(phrase)]) == phrase:
+                phrase_is_whole_key = len(tokens) == len(phrase)
+                return reason, not phrase_is_whole_key
+    return None
+
+
 def iter_key_contexts(
     value: Any,
     parent_key: Any | None = None,
@@ -305,11 +315,11 @@ def unsafe_metadata_key_reason(
     normalized = normalize_metadata_key(key)
     if normalized in NORMALIZED_UNSAFE_METADATA_ONLY_KEYS:
         return str(key)
+    phrase_reason = unsafe_metadata_key_phrase_reason(key)
+    if phrase_reason:
+        reason, _is_composite = phrase_reason
+        return reason
     tokens = tokenize_metadata_key(key)
-    for phrase, reason in UNSAFE_METADATA_ONLY_KEY_PHRASES:
-        for index in range(0, len(tokens) - len(phrase) + 1):
-            if tuple(tokens[index : index + len(phrase)]) == phrase:
-                return reason
     for token in tokens:
         if token in UNSAFE_METADATA_ONLY_KEY_TOKENS:
             return UNSAFE_METADATA_ONLY_KEY_TOKENS[token]
@@ -331,6 +341,11 @@ def unsafe_metadata_key_diagnostic(
         return f"unsafe dynamic key ({reason})"
     if unsafe_metadata_key_fragment_reason(key):
         return f"unsafe key ({reason})"
+    phrase_reason = unsafe_metadata_key_phrase_reason(key)
+    if phrase_reason:
+        _phrase_label, is_composite = phrase_reason
+        if is_composite and "_" in str(key):
+            return f"unsafe key ({reason})"
     return str(key)
 
 
