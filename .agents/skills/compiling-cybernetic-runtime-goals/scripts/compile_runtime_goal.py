@@ -67,6 +67,32 @@ def selected_execution_topology(plan_path: str) -> str | None:
     return None
 
 
+def topology_section(plan_path: str) -> str:
+    plan = Path(plan_path).read_text(encoding="utf-8")
+    return section_body(plan, "Context Management / Execution Topology") or ""
+
+
+def selected_superpowers_subagent_workflow(plan_path: str) -> bool:
+    for line in topology_section(plan_path).splitlines():
+        lowered = line.casefold()
+        if "subagent-driven-development" not in lowered:
+            continue
+        if "[" in line and "]" in line:
+            continue
+        if "do not" in lowered or "does not" in lowered or "not use" in lowered:
+            continue
+        return True
+    return False
+
+
+def conditional_subagent_workflow_clause(plan_path: str) -> str:
+    if not selected_superpowers_subagent_workflow(plan_path):
+        return ""
+    return (
+        "The approved plan explicitly selects `$superpowers:subagent-driven-development`; use it only when the approved plan's work packages match that workflow. "
+    )
+
+
 def execution_topology_clause(plan_path: str) -> str:
     topology = selected_execution_topology(plan_path)
     base = f"Use the approved execution topology defined in {plan_path}. "
@@ -74,7 +100,8 @@ def execution_topology_clause(plan_path: str) -> str:
     if topology == "Serial subagent-driven":
         return (
             base +
-            "Because the approved topology is Serial subagent-driven, use `$superpowers:subagent-driven-development` discipline with only one execution subagent active at a time. "
+            "Because the approved topology is Serial subagent-driven, use the approved bounded subagent delegation protocol defined in the plan with only one execution subagent active at a time. "
+            f"{conditional_subagent_workflow_clause(plan_path)}"
             "The main agent coordinates, integrates, maintains the progress log, and detects stop conditions; it must not personally absorb delegated bounded work packages. "
             "Subagents may execute only the bounded work packages, context packs, allowed actions, return formats, and integration gates defined in the approved plan. "
             "Subagent outputs are candidate results until the main agent integrates them against the approved control artifacts, progress log, evidence requirements, and stop conditions. "
@@ -83,7 +110,8 @@ def execution_topology_clause(plan_path: str) -> str:
     if topology == "Parallel subagent-driven":
         return (
             base +
-            "Because the approved topology is Parallel subagent-driven, use `$superpowers:subagent-driven-development` discipline and spawn subagents only for work packages explicitly marked independent by the dependency matrix and approved control review. "
+            "Because the approved topology is Parallel subagent-driven, use the approved bounded subagent delegation protocol defined in the plan and spawn subagents only for work packages explicitly marked independent by the dependency matrix and approved control review. "
+            f"{conditional_subagent_workflow_clause(plan_path)}"
             "The main agent coordinates, integrates, maintains the progress log, and detects stop conditions; it must not personally absorb delegated bounded work packages. "
             "Subagents may execute only the bounded work packages, context packs, allowed actions, return formats, and integration gates defined in the approved plan. "
             "Subagent outputs are candidate results until the main agent integrates them against the approved control artifacts, progress log, evidence requirements, and stop conditions. "

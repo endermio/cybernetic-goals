@@ -113,6 +113,8 @@ The main agent owns approved control artifacts, current batch state, dispatch, i
 
 A subagent owns one bounded work package, bounded investigation, or bounded verification pass. A subagent must not change control artifacts, widen scope, replace the execution topology, or bypass integration gates.
 
+For serial or parallel subagent-driven topology, record an approved bounded subagent delegation protocol. Do not treat `$superpowers:subagent-driven-development` as the generic delegation substrate. Use it only when the work packages fit its implementation-plan, current-session workflow and the execution policy explicitly selects it.
+
 For `Main-only` Level 3/4 work, include a meaningful `Main-only context-load justification` explaining why the main agent will not become an overloaded coordinator, worker, integrator, and verifier.
 
 At each batch boundary, the progress log must compress active context: current control summary, completed work packages, integrated subagent outputs, evidence produced, deferred sensors, unresolved blockers, policy deviations, and next allowed action.
@@ -263,7 +265,8 @@ Response-only next step:
 - [ ] Delegated work packages define Context pack, Return format, and Integration gate.
 - [ ] Delegated work packages define Context Pack Requirements with relevant control excerpts, batch objective, allowed artifacts/surfaces, forbidden changes, required sensors/evidence, stop conditions, and expected return format.
 - [ ] The plan defines a Context Compression Rule for batch boundaries.
-- [ ] Serial or parallel subagent-driven topology records `$superpowers:subagent-driven-development` or equivalent delegation substrate.
+- [ ] Serial or parallel subagent-driven topology records an approved bounded subagent delegation substrate.
+- [ ] `$superpowers:subagent-driven-development` is used only when explicitly selected for compatible implementation-plan, current-session work packages.
 - [ ] Parallel subagent-driven execution has explicit human approval, dependency independence, and review approval.
 - [ ] The plan includes Execution Granularity and Sensor Budget.
 - [ ] Batches are coherent target-state slices, not mechanical micro-steps.

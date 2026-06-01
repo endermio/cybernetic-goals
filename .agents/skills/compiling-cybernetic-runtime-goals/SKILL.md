@@ -31,7 +31,8 @@ The final command must instruct runtime Codex to:
 
 - use `$superpowers:executing-plans` discipline against the approved plan;
 - use the approved execution topology defined in the execution policy;
-- use `$superpowers:subagent-driven-development` when the approved topology selects serial or parallel subagent-driven execution;
+- use the approved bounded subagent delegation protocol when the approved topology selects serial or parallel subagent-driven execution;
+- use `$superpowers:subagent-driven-development` only when the approved plan explicitly selects it for work packages that fit that implementation-plan, current-session workflow;
 - treat subagent outputs as candidate results until main-agent integration against approved artifacts, progress log, evidence requirements, and stop conditions;
 - use `$superpowers:systematic-debugging` for unclear or repeated failures;
 - use `$superpowers:verification-before-completion` before claiming completion;
@@ -75,7 +76,8 @@ The final `/goal` must:
 - forbid replacing approved sensors without using approved sensor-governance rules;
 - use the approved execution topology defined in the execution policy;
 - use `$superpowers:executing-plans` discipline against the approved execution policy;
-- use `$superpowers:subagent-driven-development` when the approved execution topology selects serial or parallel subagent-driven execution;
+- use the approved bounded subagent delegation protocol when the approved execution topology selects serial or parallel subagent-driven execution;
+- use `$superpowers:subagent-driven-development` only when the approved execution policy explicitly selects it for work packages that fit that implementation-plan, current-session workflow;
 - state that subagent outputs remain candidate results until main-agent integration;
 - use `$superpowers:systematic-debugging` for unclear or repeated failures;
 - use `$superpowers:verification-before-completion` before claiming completion;

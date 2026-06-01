@@ -182,7 +182,7 @@ Semantic invariants must be frozen. Tactical execution details must remain adjus
 
 ### 11. Runtime Suitability
 
-The runtime `/goal` must be able to execute the approved artifacts without inventing new control structures. Any required runtime Superpowers discipline, including approved execution topology and subagent-driven execution discipline, must be precompiled into the approved plan, review, or final `/goal`.
+The runtime `/goal` must be able to execute the approved artifacts without inventing new control structures. Any required runtime discipline, including approved execution topology, bounded subagent delegation protocol, and conditionally selected Superpowers substrate, must be precompiled into the approved plan, review, or final `/goal`.
 
 ### 12. Review Independence
 

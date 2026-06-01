@@ -36,7 +36,8 @@ Approval requires a final observer pass after the last substantive mutation to t
 | Non-trivial execution policy generation | `$superpowers:writing-plans` | Required |
 | Control review approval | Independent subagent review discipline | Required for `Approved` unless explicit human approval exists |
 | Runtime execution | `$superpowers:executing-plans` discipline | Required |
-| Runtime target-work delegation | `$superpowers:subagent-driven-development` discipline | Required when execution policy selects serial or parallel subagent-driven topology |
+| Runtime target-work delegation | Approved bounded subagent delegation protocol | Required when execution policy selects serial or parallel subagent-driven topology |
+| Runtime implementation-plan delegation | `$superpowers:subagent-driven-development` discipline | Conditional: use only when the approved execution policy explicitly selects it for implementation-plan, current-session work packages that fit that workflow |
 | Unclear or repeated runtime failure | `$superpowers:systematic-debugging` | Required |
 | Completion claim | `$superpowers:verification-before-completion` | Required |
 

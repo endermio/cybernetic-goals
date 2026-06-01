@@ -103,7 +103,8 @@ Each delegated work package must define a bounded operating context, not just ar
 
 Subagent delegation substrate:
 
-- [Use `$superpowers:subagent-driven-development` for serial or parallel subagent-driven topology, or record equivalent approved delegation substrate.]
+- [Record the approved bounded subagent delegation protocol for serial or parallel subagent-driven topology.]
+- [Use `$superpowers:subagent-driven-development` only when these work packages fit that implementation-plan, current-session workflow; otherwise record the adapter-specific or plan-local bounded delegation protocol.]
 
 Parallel approval record:
 
@@ -118,6 +119,7 @@ Rules:
 - Use `Parallel subagent-driven` only when dependency independence is explicit and human + control-review approval exists.
 - The main agent must coordinate, integrate, maintain the progress log, and detect stop conditions.
 - A subagent must not modify control artifacts, widen scope, replace topology, or bypass the integration gate.
+- Do not treat `$superpowers:subagent-driven-development` as the generic delegation substrate; it applies only when explicitly selected for compatible implementation-plan work packages.
 - If the selected topology becomes insufficient, stop and revise the execution policy; do not let runtime improvise a new topology.
 
 Context Compression Rule:

@@ -9,7 +9,8 @@ ROOT = Path(__file__).resolve().parents[2]
 
 
 class ContextTopologySkillTest(unittest.TestCase):
-    def complete_serial_topology(self) -> str:
+    def complete_serial_topology(self, delegation_substrate: str | None = None) -> str:
+        substrate = delegation_substrate or "Approved bounded subagent delegation protocol for serial bounded work packages."
         return "\n".join(
             [
                 "Selected topology: `Serial subagent-driven`",
@@ -48,7 +49,7 @@ class ContextTopologySkillTest(unittest.TestCase):
                 "",
                 "Subagent delegation substrate:",
                 "",
-                "- Runtime target-work delegation uses `$superpowers:subagent-driven-development` discipline.",
+                f"- {substrate}",
                 "",
                 "Context Compression Rule:",
                 "",
@@ -229,11 +230,49 @@ class ContextTopologySkillTest(unittest.TestCase):
 
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
         self.assertIn("approved execution topology", result.stdout)
-        self.assertIn("$superpowers:subagent-driven-development", result.stdout)
+        self.assertIn("approved bounded subagent delegation protocol", result.stdout)
+        self.assertNotIn("$superpowers:subagent-driven-development", result.stdout)
         self.assertIn("only one execution subagent active at a time", result.stdout)
         self.assertIn("main agent coordinates", result.stdout)
         self.assertIn("Subagent outputs are candidate results until the main agent integrates them", result.stdout)
         self.assertNotIn("Execute serially according to the approved batch rhythm", result.stdout)
+
+    def test_runtime_compiler_uses_superpowers_subagent_workflow_when_plan_selects_it(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            tmp = Path(tmpdir)
+            requirements, goal, plan, review = self.write_artifact_chain(
+                tmp,
+                self.complete_serial_topology(
+                    "Implementation-plan same-session delegation uses `$superpowers:subagent-driven-development` discipline for independent bounded development tasks."
+                ),
+            )
+
+            result = subprocess.run(
+                [
+                    sys.executable,
+                    str(
+                        ROOT
+                        / ".agents/skills/compiling-cybernetic-runtime-goals/scripts/compile_runtime_goal.py"
+                    ),
+                    "--requirements",
+                    str(requirements),
+                    "--goal",
+                    str(goal),
+                    "--plan",
+                    str(plan),
+                    "--review",
+                    str(review),
+                    "--skip-guard",
+                    "--i-understand-this-bypasses-phase-gates",
+                ],
+                cwd=ROOT,
+                text=True,
+                capture_output=True,
+            )
+
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        self.assertIn("$superpowers:subagent-driven-development", result.stdout)
+        self.assertIn("only when the approved plan's work packages match that workflow", result.stdout)
 
     def test_control_chain_guard_requires_review_of_context_topology(self):
         with tempfile.TemporaryDirectory() as tmpdir:

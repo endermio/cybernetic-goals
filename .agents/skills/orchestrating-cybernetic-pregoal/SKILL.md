@@ -483,6 +483,9 @@ Before outputting runtime `/goal`, ensure:
 - artifact paths use the same date/slug unless the user explicitly specified alternatives
 - the runtime `/goal` references all approved files
 - the runtime `/goal` carries the final output contract from the goal when present or required
+- the runtime `/goal` preserves the approved execution topology
+- the runtime `/goal` uses the approved bounded subagent delegation protocol when the topology delegates work
+- the runtime `/goal` uses `$superpowers:subagent-driven-development` only when the execution policy explicitly selects it for compatible implementation-plan work packages
 
 If available, run:
 
@@ -527,6 +530,12 @@ It must not instruct Codex to:
 It must instruct Codex to:
 
 - use `$superpowers:executing-plans` discipline against the approved plan;
+- use the approved execution topology from the execution policy;
+- use the approved bounded subagent delegation protocol when the approved topology selects serial or parallel subagent-driven execution;
+- use `$superpowers:subagent-driven-development` only when the execution policy explicitly selects it for compatible implementation-plan, current-session work packages;
+- keep the main agent responsible for coordination, integration, progress log ownership, and stop-condition detection when work is delegated;
+- treat subagent outputs as candidate results until main-agent integration;
+- not replace the approved execution topology during runtime;
 - use `$superpowers:systematic-debugging` for unclear or repeated failures;
 - use `$superpowers:verification-before-completion` before claiming completion;
 - follow equivalent approved artifact discipline if runtime cannot load those skills.

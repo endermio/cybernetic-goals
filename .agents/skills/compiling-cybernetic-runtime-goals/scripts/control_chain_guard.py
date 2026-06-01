@@ -335,8 +335,8 @@ def check_execution_topology(plan: str | None, errors: list[str]) -> None:
         if not has_meaningful_delegation_matrix(body):
             errors.append("execution topology missing meaningful delegation matrix with Context pack, Allowed actions, Return format, and Integration gate")
         check_labeled_requirements(body, "Context Pack Requirements", CONTEXT_PACK_FIELDS, errors)
-        if "subagent-driven-development" not in body.casefold() and "runtime target-work delegation" not in body.casefold():
-            errors.append("subagent-driven topology missing $superpowers:subagent-driven-development or equivalent delegation substrate")
+        if not labeled_block_has_content(body, "Subagent delegation substrate"):
+            errors.append("subagent-driven topology missing approved bounded subagent delegation substrate")
 
     if topology in {"Serial subagent-driven", "Parallel subagent-driven"} or level in {3, 4}:
         check_labeled_requirements(body, "Context Compression Rule", CONTEXT_COMPRESSION_FIELDS, errors)
