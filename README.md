@@ -96,6 +96,12 @@ Defaults:
 
 Manual sync and aggregation are script-driven. Cloud-side outputs are candidates for review, not accepted control-law changes.
 
+## Framework maintenance
+
+Cross-artifact control rules are tracked in `docs/cybernetic-framework/invariant-artifact-consumer-matrix.md`.
+
+When adding or changing an invariant, update that matrix in the same change so the rule is mapped across source skill text, artifact templates, deterministic guards, review dimensions, runtime/downstream consumers, and regression coverage.
+
 ## Scripts
 
 The scripts are intentionally small and deterministic. They check structure and phase gates; they do not decide requirement semantics.
