@@ -118,7 +118,7 @@ UNSAFE_METADATA_ONLY_KEY_PHRASES = (
 TASK_HASH_RE = re.compile(r"^sha256:[a-f0-9]{64}$")
 EVENT_ID_RE = re.compile(r"^evt_[A-Za-z0-9_.-]+$")
 PACKAGE_ID_RE = re.compile(r"^pkg_[0-9a-f]{12,64}$")
-TAXONOMY_CODE_RE = re.compile(r"^[a-z][a-z0-9_]*(?:\.[a-z][a-z0-9_]*)+$")
+TAXONOMY_CODE_RE = re.compile(r"^[a-z][a-z0-9_]*(?:[._][a-z][a-z0-9_]*)+$")
 MACHINE_ID_RE = re.compile(r"^anon-[A-Za-z0-9_.-]+$")
 SHORT_REPO_IDENTIFIER_RE = re.compile(r"[A-Za-z0-9][A-Za-z0-9_.-]{0,99}/[A-Za-z0-9][A-Za-z0-9_.-]{0,99}")
 UNSAFE_METADATA_ONLY_VALUE_PATTERNS = (
@@ -135,9 +135,6 @@ SAFE_REPO_PRIVATE_METADATA_KEYS = {
     "repohash",
     "repoidhash",
     "repositorycount",
-}
-SAFE_SLASH_METADATA_KEYS = {
-    "compile/unit",
 }
 SYNC_EXPORT_PACKAGE_KEYS = {
     "destination_hash",
@@ -341,14 +338,18 @@ def short_repo_identifier_fragment_reason(value: Any) -> str | None:
     return "real_repo"
 
 
+def unsafe_taxonomy_code_reason(value: str) -> str | None:
+    if TAXONOMY_CODE_RE.fullmatch(value):
+        return None
+    return short_repo_identifier_reason(value) or unsafe_metadata_value_reason(value) or "invalid_format"
+
+
 def unsafe_dynamic_key_reason(
     key: Any,
     parent_key: Any | None = None,
     in_repo_context: bool = False,
 ) -> str | None:
     string_key = str(key)
-    if string_key in SAFE_SLASH_METADATA_KEYS:
-        return None
     string_pattern_reason = unsafe_metadata_value_reason(string_key)
     if string_pattern_reason:
         return string_pattern_reason
@@ -605,8 +606,17 @@ def validate_event(event: dict[str, Any], taxonomy: set[str], prefix: str) -> li
         taxonomy_codes = []
     if not isinstance(taxonomy_codes, list) or not all(isinstance(code, str) for code in taxonomy_codes):
         errors.append(f"{prefix}: taxonomy_codes must be an array of strings")
-    elif taxonomy:
-        unknown = sorted(set(taxonomy_codes) - taxonomy)
+    else:
+        unsafe_codes = {
+            reason
+            for code in taxonomy_codes
+            if (reason := unsafe_taxonomy_code_reason(code))
+        }
+        for reason in sorted(unsafe_codes):
+            errors.append(f"{prefix}: taxonomy_codes contains unsafe taxonomy code ({reason})")
+        unknown = sorted({code for code in taxonomy_codes if TAXONOMY_CODE_RE.fullmatch(code)} - taxonomy)
+        if not taxonomy:
+            unknown = []
         for code in unknown:
             errors.append(f"{prefix}: unknown taxonomy code {code}")
 

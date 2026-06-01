@@ -196,6 +196,56 @@ class AggregateRunEventsTest(unittest.TestCase):
         self.assertEqual(candidates_payload["candidates"][0]["taxonomy_code"], "routing.over_control")
         self.assertIn("assertions", candidates_payload["candidates"][0])
 
+    def test_dry_run_rejects_unsafe_taxonomy_code_without_leaking_value(self):
+        event = json.loads(SAMPLE.read_text(encoding="utf-8"))
+        event["taxonomy_codes"] = ["acme/service"]
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            event_path = Path(tmpdir) / "event.json"
+            summary = Path(tmpdir) / "aggregation-summary.json"
+            candidates = Path(tmpdir) / "eval-candidates.json"
+            event_path.write_text(json.dumps(event), encoding="utf-8")
+            result = self.run_aggregate(
+                "--input",
+                str(event_path),
+                "--out",
+                str(summary),
+                "--eval-candidates-out",
+                str(candidates),
+                "--dry-run",
+            )
+
+        output = result.stdout + result.stderr
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("taxonomy_codes contains unsafe taxonomy code", output)
+        self.assertIn("real_repo", output)
+        self.assertNotIn("acme/service", output)
+        self.assertNotIn("service", output)
+
+    def test_dry_run_rejects_compile_unit_dynamic_key_without_leaking_value(self):
+        event = json.loads(SAMPLE.read_text(encoding="utf-8"))
+        event["phase_aliases"] = {"compile/unit": "passed"}
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            event_path = Path(tmpdir) / "event.json"
+            summary = Path(tmpdir) / "aggregation-summary.json"
+            candidates = Path(tmpdir) / "eval-candidates.json"
+            event_path.write_text(json.dumps(event), encoding="utf-8")
+            result = self.run_aggregate(
+                "--input",
+                str(event_path),
+                "--out",
+                str(summary),
+                "--eval-candidates-out",
+                str(candidates),
+                "--dry-run",
+            )
+
+        output = result.stdout + result.stderr
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("unsafe dynamic key (real_repo)", output)
+        self.assertNotIn("compile/unit", output)
+
     def test_dry_run_sanitizes_underscore_composite_unsafe_key_validation_output(self):
         event = json.loads(SAMPLE.read_text(encoding="utf-8"))
         event["repoName_acme_private_repo"] = {"details": "/home/ender/private/repo"}

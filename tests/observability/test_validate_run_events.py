@@ -852,23 +852,12 @@ class ValidateRunEventsTest(unittest.TestCase):
 
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
 
-    def test_metadata_only_accepts_non_repo_slash_metadata_outside_repo_context(self):
-        safe = {
-            "schema_version": "1.0.0",
-            "event_id": "evt_safe_non_repo_slash_metadata",
-            "event": "runtime_outcome",
-            "timestamp": "2026-06-01T00:00:00Z",
-            "privacy_mode": "metadata_only",
-            "machine_id": "anon-12345678",
-            "skill_pack": {"source_commit": "abc1234"},
-            "status": "success",
-            "task_hash": "sha256:" + "7" * 64,
-            "gate": "compile/unit",
-            "phase_aliases": {"compile/unit": "passed"},
-        }
+    def test_metadata_only_rejects_unsafe_taxonomy_code_without_taxonomy_without_leaking_value(self):
+        unsafe = json.loads(SAMPLE.read_text(encoding="utf-8"))
+        unsafe["taxonomy_codes"] = ["acme/service"]
 
         with tempfile.NamedTemporaryFile("w", suffix=".json", delete=False) as tmp:
-            json.dump(safe, tmp)
+            json.dump(unsafe, tmp)
             tmp_path = tmp.name
 
         try:
@@ -876,7 +865,85 @@ class ValidateRunEventsTest(unittest.TestCase):
         finally:
             Path(tmp_path).unlink(missing_ok=True)
 
-        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        output = result.stdout + result.stderr
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("taxonomy_codes contains unsafe taxonomy code", output)
+        self.assertIn("real_repo", output)
+        self.assertNotIn("acme/service", output)
+        self.assertNotIn("service", output)
+
+    def test_metadata_only_rejects_unsafe_taxonomy_code_with_taxonomy_without_leaking_value(self):
+        unsafe = json.loads(SAMPLE.read_text(encoding="utf-8"))
+        unsafe["taxonomy_codes"] = ["acme/service"]
+
+        with tempfile.NamedTemporaryFile("w", suffix=".json", delete=False) as tmp:
+            json.dump(unsafe, tmp)
+            tmp_path = tmp.name
+
+        try:
+            result = self.run_validator(
+                "--taxonomy",
+                "observability/taxonomies/failure-taxonomy.yaml",
+                tmp_path,
+            )
+        finally:
+            Path(tmp_path).unlink(missing_ok=True)
+
+        output = result.stdout + result.stderr
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("taxonomy_codes contains unsafe taxonomy code", output)
+        self.assertIn("real_repo", output)
+        self.assertNotIn("acme/service", output)
+        self.assertNotIn("service", output)
+
+    def test_metadata_only_shows_safe_unknown_taxonomy_code(self):
+        unsafe = json.loads(SAMPLE.read_text(encoding="utf-8"))
+        unsafe["taxonomy_codes"] = ["routing.unlisted_safe_code"]
+
+        with tempfile.NamedTemporaryFile("w", suffix=".json", delete=False) as tmp:
+            json.dump(unsafe, tmp)
+            tmp_path = tmp.name
+
+        try:
+            result = self.run_validator(
+                "--taxonomy",
+                "observability/taxonomies/failure-taxonomy.yaml",
+                tmp_path,
+            )
+        finally:
+            Path(tmp_path).unlink(missing_ok=True)
+
+        output = result.stdout + result.stderr
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("unknown taxonomy code routing.unlisted_safe_code", output)
+
+    def test_metadata_only_rejects_compile_unit_dynamic_key_without_leaking_value(self):
+        unsafe = {
+            "schema_version": "1.0.0",
+            "event_id": "evt_unsafe_compile_unit_metadata",
+            "event": "runtime_outcome",
+            "timestamp": "2026-06-01T00:00:00Z",
+            "privacy_mode": "metadata_only",
+            "machine_id": "anon-12345678",
+            "skill_pack": {"source_commit": "abc1234"},
+            "status": "success",
+            "task_hash": "sha256:" + "7" * 64,
+            "phase_aliases": {"compile/unit": "passed"},
+        }
+
+        with tempfile.NamedTemporaryFile("w", suffix=".json", delete=False) as tmp:
+            json.dump(unsafe, tmp)
+            tmp_path = tmp.name
+
+        try:
+            result = self.run_validator(tmp_path)
+        finally:
+            Path(tmp_path).unlink(missing_ok=True)
+
+        output = result.stdout + result.stderr
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("unsafe dynamic key (real_repo)", output)
+        self.assertNotIn("compile/unit", output)
 
     def test_redacted_content_opt_in_rejects_raw_unsafe_fields(self):
         unsafe = {

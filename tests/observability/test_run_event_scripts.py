@@ -564,6 +564,32 @@ class RunEventScriptsTest(unittest.TestCase):
         self.assertNotIn("acme/service", output)
         self.assertNotIn("service", output)
 
+    def test_redactor_removes_compile_unit_dynamic_key_without_echoing_it(self):
+        unsafe = json.loads(SAMPLE.read_text(encoding="utf-8"))
+        unsafe["phase_aliases"] = {"compile/unit": "passed"}
+
+        with tempfile.NamedTemporaryFile("w", suffix=".json", delete=False) as tmp:
+            json.dump(unsafe, tmp)
+            tmp_path = tmp.name
+        try:
+            result = self.run_script(
+                "redact_run_event.py",
+                tmp_path,
+                "--mode",
+                "metadata_only",
+                "--dry-run",
+            )
+        finally:
+            Path(tmp_path).unlink(missing_ok=True)
+
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        payload = json.loads(result.stdout)
+        redacted_event = payload["events"][0]
+        self.assertNotIn("compile/unit", redacted_event["phase_aliases"])
+        self.assertEqual(payload["redacted_fields"], ["unsafe dynamic key (real_repo)"])
+        output = result.stdout + result.stderr
+        self.assertNotIn("compile/unit", output)
+
     def test_redactor_removes_raw_prompt_in_redacted_content_opt_in_mode(self):
         unsafe = json.loads(SAMPLE.read_text(encoding="utf-8"))
         unsafe["raw_prompt"] = "private task prompt"
@@ -845,6 +871,64 @@ class RunEventScriptsTest(unittest.TestCase):
             self.assertIn("unsafe dynamic key (real_repo)", output)
             self.assertNotIn("acme/private-repo", output)
             self.assertNotIn("private-repo", output)
+            self.assertFalse(Path(export_path).exists())
+        finally:
+            Path(input_path).unlink(missing_ok=True)
+            Path(export_path).unlink(missing_ok=True)
+
+    def test_sync_export_refuses_unsafe_taxonomy_code_without_leaking_value(self):
+        unsafe = json.loads(SAMPLE.read_text(encoding="utf-8"))
+        unsafe["taxonomy_codes"] = ["acme/service"]
+
+        with tempfile.NamedTemporaryFile("w", suffix=".json", delete=False) as tmp:
+            json.dump(unsafe, tmp)
+            input_path = tmp.name
+        with tempfile.NamedTemporaryFile("w", suffix=".json", delete=False) as tmp:
+            export_path = tmp.name
+        Path(export_path).unlink(missing_ok=True)
+
+        try:
+            result = self.run_script(
+                "sync_run_events_to_github.py",
+                "--input",
+                input_path,
+                "--export-out",
+                export_path,
+            )
+            output = result.stdout + result.stderr
+            self.assertNotEqual(result.returncode, 0)
+            self.assertIn("taxonomy_codes contains unsafe taxonomy code", output)
+            self.assertIn("real_repo", output)
+            self.assertNotIn("acme/service", output)
+            self.assertNotIn("service", output)
+            self.assertFalse(Path(export_path).exists())
+        finally:
+            Path(input_path).unlink(missing_ok=True)
+            Path(export_path).unlink(missing_ok=True)
+
+    def test_sync_export_refuses_compile_unit_dynamic_key_without_leaking_value(self):
+        unsafe = json.loads(SAMPLE.read_text(encoding="utf-8"))
+        unsafe["phase_aliases"] = {"compile/unit": "passed"}
+
+        with tempfile.NamedTemporaryFile("w", suffix=".json", delete=False) as tmp:
+            json.dump(unsafe, tmp)
+            input_path = tmp.name
+        with tempfile.NamedTemporaryFile("w", suffix=".json", delete=False) as tmp:
+            export_path = tmp.name
+        Path(export_path).unlink(missing_ok=True)
+
+        try:
+            result = self.run_script(
+                "sync_run_events_to_github.py",
+                "--input",
+                input_path,
+                "--export-out",
+                export_path,
+            )
+            output = result.stdout + result.stderr
+            self.assertNotEqual(result.returncode, 0)
+            self.assertIn("unsafe dynamic key (real_repo)", output)
+            self.assertNotIn("compile/unit", output)
             self.assertFalse(Path(export_path).exists())
         finally:
             Path(input_path).unlink(missing_ok=True)

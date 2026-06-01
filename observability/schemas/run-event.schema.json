@@ -95,7 +95,8 @@
     "taxonomy_codes": {
       "type": "array",
       "items": {
-        "type": "string"
+        "type": "string",
+        "pattern": "^[a-z][a-z0-9_]*(?:[._][a-z][a-z0-9_]*)+$"
       },
       "uniqueItems": true
     }
