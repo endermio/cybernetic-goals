@@ -134,6 +134,16 @@ SAFE_REPO_PRIVATE_METADATA_KEYS = {
     "repoidhash",
     "repositorycount",
 }
+SYNC_EXPORT_PACKAGE_KEYS = {
+    "destination_hash",
+    "event_count",
+    "event_ids",
+    "events",
+    "mode",
+    "package_id",
+    "taxonomy_counts",
+    "would_upload",
+}
 
 
 def normalize_metadata_key(key: Any) -> str:
@@ -204,6 +214,70 @@ def load_events(path: str) -> list[dict[str, Any]]:
     return events_from_json_value(path, json.loads(text))
 
 
+def safe_package_field_name(key: Any) -> str:
+    diagnostic = unsafe_metadata_key_diagnostic(key)
+    if diagnostic and diagnostic != str(key):
+        return diagnostic
+    return str(key)
+
+
+def validate_event_package(value: dict[str, Any], prefix: str | None = None) -> list[dict[str, Any]]:
+    package_prefix = prefix or "package"
+    errors: list[str] = []
+
+    unknown_keys = sorted(set(value) - SYNC_EXPORT_PACKAGE_KEYS)
+    for key in unknown_keys:
+        errors.append(f"{package_prefix}: package contains unknown top-level field {safe_package_field_name(key)}")
+
+    events = value.get("events")
+    if not isinstance(events, list) or not all(isinstance(event, dict) for event in events):
+        errors.append(f"{package_prefix}: package events must be an array of objects")
+        events = []
+
+    metadata = {key: child for key, child in value.items() if key != "events"}
+    unsafe_fields = sorted(
+        {
+            diagnostic
+            for key, parent_key, in_repo_context, in_raw_context in iter_key_contexts(metadata)
+            if (diagnostic := unsafe_metadata_key_diagnostic(key, parent_key, in_repo_context, in_raw_context))
+        }
+    )
+    for diagnostic in unsafe_fields:
+        errors.append(f"{package_prefix}: package metadata contains unsafe field {diagnostic}")
+    for path, string_value, field_name, in_repo_context, _in_raw_context in iter_string_values(metadata):
+        reason = unsafe_metadata_value_reason(string_value, field_name, in_repo_context)
+        if reason:
+            errors.append(f"{package_prefix}: unsafe package metadata value at {path} ({reason})")
+
+    if "mode" in value and value.get("mode") != "export":
+        errors.append(f"{package_prefix}: package mode must be export")
+    if "event_count" in value and (not isinstance(value.get("event_count"), int) or value.get("event_count") != len(events)):
+        errors.append(f"{package_prefix}: package event_count must match events length")
+    if "event_ids" in value and not (
+        isinstance(value.get("event_ids"), list) and all(isinstance(event_id, str) for event_id in value.get("event_ids", []))
+    ):
+        errors.append(f"{package_prefix}: package event_ids must be an array of strings")
+    if "package_id" in value and (not isinstance(value.get("package_id"), str) or not str(value.get("package_id")).startswith("pkg_")):
+        errors.append(f"{package_prefix}: package_id must start with pkg_")
+    destination_hash = value.get("destination_hash")
+    if "destination_hash" in value and destination_hash is not None and (
+        not isinstance(destination_hash, str) or not TASK_HASH_RE.match(destination_hash)
+    ):
+        errors.append(f"{package_prefix}: destination_hash must be null or match sha256:<64 lowercase hex>")
+    taxonomy_counts = value.get("taxonomy_counts")
+    if "taxonomy_counts" in value and not (
+        isinstance(taxonomy_counts, dict)
+        and all(isinstance(key, str) and isinstance(count, int) for key, count in taxonomy_counts.items())
+    ):
+        errors.append(f"{package_prefix}: taxonomy_counts must be an object of integer counts")
+    if "would_upload" in value and not isinstance(value.get("would_upload"), bool):
+        errors.append(f"{package_prefix}: would_upload must be a boolean")
+
+    if errors:
+        raise ValueError("; ".join(errors))
+    return events
+
+
 def load_event_input(path: str, package_error_prefix: str | None = None) -> list[dict[str, Any]]:
     if path.endswith(".jsonl"):
         return load_events(path)
@@ -211,11 +285,7 @@ def load_event_input(path: str, package_error_prefix: str | None = None) -> list
     text = Path(path).read_text(encoding="utf-8")
     value = json.loads(text)
     if isinstance(value, dict) and "events" in value:
-        events = value["events"]
-        if not isinstance(events, list) or not all(isinstance(event, dict) for event in events):
-            prefix = f"{package_error_prefix}: " if package_error_prefix else ""
-            raise ValueError(f"{prefix}package events must be an array of objects")
-        return events
+        return validate_event_package(value, package_error_prefix)
     return events_from_json_value(path, value)
 
 

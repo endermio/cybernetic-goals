@@ -76,6 +76,39 @@ class AggregateRunEventsTest(unittest.TestCase):
         self.assertEqual(summary_payload["event_type_counts"]["runtime_outcome"], 1)
         self.assertEqual(summary_payload["event_type_counts"]["skill_invoked"], 1)
 
+    def test_dry_run_accepts_sync_export_package(self):
+        event = json.loads(SAMPLE.read_text(encoding="utf-8"))
+        package = {
+            "mode": "export",
+            "event_count": 1,
+            "event_ids": [event["event_id"]],
+            "package_id": "pkg_" + "c" * 64,
+            "destination_hash": None,
+            "taxonomy_counts": {"observability.metadata_only_recorded": 1},
+            "would_upload": False,
+            "events": [event],
+        }
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            input_path = Path(tmpdir) / "export.json"
+            summary = Path(tmpdir) / "aggregation-summary.json"
+            candidates = Path(tmpdir) / "eval-candidates.json"
+            input_path.write_text(json.dumps(package), encoding="utf-8")
+
+            result = self.run_aggregate(
+                "--input",
+                str(input_path),
+                "--out",
+                str(summary),
+                "--eval-candidates-out",
+                str(candidates),
+                "--dry-run",
+            )
+            self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+            summary_payload = json.loads(summary.read_text(encoding="utf-8"))
+
+        self.assertEqual(summary_payload["event_count"], 1)
+
     def test_generated_at_can_be_set_for_deterministic_outputs(self):
         generated_at = "2026-01-02T03:04:05Z"
         with tempfile.TemporaryDirectory() as tmpdir:

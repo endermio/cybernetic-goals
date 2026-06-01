@@ -7,6 +7,7 @@ from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parents[2]
+SAMPLE = ROOT / "observability" / "examples" / "metadata-only-event.json"
 
 
 class ValidateRunEventsTest(unittest.TestCase):
@@ -24,6 +25,58 @@ class ValidateRunEventsTest(unittest.TestCase):
             "observability/taxonomies/failure-taxonomy.yaml",
             "observability/examples/metadata-only-event.json",
         )
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        self.assertIn("validated 1 event", result.stdout)
+
+    def test_sync_export_package_rejects_unsafe_top_level_fields_without_leaking_values(self):
+        package = {
+            "mode": "export",
+            "event_count": 0,
+            "event_ids": [],
+            "package_id": "pkg_" + "a" * 64,
+            "destination_hash": None,
+            "taxonomy_counts": {},
+            "would_upload": False,
+            "events": [],
+            "raw_response": "private model response",
+        }
+
+        with tempfile.NamedTemporaryFile("w", suffix=".json", delete=False) as tmp:
+            json.dump(package, tmp)
+            tmp_path = tmp.name
+
+        try:
+            result = self.run_validator(tmp_path)
+        finally:
+            Path(tmp_path).unlink(missing_ok=True)
+
+        output = result.stdout + result.stderr
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("package contains unknown top-level field raw_response", output)
+        self.assertNotIn("private model response", output)
+
+    def test_valid_sync_export_package_validates(self):
+        event = json.loads(SAMPLE.read_text(encoding="utf-8"))
+        package = {
+            "mode": "export",
+            "event_count": 1,
+            "event_ids": [event["event_id"]],
+            "package_id": "pkg_" + "b" * 64,
+            "destination_hash": None,
+            "taxonomy_counts": {"observability.metadata_only_recorded": 1},
+            "would_upload": False,
+            "events": [event],
+        }
+
+        with tempfile.NamedTemporaryFile("w", suffix=".json", delete=False) as tmp:
+            json.dump(package, tmp)
+            tmp_path = tmp.name
+
+        try:
+            result = self.run_validator(tmp_path)
+        finally:
+            Path(tmp_path).unlink(missing_ok=True)
+
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
         self.assertIn("validated 1 event", result.stdout)
 

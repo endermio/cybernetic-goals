@@ -67,6 +67,49 @@ class RunEventScriptsTest(unittest.TestCase):
             Path(tmp_path).unlink(missing_ok=True)
         self.assertEqual(validation.returncode, 0, validation.stdout + validation.stderr)
 
+    def test_record_run_event_does_not_use_caller_repo_head_as_source_commit(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            caller_repo = Path(tmpdir) / "caller-repo"
+            caller_repo.mkdir()
+            subprocess.run(["git", "init"], cwd=caller_repo, check=True, text=True, capture_output=True)
+            subprocess.run(["git", "config", "user.email", "test@example.invalid"], cwd=caller_repo, check=True)
+            subprocess.run(["git", "config", "user.name", "Test User"], cwd=caller_repo, check=True)
+            (caller_repo / "private.txt").write_text("private caller repo\n", encoding="utf-8")
+            subprocess.run(["git", "add", "private.txt"], cwd=caller_repo, check=True)
+            subprocess.run(["git", "commit", "-m", "private caller commit"], cwd=caller_repo, check=True, text=True, capture_output=True)
+            private_head = subprocess.run(
+                ["git", "rev-parse", "--short", "HEAD"],
+                cwd=caller_repo,
+                check=True,
+                text=True,
+                capture_output=True,
+            ).stdout.strip()
+
+            result = subprocess.run(
+                [
+                    sys.executable,
+                    str(ROOT / "scripts" / "record_run_event.py"),
+                    "--event",
+                    "skill_invoked",
+                    "--skill",
+                    "routing-cybernetic-workflows",
+                    "--status",
+                    "success",
+                    "--machine-id",
+                    "anon-testmachine",
+                    "--task-hash",
+                    "sha256:" + "e" * 64,
+                    "--dry-run",
+                ],
+                cwd=caller_repo,
+                text=True,
+                capture_output=True,
+            )
+
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        event = json.loads(result.stdout)
+        self.assertNotEqual(event["skill_pack"].get("source_commit"), private_head)
+
     def test_record_run_event_appends_jsonl_locally_without_network(self):
         with tempfile.TemporaryDirectory() as tmpdir:
             output = Path(tmpdir) / "runs.jsonl"

@@ -44,19 +44,42 @@ def load_or_create_machine_id(state_dir: Path, dry_run: bool) -> str:
     return machine_id
 
 
-def git_source_commit() -> str:
+LOCAL_UNVERSIONED_RELEASE = "local-unversioned"
+
+
+def git_source_commit(repo_root: Path) -> str | None:
     try:
         result = subprocess.run(
             ["git", "rev-parse", "--short", "HEAD"],
+            cwd=repo_root,
             text=True,
             capture_output=True,
             check=False,
         )
     except OSError:
-        return "unknown"
+        return None
     if result.returncode == 0:
-        return result.stdout.strip() or "unknown"
-    return "unknown"
+        return result.stdout.strip() or None
+    return None
+
+
+def default_skill_pack_identity(args: argparse.Namespace) -> dict[str, str]:
+    if args.release:
+        skill_pack = {"release": args.release}
+        if args.source_commit:
+            skill_pack["source_commit"] = args.source_commit
+        return skill_pack
+    if args.source_commit:
+        return {"source_commit": args.source_commit}
+
+    env_source_commit = os.environ.get("CYBERNETIC_SKILL_PACK_COMMIT")
+    if env_source_commit:
+        return {"source_commit": env_source_commit}
+
+    repo_source_commit = git_source_commit(Path(__file__).resolve().parents[1])
+    if repo_source_commit:
+        return {"source_commit": repo_source_commit}
+    return {"release": LOCAL_UNVERSIONED_RELEASE}
 
 
 def default_task_hash(args: argparse.Namespace) -> str:
@@ -73,9 +96,6 @@ def default_task_hash(args: argparse.Namespace) -> str:
 
 def build_event(args: argparse.Namespace) -> dict[str, Any]:
     state_dir = Path(args.state_dir) if args.state_dir else default_state_dir()
-    skill_pack = {"source_commit": args.source_commit or git_source_commit()}
-    if args.release:
-        skill_pack["release"] = args.release
     event: dict[str, Any] = {
         "schema_version": "1.0.0",
         "event_id": args.event_id or f"evt_{datetime.now(timezone.utc).strftime('%Y%m%d%H%M%S')}_{uuid.uuid4().hex[:8]}",
@@ -83,7 +103,7 @@ def build_event(args: argparse.Namespace) -> dict[str, Any]:
         "timestamp": args.timestamp or utc_now(),
         "privacy_mode": "metadata_only",
         "machine_id": args.machine_id or load_or_create_machine_id(state_dir, args.dry_run),
-        "skill_pack": skill_pack,
+        "skill_pack": default_skill_pack_identity(args),
         "task_hash": args.task_hash or default_task_hash(args),
     }
     if args.skill:
