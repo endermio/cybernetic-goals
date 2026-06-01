@@ -95,9 +95,12 @@ Check:
 - selected topology is explicit;
 - Level 3/4 main-only execution has a context-load justification;
 - delegated work packages define Context pack, Allowed actions, Return format, and Integration gate;
+- context packs include relevant control excerpts, current batch objective, allowed artifacts/surfaces, forbidden changes, required sensors/evidence, stop conditions, and expected return format;
 - parallel subagent-driven execution has explicit human approval, dependency independence, and control-review approval;
 - subagents cannot modify control artifacts, widen scope, replace topology, or bypass integration gates;
 - main agent owns dispatch, integration, progress log, and stop-condition detection;
+- context compression is defined for batch boundaries;
+- subagent outputs remain candidate results until main-agent integration;
 - context overload is not assigned to the main agent.
 
 Findings:

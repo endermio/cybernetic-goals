@@ -108,9 +108,24 @@
         "Selects Main-only, Serial subagent-driven, or Parallel subagent-driven explicitly.",
         "Defaults Level 3 high-context work to Serial subagent-driven unless Main-only has a context-load justification.",
         "Defines Context pack for each delegated work package.",
+        "Defines Context Pack Requirements including relevant control excerpts, current batch objective, allowed artifacts/surfaces, forbidden changes, required sensors/evidence, stop conditions, and expected return format.",
         "Defines Return format for each delegated work package.",
         "Defines Integration gate for each delegated work package.",
+        "Defines a Context Compression Rule for batch boundaries.",
         "Does not select Parallel subagent-driven without explicit human approval and dependency independence."
+      ]
+    },
+    {
+      "id": "level-3-main-only-requires-context-load-justification",
+      "prompt": "Create an execution policy for a Level 3 controlled change, but choose Main-only topology because the work is tightly coupled and subagent delegation would add more integration risk than it removes.",
+      "expected_output": "The execution policy may choose Main-only only with an explicit Main-only context-load justification explaining why the main agent will not become an overloaded coordinator, worker, integrator, and verifier.",
+      "assertions": [
+        "Records Task level as Level 3.",
+        "Selects Main-only explicitly if that topology is used.",
+        "Includes Main-only context-load justification.",
+        "Explains why bounded subagents are not needed or would be counterproductive.",
+        "Defines Context Compression Rule for batch boundaries.",
+        "Does not use a vague rationale such as only 'simpler'."
       ]
     }
   ]

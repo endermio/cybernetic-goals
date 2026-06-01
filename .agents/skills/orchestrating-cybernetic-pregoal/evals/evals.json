@@ -224,6 +224,29 @@
         "Returns to $writing-cybernetic-execution-policies or execution-policy revision.",
         "Does not compile a runtime /goal."
       ]
+    },
+    {
+      "id": "orchestrator-blocks-level-3-main-only-without-justification",
+      "prompt": "Execution policy records Task level: Level 3 and Selected topology: Main-only, but Main-only context-load justification is missing or only says 'simpler'. Orchestrate the transition to review/runtime.",
+      "expected_output": "The orchestrator blocks and returns to execution-policy revision because Level 3 Main-only topology requires a meaningful context-load justification.",
+      "assertions": [
+        "Does not decide or rewrite topology inside the orchestrator.",
+        "Reports missing Main-only context-load justification.",
+        "Returns to $writing-cybernetic-execution-policies or execution-policy revision.",
+        "Does not compile a runtime /goal."
+      ]
+    },
+    {
+      "id": "orchestrator-blocks-weak-context-pack",
+      "prompt": "Execution policy selects Serial subagent-driven and has a delegation matrix, but Context pack only lists requirements, goal, plan and lacks Context Pack Requirements and Context Compression Rule. Orchestrate the transition to review/runtime.",
+      "expected_output": "The orchestrator blocks and returns to execution-policy revision because subagent topology lacks a bounded operating context and context compression structure.",
+      "assertions": [
+        "Reports incomplete Context Pack Requirements.",
+        "Requires relevant control excerpts, current batch objective, allowed artifacts/surfaces, forbidden changes, required sensors/evidence, stop conditions, and expected return format.",
+        "Requires Context Compression Rule.",
+        "Returns to $writing-cybernetic-execution-policies or execution-policy revision.",
+        "Does not compile a runtime /goal."
+      ]
     }
   ]
 }

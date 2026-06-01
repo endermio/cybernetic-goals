@@ -54,11 +54,17 @@ These may change during execution if invariants are preserved.
 
 ## Context Management / Execution Topology
 
+Task level: `Level 0 / Level 1 / Level 2 / Level 3 / Level 4`
+
 Selected topology: `Main-only / Serial subagent-driven / Parallel subagent-driven`
 
 Topology rationale:
 
 - [why this topology fits the task level, context load, dependency matrix, and review constraints]
+
+Main-only context-load justification:
+
+- [required for Level 3/4 Main-only; explain why the main agent will not become coordinator, worker, integrator, and verifier for context-heavy work]
 
 Main agent owns:
 
@@ -81,6 +87,20 @@ Delegation matrix:
 |---|---|---|---|---|---|
 | [package] | `main / serial subagent / parallel subagent` | [artifact paths, files, constraints, stop conditions] | [bounded actions] | [required summary/evidence format] | [main-agent integration condition] |
 
+Context Pack Requirements:
+
+Each delegated work package must define a bounded operating context, not just artifact path names.
+
+| Field | Content |
+|---|---|
+| Relevant control excerpts | [requirements/design/goal/policy excerpts needed for this package] |
+| Current batch objective | [bounded objective for this package] |
+| Allowed artifacts/surfaces | [files, documents, commands, or surfaces this package may touch] |
+| Forbidden changes | [control artifacts, scope, topology, unrelated surfaces, or other forbidden changes] |
+| Required sensors/evidence | [checks, evidence references, or observations this package must return] |
+| Stop conditions | [conditions that force the subagent to stop and report rather than continue] |
+| Expected return format | [summary/evidence/blocker format required for integration] |
+
 Subagent delegation substrate:
 
 - [Use `$superpowers:subagent-driven-development` for serial or parallel subagent-driven topology, or record equivalent approved delegation substrate.]
@@ -99,6 +119,19 @@ Rules:
 - The main agent must coordinate, integrate, maintain the progress log, and detect stop conditions.
 - A subagent must not modify control artifacts, widen scope, replace topology, or bypass the integration gate.
 - If the selected topology becomes insufficient, stop and revise the execution policy; do not let runtime improvise a new topology.
+
+Context Compression Rule:
+
+At each batch boundary, update the progress log with:
+
+- Active control summary: [current requirements, goal invariants, topology, and stop conditions]
+- Completed work packages: [packages completed and integrated]
+- Subagent outputs integrated: [candidate outputs accepted into main progress state]
+- Evidence produced: [evidence references and sensor interpretation]
+- Deferred sensors and reasons: [policy-approved deferrals]
+- Unresolved blockers: [blockers requiring revision or human input]
+- Deviations from policy: [deviations and whether execution must stop]
+- Next allowed action: [next policy-approved action]
 
 ## Execution Granularity and Sensor Budget
 
@@ -250,6 +283,12 @@ Each entry must include:
 - result
 - sensor interpretation
 - deferred/final-only sensors and reason
+- active control summary
+- completed work packages
+- subagent outputs integrated
+- evidence produced
+- unresolved blockers
+- deviations from policy
 - current risk
 - next step
 

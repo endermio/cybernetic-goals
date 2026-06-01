@@ -77,6 +77,7 @@ def execution_topology_clause(plan_path: str) -> str:
             "Because the approved topology is Serial subagent-driven, use `$superpowers:subagent-driven-development` discipline with only one execution subagent active at a time. "
             "The main agent coordinates, integrates, maintains the progress log, and detects stop conditions; it must not personally absorb delegated bounded work packages. "
             "Subagents may execute only the bounded work packages, context packs, allowed actions, return formats, and integration gates defined in the approved plan. "
+            "Subagent outputs are candidate results until the main agent integrates them against the approved control artifacts, progress log, evidence requirements, and stop conditions. "
         )
 
     if topology == "Parallel subagent-driven":
@@ -85,6 +86,7 @@ def execution_topology_clause(plan_path: str) -> str:
             "Because the approved topology is Parallel subagent-driven, use `$superpowers:subagent-driven-development` discipline and spawn subagents only for work packages explicitly marked independent by the dependency matrix and approved control review. "
             "The main agent coordinates, integrates, maintains the progress log, and detects stop conditions; it must not personally absorb delegated bounded work packages. "
             "Subagents may execute only the bounded work packages, context packs, allowed actions, return formats, and integration gates defined in the approved plan. "
+            "Subagent outputs are candidate results until the main agent integrates them against the approved control artifacts, progress log, evidence requirements, and stop conditions. "
         )
 
     if topology == "Main-only":

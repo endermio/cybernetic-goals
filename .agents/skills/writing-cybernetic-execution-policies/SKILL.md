@@ -83,6 +83,8 @@ The execution policy must choose one approved topology:
 - `Serial subagent-driven`
 - `Parallel subagent-driven`
 
+The execution policy must record `Task level` next to the selected topology.
+
 Default topology rules:
 
 - Level 0/1: use `Main-only`.
@@ -98,10 +100,22 @@ For every delegated work package, define:
 - Allowed actions
 - Return format
 - Integration gate
+- Context Pack Requirements:
+  - Relevant control excerpts
+  - Current batch objective
+  - Allowed artifacts/surfaces
+  - Forbidden changes
+  - Required sensors/evidence
+  - Stop conditions
+  - Expected return format
 
 The main agent owns approved control artifacts, current batch state, dispatch, integration, progress log, and stop-condition detection.
 
 A subagent owns one bounded work package, bounded investigation, or bounded verification pass. A subagent must not change control artifacts, widen scope, replace the execution topology, or bypass integration gates.
+
+For `Main-only` Level 3/4 work, include a meaningful `Main-only context-load justification` explaining why the main agent will not become an overloaded coordinator, worker, integrator, and verifier.
+
+At each batch boundary, the progress log must compress active context: current control summary, completed work packages, integrated subagent outputs, evidence produced, deferred sensors, unresolved blockers, policy deviations, and next allowed action.
 
 ## Execution Granularity and Sensor Budget
 
@@ -247,6 +261,8 @@ Response-only next step:
 - [ ] The plan selects `Main-only`, `Serial subagent-driven`, or `Parallel subagent-driven`.
 - [ ] Level 3/4 main-only execution has an explicit context-load justification.
 - [ ] Delegated work packages define Context pack, Return format, and Integration gate.
+- [ ] Delegated work packages define Context Pack Requirements with relevant control excerpts, batch objective, allowed artifacts/surfaces, forbidden changes, required sensors/evidence, stop conditions, and expected return format.
+- [ ] The plan defines a Context Compression Rule for batch boundaries.
 - [ ] Serial or parallel subagent-driven topology records `$superpowers:subagent-driven-development` or equivalent delegation substrate.
 - [ ] Parallel subagent-driven execution has explicit human approval, dependency independence, and review approval.
 - [ ] The plan includes Execution Granularity and Sensor Budget.

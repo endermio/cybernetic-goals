@@ -100,6 +100,7 @@
         "Mentions $superpowers:subagent-driven-development when serial subagent-driven topology is selected.",
         "Requires only one execution subagent active at a time for serial topology.",
         "Says the main agent coordinates, integrates, maintains progress log, and detects stop conditions.",
+        "States that subagent outputs are candidate results until main-agent integration against approved artifacts, progress log, evidence requirements, and stop conditions.",
         "Does not replace the approved topology with generic serial main-agent execution.",
         "Stops if runtime would need to invent or replace execution topology."
       ]
@@ -112,6 +113,8 @@
         "Does not output final /goal.",
         "Reports incomplete Context Management / Execution Topology.",
         "Requires Context pack, Allowed actions, Return format, and Integration gate for subagent-driven topology.",
+        "Requires Context Pack Requirements for subagent-driven topology.",
+        "Requires Context Compression Rule when subagent-driven topology is selected.",
         "Requires main-agent ownership.",
         "Requires $superpowers:subagent-driven-development or equivalent delegation substrate for subagent-driven topology.",
         "Includes a response-only next step to revise the execution policy."

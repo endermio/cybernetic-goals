@@ -14,6 +14,8 @@ class ContextTopologySkillTest(unittest.TestCase):
             [
                 "Selected topology: `Serial subagent-driven`",
                 "",
+                "Task level: `Level 3`",
+                "",
                 "Topology rationale:",
                 "",
                 "- Level 3 context load needs bounded delegation.",
@@ -32,9 +34,32 @@ class ContextTopologySkillTest(unittest.TestCase):
                 "|---|---|---|---|---|---|",
                 "| Package A | serial subagent | requirements, goal, plan | inspect files | findings and evidence | main integrates result |",
                 "",
+                "Context Pack Requirements:",
+                "",
+                "| Field | Content |",
+                "|---|---|",
+                "| Relevant control excerpts | requirements success conditions, goal invariants, execution policy stop conditions |",
+                "| Current batch objective | complete Package A bounded inspection |",
+                "| Allowed artifacts/surfaces | target files listed in package scope |",
+                "| Forbidden changes | control artifacts, scope, topology, unrelated files |",
+                "| Required sensors/evidence | command output and evidence references |",
+                "| Stop conditions | missing context, invariant conflict, unauthorized scope change |",
+                "| Expected return format | summary, files inspected, evidence, blockers, next integration note |",
+                "",
                 "Subagent delegation substrate:",
                 "",
                 "- Runtime target-work delegation uses `$superpowers:subagent-driven-development` discipline.",
+                "",
+                "Context Compression Rule:",
+                "",
+                "- Active control summary: summarize current requirements, goal invariants, topology, and stop conditions.",
+                "- Completed work packages: record packages integrated at the boundary.",
+                "- Subagent outputs integrated: record candidate outputs accepted into main progress state.",
+                "- Evidence produced: record evidence references and sensor interpretation.",
+                "- Deferred sensors and reasons: preserve policy-approved deferrals.",
+                "- Unresolved blockers: record blockers requiring revision or human input.",
+                "- Deviations from policy: record deviations and whether execution must stop.",
+                "- Next allowed action: record the next policy-approved action.",
             ]
         )
 
@@ -108,6 +133,9 @@ class ContextTopologySkillTest(unittest.TestCase):
             self.assertIn("Context pack", text)
             self.assertIn("Return format", text)
             self.assertIn("Integration gate", text)
+            self.assertIn("Task level", text)
+            self.assertIn("Context Pack Requirements", text)
+            self.assertIn("Context Compression Rule", text)
 
         self.assertIn("main agent owns", template.casefold())
         self.assertIn("subagent owns", template.casefold())
@@ -168,6 +196,7 @@ class ContextTopologySkillTest(unittest.TestCase):
         self.assertIn("$superpowers:subagent-driven-development", result.stdout)
         self.assertIn("only one execution subagent active at a time", result.stdout)
         self.assertIn("main agent coordinates", result.stdout)
+        self.assertIn("Subagent outputs are candidate results until the main agent integrates them", result.stdout)
         self.assertNotIn("Execute serially according to the approved batch rhythm", result.stdout)
 
     def test_control_chain_guard_rejects_incomplete_subagent_topology(self):
@@ -204,6 +233,166 @@ class ContextTopologySkillTest(unittest.TestCase):
         self.assertIn("Context pack", output)
         self.assertIn("Return format", output)
         self.assertIn("Integration gate", output)
+
+    def test_guards_reject_level_3_main_only_without_context_load_justification(self):
+        topology_body = "\n".join(
+            [
+                "Selected topology: `Main-only`",
+                "",
+                "Task level: `Level 3`",
+                "",
+                "Topology rationale:",
+                "",
+                "- simpler",
+                "",
+                "Main agent owns:",
+                "",
+                "- approved control artifacts",
+                "- dispatch",
+                "- integration",
+                "- progress log",
+                "- stop-condition detection",
+            ]
+        )
+        with tempfile.TemporaryDirectory() as tmpdir:
+            requirements, goal, plan, review = self.write_artifact_chain(Path(tmpdir), topology_body)
+
+            control_guard = subprocess.run(
+                [
+                    sys.executable,
+                    str(
+                        ROOT
+                        / ".agents/skills/compiling-cybernetic-runtime-goals/scripts/control_chain_guard.py"
+                    ),
+                    "--requirements",
+                    str(requirements),
+                    "--goal",
+                    str(goal),
+                    "--plan",
+                    str(plan),
+                    "--review",
+                    str(review),
+                ],
+                cwd=ROOT,
+                text=True,
+                capture_output=True,
+            )
+            orchestration_guard = subprocess.run(
+                [
+                    sys.executable,
+                    str(
+                        ROOT
+                        / ".agents/skills/orchestrating-cybernetic-pregoal/scripts/orchestration_guard.py"
+                    ),
+                    "--state",
+                    "before-review",
+                    "--requirements",
+                    str(requirements),
+                    "--goal",
+                    str(goal),
+                    "--plan",
+                    str(plan),
+                ],
+                cwd=ROOT,
+                text=True,
+                capture_output=True,
+            )
+
+        for result in (control_guard, orchestration_guard):
+            output = result.stdout + result.stderr
+            self.assertNotEqual(result.returncode, 0)
+            self.assertIn("Main-only context-load justification", output)
+
+    def test_guards_reject_weak_context_pack_requirements(self):
+        weak_topology = "\n".join(
+            [
+                "Selected topology: `Serial subagent-driven`",
+                "",
+                "Task level: `Level 3`",
+                "",
+                "Topology rationale:",
+                "",
+                "- Level 3 context load needs bounded delegation.",
+                "",
+                "Main agent owns:",
+                "",
+                "- approved control artifacts",
+                "- dispatch",
+                "- integration",
+                "- progress log",
+                "- stop-condition detection",
+                "",
+                "Delegation matrix:",
+                "",
+                "| Work package | Executor | Context pack | Allowed actions | Return format | Integration gate |",
+                "|---|---|---|---|---|---|",
+                "| Package A | serial subagent | requirements, goal, plan | inspect files | summary | review |",
+                "",
+                "Subagent delegation substrate:",
+                "",
+                "- Runtime target-work delegation uses `$superpowers:subagent-driven-development` discipline.",
+                "",
+                "Context Compression Rule:",
+                "",
+                "- Active control summary: present.",
+                "- Completed work packages: present.",
+                "- Subagent outputs integrated: present.",
+                "- Evidence produced: present.",
+                "- Deferred sensors and reasons: present.",
+                "- Unresolved blockers: present.",
+                "- Deviations from policy: present.",
+                "- Next allowed action: present.",
+            ]
+        )
+        with tempfile.TemporaryDirectory() as tmpdir:
+            requirements, goal, plan, review = self.write_artifact_chain(Path(tmpdir), weak_topology)
+
+            control_guard = subprocess.run(
+                [
+                    sys.executable,
+                    str(
+                        ROOT
+                        / ".agents/skills/compiling-cybernetic-runtime-goals/scripts/control_chain_guard.py"
+                    ),
+                    "--requirements",
+                    str(requirements),
+                    "--goal",
+                    str(goal),
+                    "--plan",
+                    str(plan),
+                    "--review",
+                    str(review),
+                ],
+                cwd=ROOT,
+                text=True,
+                capture_output=True,
+            )
+            orchestration_guard = subprocess.run(
+                [
+                    sys.executable,
+                    str(
+                        ROOT
+                        / ".agents/skills/orchestrating-cybernetic-pregoal/scripts/orchestration_guard.py"
+                    ),
+                    "--state",
+                    "before-review",
+                    "--requirements",
+                    str(requirements),
+                    "--goal",
+                    str(goal),
+                    "--plan",
+                    str(plan),
+                ],
+                cwd=ROOT,
+                text=True,
+                capture_output=True,
+            )
+
+        for result in (control_guard, orchestration_guard):
+            output = result.stdout + result.stderr
+            self.assertNotEqual(result.returncode, 0)
+            self.assertIn("Context Pack Requirements", output)
+            self.assertIn("Relevant control excerpts", output)
 
     def test_orchestration_guard_rejects_incomplete_subagent_topology(self):
         with tempfile.TemporaryDirectory() as tmpdir:

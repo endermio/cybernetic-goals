@@ -158,10 +158,12 @@ Flag as Major or Blocking when:
 - Level 3/4 work assigns all target work to the main agent without a context-load justification;
 - the plan creates context overload by making the main agent coordinator, worker, integrator, and verifier for context-heavy work;
 - delegated work packages lack Context pack, Allowed actions, Return format, or Integration gate;
+- context packs are only artifact path lists instead of bounded operating context with relevant control excerpts, current batch objective, allowed artifacts/surfaces, forbidden changes, required sensors/evidence, stop conditions, and expected return format;
 - parallel subagent-driven execution lacks explicit human approval, dependency independence, or control-review approval;
 - a subagent may modify control artifacts, widen scope, replace topology, or bypass integration gates;
 - progress-log ownership or stop-condition detection is unclear;
-- context compression or bounded return material is missing for delegated work.
+- context compression or bounded return material is missing for delegated work;
+- subagent outputs can be treated as final completion before main-agent integration.
 
 Use `Major` when execution-policy revision can repair topology. Use `Blocking` when context overload would likely make runtime lose requirements, design invariants, output contract, stop conditions, or approval boundaries.
 

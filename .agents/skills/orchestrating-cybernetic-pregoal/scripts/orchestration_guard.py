@@ -222,6 +222,16 @@ def selected_execution_topology(plan: str | None) -> str | None:
     return None
 
 
+def task_level(plan: str | None) -> int | None:
+    body = section_body(plan or "", "Context Management / Execution Topology")
+    if body is None:
+        return None
+    match = re.search(r"(?im)^\s*Task level\s*:\s*`?Level\s*([0-4])`?\s*$", body)
+    if not match:
+        return None
+    return int(match.group(1))
+
+
 def labeled_block_has_content(text: str, label: str) -> bool:
     lines = text.splitlines()
     pattern = re.compile(rf"^\s*{re.escape(label)}\s*:\s*(.*?)\s*$", re.IGNORECASE)
@@ -241,6 +251,24 @@ def labeled_block_has_content(text: str, label: str) -> bool:
                 return True
         return False
     return False
+
+
+def table_field_has_content(text: str, field: str) -> bool:
+    for line in text.splitlines():
+        stripped = line.strip()
+        if "|" not in stripped:
+            continue
+        if re.fullmatch(r"\|?\s*:?-{3,}:?\s*(\|\s*:?-{3,}:?\s*)+\|?", stripped):
+            continue
+        cells = [cell.strip() for cell in stripped.strip("|").split("|")]
+        if not cells or field.casefold() not in cells[0].casefold():
+            continue
+        return any(meaningful_line(cell) for cell in cells[1:])
+    return False
+
+
+def labeled_or_table_field_has_content(text: str, label: str) -> bool:
+    return bullet_has_content(text, label) or labeled_block_has_content(text, label) or table_field_has_content(text, label)
 
 
 def has_meaningful_delegation_matrix(body: str) -> bool:
@@ -271,6 +299,37 @@ def has_meaningful_delegation_matrix(body: str) -> bool:
     return False
 
 
+CONTEXT_PACK_FIELDS = [
+    "Relevant control excerpts",
+    "Current batch objective",
+    "Allowed artifacts/surfaces",
+    "Forbidden changes",
+    "Required sensors/evidence",
+    "Stop conditions",
+    "Expected return format",
+]
+
+CONTEXT_COMPRESSION_FIELDS = [
+    "Active control summary",
+    "Completed work packages",
+    "Subagent outputs integrated",
+    "Evidence produced",
+    "Deferred sensors and reasons",
+    "Unresolved blockers",
+    "Deviations from policy",
+    "Next allowed action",
+]
+
+
+def check_labeled_requirements(body: str, heading: str, labels: list[str], errors: list[str]) -> None:
+    if heading.casefold() not in body.casefold():
+        errors.append(f"execution topology missing {heading}: {', '.join(labels)}")
+        return
+    for label in labels:
+        if not labeled_or_table_field_has_content(body, label):
+            errors.append(f"execution topology {heading} missing {label}")
+
+
 def check_execution_topology(plan: str | None, errors: list[str]) -> None:
     body = section_body(plan or "", "Context Management / Execution Topology")
     if body is None:
@@ -287,11 +346,19 @@ def check_execution_topology(plan: str | None, errors: list[str]) -> None:
     if not labeled_block_has_content(body, "Main agent owns"):
         errors.append("execution topology missing main-agent ownership")
 
+    level = task_level(plan)
+    if topology == "Main-only" and level in {3, 4} and not labeled_block_has_content(body, "Main-only context-load justification"):
+        errors.append("Level 3/4 Main-only execution topology missing Main-only context-load justification")
+
     if topology in {"Serial subagent-driven", "Parallel subagent-driven"}:
         if not has_meaningful_delegation_matrix(body):
             errors.append("execution topology missing meaningful delegation matrix with Context pack, Allowed actions, Return format, and Integration gate")
+        check_labeled_requirements(body, "Context Pack Requirements", CONTEXT_PACK_FIELDS, errors)
         if "subagent-driven-development" not in body.casefold() and "runtime target-work delegation" not in body.casefold():
             errors.append("subagent-driven topology missing $superpowers:subagent-driven-development or equivalent delegation substrate")
+
+    if topology in {"Serial subagent-driven", "Parallel subagent-driven"} or level in {3, 4}:
+        check_labeled_requirements(body, "Context Compression Rule", CONTEXT_COMPRESSION_FIELDS, errors)
 
     if topology == "Parallel subagent-driven":
         for label in ("Human approval", "Dependency independence", "Control-review approval"):

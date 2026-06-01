@@ -124,6 +124,21 @@
         "Does not approve runtime /goal compilation.",
         "Does not decide the execution topology inside the orchestrator."
       ]
+    },
+    {
+      "id": "flags-weak-context-pack",
+      "prompt": "Review a Serial subagent-driven execution policy whose delegation matrix says Context pack: requirements, goal, plan; Return format: summary; Integration gate: review, but lacks relevant control excerpts, current batch objective, allowed artifacts/surfaces, forbidden changes, required sensors/evidence, stop conditions, expected return format, and context compression.",
+      "expected_output": "The review flags Context Management / Execution Topology as Needs Revision because the context pack is not a bounded operating context and batch-boundary context compression is missing.",
+      "assertions": [
+        "Flags that context pack is only an artifact path list.",
+        "Requires relevant control excerpts.",
+        "Requires current batch objective.",
+        "Requires allowed artifacts/surfaces and forbidden changes.",
+        "Requires required sensors/evidence and stop conditions.",
+        "Requires expected return format.",
+        "Requires context compression at batch boundaries.",
+        "Does not mark Approved."
+      ]
     }
   ]
 }

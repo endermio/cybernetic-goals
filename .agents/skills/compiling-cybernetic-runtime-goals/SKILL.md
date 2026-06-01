@@ -32,6 +32,7 @@ The final command must instruct runtime Codex to:
 - use `$superpowers:executing-plans` discipline against the approved plan;
 - use the approved execution topology defined in the execution policy;
 - use `$superpowers:subagent-driven-development` when the approved topology selects serial or parallel subagent-driven execution;
+- treat subagent outputs as candidate results until main-agent integration against approved artifacts, progress log, evidence requirements, and stop conditions;
 - use `$superpowers:systematic-debugging` for unclear or repeated failures;
 - use `$superpowers:verification-before-completion` before claiming completion;
 - if runtime cannot load these skills, follow the equivalent discipline already written in the approved plan and control review.
@@ -73,6 +74,7 @@ The final `/goal` must:
 - use the approved execution topology defined in the execution policy;
 - use `$superpowers:executing-plans` discipline against the approved execution policy;
 - use `$superpowers:subagent-driven-development` when the approved execution topology selects serial or parallel subagent-driven execution;
+- state that subagent outputs remain candidate results until main-agent integration;
 - use `$superpowers:systematic-debugging` for unclear or repeated failures;
 - use `$superpowers:verification-before-completion` before claiming completion;
 - follow equivalent discipline already written in the approved plan and control review if runtime cannot load those skills;
@@ -146,6 +148,7 @@ Do not create or modify target-work artifacts.
 - [ ] The final `/goal` references all approved files.
 - [ ] The final `/goal` carries the goal's Final Output Contract when present or required.
 - [ ] The final `/goal` preserves the approved execution topology.
+- [ ] The final `/goal` treats subagent outputs as candidate results until main-agent integration.
 - [ ] The final `/goal` does not ask runtime Codex to write a new plan.
 - [ ] The final `/goal` does not ask runtime Codex to create or revise solution design.
 - [ ] The final `/goal` includes executing, debugging, and completion-verification discipline.
