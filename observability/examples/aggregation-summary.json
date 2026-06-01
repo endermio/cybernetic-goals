@@ -5,13 +5,13 @@
   "event_type_counts": {
     "skill_invoked": 1
   },
-  "generated_at": "2026-06-01T07:05:24Z",
+  "generated_at": "2026-06-01T15:17:31Z",
   "schema_version": "1.0.0",
   "skill_counts": {
     "routing-cybernetic-workflows": 1
   },
   "skill_pack_versions": [
-    "commit:unknown"
+    "release:cybernetic-observability-contract-v1.0.0"
   ],
   "status_counts": {
     "success": 1
