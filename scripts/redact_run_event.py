@@ -9,6 +9,7 @@ from pathlib import Path
 from typing import Any
 
 from validate_run_events import (
+    is_likely_repo_context_key,
     load_events,
     unsafe_metadata_key_diagnostic,
     unsafe_metadata_key_reason,
@@ -20,30 +21,36 @@ from validate_run_events import (
 REDACTED = object()
 
 
-def redact_value(value: Any, redacted_fields: set[str], field_name: str | None = None) -> Any:
+def redact_value(
+    value: Any,
+    redacted_fields: set[str],
+    field_name: str | None = None,
+    in_repo_context: bool = False,
+) -> Any:
     if isinstance(value, dict):
         clean: dict[str, Any] = {}
         for key, child in value.items():
-            if unsafe_metadata_key_reason(key):
-                redacted_fields.add(unsafe_metadata_key_diagnostic(key) or "unsafe field")
+            if unsafe_metadata_key_reason(key, field_name):
+                redacted_fields.add(unsafe_metadata_key_diagnostic(key, field_name) or "unsafe field")
                 continue
-            clean_child = redact_value(child, redacted_fields, key)
+            child_repo_context = in_repo_context or is_likely_repo_context_key(key)
+            clean_child = redact_value(child, redacted_fields, key, child_repo_context)
             if clean_child is REDACTED:
-                redacted_fields.add(unsafe_metadata_key_diagnostic(key) or str(key))
+                redacted_fields.add(unsafe_metadata_key_diagnostic(key, field_name) or str(key))
                 continue
             clean[key] = clean_child
         return clean
     if isinstance(value, list):
         clean_items: list[Any] = []
         for item in value:
-            clean_item = redact_value(item, redacted_fields, field_name)
+            clean_item = redact_value(item, redacted_fields, field_name, in_repo_context)
             if clean_item is REDACTED:
                 if field_name:
                     redacted_fields.add(unsafe_metadata_key_diagnostic(field_name) or field_name)
                 continue
             clean_items.append(clean_item)
         return clean_items
-    if unsafe_metadata_value_reason(value):
+    if unsafe_metadata_value_reason(value, field_name, in_repo_context):
         return REDACTED
     return value
 

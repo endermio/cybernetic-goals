@@ -107,12 +107,14 @@ UNSAFE_METADATA_ONLY_KEY_PHRASES = (
 TASK_HASH_RE = re.compile(r"^sha256:[a-f0-9]{64}$")
 EVENT_ID_RE = re.compile(r"^evt_[A-Za-z0-9_.-]+$")
 MACHINE_ID_RE = re.compile(r"^anon-[A-Za-z0-9_.-]+$")
+SHORT_REPO_IDENTIFIER_RE = re.compile(r"[A-Za-z0-9][A-Za-z0-9_.-]{0,99}/[A-Za-z0-9][A-Za-z0-9_.-]{0,99}")
 UNSAFE_METADATA_ONLY_VALUE_PATTERNS = (
     ("credential_url", re.compile(r"://[^/\s:@]+:[^@\s]+@")),
     ("credential", re.compile(r"\b(?:gh[pousr]_[A-Za-z0-9_]{20,}|sk-[A-Za-z0-9_-]{20,})\b")),
     ("real_path", re.compile(r"(?<![A-Za-z0-9])(?:/home/|/Users/|/private/|/var/log/|/etc/|[A-Za-z]:\\)[^\s,;]*")),
     ("real_repo", re.compile(r"\b(?:github|gitlab|bitbucket)\.com[:/][A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+")),
 )
+REPO_CONTEXT_TOKENS = {"repo", "repository", "remote", "origin", "upstream"}
 
 
 def normalize_metadata_key(key: Any) -> str:
@@ -180,22 +182,46 @@ def load_events(path: str) -> list[dict[str, Any]]:
     raise ValueError(f"{path}: event file must contain an object or array")
 
 
-def iter_keys(value: Any) -> list[str]:
-    keys: list[str] = []
+def is_likely_repo_context_key(key: Any) -> bool:
+    return any(token in REPO_CONTEXT_TOKENS for token in tokenize_metadata_key(key))
+
+
+def short_repo_identifier_reason(value: Any) -> str | None:
+    if not isinstance(value, str):
+        return None
+    if not SHORT_REPO_IDENTIFIER_RE.fullmatch(value):
+        return None
+    if not re.search(r"[A-Za-z]", value):
+        return None
+    return "real_repo"
+
+
+def unsafe_dynamic_key_reason(key: Any, parent_key: Any | None = None) -> str | None:
+    string_key = str(key)
+    string_pattern_reason = unsafe_metadata_value_reason(string_key)
+    if string_pattern_reason:
+        return string_pattern_reason
+    if parent_key is not None and is_likely_repo_context_key(parent_key):
+        return short_repo_identifier_reason(string_key)
+    return None
+
+
+def iter_key_contexts(value: Any, parent_key: Any | None = None) -> list[tuple[str, Any | None]]:
+    keys: list[tuple[str, Any | None]] = []
     if isinstance(value, dict):
         for key, child in value.items():
-            keys.append(str(key))
-            keys.extend(iter_keys(child))
+            keys.append((str(key), parent_key))
+            keys.extend(iter_key_contexts(child, key))
     elif isinstance(value, list):
         for child in value:
-            keys.extend(iter_keys(child))
+            keys.extend(iter_key_contexts(child, parent_key))
     return keys
 
 
-def unsafe_metadata_key_reason(key: Any) -> str | None:
-    string_pattern_reason = unsafe_metadata_value_reason(str(key))
-    if string_pattern_reason:
-        return string_pattern_reason
+def unsafe_metadata_key_reason(key: Any, parent_key: Any | None = None) -> str | None:
+    dynamic_reason = unsafe_dynamic_key_reason(key, parent_key)
+    if dynamic_reason:
+        return dynamic_reason
     normalized = normalize_metadata_key(key)
     if normalized in NORMALIZED_UNSAFE_METADATA_ONLY_KEYS:
         return str(key)
@@ -210,40 +236,50 @@ def unsafe_metadata_key_reason(key: Any) -> str | None:
     return None
 
 
-def unsafe_metadata_key_diagnostic(key: Any) -> str | None:
-    reason = unsafe_metadata_key_reason(key)
+def unsafe_metadata_key_diagnostic(key: Any, parent_key: Any | None = None) -> str | None:
+    reason = unsafe_metadata_key_reason(key, parent_key)
     if not reason:
         return None
-    if unsafe_metadata_value_reason(str(key)):
+    if unsafe_dynamic_key_reason(key, parent_key):
         return f"unsafe dynamic key ({reason})"
     return str(key)
 
 
-def unsafe_metadata_value_reason(value: Any) -> str | None:
+def unsafe_metadata_value_reason(value: Any, field_name: Any | None = None, in_repo_context: bool = False) -> str | None:
     if not isinstance(value, str):
         return None
     for reason, pattern in UNSAFE_METADATA_ONLY_VALUE_PATTERNS:
         if pattern.search(value):
             return reason
+    if in_repo_context or (field_name is not None and is_likely_repo_context_key(field_name)):
+        return short_repo_identifier_reason(value)
     return None
 
 
-def safe_metadata_path_key(key: Any) -> str:
-    if unsafe_metadata_value_reason(str(key)):
+def safe_metadata_path_key(key: Any, parent_key: Any | None = None) -> str:
+    if unsafe_dynamic_key_reason(key, parent_key):
         return "<unsafe-key>"
     return str(key)
 
 
-def iter_string_values(value: Any, path: str = "$") -> list[tuple[str, str]]:
-    values: list[tuple[str, str]] = []
+def iter_string_values(
+    value: Any,
+    path: str = "$",
+    field_name: Any | None = None,
+    in_repo_context: bool = False,
+) -> list[tuple[str, str, Any | None, bool]]:
+    values: list[tuple[str, str, Any | None, bool]] = []
     if isinstance(value, dict):
         for key, child in value.items():
-            values.extend(iter_string_values(child, f"{path}.{safe_metadata_path_key(key)}"))
+            child_repo_context = in_repo_context or is_likely_repo_context_key(key)
+            values.extend(
+                iter_string_values(child, f"{path}.{safe_metadata_path_key(key, field_name)}", key, child_repo_context)
+            )
     elif isinstance(value, list):
         for index, child in enumerate(value):
-            values.extend(iter_string_values(child, f"{path}[{index}]"))
+            values.extend(iter_string_values(child, f"{path}[{index}]", field_name, in_repo_context))
     elif isinstance(value, str):
-        values.append((path, value))
+        values.append((path, value, field_name, in_repo_context))
     return values
 
 
@@ -324,11 +360,17 @@ def validate_event(event: dict[str, Any], taxonomy: set[str], prefix: str) -> li
 
     privacy_mode = event.get("privacy_mode")
     if privacy_mode in {"metadata_only", "redacted_content_opt_in"}:
-        unsafe = sorted({diagnostic for key in iter_keys(event) if (diagnostic := unsafe_metadata_key_diagnostic(key))})
+        unsafe = sorted(
+            {
+                diagnostic
+                for key, parent_key in iter_key_contexts(event)
+                if (diagnostic := unsafe_metadata_key_diagnostic(key, parent_key))
+            }
+        )
         for diagnostic in unsafe:
             errors.append(f"{prefix}: {privacy_mode} event contains unsafe field {diagnostic}")
-        for path, value in iter_string_values(event):
-            reason = unsafe_metadata_value_reason(value)
+        for path, value, field_name, in_repo_context in iter_string_values(event):
+            reason = unsafe_metadata_value_reason(value, field_name, in_repo_context)
             if reason:
                 if privacy_mode == "metadata_only":
                     errors.append(f"{prefix}: unsafe metadata-only value at {path} ({reason})")

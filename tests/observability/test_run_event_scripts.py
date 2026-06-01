@@ -266,6 +266,39 @@ class RunEventScriptsTest(unittest.TestCase):
         self.assertNotIn("github.com/acme/private-repo", output)
         self.assertNotIn("private-repo", output)
 
+    def test_redactor_removes_dynamic_short_repo_keys(self):
+        unsafe = json.loads(SAMPLE.read_text(encoding="utf-8"))
+        unsafe["repositories"] = {
+            "acme/private-repo": {"status": "recorded"},
+            "primary": "acme/private-repo",
+            "repository_count": 1,
+        }
+
+        with tempfile.NamedTemporaryFile("w", suffix=".json", delete=False) as tmp:
+            json.dump(unsafe, tmp)
+            tmp_path = tmp.name
+        try:
+            result = self.run_script(
+                "redact_run_event.py",
+                tmp_path,
+                "--mode",
+                "metadata_only",
+                "--dry-run",
+            )
+        finally:
+            Path(tmp_path).unlink(missing_ok=True)
+
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        payload = json.loads(result.stdout)
+        redacted_event = payload["events"][0]
+        self.assertNotIn("acme/private-repo", redacted_event["repositories"])
+        self.assertNotIn("primary", redacted_event["repositories"])
+        self.assertEqual(redacted_event["repositories"]["repository_count"], 1)
+        self.assertEqual(set(payload["redacted_fields"]), {"primary", "unsafe dynamic key (real_repo)"})
+        output = result.stdout + result.stderr
+        self.assertNotIn("acme/private-repo", output)
+        self.assertNotIn("private-repo", output)
+
     def test_redactor_removes_raw_prompt_in_redacted_content_opt_in_mode(self):
         unsafe = json.loads(SAMPLE.read_text(encoding="utf-8"))
         unsafe["raw_prompt"] = "private task prompt"
@@ -421,6 +454,38 @@ class RunEventScriptsTest(unittest.TestCase):
             self.assertIn("unsafe dynamic key (real_path)", output)
             self.assertNotIn("/home/ender/private/repo/file.txt", output)
             self.assertNotIn("private/repo", output)
+            self.assertFalse(Path(export_path).exists())
+        finally:
+            Path(input_path).unlink(missing_ok=True)
+            Path(export_path).unlink(missing_ok=True)
+
+    def test_sync_export_refuses_unredacted_event_with_dynamic_short_repo_key(self):
+        unsafe = json.loads(SAMPLE.read_text(encoding="utf-8"))
+        unsafe["privacy_mode"] = "metadata_only"
+        unsafe["repositories"] = {
+            "acme/private-repo": {"status": "recorded"},
+        }
+
+        with tempfile.NamedTemporaryFile("w", suffix=".json", delete=False) as tmp:
+            json.dump(unsafe, tmp)
+            input_path = tmp.name
+        with tempfile.NamedTemporaryFile("w", suffix=".json", delete=False) as tmp:
+            export_path = tmp.name
+        Path(export_path).unlink(missing_ok=True)
+
+        try:
+            result = self.run_script(
+                "sync_run_events_to_github.py",
+                "--input",
+                input_path,
+                "--export-out",
+                export_path,
+            )
+            self.assertNotEqual(result.returncode, 0)
+            output = result.stdout + result.stderr
+            self.assertIn("unsafe dynamic key (real_repo)", output)
+            self.assertNotIn("acme/private-repo", output)
+            self.assertNotIn("private-repo", output)
             self.assertFalse(Path(export_path).exists())
         finally:
             Path(input_path).unlink(missing_ok=True)

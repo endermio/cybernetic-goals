@@ -282,6 +282,122 @@ class ValidateRunEventsTest(unittest.TestCase):
         self.assertNotIn("github.com/acme/private-repo", output)
         self.assertNotIn("private-repo", output)
 
+    def test_metadata_only_rejects_dynamic_key_that_is_short_repo_identifier(self):
+        unsafe = {
+            "schema_version": "1.0.0",
+            "event_id": "evt_unsafe_short_repo_key",
+            "event": "runtime_outcome",
+            "timestamp": "2026-06-01T00:00:00Z",
+            "privacy_mode": "metadata_only",
+            "machine_id": "anon-12345678",
+            "skill_pack": {"source_commit": "abc1234"},
+            "status": "success",
+            "task_hash": "sha256:" + "4" * 64,
+            "repositories": {
+                "acme/private-repo": {"status": "recorded"},
+            },
+        }
+
+        with tempfile.NamedTemporaryFile("w", suffix=".json", delete=False) as tmp:
+            json.dump(unsafe, tmp)
+            tmp_path = tmp.name
+
+        try:
+            result = self.run_validator(tmp_path)
+        finally:
+            Path(tmp_path).unlink(missing_ok=True)
+
+        output = result.stdout + result.stderr
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("metadata_only", output)
+        self.assertIn("unsafe dynamic key (real_repo)", output)
+        self.assertNotIn("acme/private-repo", output)
+        self.assertNotIn("private-repo", output)
+
+    def test_metadata_only_rejects_short_repo_identifier_value_under_repo_field(self):
+        unsafe = {
+            "schema_version": "1.0.0",
+            "event_id": "evt_unsafe_short_repo_value",
+            "event": "runtime_outcome",
+            "timestamp": "2026-06-01T00:00:00Z",
+            "privacy_mode": "metadata_only",
+            "machine_id": "anon-12345678",
+            "skill_pack": {"source_commit": "abc1234"},
+            "status": "success",
+            "task_hash": "sha256:" + "5" * 64,
+            "repository_ref": "acme/private-repo",
+            "repositories": {"primary": "acme/private-repo"},
+        }
+
+        with tempfile.NamedTemporaryFile("w", suffix=".json", delete=False) as tmp:
+            json.dump(unsafe, tmp)
+            tmp_path = tmp.name
+
+        try:
+            result = self.run_validator(tmp_path)
+        finally:
+            Path(tmp_path).unlink(missing_ok=True)
+
+        output = result.stdout + result.stderr
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("unsafe metadata-only value", output)
+        self.assertIn("real_repo", output)
+        self.assertNotIn("acme/private-repo", output)
+        self.assertNotIn("private-repo", output)
+
+    def test_metadata_only_accepts_safe_slash_free_metadata(self):
+        safe = {
+            "schema_version": "1.0.0",
+            "event_id": "evt_safe_slash_free_metadata",
+            "event": "runtime_outcome",
+            "timestamp": "2026-06-01T00:00:00Z",
+            "privacy_mode": "metadata_only",
+            "machine_id": "anon-12345678",
+            "skill_pack": {"source_commit": "abc1234"},
+            "status": "success",
+            "task_hash": "sha256:" + "6" * 64,
+            "phase": "compile",
+            "result_bucket": "unit",
+            "repositories": {"repository_count": 0},
+        }
+
+        with tempfile.NamedTemporaryFile("w", suffix=".json", delete=False) as tmp:
+            json.dump(safe, tmp)
+            tmp_path = tmp.name
+
+        try:
+            result = self.run_validator(tmp_path)
+        finally:
+            Path(tmp_path).unlink(missing_ok=True)
+
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+
+    def test_metadata_only_accepts_non_repo_slash_metadata_outside_repo_context(self):
+        safe = {
+            "schema_version": "1.0.0",
+            "event_id": "evt_safe_non_repo_slash_metadata",
+            "event": "runtime_outcome",
+            "timestamp": "2026-06-01T00:00:00Z",
+            "privacy_mode": "metadata_only",
+            "machine_id": "anon-12345678",
+            "skill_pack": {"source_commit": "abc1234"},
+            "status": "success",
+            "task_hash": "sha256:" + "7" * 64,
+            "gate": "compile/unit",
+            "phase_aliases": {"compile/unit": "passed"},
+        }
+
+        with tempfile.NamedTemporaryFile("w", suffix=".json", delete=False) as tmp:
+            json.dump(safe, tmp)
+            tmp_path = tmp.name
+
+        try:
+            result = self.run_validator(tmp_path)
+        finally:
+            Path(tmp_path).unlink(missing_ok=True)
+
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+
     def test_redacted_content_opt_in_rejects_raw_unsafe_fields(self):
         unsafe = {
             "schema_version": "1.0.0",
