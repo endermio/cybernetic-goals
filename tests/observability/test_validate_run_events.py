@@ -174,6 +174,8 @@ class ValidateRunEventsTest(unittest.TestCase):
             "task_hash_alias": "sha256:" + "7" * 64,
             "machine_id_alias": "anon-machine",
             "privacy_mode_alias": "metadata_only",
+            "raw_event_count": 3,
+            "raw_metric_name": "duration_ms",
         }
 
         with tempfile.NamedTemporaryFile("w", suffix=".json", delete=False) as tmp:
@@ -244,6 +246,64 @@ class ValidateRunEventsTest(unittest.TestCase):
         self.assertIn("redacted_content_opt_in", output)
         self.assertIn("raw_prompt", output)
 
+    def test_metadata_only_rejects_raw_response_field(self):
+        unsafe = {
+            "schema_version": "1.0.0",
+            "event_id": "evt_unsafe_raw_response",
+            "event": "skill_invoked",
+            "timestamp": "2026-06-01T00:00:00Z",
+            "privacy_mode": "metadata_only",
+            "machine_id": "anon-12345678",
+            "skill_pack": {"source_commit": "abc1234"},
+            "skill": "routing-cybernetic-workflows",
+            "status": "success",
+            "task_hash": "sha256:" + "2" * 64,
+            "raw_response": "private model response",
+        }
+
+        with tempfile.NamedTemporaryFile("w", suffix=".json", delete=False) as tmp:
+            json.dump(unsafe, tmp)
+            tmp_path = tmp.name
+
+        try:
+            result = self.run_validator(tmp_path)
+        finally:
+            Path(tmp_path).unlink(missing_ok=True)
+
+        output = result.stdout + result.stderr
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("metadata_only", output)
+        self.assertIn("raw_response", output)
+
+    def test_redacted_content_opt_in_rejects_raw_response_field(self):
+        unsafe = {
+            "schema_version": "1.0.0",
+            "event_id": "evt_unsafe_opt_in_raw_response",
+            "event": "skill_invoked",
+            "timestamp": "2026-06-01T00:00:00Z",
+            "privacy_mode": "redacted_content_opt_in",
+            "machine_id": "anon-12345678",
+            "skill_pack": {"source_commit": "abc1234"},
+            "skill": "routing-cybernetic-workflows",
+            "status": "success",
+            "task_hash": "sha256:" + "3" * 64,
+            "raw_response": "private model response",
+        }
+
+        with tempfile.NamedTemporaryFile("w", suffix=".json", delete=False) as tmp:
+            json.dump(unsafe, tmp)
+            tmp_path = tmp.name
+
+        try:
+            result = self.run_validator(tmp_path)
+        finally:
+            Path(tmp_path).unlink(missing_ok=True)
+
+        output = result.stdout + result.stderr
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("redacted_content_opt_in", output)
+        self.assertIn("raw_response", output)
+
     def test_rejects_hostname_like_machine_id(self):
         unsafe = {
             "schema_version": "1.0.0",
@@ -295,6 +355,58 @@ class ValidateRunEventsTest(unittest.TestCase):
         self.assertNotEqual(result.returncode, 0)
         self.assertIn("missing required field status", output)
         self.assertIn("must not be unknown", output)
+
+    def test_rejects_null_skill_pack_release_even_with_valid_source_commit(self):
+        unsafe = {
+            "schema_version": "1.0.0",
+            "event_id": "evt_null_release",
+            "event": "skill_invoked",
+            "timestamp": "2026-06-01T00:00:00Z",
+            "privacy_mode": "metadata_only",
+            "machine_id": "anon-12345678",
+            "skill_pack": {"release": None, "source_commit": "abc1234"},
+            "status": "success",
+            "task_hash": "sha256:" + "4" * 64,
+        }
+
+        with tempfile.NamedTemporaryFile("w", suffix=".json", delete=False) as tmp:
+            json.dump(unsafe, tmp)
+            tmp_path = tmp.name
+
+        try:
+            result = self.run_validator(tmp_path)
+        finally:
+            Path(tmp_path).unlink(missing_ok=True)
+
+        output = result.stdout + result.stderr
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("skill_pack release must be a non-empty string", output)
+
+    def test_rejects_null_skill_pack_source_commit_even_with_valid_release(self):
+        unsafe = {
+            "schema_version": "1.0.0",
+            "event_id": "evt_null_source_commit",
+            "event": "skill_invoked",
+            "timestamp": "2026-06-01T00:00:00Z",
+            "privacy_mode": "metadata_only",
+            "machine_id": "anon-12345678",
+            "skill_pack": {"release": "v1.2.3", "source_commit": None},
+            "status": "success",
+            "task_hash": "sha256:" + "5" * 64,
+        }
+
+        with tempfile.NamedTemporaryFile("w", suffix=".json", delete=False) as tmp:
+            json.dump(unsafe, tmp)
+            tmp_path = tmp.name
+
+        try:
+            result = self.run_validator(tmp_path)
+        finally:
+            Path(tmp_path).unlink(missing_ok=True)
+
+        output = result.stdout + result.stderr
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("skill_pack source_commit must be a non-empty string", output)
 
     def test_rejects_null_status(self):
         unsafe = {

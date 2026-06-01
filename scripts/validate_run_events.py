@@ -53,6 +53,7 @@ UNSAFE_METADATA_ONLY_KEYS = {
     "path",
     "prompt",
     "raw_prompt",
+    "raw_response",
     "real_path",
     "real_repo",
     "repo_name",
@@ -87,7 +88,16 @@ UNSAFE_METADATA_ONLY_KEY_PHRASES = (
     (("log", "text"), "log"),
     (("prompt", "text"), "prompt"),
     (("prompt", "example"), "prompt_example"),
+    (("raw", "body"), "raw_body"),
+    (("raw", "completion"), "raw_completion"),
+    (("raw", "content"), "raw_content"),
+    (("raw", "input"), "raw_input"),
+    (("raw", "message"), "raw_message"),
+    (("raw", "output"), "raw_output"),
     (("raw", "prompt"), "raw_prompt"),
+    (("raw", "request"), "raw_request"),
+    (("raw", "response"), "raw_response"),
+    (("raw", "text"), "raw_text"),
     (("real", "path"), "real_path"),
     (("real", "repo"), "real_repo"),
     (("repo", "name"), "repo_name"),
@@ -234,18 +244,19 @@ def validate_skill_pack(value: Any, errors: list[str], prefix: str) -> None:
     if not isinstance(value, dict):
         errors.append(f"{prefix}: skill_pack must be an object")
         return
-    release = value.get("release")
-    source_commit = value.get("source_commit")
-    if not release and not source_commit:
-        errors.append(f"{prefix}: skill_pack requires release or source_commit")
-        return
-    for field_name, field_value in (("release", release), ("source_commit", source_commit)):
-        if field_value is None:
+    has_valid_identity = False
+    for field_name in ("release", "source_commit"):
+        if field_name not in value:
             continue
+        field_value = value[field_name]
         if not isinstance(field_value, str) or not field_value.strip():
             errors.append(f"{prefix}: skill_pack {field_name} must be a non-empty string")
         elif field_value == "unknown":
             errors.append(f"{prefix}: skill_pack {field_name} must not be unknown")
+        else:
+            has_valid_identity = True
+    if not has_valid_identity:
+        errors.append(f"{prefix}: skill_pack requires release or source_commit")
 
 
 def validate_machine_id(value: Any, errors: list[str], prefix: str) -> None:

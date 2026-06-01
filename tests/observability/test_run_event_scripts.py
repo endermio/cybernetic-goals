@@ -250,6 +250,55 @@ class RunEventScriptsTest(unittest.TestCase):
         self.assertNotIn("raw_prompt", redacted_event)
         self.assertEqual(payload["redacted_fields"], ["raw_prompt"])
 
+    def test_redactor_removes_raw_response_in_metadata_only_mode(self):
+        unsafe = json.loads(SAMPLE.read_text(encoding="utf-8"))
+        unsafe["raw_response"] = "private model response"
+
+        with tempfile.NamedTemporaryFile("w", suffix=".json", delete=False) as tmp:
+            json.dump(unsafe, tmp)
+            tmp_path = tmp.name
+        try:
+            result = self.run_script(
+                "redact_run_event.py",
+                tmp_path,
+                "--mode",
+                "metadata_only",
+                "--dry-run",
+            )
+        finally:
+            Path(tmp_path).unlink(missing_ok=True)
+
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        payload = json.loads(result.stdout)
+        redacted_event = payload["events"][0]
+        self.assertNotIn("raw_response", redacted_event)
+        self.assertEqual(payload["redacted_fields"], ["raw_response"])
+
+    def test_redactor_removes_raw_response_in_redacted_content_opt_in_mode(self):
+        unsafe = json.loads(SAMPLE.read_text(encoding="utf-8"))
+        unsafe["raw_response"] = "private model response"
+
+        with tempfile.NamedTemporaryFile("w", suffix=".json", delete=False) as tmp:
+            json.dump(unsafe, tmp)
+            tmp_path = tmp.name
+        try:
+            result = self.run_script(
+                "redact_run_event.py",
+                tmp_path,
+                "--mode",
+                "redacted_content_opt_in",
+                "--dry-run",
+            )
+        finally:
+            Path(tmp_path).unlink(missing_ok=True)
+
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        payload = json.loads(result.stdout)
+        redacted_event = payload["events"][0]
+        self.assertEqual(redacted_event["privacy_mode"], "redacted_content_opt_in")
+        self.assertNotIn("raw_response", redacted_event)
+        self.assertEqual(payload["redacted_fields"], ["raw_response"])
+
     def test_sync_export_refuses_redacted_content_opt_in_with_raw_prompt(self):
         unsafe = json.loads(SAMPLE.read_text(encoding="utf-8"))
         unsafe["privacy_mode"] = "redacted_content_opt_in"
@@ -272,6 +321,33 @@ class RunEventScriptsTest(unittest.TestCase):
             )
             self.assertNotEqual(result.returncode, 0)
             self.assertIn("raw_prompt", result.stdout + result.stderr)
+            self.assertFalse(Path(export_path).exists())
+        finally:
+            Path(input_path).unlink(missing_ok=True)
+            Path(export_path).unlink(missing_ok=True)
+
+    def test_sync_export_refuses_redacted_content_opt_in_with_raw_response(self):
+        unsafe = json.loads(SAMPLE.read_text(encoding="utf-8"))
+        unsafe["privacy_mode"] = "redacted_content_opt_in"
+        unsafe["raw_response"] = "private model response"
+
+        with tempfile.NamedTemporaryFile("w", suffix=".json", delete=False) as tmp:
+            json.dump(unsafe, tmp)
+            input_path = tmp.name
+        with tempfile.NamedTemporaryFile("w", suffix=".json", delete=False) as tmp:
+            export_path = tmp.name
+        Path(export_path).unlink(missing_ok=True)
+
+        try:
+            result = self.run_script(
+                "sync_run_events_to_github.py",
+                "--input",
+                input_path,
+                "--export-out",
+                export_path,
+            )
+            self.assertNotEqual(result.returncode, 0)
+            self.assertIn("raw_response", result.stdout + result.stderr)
             self.assertFalse(Path(export_path).exists())
         finally:
             Path(input_path).unlink(missing_ok=True)
