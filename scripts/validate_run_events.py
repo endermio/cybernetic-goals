@@ -117,6 +117,8 @@ UNSAFE_METADATA_ONLY_KEY_PHRASES = (
 
 TASK_HASH_RE = re.compile(r"^sha256:[a-f0-9]{64}$")
 EVENT_ID_RE = re.compile(r"^evt_[A-Za-z0-9_.-]+$")
+PACKAGE_ID_RE = re.compile(r"^pkg_[0-9a-f]{12,64}$")
+TAXONOMY_CODE_RE = re.compile(r"^[a-z][a-z0-9_]*(?:\.[a-z][a-z0-9_]*)+$")
 MACHINE_ID_RE = re.compile(r"^anon-[A-Za-z0-9_.-]+$")
 SHORT_REPO_IDENTIFIER_RE = re.compile(r"[A-Za-z0-9][A-Za-z0-9_.-]{0,99}/[A-Za-z0-9][A-Za-z0-9_.-]{0,99}")
 UNSAFE_METADATA_ONLY_VALUE_PATTERNS = (
@@ -253,12 +255,18 @@ def validate_event_package(value: dict[str, Any], prefix: str | None = None) -> 
         errors.append(f"{package_prefix}: package mode must be export")
     if "event_count" in value and (not isinstance(value.get("event_count"), int) or value.get("event_count") != len(events)):
         errors.append(f"{package_prefix}: package event_count must match events length")
-    if "event_ids" in value and not (
-        isinstance(value.get("event_ids"), list) and all(isinstance(event_id, str) for event_id in value.get("event_ids", []))
-    ):
-        errors.append(f"{package_prefix}: package event_ids must be an array of strings")
-    if "package_id" in value and (not isinstance(value.get("package_id"), str) or not str(value.get("package_id")).startswith("pkg_")):
-        errors.append(f"{package_prefix}: package_id must start with pkg_")
+    event_ids = value.get("event_ids")
+    if "event_ids" in value:
+        if not isinstance(event_ids, list) or not all(
+            isinstance(event_id, str) and EVENT_ID_RE.match(event_id) for event_id in event_ids
+        ):
+            errors.append(f"{package_prefix}: package event_ids must be an array of safe evt_* identifiers")
+        else:
+            exported_event_ids = [event.get("event_id") for event in events]
+            if event_ids != exported_event_ids:
+                errors.append(f"{package_prefix}: package event_ids must match exported event event_id values")
+    if "package_id" in value and (not isinstance(value.get("package_id"), str) or not PACKAGE_ID_RE.match(value.get("package_id"))):
+        errors.append(f"{package_prefix}: package_id must match pkg_<12-64 lowercase hex>")
     destination_hash = value.get("destination_hash")
     if "destination_hash" in value and destination_hash is not None and (
         not isinstance(destination_hash, str) or not TASK_HASH_RE.match(destination_hash)
@@ -267,9 +275,12 @@ def validate_event_package(value: dict[str, Any], prefix: str | None = None) -> 
     taxonomy_counts = value.get("taxonomy_counts")
     if "taxonomy_counts" in value and not (
         isinstance(taxonomy_counts, dict)
-        and all(isinstance(key, str) and isinstance(count, int) for key, count in taxonomy_counts.items())
+        and all(
+            isinstance(key, str) and TAXONOMY_CODE_RE.match(key) and isinstance(count, int)
+            for key, count in taxonomy_counts.items()
+        )
     ):
-        errors.append(f"{package_prefix}: taxonomy_counts must be an object of integer counts")
+        errors.append(f"{package_prefix}: taxonomy_counts must be an object of safe taxonomy-code integer counts")
     if "would_upload" in value and not isinstance(value.get("would_upload"), bool):
         errors.append(f"{package_prefix}: would_upload must be a boolean")
 

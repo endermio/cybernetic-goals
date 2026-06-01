@@ -1103,6 +1103,36 @@ class RunEventScriptsTest(unittest.TestCase):
 
         self.assertEqual(summary_payload["event_count"], 2)
 
+    def test_sync_dry_run_rejects_unsafe_export_package_without_leaking_values(self):
+        event = json.loads(SAMPLE.read_text(encoding="utf-8"))
+        package = {
+            "mode": "export",
+            "event_count": 1,
+            "event_ids": ["acme/private-repo"],
+            "package_id": "pkg_acme/private-repo",
+            "destination_hash": None,
+            "taxonomy_counts": {"observability.metadata_only_recorded": 1},
+            "would_upload": False,
+            "events": [event],
+        }
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            input_path = Path(tmpdir) / "export.json"
+            input_path.write_text(json.dumps(package), encoding="utf-8")
+
+            result = self.run_script(
+                "sync_run_events_to_github.py",
+                "--dry-run",
+                "--input",
+                str(input_path),
+            )
+
+        output = result.stdout + result.stderr
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("package_id", output)
+        self.assertIn("event_ids", output)
+        self.assertNotIn("acme/private-repo", output)
+
     def test_sync_dry_run_dominates_simulated_upload_without_ledger_writes(self):
         with tempfile.TemporaryDirectory() as tmpdir:
             env = {"CYBERNETIC_SYNC_TOKEN": "dummy-token"}

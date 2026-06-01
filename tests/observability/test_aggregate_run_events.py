@@ -109,6 +109,41 @@ class AggregateRunEventsTest(unittest.TestCase):
 
         self.assertEqual(summary_payload["event_count"], 1)
 
+    def test_dry_run_rejects_unsafe_sync_export_package_without_leaking_values(self):
+        event = json.loads(SAMPLE.read_text(encoding="utf-8"))
+        package = {
+            "mode": "export",
+            "event_count": 1,
+            "event_ids": ["acme/private-repo"],
+            "package_id": "pkg_acme/private-repo",
+            "destination_hash": None,
+            "taxonomy_counts": {"observability.metadata_only_recorded": 1},
+            "would_upload": False,
+            "events": [event],
+        }
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            input_path = Path(tmpdir) / "export.json"
+            summary = Path(tmpdir) / "aggregation-summary.json"
+            candidates = Path(tmpdir) / "eval-candidates.json"
+            input_path.write_text(json.dumps(package), encoding="utf-8")
+
+            result = self.run_aggregate(
+                "--input",
+                str(input_path),
+                "--out",
+                str(summary),
+                "--eval-candidates-out",
+                str(candidates),
+                "--dry-run",
+            )
+
+        output = result.stdout + result.stderr
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("package_id", output)
+        self.assertIn("event_ids", output)
+        self.assertNotIn("acme/private-repo", output)
+
     def test_generated_at_can_be_set_for_deterministic_outputs(self):
         generated_at = "2026-01-02T03:04:05Z"
         with tempfile.TemporaryDirectory() as tmpdir:

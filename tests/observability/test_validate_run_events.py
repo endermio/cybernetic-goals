@@ -80,6 +80,60 @@ class ValidateRunEventsTest(unittest.TestCase):
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
         self.assertIn("validated 1 event", result.stdout)
 
+    def test_sync_export_package_rejects_unsafe_package_id_without_leaking_value(self):
+        event = json.loads(SAMPLE.read_text(encoding="utf-8"))
+        package = {
+            "mode": "export",
+            "event_count": 1,
+            "event_ids": [event["event_id"]],
+            "package_id": "pkg_acme/private-repo",
+            "destination_hash": None,
+            "taxonomy_counts": {"observability.metadata_only_recorded": 1},
+            "would_upload": False,
+            "events": [event],
+        }
+
+        with tempfile.NamedTemporaryFile("w", suffix=".json", delete=False) as tmp:
+            json.dump(package, tmp)
+            tmp_path = tmp.name
+
+        try:
+            result = self.run_validator(tmp_path)
+        finally:
+            Path(tmp_path).unlink(missing_ok=True)
+
+        output = result.stdout + result.stderr
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("package_id", output)
+        self.assertNotIn("acme/private-repo", output)
+
+    def test_sync_export_package_rejects_unsafe_event_ids_without_leaking_value(self):
+        event = json.loads(SAMPLE.read_text(encoding="utf-8"))
+        package = {
+            "mode": "export",
+            "event_count": 1,
+            "event_ids": ["acme/private-repo"],
+            "package_id": "pkg_" + "d" * 64,
+            "destination_hash": None,
+            "taxonomy_counts": {"observability.metadata_only_recorded": 1},
+            "would_upload": False,
+            "events": [event],
+        }
+
+        with tempfile.NamedTemporaryFile("w", suffix=".json", delete=False) as tmp:
+            json.dump(package, tmp)
+            tmp_path = tmp.name
+
+        try:
+            result = self.run_validator(tmp_path)
+        finally:
+            Path(tmp_path).unlink(missing_ok=True)
+
+        output = result.stdout + result.stderr
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("event_ids", output)
+        self.assertNotIn("acme/private-repo", output)
+
     def test_metadata_only_rejects_content_summary_and_real_paths(self):
         unsafe = {
             "schema_version": "1.0.0",
