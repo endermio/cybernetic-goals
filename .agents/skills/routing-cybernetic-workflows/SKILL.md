@@ -1,6 +1,6 @@
 ---
 name: routing-cybernetic-workflows
-description: 'Use first when deciding whether a task should use the cybernetic workflow. Classifies work by control uncertainty and required gates, not scary keywords: direct prompt, inline goal, bounded file goal, Design Gate, Rubric Gate, full pre-goal pipeline, or high-risk human-gated workflow. Downgrades bounded corrections inside existing approved control artifacts and rejects over-heavy workflow for small tasks.'
+description: 'Use first for formed tasks when deciding whether the task should use the cybernetic workflow. If user input is pre-task intent such as confusion, dissatisfaction, risk sense, failed experience, method preference, or process distrust, hand off to framing-cybernetic-intent before routing. Classifies formed tasks by control uncertainty and required gates: direct prompt, inline goal, bounded file goal, Design Gate, Rubric Gate, full pre-goal pipeline, or high-risk human-gated workflow.'
 ---
 
 # Routing Cybernetic Workflows
@@ -10,6 +10,12 @@ description: 'Use first when deciding whether a task should use the cybernetic w
 Choose the lightest workflow that can control the task safely.
 
 This skill is a router, not a planner, not a goal writer, not a requirements analyzer, and not an executor.
+
+It routes formed tasks. It does not collaboratively form the task from
+pre-task intent. If the user input is primarily confusion, dissatisfaction,
+risk sense, observed symptoms, failure experience, method preference, or
+process distrust, hand off to `$framing-cybernetic-intent` before making a
+workflow decision.
 
 It decides whether the task needs:
 

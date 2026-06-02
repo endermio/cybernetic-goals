@@ -1,6 +1,6 @@
 ---
 name: analyzing-cybernetic-requirements
-description: 'Use before solution design, control-contract writing, execution-policy writing, or controlled execution for complex, ambiguous, evaluative, or output-sensitive work. Analyzes human purpose, requirement semantics, controlled objects and boundaries, evaluation functions, output-contract needs, constraints, non-goals, safe defaults, blocking human decisions, and required gates. Does not create solution designs, control contracts, execution policies, control reviews, runtime /goal commands, or target-work artifacts. Creates a requirements analysis brief under docs/cybernetics/requirements/ when file writing is available.'
+description: 'Use after a formed task exists and before solution design, control-contract writing, execution-policy writing, or controlled execution for complex, ambiguous, evaluative, or output-sensitive work. Analyzes human purpose, requirement semantics, controlled objects and boundaries, evaluation functions, output-contract needs, constraints, non-goals, safe defaults, blocking human decisions, and required gates. For pre-task intent such as confusion, dissatisfaction, risk sense, failed experience, method preference, or process distrust, use framing-cybernetic-intent first. Does not create solution designs, control contracts, execution policies, control reviews, runtime /goal commands, or target-work artifacts.'
 ---
 
 # Analyzing Cybernetic Requirements
@@ -26,7 +26,14 @@ Use `assets/requirements-analysis-template.md`.
 
 ## Core Boundary
 
-This skill analyzes requirements. It must not:
+This skill analyzes requirements.
+
+It assumes a formed task exists. It must not absorb the pre-task responsibility
+of collaboratively forming user intent from confusion, dissatisfaction, risk
+sense, failed experience, method preference, or process distrust. Use
+`$framing-cybernetic-intent` first when the setpoint is not yet clear.
+
+It must not:
 
 - design the solution structure;
 - define interfaces, object structures, mechanism architecture, flows, report structures, output schemas, or lifecycle models as a new solution model;

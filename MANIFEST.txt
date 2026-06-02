@@ -23,6 +23,10 @@
 .agents/skills/designing-cybernetic-solutions/assets/solution-design-template.md
 .agents/skills/designing-cybernetic-solutions/evals/evals.json
 .agents/skills/designing-cybernetic-solutions/references/design-gate.md
+.agents/skills/framing-cybernetic-intent/SKILL.md
+.agents/skills/framing-cybernetic-intent/agents/openai.yaml
+.agents/skills/framing-cybernetic-intent/assets/intent-frame-template.md
+.agents/skills/framing-cybernetic-intent/evals/evals.json
 .agents/skills/orchestrating-cybernetic-pregoal/SKILL.md
 .agents/skills/orchestrating-cybernetic-pregoal/agents/openai.yaml
 .agents/skills/orchestrating-cybernetic-pregoal/assets/orchestration-report-template.md
@@ -78,3 +82,4 @@ tests/observability/__init__.py
 tests/observability/test_aggregate_run_events.py
 tests/observability/test_run_event_scripts.py
 tests/observability/test_validate_run_events.py
+tests/skills/test_intent_framing.py

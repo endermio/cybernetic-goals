@@ -10,6 +10,21 @@ skills = compile-time control tools
 Superpowers = planning/review/execution substrate
 ```
 
+Human input does not always arrive as a formed task. For pre-task intent such
+as confusion, dissatisfaction, risk sense, failed experience, method preference,
+or distrust of the current process, start from the human situation:
+
+```text
+human situation
+  -> $framing-cybernetic-intent
+  -> shared intent understanding
+  -> optional task formation
+  -> $routing-cybernetic-workflows
+```
+
+Only route formed tasks. Do not treat a requested method or workflow as the
+human purpose.
+
 For complex work, do not let `/goal` analyze requirements, invent the solution design, write its own plan, review its own plan, or invent a new control strategy during execution. Instead, prepare and approve control artifacts first, then compile the final runtime `/goal` command.
 
 Superpowers dependencies are stage-specific infrastructure, not optional style suggestions. See `docs/cybernetic-framework/superpowers-infrastructure-policy.md`.
@@ -35,8 +50,15 @@ cp -R .agents/skills/* /path/to/target-repo/.agents/skills/
 For complex work:
 
 ```text
+human situation
+  -> when input is pre-task intent rather than a formed task
+
+$framing-cybernetic-intent
+  -> shared intent understanding
+  -> optional task formation
+
 $routing-cybernetic-workflows
-  -> decide whether full pipeline is appropriate
+  -> decide whether a formed task should use the cybernetic workflow
 
 $analyzing-cybernetic-requirements
   -> docs/cybernetics/requirements/YYYY-MM-DD-feature.md
@@ -70,6 +92,7 @@ For simple work, the router should reject the full pipeline and recommend an inl
 
 ## Included skills
 
+- `framing-cybernetic-intent`: collaboratively frame pre-task human intent into shared understanding before optional task formation and routing.
 - `routing-cybernetic-workflows`: classify complexity and route to the right workflow.
 - `analyzing-cybernetic-requirements`: analyze human intent and create a requirements analysis brief.
 - `clarifying-cybernetic-tasks`: deprecated compatibility alias for `analyzing-cybernetic-requirements`.

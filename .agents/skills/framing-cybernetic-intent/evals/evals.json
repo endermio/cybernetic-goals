@@ -1,0 +1,88 @@
+{
+  "evals": [
+    {
+      "id": "method-preference-is-not-purpose",
+      "prompt": "Use the full cybernetic workflow for this because I do not trust the current process.",
+      "expected_output": "The skill distinguishes the requested workflow as a method preference, frames the underlying distrust and uncertainty, and does not start routing or requirements analysis.",
+      "assertions": [
+        "States that the workflow is a possible method, not the human purpose.",
+        "Identifies process distrust as the human situation.",
+        "Asks what uncertainty or risk the user wants reduced if intent is unstable.",
+        "Does not create requirements, design, goal, execution policy, or review artifacts.",
+        "Does not hand off to routing until the intended change is clear."
+      ]
+    },
+    {
+      "id": "dissatisfaction-is-not-execution-task",
+      "prompt": "This plan feels wrong and too heavy.",
+      "expected_output": "The skill reflects dissatisfaction as pre-task intent and helps clarify what feels wrong before proposing any task.",
+      "assertions": [
+        "Does not turn the complaint into an immediate repair task.",
+        "Separates symptom from purpose.",
+        "Identifies possible uncertainty about control weight or fit.",
+        "Asks at most one high-value clarification question.",
+        "Uses Shared Intent Understanding as the default output shape."
+      ]
+    },
+    {
+      "id": "failure-experience-is-not-repair-goal",
+      "prompt": "Last time this workflow generated many artifacts and did not converge.",
+      "expected_output": "The skill frames the failed experience and risk before forming any repair goal.",
+      "assertions": [
+        "Recognizes the input as failure experience.",
+        "Does not immediately recommend rerunning the workflow.",
+        "Does not create a repair goal by default.",
+        "Identifies convergence, artifact volume, or control fit as uncertainty to reduce.",
+        "Offers possible next moves without making one mandatory."
+      ]
+    },
+    {
+      "id": "unstable-intent-asks-one-question",
+      "prompt": "Something is off here. Maybe use the orchestrator.",
+      "expected_output": "The skill separates the vague concern from the suggested method and asks one small question about what the user wants clarified or changed.",
+      "assertions": [
+        "Does not assume orchestrator use is the goal.",
+        "Reflects that the intent is not yet stable.",
+        "Asks one concise question.",
+        "Does not ask several routine execution questions.",
+        "Does not start workflow routing."
+      ]
+    },
+    {
+      "id": "shared-understanding-before-task-candidate",
+      "prompt": "I think we are optimizing process completeness instead of my purpose.",
+      "expected_output": "The skill first summarizes shared intent understanding and only then, if clear, offers an optional task candidate.",
+      "assertions": [
+        "Names the method-goal confusion.",
+        "Summarizes the apparent purpose.",
+        "States what should not be assumed yet.",
+        "Keeps any task candidate optional.",
+        "Explains why any task candidate follows from the shared intent."
+      ]
+    },
+    {
+      "id": "chat-only-default-no-artifact",
+      "prompt": "Help me understand why this feels overcontrolled.",
+      "expected_output": "The skill responds in chat with shared intent framing and does not write files by default.",
+      "assertions": [
+        "Uses a chat-only shared understanding response.",
+        "Does not create an intent brief by default.",
+        "Does not create requirements, design, goal, plan, review, or runtime goal artifacts.",
+        "Clarifies the control concern.",
+        "Offers a bounded next move only if useful."
+      ]
+    },
+    {
+      "id": "persistent-intent-brief-only-when-justified",
+      "prompt": "This intent framing will guide several future control artifacts; record it before we proceed.",
+      "expected_output": "The skill may write an intent brief because persistence is explicitly justified, while keeping it limited to shared understanding and optional handoff.",
+      "assertions": [
+        "Uses docs/cybernetics/intents/YYYY-MM-DD-<slug>.md when writing.",
+        "States why persistence is justified.",
+        "Preserves shared intent understanding.",
+        "Does not include full requirements or execution policy content.",
+        "Keeps any downstream handoff optional and response-oriented."
+      ]
+    }
+  ]
+}
