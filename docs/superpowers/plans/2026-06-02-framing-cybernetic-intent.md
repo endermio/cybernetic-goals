@@ -35,7 +35,7 @@
 
 ---
 
-### Task 1: Add Failing Intent-Framing Structural Tests
+### Task 1: Add Intent-Framing Structural Tests
 
 **Files:**
 - Create: `tests/skills/test_intent_framing.py`
@@ -51,55 +51,63 @@ from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parents[2]
-SKILL_DIR = ROOT / ".agents/skills/framing-cybernetic-intent"
 
 
 class IntentFramingSkillTest(unittest.TestCase):
     def read(self, path: str) -> str:
         return (ROOT / path).read_text(encoding="utf-8")
 
-    def test_skill_metadata_and_core_boundary_exist(self):
-        skill = self.read(".agents/skills/framing-cybernetic-intent/SKILL.md")
-
-        self.assertIn("name: framing-cybernetic-intent", skill)
-        self.assertIn("pre-task", skill.casefold())
-        self.assertIn("collaborative intent framing", skill.casefold())
-        self.assertIn("Shared Intent Understanding", skill)
-        self.assertIn("method", skill.casefold())
-        self.assertIn("purpose", skill.casefold())
-        self.assertIn("must not", skill.casefold())
-        self.assertIn("routing-cybernetic-workflows", skill)
-
-    def test_template_preserves_shared_understanding_not_requirements(self):
-        template = self.read(
-            ".agents/skills/framing-cybernetic-intent/assets/intent-frame-template.md"
-        )
-        template_text = template.casefold()
-
-        self.assertIn("shared intent understanding", template_text)
-        self.assertIn("human situation", template_text)
-        self.assertIn("method vs purpose", template_text)
-        self.assertIn("uncertainty to reduce", template_text)
-        self.assertIn("what not to assume yet", template_text)
-        self.assertIn("optional task formation", template_text)
-        self.assertNotIn("Execution Policy", template)
-        self.assertNotIn("Runtime /goal", template)
-
-    def test_agent_metadata_and_manifest_include_new_skill_files(self):
-        metadata = self.read(
-            ".agents/skills/framing-cybernetic-intent/agents/openai.yaml"
-        )
-        manifest = self.read("MANIFEST.txt")
-
-        self.assertIn("allow_implicit_invocation: false", metadata)
-        for path in (
+    def test_required_files_metadata_and_manifest_entries_exist(self):
+        required_paths = (
             ".agents/skills/framing-cybernetic-intent/SKILL.md",
             ".agents/skills/framing-cybernetic-intent/agents/openai.yaml",
             ".agents/skills/framing-cybernetic-intent/assets/intent-frame-template.md",
             ".agents/skills/framing-cybernetic-intent/evals/evals.json",
             "tests/skills/test_intent_framing.py",
-        ):
+        )
+        manifest = self.read("MANIFEST.txt")
+        metadata = self.read(
+            ".agents/skills/framing-cybernetic-intent/agents/openai.yaml"
+        )
+
+        for path in required_paths:
+            self.assertTrue((ROOT / path).exists(), path)
             self.assertIn(path, manifest)
+        self.assertIn("allow_implicit_invocation: false", metadata)
+
+    def test_skill_contract_anchors_exist(self):
+        skill = self.read(".agents/skills/framing-cybernetic-intent/SKILL.md")
+        skill_text = skill.casefold()
+
+        self.assertIn("name: framing-cybernetic-intent", skill)
+        self.assertIn("Shared Intent Understanding", skill)
+        for term in (
+            "pre-task",
+            "collaborative intent framing",
+            "method",
+            "purpose",
+            "must not",
+            "optional task",
+        ):
+            self.assertIn(term, skill_text)
+        self.assertIn("routing-cybernetic-workflows", skill)
+
+    def test_template_preserves_intent_frame_not_control_artifacts(self):
+        template = self.read(
+            ".agents/skills/framing-cybernetic-intent/assets/intent-frame-template.md"
+        )
+
+        for heading in (
+            "## Human Situation",
+            "## Method vs Purpose",
+            "## Risk or Uncertainty to Reduce",
+            "## What Not To Assume Yet",
+            "## Shared Intent Understanding",
+            "## Optional Task Formation",
+        ):
+            self.assertIn(heading, template)
+        self.assertNotIn("Execution Policy", template)
+        self.assertNotIn("Runtime /goal", template)
 
     def test_evals_cover_pre_task_failure_modes(self):
         evals = json.loads(
@@ -115,34 +123,22 @@ class IntentFramingSkillTest(unittest.TestCase):
         self.assertIn("chat-only-default-no-artifact", ids)
         self.assertIn("persistent-intent-brief-only-when-justified", ids)
 
-    def test_readme_routes_human_situation_before_routing(self):
+    def test_integration_surfaces_reference_pre_task_handoff(self):
         readme = self.read("README.md")
-
-        self.assertIn("human situation", readme)
-        self.assertIn("framing-cybernetic-intent", readme)
-        self.assertIn("shared intent understanding", readme.casefold())
-
-    def test_router_hands_pre_task_input_to_intent_framing(self):
         router = self.read(".agents/skills/routing-cybernetic-workflows/SKILL.md")
-
-        self.assertIn("framing-cybernetic-intent", router)
-        self.assertIn("pre-task", router.casefold())
-        self.assertIn("formed task", router.casefold())
-
-    def test_requirements_skill_does_not_absorb_intent_framing(self):
         requirements = self.read(
             ".agents/skills/analyzing-cybernetic-requirements/SKILL.md"
         )
-
-        self.assertIn("framing-cybernetic-intent", requirements)
-        self.assertIn("formed task", requirements.casefold())
-        self.assertIn("pre-task", requirements.casefold())
-
-    def test_invariant_matrix_tracks_intent_framing(self):
         matrix = self.read("docs/cybernetic-framework/invariant-artifact-consumer-matrix.md")
 
+        self.assertIn("human situation", readme)
+        self.assertIn("framing-cybernetic-intent", readme)
+        for text in (router, requirements):
+            folded = text.casefold()
+            self.assertIn("framing-cybernetic-intent", text)
+            self.assertIn("pre-task", folded)
+            self.assertIn("formed task", folded)
         self.assertIn("INV-INT-001", matrix)
-        self.assertIn("Pre-task intent", matrix)
         self.assertIn("framing-cybernetic-intent", matrix)
 
 
@@ -490,35 +486,26 @@ Create `.agents/skills/framing-cybernetic-intent/evals/evals.json` with this con
 }
 ```
 
-- [ ] **Step 6: Run the focused test**
+- [ ] **Step 6: Validate eval JSON**
 
 Run:
 
 ```bash
-python3 -m unittest tests.skills.test_intent_framing
+python3 -m json.tool .agents/skills/framing-cybernetic-intent/evals/evals.json >/tmp/framing-intent-evals.json
 ```
 
-Expected: FAIL because README, router, requirements skill, invariant matrix,
-and MANIFEST are not updated yet.
-
-- [ ] **Step 7: Optional checkpoint commit for the new skill files**
-
-If using checkpoint commits, run this after the focused test has produced the
-expected failure for only the remaining integration files:
-
-```bash
-git add .agents/skills/framing-cybernetic-intent
-git commit -m "Add intent framing skill"
-```
+Expected: command exits 0.
 
 ---
 
-### Task 3: Update Workflow Documentation And Skill Boundaries
+### Task 3: Update Integration Documentation, Invariant, And Manifest
 
 **Files:**
 - Modify: `README.md`
 - Modify: `.agents/skills/routing-cybernetic-workflows/SKILL.md`
 - Modify: `.agents/skills/analyzing-cybernetic-requirements/SKILL.md`
+- Modify: `docs/cybernetic-framework/invariant-artifact-consumer-matrix.md`
+- Modify: `MANIFEST.txt`
 
 - [ ] **Step 1: Update the README workflow**
 
@@ -596,35 +583,7 @@ sense, failed experience, method preference, or process distrust. Use
 `$framing-cybernetic-intent` first when the setpoint is not yet clear.
 ```
 
-- [ ] **Step 4: Run the focused test**
-
-Run:
-
-```bash
-python3 -m unittest tests.skills.test_intent_framing
-```
-
-Expected: FAIL because the invariant matrix and MANIFEST are not updated yet.
-
-- [ ] **Step 5: Optional checkpoint commit for documentation and boundary updates**
-
-If using checkpoint commits, run this after the focused test has produced the
-expected failure for only the remaining invariant or manifest updates:
-
-```bash
-git add README.md .agents/skills/routing-cybernetic-workflows/SKILL.md .agents/skills/analyzing-cybernetic-requirements/SKILL.md
-git commit -m "Document pre-task intent framing"
-```
-
----
-
-### Task 4: Update Invariants And Manifest
-
-**Files:**
-- Modify: `docs/cybernetic-framework/invariant-artifact-consumer-matrix.md`
-- Modify: `MANIFEST.txt`
-
-- [ ] **Step 1: Add `INV-INT-001` to the invariant matrix**
+- [ ] **Step 4: Add `INV-INT-001` to the invariant matrix**
 
 In `docs/cybernetic-framework/invariant-artifact-consumer-matrix.md`, add this row near the start of the consumer matrix, before `INV-DES-001`:
 
@@ -632,7 +591,7 @@ In `docs/cybernetic-framework/invariant-artifact-consumer-matrix.md`, add this r
 | INV-INT-001 | Pre-task intent must be collaboratively framed before workflow routing when user input is not yet a formed task or when method is being treated as goal. | `.agents/skills/framing-cybernetic-intent/SKILL.md`; `.agents/skills/routing-cybernetic-workflows/SKILL.md`; `.agents/skills/analyzing-cybernetic-requirements/SKILL.md` | `Shared Intent Understanding`; optional `docs/cybernetics/intents/*`; intent-frame template | N/A: semantic framing quality is eval-governed; router boundary text provides handoff rule | N/A: intent framing precedes control review; later reviews consume formed requirements only | router receives optional clear task candidate; requirements analysis receives formed task only | `tests/skills/test_intent_framing.py`; `.agents/skills/framing-cybernetic-intent/evals/evals.json` | Active |
 ```
 
-- [ ] **Step 2: Update `MANIFEST.txt`**
+- [ ] **Step 5: Update `MANIFEST.txt`**
 
 Add these lines to `MANIFEST.txt` in sorted location with the other skill files and tests:
 
@@ -644,7 +603,7 @@ Add these lines to `MANIFEST.txt` in sorted location with the other skill files 
 tests/skills/test_intent_framing.py
 ```
 
-- [ ] **Step 3: Run focused tests**
+- [ ] **Step 6: Run focused tests after all integration surfaces are updated**
 
 Run:
 
@@ -655,21 +614,12 @@ python3 -m unittest tests.skills.test_invariant_consumer_matrix
 
 Expected: both commands pass.
 
-- [ ] **Step 4: Optional checkpoint commit for invariant and manifest updates**
-
-If using checkpoint commits, run this after the focused tests pass:
-
-```bash
-git add docs/cybernetic-framework/invariant-artifact-consumer-matrix.md MANIFEST.txt
-git commit -m "Track intent framing invariant"
-```
-
 ---
 
-### Task 5: Full Verification And Final Commit State
+### Task 4: Full Verification And Final Commit State
 
 **Files:**
-- Verify all files changed in Tasks 1-4.
+- Verify all files changed in Tasks 1-3.
 
 - [ ] **Step 1: Run syntax and JSON validation**
 
@@ -722,17 +672,14 @@ rg -n "framing-cybernetic-intent|pre-task|formed task|Shared Intent Understandin
 
 Expected: output shows the new skill, README workflow, router handoff, requirements boundary, invariant row, evals, template, and tests.
 
-- [ ] **Step 6: Commit any remaining verified implementation changes**
+- [ ] **Step 6: Commit verified implementation changes**
 
-If checkpoint commits were skipped, run:
+Run:
 
 ```bash
 git add .agents/skills/framing-cybernetic-intent README.md .agents/skills/routing-cybernetic-workflows/SKILL.md .agents/skills/analyzing-cybernetic-requirements/SKILL.md docs/cybernetic-framework/invariant-artifact-consumer-matrix.md MANIFEST.txt tests/skills/test_intent_framing.py
 git commit -m "Add intent framing skill"
 ```
-
-If checkpoint commits were used and `git status --short` shows no tracked
-changes, do not create an empty commit.
 
 ---
 
