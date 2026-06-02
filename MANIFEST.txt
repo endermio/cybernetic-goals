@@ -61,6 +61,7 @@
 .agents/skills/writing-cybernetic-goals/references/control-contract-rules.md
 .github/ISSUE_TEMPLATE/cybernetic-improvement-pattern.md
 .github/workflows/aggregate-cybernetic-outcomes.yml
+docs/cybernetic-framework/invariant-artifact-consumer-matrix.md
 docs/cybernetic-framework/superpowers-infrastructure-policy.md
 MANIFEST.txt
 observability/README.md

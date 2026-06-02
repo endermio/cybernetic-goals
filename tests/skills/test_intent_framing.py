@@ -16,6 +16,7 @@ class IntentFramingSkillTest(unittest.TestCase):
             ".agents/skills/framing-cybernetic-intent/agents/openai.yaml",
             ".agents/skills/framing-cybernetic-intent/assets/intent-frame-template.md",
             ".agents/skills/framing-cybernetic-intent/evals/evals.json",
+            "docs/cybernetic-framework/invariant-artifact-consumer-matrix.md",
             "tests/skills/test_intent_framing.py",
         )
         manifest = self.read("MANIFEST.txt")
@@ -68,6 +69,7 @@ class IntentFramingSkillTest(unittest.TestCase):
         )
         ids = {item["id"] for item in evals["evals"]}
 
+        self.assertEqual("framing-cybernetic-intent", evals["skill_name"])
         self.assertIn("method-preference-is-not-purpose", ids)
         self.assertIn("dissatisfaction-is-not-execution-task", ids)
         self.assertIn("failure-experience-is-not-repair-goal", ids)
@@ -75,6 +77,28 @@ class IntentFramingSkillTest(unittest.TestCase):
         self.assertIn("shared-understanding-before-task-candidate", ids)
         self.assertIn("chat-only-default-no-artifact", ids)
         self.assertIn("persistent-intent-brief-only-when-justified", ids)
+
+    def test_router_evals_cover_pre_task_method_preference_handoff(self):
+        evals = json.loads(
+            self.read(".agents/skills/routing-cybernetic-workflows/evals/evals.json")
+        )
+        ids = {item["id"] for item in evals["evals"]}
+        target_id = "pre-task-method-preference-routes-to-intent-framing"
+
+        self.assertIn(target_id, ids)
+        target = next(
+            item
+            for item in evals["evals"]
+            if item["id"] == target_id
+        )
+        target_text = json.dumps(target, ensure_ascii=False)
+
+        self.assertEqual("routing-cybernetic-workflows", evals["skill_name"])
+        self.assertIn("framing-cybernetic-intent", target_text)
+        self.assertIn("method preference", target_text)
+        self.assertIn("process distrust", target_text)
+        self.assertIn("Does not classify as Level 3", target_text)
+        self.assertIn("Does not recommend orchestrating-cybernetic-pregoal yet", target_text)
 
     def test_integration_surfaces_reference_pre_task_handoff(self):
         readme = self.read("README.md")
@@ -86,6 +110,7 @@ class IntentFramingSkillTest(unittest.TestCase):
 
         self.assertIn("human situation", readme)
         self.assertIn("framing-cybernetic-intent", readme)
+        self.assertIn("Turn a formed task or task candidate", requirements)
         for text in (router, requirements):
             folded = text.casefold()
             self.assertIn("framing-cybernetic-intent", text)
@@ -93,6 +118,31 @@ class IntentFramingSkillTest(unittest.TestCase):
             self.assertIn("formed task", folded)
         self.assertIn("INV-INT-001", matrix)
         self.assertIn("framing-cybernetic-intent", matrix)
+
+    def test_orchestrator_requires_workflow_fit_before_pregoal_artifacts(self):
+        orchestrator = self.read(
+            ".agents/skills/orchestrating-cybernetic-pregoal/SKILL.md"
+        )
+        folded = orchestrator.casefold()
+
+        self.assertIn("Workflow Fit Gate", orchestrator)
+        self.assertIn(
+            "A user request to use full pre-goal compilation is not sufficient by itself.",
+            orchestrator,
+        )
+        self.assertNotIn(
+            "or the user explicitly chose full pre-goal compilation",
+            orchestrator,
+        )
+        for term in (
+            "pre-task intent",
+            "Level 0/1/2",
+            "lightest workflow",
+            "evidence/context/review budget",
+        ):
+            self.assertIn(term.casefold(), folded)
+        self.assertIn("framing-cybernetic-intent", orchestrator)
+        self.assertIn("routing-cybernetic-workflows", orchestrator)
 
 
 if __name__ == "__main__":

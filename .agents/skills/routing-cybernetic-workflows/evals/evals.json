@@ -115,6 +115,17 @@
       ]
     },
     {
+      "id": "pre-task-method-preference-routes-to-intent-framing",
+      "prompt": "使用 $routing-cybernetic-workflows 分析：我不信任当前流程，想直接走完整 cybernetic workflow。",
+      "expected_output": "Do not route as a formed task. Hand off to framing-cybernetic-intent because this is method preference and process distrust.",
+      "assertions": [
+        "Does not classify as Level 3 merely because the user requested full workflow.",
+        "Identifies method preference or process distrust.",
+        "Recommends $framing-cybernetic-intent before routing.",
+        "Does not recommend orchestrating-cybernetic-pregoal yet."
+      ]
+    },
+    {
       "id": "wide-user-closure-audit-needs-rubric-gate",
       "prompt": "使用 $routing-cybernetic-workflows 分析任务：从观察者使用层面逐项核对某组能力是否闭环，分类为已闭环、部分闭环、未闭环、不可判定。可以读源材料、文档、检查结果、记录、预览状态和证据 artifacts，只输出评估报告，不执行修复，不改变结构契约、授权、外部契约或需求语义。",
       "expected_output": "Classify as Level 2 with Required gates: Rubric Gate required, because execution complexity is bounded but the evaluation rubric for closure/completeness is not explicit. Recommend rubric analysis before creating the bounded audit goal.",

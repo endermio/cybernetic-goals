@@ -7,12 +7,12 @@ description: 'Use after a formed task exists and before solution design, control
 
 ## Overview
 
-Turn a human intention into a requirements analysis brief before it becomes a solution design, Codex `/goal`, execution policy, or target-work change.
+Turn a formed task or task candidate into a requirements analysis brief before it becomes a solution design, Codex `/goal`, execution policy, or target-work change.
 
 This skill is a pre-goal control loop:
 
 ```text
-human purpose -> AI context scan -> requirement semantics -> rubric/output/gate analysis -> human decisions/defaults -> goal-ready requirements brief
+formed task -> AI context scan -> requirement semantics -> rubric/output/gate analysis -> human decisions/defaults -> goal-ready requirements brief
 ```
 
 Requirements analysis is broader than asking clarifying questions. Clarifying questions are one tool inside this skill. The output is not just answers to questions; it is the analyzed setpoint, constraints, evaluation function, and required gates.

@@ -70,10 +70,16 @@ If a required substrate is unavailable, stop and report the missing infrastructu
 
 ## Relationship to Other Skills
 
-Use this skill after:
+Use this skill only after a completed requirements analysis brief exists and
+one of these fit checks is satisfied:
 
-- `$routing-cybernetic-workflows` has recommended a Level 3 or Level 4 workflow, or the user explicitly chose full pre-goal compilation
-- `$analyzing-cybernetic-requirements` has produced a completed requirements analysis brief
+- `$routing-cybernetic-workflows` has recommended a Level 3 or Level 4 workflow or full pre-goal pipeline;
+- `$analyzing-cybernetic-requirements` has explicitly recorded that full pre-goal orchestration is required.
+
+A user request to use full pre-goal compilation is not sufficient by itself.
+If the request expresses method preference, uncertainty, dissatisfaction, or
+process distrust, route to `$framing-cybernetic-intent` or
+`$routing-cybernetic-workflows` first.
 
 This skill orchestrates:
 
@@ -92,6 +98,20 @@ Never emulate required Superpowers substrates. In particular:
 - do not replace `$superpowers:writing-plans` with ad hoc internal planning for non-trivial execution policies;
 - do not replace independent review discipline with self-review;
 - do not compile a runtime `/goal` that omits required runtime execution, debugging, and verification discipline.
+
+## Workflow Fit Gate
+
+Before creating downstream artifacts, confirm full pre-goal orchestration is
+still the lightest workflow that controls the task.
+
+Reject or downgrade when:
+
+- the input is pre-task intent;
+- the task is Level 0/1/2;
+- existing artifacts already control the semantics;
+- full orchestration would produce formal artifacts without reducing runtime
+  uncertainty;
+- evidence/context/review budget cannot be bounded.
 
 ## Required Input
 
