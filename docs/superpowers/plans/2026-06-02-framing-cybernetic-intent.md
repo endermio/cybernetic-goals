@@ -74,15 +74,32 @@ class IntentFramingSkillTest(unittest.TestCase):
         template = self.read(
             ".agents/skills/framing-cybernetic-intent/assets/intent-frame-template.md"
         )
+        template_text = template.casefold()
 
-        self.assertIn("Shared Intent Understanding", template)
-        self.assertIn("Human situation", template)
-        self.assertIn("Method vs Purpose", template)
-        self.assertIn("Uncertainty to Reduce", template)
-        self.assertIn("What Not To Assume Yet", template)
-        self.assertIn("Optional Task Formation", template)
+        self.assertIn("shared intent understanding", template_text)
+        self.assertIn("human situation", template_text)
+        self.assertIn("method vs purpose", template_text)
+        self.assertIn("uncertainty to reduce", template_text)
+        self.assertIn("what not to assume yet", template_text)
+        self.assertIn("optional task formation", template_text)
         self.assertNotIn("Execution Policy", template)
         self.assertNotIn("Runtime /goal", template)
+
+    def test_agent_metadata_and_manifest_include_new_skill_files(self):
+        metadata = self.read(
+            ".agents/skills/framing-cybernetic-intent/agents/openai.yaml"
+        )
+        manifest = self.read("MANIFEST.txt")
+
+        self.assertIn("allow_implicit_invocation: false", metadata)
+        for path in (
+            ".agents/skills/framing-cybernetic-intent/SKILL.md",
+            ".agents/skills/framing-cybernetic-intent/agents/openai.yaml",
+            ".agents/skills/framing-cybernetic-intent/assets/intent-frame-template.md",
+            ".agents/skills/framing-cybernetic-intent/evals/evals.json",
+            "tests/skills/test_intent_framing.py",
+        ):
+            self.assertIn(path, manifest)
 
     def test_evals_cover_pre_task_failure_modes(self):
         evals = json.loads(
@@ -143,14 +160,10 @@ python3 -m unittest tests.skills.test_intent_framing
 
 Expected: FAIL because `.agents/skills/framing-cybernetic-intent/SKILL.md` does not exist yet.
 
-- [ ] **Step 3: Commit the failing test**
+- [ ] **Step 3: Keep the failing test uncommitted**
 
-Run:
-
-```bash
-git add tests/skills/test_intent_framing.py
-git commit -m "test: cover intent framing skill"
-```
+Do not commit the intentionally failing test by itself. Keep it in the working
+tree so the implementation can turn it green in the same bounded change.
 
 ---
 
@@ -485,11 +498,13 @@ Run:
 python3 -m unittest tests.skills.test_intent_framing
 ```
 
-Expected: FAIL because README, router, requirements skill, and invariant matrix are not updated yet.
+Expected: FAIL because README, router, requirements skill, invariant matrix,
+and MANIFEST are not updated yet.
 
-- [ ] **Step 7: Commit the new skill files**
+- [ ] **Step 7: Optional checkpoint commit for the new skill files**
 
-Run:
+If using checkpoint commits, run this after the focused test has produced the
+expected failure for only the remaining integration files:
 
 ```bash
 git add .agents/skills/framing-cybernetic-intent
@@ -512,12 +527,14 @@ In `README.md`, after the opening code block that defines the core idea, add:
 ````markdown
 Human input does not always arrive as a formed task. For pre-task intent such
 as confusion, dissatisfaction, risk sense, failed experience, method preference,
-or distrust of the current process, first use:
+or distrust of the current process, start from the human situation:
 
 ```text
-$framing-cybernetic-intent
+human situation
+  -> $framing-cybernetic-intent
   -> shared intent understanding
   -> optional task formation
+  -> $routing-cybernetic-workflows
 ```
 
 Only route formed tasks. Do not treat a requested method or workflow as the
@@ -527,8 +544,12 @@ human purpose.
 Then change the recommended workflow block so it starts with:
 
 ```text
+human situation
+  -> when input is pre-task intent rather than a formed task
+
 $framing-cybernetic-intent
-  -> use when input is pre-task intent rather than a formed task
+  -> shared intent understanding
+  -> optional task formation
 
 $routing-cybernetic-workflows
   -> decide whether a formed task should use the cybernetic workflow
@@ -583,11 +604,12 @@ Run:
 python3 -m unittest tests.skills.test_intent_framing
 ```
 
-Expected: FAIL because the invariant matrix is not updated yet.
+Expected: FAIL because the invariant matrix and MANIFEST are not updated yet.
 
-- [ ] **Step 5: Commit documentation and boundary updates**
+- [ ] **Step 5: Optional checkpoint commit for documentation and boundary updates**
 
-Run:
+If using checkpoint commits, run this after the focused test has produced the
+expected failure for only the remaining invariant or manifest updates:
 
 ```bash
 git add README.md .agents/skills/routing-cybernetic-workflows/SKILL.md .agents/skills/analyzing-cybernetic-requirements/SKILL.md
@@ -633,9 +655,9 @@ python3 -m unittest tests.skills.test_invariant_consumer_matrix
 
 Expected: both commands pass.
 
-- [ ] **Step 4: Commit invariant and manifest updates**
+- [ ] **Step 4: Optional checkpoint commit for invariant and manifest updates**
 
-Run:
+If using checkpoint commits, run this after the focused tests pass:
 
 ```bash
 git add docs/cybernetic-framework/invariant-artifact-consumer-matrix.md MANIFEST.txt
@@ -699,6 +721,18 @@ rg -n "framing-cybernetic-intent|pre-task|formed task|Shared Intent Understandin
 ```
 
 Expected: output shows the new skill, README workflow, router handoff, requirements boundary, invariant row, evals, template, and tests.
+
+- [ ] **Step 6: Commit any remaining verified implementation changes**
+
+If checkpoint commits were skipped, run:
+
+```bash
+git add .agents/skills/framing-cybernetic-intent README.md .agents/skills/routing-cybernetic-workflows/SKILL.md .agents/skills/analyzing-cybernetic-requirements/SKILL.md docs/cybernetic-framework/invariant-artifact-consumer-matrix.md MANIFEST.txt tests/skills/test_intent_framing.py
+git commit -m "Add intent framing skill"
+```
+
+If checkpoint commits were used and `git status --short` shows no tracked
+changes, do not create an empty commit.
 
 ---
 
