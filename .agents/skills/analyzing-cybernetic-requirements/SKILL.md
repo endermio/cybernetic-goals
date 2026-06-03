@@ -1,6 +1,6 @@
 ---
 name: analyzing-cybernetic-requirements
-description: 'Use after a formed task exists and before solution design, control-contract writing, execution-policy writing, or controlled execution for complex, ambiguous, evaluative, or output-sensitive work. Analyzes human purpose, requirement semantics, controlled objects and boundaries, evaluation functions, output-contract needs, constraints, non-goals, safe defaults, blocking human decisions, and required gates. For pre-task intent such as confusion, dissatisfaction, risk sense, failed experience, method preference, or process distrust, use framing-cybernetic-intent first. Does not create solution designs, control contracts, execution policies, control reviews, runtime /goal commands, or target-work artifacts.'
+description: 'Use when a formed task or task candidate exists and requirement semantics, acceptance criteria, output shape, constraints, non-goals, risk, or required control gates are ambiguous before design, goal writing, execution policy, or controlled execution. Use framing-cybernetic-intent first for pre-task intent.'
 ---
 
 # Analyzing Cybernetic Requirements

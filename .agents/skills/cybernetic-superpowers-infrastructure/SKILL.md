@@ -1,6 +1,6 @@
 ---
 name: cybernetic-superpowers-infrastructure
-description: 'Use when a cybernetic skill needs to decide which Superpowers substrate is required for planning, independent review, runtime execution, debugging, or completion verification. Defines stage dependencies and non-substitution rules; it does not create control artifacts or execute target work.'
+description: 'Use when a cybernetic skill must choose required Superpowers substrate for planning, independent review, runtime execution, debugging, or completion verification.'
 ---
 
 # Cybernetic Superpowers Infrastructure

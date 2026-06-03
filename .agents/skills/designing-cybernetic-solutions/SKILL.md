@@ -1,6 +1,6 @@
 ---
 name: designing-cybernetic-solutions
-description: 'Use after requirements analysis when the required solution model is not explicit. Creates a core cybernetic solution model: controlled objects, roles, relationships, flows, boundaries, mechanisms, interfaces/contracts, lifecycle, failure model, evidence model, output-structure model when required, design decisions, and mappings to control contract and execution policy. Does not write control contracts, execution policies, control reviews, runtime /goal commands, or execute target work.'
+description: 'Use when requirements analysis exists but the solution model is not explicit enough for goal writing or execution policy, especially unclear objects, roles, boundaries, flows, interfaces, lifecycle, failure model, or evidence model.'
 ---
 
 # Designing Cybernetic Solutions

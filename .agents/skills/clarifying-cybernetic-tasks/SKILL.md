@@ -1,6 +1,6 @@
 ---
 name: clarifying-cybernetic-tasks
-description: 'Deprecated compatibility alias for analyzing-cybernetic-requirements. Use only for older prompts that invoke clarification terminology. Route to $analyzing-cybernetic-requirements and create requirements analysis briefs under docs/cybernetics/requirements/. Do not create solution designs, control contracts, execution policies, control reviews, runtime /goal commands, or target-work artifacts.'
+description: 'Use when older prompts invoke cybernetic clarification terminology; prefer analyzing-cybernetic-requirements for formed task requirements analysis.'
 ---
 
 # Clarifying Cybernetic Tasks

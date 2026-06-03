@@ -1,6 +1,6 @@
 ---
 name: reviewing-cybernetic-control-structures
-description: 'Use after requirements analysis, any required solution design, control contract, and execution policy files exist, before starting /goal execution. Reviews the whole AI control structure, not only the plan: traceability, design fidelity, output contract fidelity, goal fidelity, control law quality, context topology, evidence lifecycle/budget, sensor/evidence governance, batch cadence, phase gates, stop conditions, and semantic-vs-tactical boundaries. Produces a control review file under docs/cybernetics/control-reviews/ and must mark Approved before runtime /goal may start.'
+description: 'Use when requirements analysis, any required design, goal contract, and execution policy exist before runtime /goal, and the cybernetic control structure needs independent approval, blocker review, or risk review.'
 ---
 
 # Reviewing Cybernetic Control Structures

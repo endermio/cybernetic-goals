@@ -1,6 +1,6 @@
 ---
 name: recording-cybernetic-run-outcomes
-description: 'Use after a cybernetic skill invocation, artifact creation, blocked state, human feedback, or runtime outcome when the operator wants to record local process evidence. Produces metadata-only local run-event records using repository observability scripts. Does not upload, sync, modify skills, publish releases, update machines, or accept cloud improvement candidates.'
+description: 'Use when a cybernetic skill invocation, artifact creation, blocked state, human feedback, or runtime outcome should be recorded as local metadata-only process evidence. Not for upload, skill self-modification, release, rollout, or accepting cloud candidates.'
 ---
 
 # Recording Cybernetic Run Outcomes

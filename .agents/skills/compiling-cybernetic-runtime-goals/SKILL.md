@@ -1,6 +1,6 @@
 ---
 name: compiling-cybernetic-runtime-goals
-description: 'Use only after requirements analysis, any required solution design, control contract, execution policy, and approved control review exist. Produces the final executable Codex /goal command that references the approved files. Does not analyze requirements, design solutions, write execution policies, review control artifacts, or execute target work.'
+description: 'Use when requirements, any required design, goal contract, execution policy, and approved control review exist, and the final runtime /goal command must be checked or emitted before execution.'
 ---
 
 # Compiling Cybernetic Runtime Goals

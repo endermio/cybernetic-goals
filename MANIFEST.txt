@@ -33,8 +33,10 @@
 .agents/skills/orchestrating-cybernetic-pregoal/assets/pregoal-orchestration-status-template.md
 .agents/skills/orchestrating-cybernetic-pregoal/evals/evals.json
 .agents/skills/orchestrating-cybernetic-pregoal/references/orchestration-protocol.md
+.agents/skills/orchestrating-cybernetic-pregoal/references/output-and-final-checks.md
 .agents/skills/orchestrating-cybernetic-pregoal/references/subagent-review-roles.md
 .agents/skills/orchestrating-cybernetic-pregoal/scripts/check_pregoal_inputs.py
+.agents/skills/orchestrating-cybernetic-pregoal/scripts/orchestration_guard.py
 .agents/skills/recording-cybernetic-run-outcomes/SKILL.md
 .agents/skills/recording-cybernetic-run-outcomes/assets/run-outcome-template.md
 .agents/skills/recording-cybernetic-run-outcomes/evals/evals.json
@@ -48,6 +50,7 @@
 .agents/skills/routing-cybernetic-workflows/agents/openai.yaml
 .agents/skills/routing-cybernetic-workflows/evals/evals.json
 .agents/skills/routing-cybernetic-workflows/references/complexity-routing.md
+.agents/skills/routing-cybernetic-workflows/references/response-shapes.md
 .agents/skills/writing-cybernetic-execution-policies/SKILL.md
 .agents/skills/writing-cybernetic-execution-policies/agents/openai.yaml
 .agents/skills/writing-cybernetic-execution-policies/assets/execution-policy-template.md
@@ -83,4 +86,9 @@ tests/observability/__init__.py
 tests/observability/test_aggregate_run_events.py
 tests/observability/test_run_event_scripts.py
 tests/observability/test_validate_run_events.py
+tests/skills/__init__.py
+tests/skills/test_context_topology.py
+tests/skills/test_evidence_lifecycle_budget.py
 tests/skills/test_intent_framing.py
+tests/skills/test_invariant_consumer_matrix.py
+tests/skills/test_skill_repository_integrity.py

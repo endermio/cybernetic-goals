@@ -1,6 +1,6 @@
 ---
 name: framing-cybernetic-intent
-description: 'Use before cybernetic workflow routing when user input is pre-task intent rather than a formed task: confusion, dissatisfaction, intuition, risk sense, observed symptoms, failed attempts, method preference, or distrust of the current process. Collaboratively frames human intent into shared understanding before optional task formation. Does not analyze requirements, choose workflow fit, write control artifacts, or execute target work.'
+description: 'Use when cybernetic routing is requested but user input is pre-task intent or role-ambiguous context: confusion, dissatisfaction, risk sense, observed symptoms, failed attempts, method preference, process distrust, source material, declared current state, or unclear requested transformation.'
 ---
 
 # Framing Cybernetic Intent

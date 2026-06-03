@@ -1,6 +1,6 @@
 ---
 name: writing-cybernetic-execution-policies
-description: 'Use after an approved requirements analysis brief, any required solution design, and control contract exist, before starting an executable /goal. Creates a cybernetic execution policy for controlled execution: dependency matrix, execution topology, batch cadence, output material/evidence collection, evidence lifecycle/budget, sensor/evidence governance, semantic invariants, design invariants, tactical degrees of freedom, phase gates, and execution rhythm. Does not execute target work and does not start /goal execution.'
+description: 'Use when requirements, any required design, and a goal contract exist before executable /goal work, and the task needs a bounded execution policy, phase gates, evidence handling, topology, batch rhythm, or stop conditions.'
 ---
 
 # Writing Cybernetic Execution Policies

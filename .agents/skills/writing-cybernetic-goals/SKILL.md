@@ -1,6 +1,6 @@
 ---
 name: writing-cybernetic-goals
-description: 'Use after requirements analysis is complete and any required solution design exists, when a router-selected Level 2 bounded task needs a small file goal, or when a low-risk task needs an inline goal. Applies when human semantics, any required design, output contract, and any required evaluation rubric are confirmed before execution.'
+description: 'Use when requirements analysis and any required design exist, and a router-selected Level 2 bounded task or low-risk task needs a goal contract or inline /goal while preserving confirmed semantics before execution.'
 ---
 
 # Writing Cybernetic Goals
