@@ -14,6 +14,7 @@ This skill handles the pre-task layer:
 
 ```text
 human situation
+-> input role binding
 -> collaborative intent framing
 -> shared intent understanding
 -> optional task formation
@@ -29,6 +30,8 @@ This skill must not:
 - analyze full requirements semantics;
 - decide workflow fit;
 - treat a user-selected method, skill, workflow, or tool as the human purpose;
+- treat source material, reference context, or declared current state as the
+  primary task object without checking the user's requested transformation;
 - turn confusion, dissatisfaction, risk sense, failed experience, or process
   distrust directly into an execution task;
 - force every vague input into a task candidate;
@@ -39,8 +42,10 @@ This skill must not:
 This skill may:
 
 - reflect the user's situation without prematurely taskifying it;
-- separate purpose, method, symptom, constraint, risk, uncertainty, and failure
-  experience;
+- bind input roles before suggesting a next move;
+- separate purpose, method, source material, declared current state, requested
+  transformation, primary object, reference object, non-goal, risk,
+  uncertainty, and failure experience;
 - identify what uncertainty the user appears to want reduced;
 - state what should not be assumed yet;
 - ask one high-value question when intent is unstable;
@@ -59,20 +64,69 @@ Use this skill when the input is not yet a formed task. Common signals:
 - observed symptoms: "The agent keeps writing plans";
 - failure experience: "Last time this did not converge";
 - method preference: "Use the full cybernetic workflow";
-- process distrust: "I do not trust the current pipeline".
+- process distrust: "I do not trust the current pipeline";
+- completed findings: "I already finished the investigation; turn these
+  findings into a repair plan";
+- feasibility framing: "Use the current system as baseline, but investigate
+  future implementation boundaries".
 
 Do not use this skill for clearly formed low-risk tasks unless the user also
 expresses unclear intent, process distrust, or method-goal confusion.
 
+## Input Role Binding
+
+Before suggesting any next move, classify the user's input into roles:
+
+- Human purpose: what the user ultimately wants changed.
+- Method preference: what method, skill, workflow, or tool the user suggests.
+- Source material: material, lists, code, conclusions, logs, observations, or
+  prior findings provided as input.
+- Declared current state: what the user says is already complete or currently
+  true.
+- Requested transformation: what the user wants the source material changed
+  into, such as findings to repair framing or baseline plus target capability
+  to feasibility boundaries.
+- Primary object: the real object to analyze, design, repair, judge, or decide.
+- Reference object: evidence, baseline, constraint, context, or comparison
+  material that should not become the task object by default.
+- Non-goals: what should not be done.
+- Uncertainty to reduce: the current uncertainty that matters most.
+
+Do not turn source material into the task unless the user explicitly asks to
+act on it as the primary object.
+
+Do not turn a declared completed finding into a new investigation unless the
+user asks to verify it.
+
+Do not treat current implementation as the primary object of a feasibility inquiry unless the user asks for current-state audit.
+
+Do not treat method preference as purpose.
+
+Ask one concise role-binding question only when roles conflict or the primary
+object is ambiguous, for example:
+
+```text
+Do you want these findings verified, or turned into a repair/convergence task?
+```
+
+```text
+Does "capability boundary" mean current system state, or future technical
+implementation limit?
+```
+
 ## Process
 
 1. Reflect the human situation in neutral language.
-2. Separate purpose, method, symptom, constraint, risk, and uncertainty.
-3. Identify the uncertainty the user seems to want reduced.
-4. State what should not be assumed yet.
-5. Ask at most one high-value question when the intent is still unstable.
-6. Summarize shared intent understanding once it is clear enough.
-7. Offer possible next moves without treating any one move as mandatory.
+2. Bind input roles before treating any part of the input as the task object.
+3. Separate purpose, method, source material, declared state, requested
+   transformation, primary object, reference object, non-goals, risk, and
+   uncertainty.
+4. Identify the uncertainty the user seems to want reduced.
+5. State what should not be assumed yet.
+6. Ask at most one high-value role-binding or intent question when the intent
+   is still unstable.
+7. Summarize shared intent understanding once it is clear enough.
+8. Offer possible next moves without treating any one move as mandatory.
 
 Ask concise questions. Do not interview the user for routine execution details.
 The loop ends at shared understanding, not at artifact production.
@@ -84,6 +138,14 @@ Use this chat-only shape by default:
 ```text
 Shared Intent Understanding
 - Human situation:
+- Input role binding:
+  - Source material:
+  - Declared current state:
+  - Requested transformation:
+  - Primary object:
+  - Reference object:
+  - Method preference:
+  - Non-goals:
 - Apparent purpose:
 - Method vs purpose distinction:
 - Symptoms or failure experience:
@@ -150,6 +212,10 @@ review, or runtime goal content.
 ## Common Mistakes
 
 - Treating "use this workflow" as the user's goal.
+- Treating source material as the task object.
+- Treating declared completed findings as a new investigation request.
+- Treating current implementation as the primary object of a future feasibility
+  inquiry.
 - Responding to dissatisfaction by creating a repair goal.
 - Responding to failed experience by rerunning the same workflow.
 - Producing requirements before clarifying what the user wants changed.

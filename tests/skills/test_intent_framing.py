@@ -38,8 +38,14 @@ class IntentFramingSkillTest(unittest.TestCase):
         for term in (
             "pre-task",
             "collaborative intent framing",
+            "input role binding",
             "method",
             "purpose",
+            "source material",
+            "declared current state",
+            "requested transformation",
+            "primary object",
+            "reference object",
             "must not",
             "optional task",
         ):
@@ -53,6 +59,7 @@ class IntentFramingSkillTest(unittest.TestCase):
 
         for heading in (
             "## Human Situation",
+            "## Input Role Binding",
             "## Method vs Purpose",
             "## Risk or Uncertainty to Reduce",
             "## What Not To Assume Yet",
@@ -77,6 +84,34 @@ class IntentFramingSkillTest(unittest.TestCase):
         self.assertIn("shared-understanding-before-task-candidate", ids)
         self.assertIn("chat-only-default-no-artifact", ids)
         self.assertIn("persistent-intent-brief-only-when-justified", ids)
+        self.assertIn("completed-findings-become-repair-framing-not-audit", ids)
+        self.assertIn("feasibility-inquiry-distinguishes-baseline-from-target", ids)
+
+    def test_default_output_requires_input_role_binding(self):
+        skill = self.read(".agents/skills/framing-cybernetic-intent/SKILL.md")
+
+        self.assertIn("Input role binding:", skill)
+        for field in (
+            "- Source material:",
+            "- Declared current state:",
+            "- Requested transformation:",
+            "- Primary object:",
+            "- Reference object:",
+            "- Method preference:",
+            "- Non-goals:",
+        ):
+            self.assertIn(field, skill)
+
+    def test_role_binding_prevents_source_material_from_becoming_task(self):
+        skill = self.read(".agents/skills/framing-cybernetic-intent/SKILL.md")
+
+        for rule in (
+            "Do not turn source material into the task",
+            "Do not turn a declared completed finding into a new investigation",
+            "Do not treat current implementation as the primary object of a feasibility inquiry",
+            "Ask one concise role-binding question",
+        ):
+            self.assertIn(rule, skill)
 
     def test_router_evals_cover_pre_task_method_preference_handoff(self):
         evals = json.loads(

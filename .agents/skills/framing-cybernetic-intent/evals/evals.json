@@ -84,6 +84,30 @@
         "Does not include full requirements or execution policy content.",
         "Keeps any downstream handoff optional and response-oriented."
       ]
+    },
+    {
+      "id": "completed-findings-become-repair-framing-not-audit",
+      "prompt": "We already finished the same-root investigation. Here are eight residual problem classes and four convergence batches. Use framing-cybernetic-intent to analyze the next step.",
+      "expected_output": "The skill binds the eight problem classes and convergence batches as source material and declared completed findings, then frames the next step as transforming findings into repair/convergence scope rather than starting another audit.",
+      "assertions": [
+        "Identifies the problem list as source material, not the primary investigation object.",
+        "Records that the current state is completed investigation.",
+        "Frames the requested transformation as findings to repair or convergence task.",
+        "Does not recommend a new same-root audit unless the user asks to verify the findings.",
+        "Names non-goals such as re-auditing or proving the listed findings exist."
+      ]
+    },
+    {
+      "id": "feasibility-inquiry-distinguishes-baseline-from-target",
+      "prompt": "Use the current codebase as baseline, but investigate the feasibility and capability boundary of a future implementation.",
+      "expected_output": "The skill binds the current codebase as reference object or baseline, binds the future capability as the primary object, and avoids treating missing current implementation as evidence of technical impossibility.",
+      "assertions": [
+        "Identifies current codebase as reference object or baseline.",
+        "Identifies future capability or technical implementation boundary as the primary object.",
+        "States that current absence is not the same as technical infeasibility.",
+        "Frames the requested transformation as baseline plus target capability to feasibility/boundary report.",
+        "Does not recommend a current-state audit unless the user asks for one."
+      ]
     }
   ]
 }

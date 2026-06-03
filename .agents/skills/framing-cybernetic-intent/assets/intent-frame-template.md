@@ -6,6 +6,22 @@ Status: `Draft`
 
 ## Human Situation
 
+## Input Role Binding
+
+### Source Material
+
+### Declared Current State
+
+### Requested Transformation
+
+### Primary Object
+
+### Reference Object
+
+### Method Preference
+
+### Non-Goals
+
 ## Apparent Purpose
 
 ## Method vs Purpose
