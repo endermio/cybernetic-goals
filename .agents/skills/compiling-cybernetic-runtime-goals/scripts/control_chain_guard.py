@@ -438,6 +438,42 @@ def check_review_context_topology(review: str, errors: list[str]) -> None:
         errors.append("control review Context Management / Execution Topology section has no meaningful findings")
 
 
+def check_goal_purpose_feedback(goal: str, errors: list[str]) -> None:
+    body = section_body(goal, "Purpose Feedback Contract")
+    if body is None:
+        errors.append("goal missing ## Purpose Feedback Contract")
+        return
+
+    required_fields = [
+        "Beneficiary / observer",
+        "Purpose-realizing outcome observed",
+        "Supporting Evidence",
+        "Sufficient evidence level",
+        "Purpose feedback unavailable handling",
+        "Allowed completion wording",
+    ]
+    for field in required_fields:
+        if not labeled_or_table_field_has_content(body, field):
+            errors.append(f"goal Purpose Feedback Contract missing {field}")
+
+
+def check_review_purpose_feedback(review: str, errors: list[str]) -> None:
+    independence = section_body(review, "Review Independence")
+    if independence is None:
+        errors.append("control review missing ## Review Independence for Purpose Feedback Adequacy")
+    else:
+        reviewed = yes_no_value(independence, "Purpose feedback adequacy")
+        if reviewed != "yes":
+            errors.append("control review did not record Purpose feedback adequacy: yes in ## Review Independence")
+
+    body = section_body(review, "Purpose Feedback Adequacy")
+    if body is None:
+        errors.append("control review missing ## Purpose Feedback Adequacy")
+        return
+    if not labeled_block_has_content(body, "Findings"):
+        errors.append("control review Purpose Feedback Adequacy section has no meaningful findings")
+
+
 def suggest_next_action(errors: list[str]) -> str:
     joined = "\n".join(errors).casefold()
     lowered_errors = [error.casefold() for error in errors]
@@ -446,7 +482,13 @@ def suggest_next_action(errors: list[str]) -> str:
         return "ReturnToRequirementsAnalysis"
     if "design gate is required" in joined or "design status" in joined or "design does not reference" in joined:
         return "RunDesign"
-    if "output contract" in joined or "goal lacks" in joined or "goal contains runtime control-structure" in joined:
+    if (
+        "output contract" in joined
+        or "goal lacks" in joined
+        or "goal contains runtime control-structure" in joined
+        or "goal missing ## purpose feedback contract" in joined
+        or "goal purpose feedback contract missing" in joined
+    ):
         return "RunGoalWriting"
     if (
         "execution policy status" in joined
@@ -472,6 +514,9 @@ def suggest_next_action(errors: list[str]) -> str:
         or "review does not reference" in joined
         or "control review missing ## review independence" in joined
         or "control review missing ## context management / execution topology" in joined
+        or "control review missing ## purpose feedback adequacy" in joined
+        or "purpose feedback adequacy section has no meaningful findings" in joined
+        or "did not record purpose feedback adequacy" in joined
         or "context management / execution topology section has no meaningful findings" in joined
         or "did not record context management / execution topology" in joined
     ):
@@ -526,6 +571,9 @@ def main() -> int:
     if goal and output_contract_required(requirements, design or "", goal) and not section_has_meaningful_content(goal, "Final Output Contract"):
         errors.append("Output contract is required by gate or upstream artifact, but goal lacks meaningful ## Final Output Contract")
 
+    if goal:
+        check_goal_purpose_feedback(goal, errors)
+
     if plan:
         plan_status = section_status(plan, "Execution Policy Status")
         if plan_status != "Candidate":
@@ -538,6 +586,7 @@ def main() -> int:
             errors.append(f"control review status under ## Review Status is not Approved: {review_status!r}")
         check_final_observer(review, errors)
         check_review_context_topology(review, errors)
+        check_review_purpose_feedback(review, errors)
 
     for path, text, label in [
         (args.requirements, goal, "goal"),

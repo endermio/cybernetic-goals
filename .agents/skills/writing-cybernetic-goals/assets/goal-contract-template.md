@@ -161,8 +161,11 @@ If blocked, report:
 
 When complete, report:
 
-- goal achieved
-- verification evidence
+- purpose feedback status: achieved / partially observed / pending / unavailable / not required with justification
+- highest purpose-relevant evidence observed
+- supporting internal/integration evidence
+- not yet observed
+- smallest next observation needed
 - commands run
 - files changed
 - known residual risks

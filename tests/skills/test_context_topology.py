@@ -163,7 +163,27 @@ class ContextTopologySkillTest(unittest.TestCase):
             encoding="utf-8",
         )
         goal.write_text(
-            f"# Goal\n\n## Source Contracts\n\n- Requirements analysis: `{requirements}`\n",
+            "\n".join(
+                [
+                    "# Goal",
+                    "",
+                    "## Source Contracts",
+                    "",
+                    f"- Requirements analysis: `{requirements}`",
+                    "",
+                    "## Purpose Feedback Contract",
+                    "",
+                    "| Element | Requirement |",
+                    "|---|---|",
+                    "| Beneficiary / observer | test operator |",
+                    "| Purpose-realizing outcome observed | test operator can observe the approved outcome |",
+                    "| Supporting Evidence | guard tests support structural readiness |",
+                    "| Sufficient evidence level | internal |",
+                    "| Purpose feedback unavailable handling | report pending and smallest next observation |",
+                    "| Allowed completion wording | internal purpose feedback sufficient for this guard fixture |",
+                    "",
+                ]
+            ),
             encoding="utf-8",
         )
         plan.write_text(
@@ -207,11 +227,20 @@ class ContextTopologySkillTest(unittest.TestCase):
                     "- Goal contract: `yes`",
                     "- Execution policy: `yes`",
                     f"- Context management / execution topology: `{review_topology_independence}`",
+                    "- Purpose feedback adequacy: `yes`",
                     "",
                     "## Context Management / Execution Topology",
                     "",
                     "Findings:",
                     "- Reviewed selected topology, context pack requirements, delegation substrate, context compression, and integration gates; no Blocking/Major findings.",
+                    "",
+                    "## Purpose Feedback Adequacy",
+                    "",
+                    "Classification:",
+                    "- Purpose-boundary evidence not required, justified",
+                    "",
+                    "Findings:",
+                    "- This guard fixture exercises internal structural readiness; internal feedback is sufficient for the fixture purpose.",
                     "",
                 ]
             )

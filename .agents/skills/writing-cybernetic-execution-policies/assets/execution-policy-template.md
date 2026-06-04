@@ -347,6 +347,11 @@ Each entry must include:
 - commands run
 - result
 - sensor interpretation
+- purpose feedback status
+- highest purpose-relevant evidence observed
+- purpose feedback not yet observed
+- smallest next observation needed
+- allowed completion wording
 - deferred/final-only sensors and reason
 - active control summary
 - completed work packages

@@ -13,6 +13,143 @@ class PurposeFeedbackBoundaryTest(unittest.TestCase):
     def read(self, path: str) -> str:
         return (ROOT / path).read_text(encoding="utf-8")
 
+    def write_guard_artifacts(
+        self,
+        tmp: Path,
+        *,
+        include_goal_pfb: bool = True,
+        include_review_pfb: bool = True,
+        review_independence_pfb: str = "yes",
+    ) -> tuple[Path, Path, Path, Path]:
+        requirements = tmp / "requirements.md"
+        goal = tmp / "goal.md"
+        plan = tmp / "plan.md"
+        review = tmp / "review.md"
+
+        requirements.write_text(
+            "# Requirements\n\n## Requirements Analysis Status\n\nStatus: `Complete`\n",
+            encoding="utf-8",
+        )
+
+        goal_parts = [
+            "# Goal",
+            "",
+            "## Source Contracts",
+            "",
+            f"- Requirements analysis: `{requirements}`",
+            "",
+        ]
+        if include_goal_pfb:
+            goal_parts.extend(
+                [
+                    "## Purpose Feedback Contract",
+                    "",
+                    "| Element | Requirement |",
+                    "|---|---|",
+                    "| Beneficiary / observer | operator |",
+                    "| Purpose-realizing outcome observed | operator can observe the intended result |",
+                    "| Supporting Evidence | internal checks support progress only |",
+                    "| Sufficient evidence level | purpose-boundary |",
+                    "| Purpose feedback unavailable handling | report pending and next observation |",
+                    "| Allowed completion wording | pending until purpose feedback is observed |",
+                    "",
+                ]
+            )
+        goal.write_text("\n".join(goal_parts), encoding="utf-8")
+
+        plan.write_text(
+            "\n".join(
+                [
+                    "# Plan",
+                    "",
+                    "## Execution Policy Status",
+                    "",
+                    "Status: `Candidate`",
+                    "",
+                    "## Source Contracts",
+                    "",
+                    f"- Requirements analysis: `{requirements}`",
+                    f"- Goal contract: `{goal}`",
+                    "",
+                    "## Context Management / Execution Topology",
+                    "",
+                    "Task level: `Level 2`",
+                    "",
+                    "Selected topology: `Main-only`",
+                    "",
+                    "Selected delegation substrate: `none`",
+                    "",
+                    "Topology rationale:",
+                    "",
+                    "- Bounded work fits main-only execution.",
+                    "",
+                    "Main agent owns:",
+                    "",
+                    "- approved control artifacts",
+                    "- progress log",
+                    "- stop-condition detection",
+                    "",
+                ]
+            ),
+            encoding="utf-8",
+        )
+
+        review_parts = [
+            "# Review",
+            "",
+            "## Review Status",
+            "",
+            "Status: `Approved`",
+            "",
+            f"Reviewed `{requirements}`, `{goal}`, and `{plan}`.",
+            "",
+            "## Review Independence",
+            "",
+            "- Requirements analysis: `yes`",
+            "- Goal contract: `yes`",
+            "- Execution policy: `yes`",
+            "- Context management / execution topology: `yes`",
+            f"- Purpose feedback adequacy: `{review_independence_pfb}`",
+            "",
+            "## Context Management / Execution Topology",
+            "",
+            "Findings:",
+            "- Reviewed selected topology and no Blocking/Major findings.",
+            "",
+        ]
+        if include_review_pfb:
+            review_parts.extend(
+                [
+                    "## Purpose Feedback Adequacy",
+                    "",
+                    "Classification:",
+                    "",
+                    "- Internally verified, purpose feedback pending",
+                    "",
+                    "Findings:",
+                    "- Internal checks are progress evidence; purpose achievement claim waits for purpose-boundary feedback.",
+                    "",
+                ]
+            )
+        review_parts.extend(
+            [
+                "## Final Observer Check",
+                "",
+                "- Last independent review completed at: `test`",
+                "- Substantive artifact changes after last independent review: `no`",
+                "- If yes, final re-review performed: `no`",
+                "- Final reviewers confirming no Blocking/Major findings:",
+                "  - test reviewer",
+                "- Deterministic-only exception used: `no`",
+                "- Deterministic guard covering exception:",
+                "  - not used",
+                "- Approval allowed after final observer check: `yes`",
+                "",
+            ]
+        )
+        review.write_text("\n".join(review_parts), encoding="utf-8")
+        return requirements, goal, plan, review
+
     def test_requirements_define_purpose_feedback_boundary(self):
         skill = self.read(".agents/skills/analyzing-cybernetic-requirements/SKILL.md")
         template = self.read(
@@ -28,6 +165,10 @@ class PurposeFeedbackBoundaryTest(unittest.TestCase):
             self.assertIn("Internal sensors role", text)
             self.assertIn("Sufficient evidence level", text)
             self.assertIn("If feedback unavailable", text)
+        self.assertIn("purpose feedback boundary", skill.casefold())
+        self.assertIn("beneficiary/observer", skill)
+        self.assertIn("sufficient evidence level", skill)
+        self.assertIn("feedback-unavailable handling", skill)
 
     def test_goal_separates_purpose_achievement_from_supporting_sensors(self):
         skill = self.read(".agents/skills/writing-cybernetic-goals/SKILL.md")
@@ -41,6 +182,23 @@ class PurposeFeedbackBoundaryTest(unittest.TestCase):
                 "Do not define success as internal sensor success unless the human purpose is internal-state correctness.",
                 text,
             )
+
+    def test_goal_final_report_uses_purpose_feedback_status(self):
+        template = self.read(".agents/skills/writing-cybernetic-goals/assets/goal-contract-template.md")
+        final_report = template.split("## Final Report Format", 1)[1]
+
+        self.assertNotIn("- goal achieved", final_report)
+        for required in (
+            "purpose feedback status",
+            "highest purpose-relevant evidence observed",
+            "supporting internal/integration evidence",
+            "not yet observed",
+            "smallest next observation needed",
+            "commands run",
+            "files changed",
+            "known residual risks",
+        ):
+            self.assertIn(required, final_report)
 
     def test_execution_policy_defines_purpose_feedback_strategy(self):
         skill = self.read(".agents/skills/writing-cybernetic-execution-policies/SKILL.md")
@@ -57,6 +215,21 @@ class PurposeFeedbackBoundaryTest(unittest.TestCase):
             self.assertIn("Feedback cadence", text)
             self.assertIn("Evidence unavailable handling", text)
             self.assertIn("Allowed completion wording", text)
+
+    def test_execution_policy_progress_log_records_purpose_feedback_status(self):
+        template = self.read(
+            ".agents/skills/writing-cybernetic-execution-policies/assets/execution-policy-template.md"
+        )
+        progress_log = template.split("## Progress Log Rules", 1)[1]
+
+        for required in (
+            "purpose feedback status",
+            "highest purpose-relevant evidence observed",
+            "purpose feedback not yet observed",
+            "smallest next observation needed",
+            "allowed completion wording",
+        ):
+            self.assertIn(required, progress_log)
 
     def test_review_classifies_purpose_feedback_adequacy(self):
         skill = self.read(".agents/skills/reviewing-cybernetic-control-structures/SKILL.md")
@@ -130,6 +303,74 @@ class PurposeFeedbackBoundaryTest(unittest.TestCase):
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
         self.assertIn("highest purpose-relevant evidence actually observed", result.stdout)
         self.assertIn("smallest next observation needed", result.stdout)
+
+    def test_control_chain_guard_rejects_goal_missing_purpose_feedback_contract(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            requirements, goal, plan, review = self.write_guard_artifacts(
+                Path(tmpdir),
+                include_goal_pfb=False,
+            )
+
+            result = subprocess.run(
+                [
+                    sys.executable,
+                    str(
+                        ROOT
+                        / ".agents/skills/compiling-cybernetic-runtime-goals/scripts/control_chain_guard.py"
+                    ),
+                    "--requirements",
+                    str(requirements),
+                    "--goal",
+                    str(goal),
+                    "--plan",
+                    str(plan),
+                    "--review",
+                    str(review),
+                ],
+                cwd=ROOT,
+                text=True,
+                capture_output=True,
+            )
+
+        output = result.stdout + result.stderr
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("NEXT: RunGoalWriting", output)
+        self.assertIn("Purpose Feedback Contract", output)
+
+    def test_control_chain_guard_rejects_review_missing_purpose_feedback_adequacy(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            requirements, goal, plan, review = self.write_guard_artifacts(
+                Path(tmpdir),
+                include_review_pfb=False,
+                review_independence_pfb="no",
+            )
+
+            result = subprocess.run(
+                [
+                    sys.executable,
+                    str(
+                        ROOT
+                        / ".agents/skills/compiling-cybernetic-runtime-goals/scripts/control_chain_guard.py"
+                    ),
+                    "--requirements",
+                    str(requirements),
+                    "--goal",
+                    str(goal),
+                    "--plan",
+                    str(plan),
+                    "--review",
+                    str(review),
+                ],
+                cwd=ROOT,
+                text=True,
+                capture_output=True,
+            )
+
+        output = result.stdout + result.stderr
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("NEXT: RunReview", output)
+        self.assertIn("Purpose Feedback Adequacy", output)
+        self.assertIn("Purpose feedback adequacy: yes", output)
 
     def test_purpose_feedback_evals_cover_false_completion_and_overcontrol(self):
         review_evals = json.loads(
