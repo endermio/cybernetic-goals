@@ -79,7 +79,7 @@ The `Final Output Contract` must preserve:
 - destination path;
 - acceptance condition.
 
-If requirements or solution design define a structured output, copy the substance into the goal and forbid runtime substitution. If the output contract affects execution or acceptance and no safe default exists, stop and route back to requirements analysis or solution design instead of guessing.
+If requirements or solution design define a structured output, copy the substance into the goal and forbid runtime substitution. If the output contract affects execution or acceptance and no safe default exists, stop and route the missing decision back to requirements analysis or solution design.
 
 ## Purpose Feedback Contract
 
@@ -189,7 +189,7 @@ Map requirements analysis to:
 - Error function: rubric for interpreting sensor output when the task is evaluative
 - Output contract: final audience, purpose, medium, structure, detail level, evidence references, destination, and acceptance condition
 - Constraints: invariants and non-goals
-- Stop conditions: when Codex must stop instead of guessing
+- Stop conditions: when Codex must stop and report the missing decision
 
 ## Output Format
 

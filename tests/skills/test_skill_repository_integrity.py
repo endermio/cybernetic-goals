@@ -71,6 +71,32 @@ class SkillRepositoryIntegrityTest(unittest.TestCase):
                 for phrase in forbidden_process_summaries:
                     self.assertNotIn(phrase, description)
 
+    def test_skill_boundaries_are_positive_first(self):
+        defensive_openers = (
+            "This skill must not:",
+            "It must not:",
+        )
+        contrastive_heading = re.compile(r"^## .*Do Not", re.MULTILINE)
+
+        for skill_path in sorted((ROOT / ".agents/skills").glob("*/SKILL.md")):
+            with self.subTest(path=skill_path.relative_to(ROOT)):
+                text = skill_path.read_text(encoding="utf-8")
+                for opener in defensive_openers:
+                    self.assertNotIn(opener, text)
+                self.assertIsNone(contrastive_heading.search(text))
+
+    def test_skill_docs_limit_contrastive_idiom_density(self):
+        contrastive = re.compile(
+            r"\bnot\b.{0,140}\bbut\b|\brather than\b|\binstead of\b",
+            re.IGNORECASE,
+        )
+
+        for skill_path in sorted((ROOT / ".agents/skills").glob("*/SKILL.md")):
+            with self.subTest(path=skill_path.relative_to(ROOT)):
+                text = skill_path.read_text(encoding="utf-8")
+                matches = contrastive.findall(text)
+                self.assertLessEqual(len(matches), 2, matches)
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -51,7 +51,7 @@ For complex work:
 
 ```text
 human situation
-  -> when input is pre-task intent rather than a formed task
+  -> for pre-task intent before formed task routing
 
 $framing-cybernetic-intent
   -> shared intent understanding

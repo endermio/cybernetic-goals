@@ -24,20 +24,10 @@ This skill is a thin orchestrator. It does not replace the other cybernetic skil
 
 ## Core Boundary
 
-This skill must not:
+This skill owns pre-goal artifact orchestration. It coordinates existing
+cybernetic skills and preserves their ownership boundaries.
 
-- analyze requirements from scratch
-- invent required solution design inside the execution policy
-- synthesize solution design inside the orchestrator
-- synthesize or revise output contracts inside the orchestrator
-- execute target work
-- start `/goal` execution
-- make requirement decisions for the human
-- mark a control structure approved when semantic conflicts remain
-- spawn subagents unless the user explicitly authorized subagents in the current request
-- let `/goal` write or approve its own plan
-
-This skill may:
+Owned orchestration:
 
 - inspect a completed requirements analysis brief
 - call existing cybernetic skills in the correct order
@@ -48,6 +38,19 @@ This skill may:
 - use explicitly authorized subagents as independent reviewers
 - iterate review and revision up to the configured limit
 - compile the final `/goal` command after approval
+
+Routed elsewhere or held for approval:
+
+- new requirement analysis goes to `$analyzing-cybernetic-requirements`
+- required solution design goes to `$designing-cybernetic-solutions`
+- output contract identification belongs to requirements analysis; complex output-structure synthesis belongs to solution design; final output contract preservation belongs to goal writing
+- target work starts only after the final runtime `/goal` is launched separately
+- requirement decisions remain human decisions
+- pre-goal review subagents require explicit authorization in the current request
+- `/goal` execution uses an approved plan; runtime plan writing and approval stay outside `/goal`
+
+Approval requires resolved semantic conflicts and the configured independent
+review discipline.
 
 ## Required Infrastructure
 
@@ -249,7 +252,7 @@ docs/cybernetics/progress/YYYY-MM-DD-<slug>.md
 docs/cybernetics/orchestrations/YYYY-MM-DD-<slug>.md
 ```
 
-The design, goal, plan, control review, and progress log must use the same derived date/slug. This keeps queue-friendly `/goal` commands emitted by `$analyzing-cybernetic-requirements` stable. If the requested path is ambiguous or does not contain a deterministic date/slug, stop and ask for the smallest path decision instead of inventing a different slug.
+The design, goal, plan, control review, and progress log must use the same derived date/slug. This keeps queue-friendly `/goal` commands emitted by `$analyzing-cybernetic-requirements` stable. If the requested path is ambiguous or lacks a deterministic date/slug, stop and ask for the smallest path decision; keep the slug unresolved until the decision exists.
 
 Use `assets/pregoal-orchestration-status-template.md` for the orchestration status artifact.
 

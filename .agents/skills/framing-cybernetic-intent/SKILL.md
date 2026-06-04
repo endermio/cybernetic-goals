@@ -25,21 +25,10 @@ It is not a router, requirements analyzer, planner, reviewer, or executor.
 
 ## Core Boundary
 
-This skill must not:
+This skill owns input role binding and collaborative intent framing before
+workflow routing.
 
-- analyze full requirements semantics;
-- decide workflow fit;
-- treat a user-selected method, skill, workflow, or tool as the human purpose;
-- treat source material, reference context, or declared current state as the
-  primary task object without checking the user's requested transformation;
-- turn confusion, dissatisfaction, risk sense, failed experience, or process
-  distrust directly into an execution task;
-- force every vague input into a task candidate;
-- write requirements, solution designs, goal contracts, execution policies,
-  control reviews, progress logs, or runtime `/goal` commands;
-- create persistent artifacts for routine clarification.
-
-This skill may:
+Owned framing:
 
 - reflect the user's situation without prematurely taskifying it;
 - bind input roles before suggesting a next move;
@@ -52,6 +41,22 @@ This skill may:
 - summarize shared intent understanding;
 - optionally form a task candidate only after the shared intent is clear;
 - optionally write an intent brief when persistence is justified or requested.
+
+Routed elsewhere:
+
+- requirements semantics go to `$analyzing-cybernetic-requirements`;
+- workflow fit goes to `$routing-cybernetic-workflows`;
+- solution design, goal contracts, execution policies, control reviews,
+  progress logs, and runtime `/goal` commands belong to their downstream skills;
+- routine clarification stays in chat unless persistence is justified.
+
+Protect these bindings during framing:
+
+- user-selected methods, skills, workflows, and tools are method preferences;
+- source material, reference context, and declared current state need an explicit
+  requested transformation before becoming the primary task object;
+- confusion, dissatisfaction, risk sense, failed experience, and process distrust
+  are pre-task inputs until shared intent is clear.
 
 ## Trigger Signals
 

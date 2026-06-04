@@ -42,7 +42,7 @@ Pre-goal review subagents and runtime target-work subagents use different author
 
 Pre-goal review subagents require explicit authorization in the current orchestration request.
 
-If pre-goal review subagents are not authorized, pre-goal orchestration may produce candidate artifacts, but control review must be marked `Needs Independent Review` unless explicit human approval or another independent reviewer is already present.
+Without pre-goal review subagent authorization, pre-goal orchestration may produce candidate artifacts. Control review status remains `Needs Independent Review` until explicit human approval or another independent reviewer is present.
 
 Runtime target-work subagents are authorized only when the final `/goal` explicitly contains the approved subagent-driven execution topology and the user launches that `/goal`. Compiling or displaying the final `/goal` does not itself start runtime target-work subagents.
 

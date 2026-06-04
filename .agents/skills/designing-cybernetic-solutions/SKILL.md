@@ -27,17 +27,9 @@ Use `assets/solution-design-template.md`.
 
 ## Core Boundary
 
-This skill must not:
+This skill owns solution model synthesis after requirement semantics are formed.
 
-- analyze unresolved requirement semantics from scratch;
-- write a goal contract;
-- write an execution policy;
-- review the whole control structure;
-- compile or start a runtime `/goal`;
-- execute target work;
-- force adapter-specific terms onto the core solution model.
-
-This skill may:
+Owned design:
 
 - inspect the completed requirements analysis brief and relevant source artifacts;
 - ask a small number of high-value design questions when solution structure cannot be safely inferred;
@@ -45,6 +37,18 @@ This skill may:
 - design complex output/report/schema/artifact-bundle structures when Output Contract Gate requires structure synthesis;
 - record open design questions and stop before approval;
 - recommend a route-appropriate response-only handoff when the design is sufficient.
+
+Routed elsewhere:
+
+- unresolved requirement semantics return to `$analyzing-cybernetic-requirements`;
+- goal contracts go to `$writing-cybernetic-goals`;
+- execution policies go to `$writing-cybernetic-execution-policies`;
+- whole-chain review goes to `$reviewing-cybernetic-control-structures`;
+- runtime `/goal` compilation goes to `$compiling-cybernetic-runtime-goals`;
+- target work starts only after an approved runtime `/goal`.
+
+Keep the core solution model neutral. Adapter-specific terms appear only when
+they are part of the confirmed domain.
 
 ## Required Input
 

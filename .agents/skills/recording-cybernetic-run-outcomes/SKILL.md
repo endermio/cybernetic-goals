@@ -23,24 +23,29 @@ before event recording.
 
 ## Core Boundary
 
-This skill must not:
+This skill owns local metadata-only observability records for completed
+cybernetic outcomes.
 
-- upload or sync events;
-- create GitHub issues;
-- modify installed or repository skill files;
-- publish releases;
-- update machines;
-- accept, merge, or apply improvement candidates;
-- record raw prompts, content summaries/excerpts, artifact bodies, code/log excerpts, credentials, customer data, real paths, or real repository names by default;
-- turn observability into a required gate for ordinary cybernetic tasks.
-
-This skill may:
+Owned recording:
 
 - inspect the current run outcome and existing control artifacts;
 - classify the event type and optional failure-taxonomy codes;
 - write metadata-only local events through `scripts/record_run_event.py`;
 - validate local event files through `scripts/validate_run_events.py`;
 - recommend manual redaction/sync as a response-only follow-up when the operator explicitly asks for upload.
+
+Routed elsewhere or excluded:
+
+- upload and sync use the manual sync scripts after explicit redaction;
+- GitHub issue creation, releases, machine updates, and skill modification use
+  their normal repository workflows;
+- improvement candidates remain candidates until reviewed through the normal
+  review/eval/release process;
+- ordinary cybernetic tasks can proceed without an observability gate.
+
+Metadata-only mode excludes raw prompts, content summaries/excerpts, artifact
+bodies, code/log excerpts, credentials, customer data, real paths, and real
+repository names by default.
 
 ## Event Types
 

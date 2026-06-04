@@ -152,11 +152,11 @@ Classify purpose feedback as one of:
 
 Flag as Major or Blocking when:
 
-- evidence does not observe the human purpose or beneficiary/observer boundary but is used to claim purpose achieved;
+- evidence is used to claim purpose achieved without observing the human purpose or beneficiary/observer boundary;
 - internal checks, scripts, lint, API smoke, or other convenient sensors are treated as purpose-achievement evidence without justification;
 - purpose-boundary feedback is missing and the plan does not provide honest pending, partial, or unavailable status wording;
 - the plan demands heavy end-to-end or operational feedback when a smaller purpose-boundary observation would suffice;
-- the goal defines success as sensor success rather than purpose-realizing outcome observed, unless the purpose is internal-state correctness.
+- the goal defines success as sensor success; purpose-realizing outcome evidence is required unless the purpose is internal-state correctness.
 
 ### 8. Evidence Lifecycle / Evidence Budget
 
@@ -167,7 +167,7 @@ Flag as Major or Blocking when:
 - intermediate evidence lacks summary or delta;
 - tracked evidence is not reviewable;
 - no raw, pointer, summary/delta, and retained-full retention policy exists;
-- evidence files are used as context instead of indexed references;
+- evidence files are loaded as context; indexed references are the required form;
 - reviewers would need to read raw evidence to approve;
 - evidence artifacts are not separated into transient raw, raw pointer, reviewable summary/delta, and retained full classes;
 - repeated full snapshots of the same sensor are allowed without explaining why delta is impossible.
@@ -178,7 +178,7 @@ Use `Major` when execution-policy revision can repair evidence lifecycle. Use `B
 
 Flag as Major or Blocking when:
 
-- batches are mechanical micro-steps rather than coherent target-state slices;
+- batches are mechanical micro-steps; coherent target-state slices are the required form;
 - every step requires full observability;
 - sensor cost dominates execution cost;
 - broad verification is required after every small edit;
@@ -197,7 +197,7 @@ Flag as Major or Blocking when:
 - Level 3/4 work assigns all target work to the main agent without a context-load justification;
 - the plan creates context overload by making the main agent coordinator, worker, integrator, and verifier for context-heavy work;
 - delegated work packages lack Context pack, Allowed actions, Return format, or Integration gate;
-- context packs are only artifact path lists instead of bounded operating context with relevant control excerpts, current batch objective, allowed artifacts/surfaces, forbidden changes, required sensors/evidence, stop conditions, and expected return format;
+- context packs contain only artifact path lists; bounded operating context requires relevant control excerpts, current batch objective, allowed artifacts/surfaces, forbidden changes, required sensors/evidence, stop conditions, and expected return format;
 - parallel subagent-driven execution lacks explicit human approval, dependency independence, or control-review approval;
 - a subagent may modify control artifacts, widen scope, replace topology, or bypass integration gates;
 - progress-log ownership or stop-condition detection is unclear;
@@ -223,7 +223,7 @@ Semantic invariants must be frozen. Tactical execution details must remain adjus
 
 The runtime `/goal` must be able to execute the approved artifacts without inventing new control structures. Any required runtime discipline, including approved execution topology, bounded subagent delegation protocol, and conditionally selected Superpowers substrate, must be precompiled into the approved plan, review, or final `/goal`.
 
-Runtime completion claims must be calibrated to the highest purpose-relevant evidence actually observed. If purpose feedback is missing, runtime must report what is verified, what is not yet observed, and the smallest next observation needed instead of claiming the human purpose achieved.
+Runtime completion claims must be calibrated to the highest purpose-relevant evidence actually observed. If purpose feedback is missing, runtime must report what is verified, what is not yet observed, and the smallest next observation needed. Purpose-achieved wording is reserved for observed or approved purpose feedback.
 
 ### 14. Review Independence
 

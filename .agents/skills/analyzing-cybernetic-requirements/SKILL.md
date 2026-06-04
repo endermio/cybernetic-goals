@@ -26,24 +26,12 @@ Use `assets/requirements-analysis-template.md`.
 
 ## Core Boundary
 
-This skill analyzes requirements.
+This skill owns requirements analysis for formed tasks and task candidates.
+Use `$framing-cybernetic-intent` first when the setpoint is still pre-task
+intent: confusion, dissatisfaction, risk sense, failed experience, method
+preference, or process distrust.
 
-It assumes a formed task exists. It must not absorb the pre-task responsibility
-of collaboratively forming user intent from confusion, dissatisfaction, risk
-sense, failed experience, method preference, or process distrust. Use
-`$framing-cybernetic-intent` first when the setpoint is not yet clear.
-
-It must not:
-
-- design the solution structure;
-- define interfaces, object structures, mechanism architecture, flows, report structures, output schemas, or lifecycle models as a new solution model;
-- write a goal contract;
-- write an execution policy;
-- review the whole control structure;
-- compile or start a runtime `/goal`;
-- execute target work.
-
-This skill may:
+Owned analysis:
 
 - extract human purpose;
 - identify requirement objects, actors, terms, boundaries, and non-goals;
@@ -56,9 +44,18 @@ This skill may:
 - record obvious defaults without blocking progress;
 - recommend the appropriate handoff for Design Gate: direct `$designing-cybernetic-solutions` for bounded/manual chains, or `$orchestrating-cybernetic-pregoal` for Level 3/4 full pre-goal work.
 
+Routed elsewhere:
+
+- solution structure, interfaces, object structures, mechanism architecture, flows, report structures, output schemas, and lifecycle models go to `$designing-cybernetic-solutions`;
+- goal contracts go to `$writing-cybernetic-goals`;
+- execution policies go to `$writing-cybernetic-execution-policies`;
+- whole-chain review goes to `$reviewing-cybernetic-control-structures`;
+- runtime `/goal` compilation goes to `$compiling-cybernetic-runtime-goals`;
+- target work starts only after an approved runtime `/goal`.
+
 Requirement object lists are not solution designs. They name what the human is talking about; they do not prescribe mechanisms, interfaces, lifecycle, state flow, or execution batches.
 
-## Analyze Requirements, Do Not Downscope Them
+## Preserve Requested Scope
 
 Do not reduce, simplify, postpone, or replace the requested behavior merely because execution seems complex, risky, unstable, or hard.
 

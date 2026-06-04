@@ -338,7 +338,7 @@ $reviewing-cybernetic-control-structures
 $compiling-cybernetic-runtime-goals
 ```
 
-If Design Gate is not required or an existing design artifact is already valid, pass that state or artifact path into orchestration instead of redoing solution design.
+If Design Gate is not required or an existing design artifact is already valid, pass that state or artifact path into orchestration and skip redundant solution design.
 
 If orchestration is unavailable and Design Gate is not required, manually run:
 
