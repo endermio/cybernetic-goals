@@ -81,6 +81,22 @@ The `Final Output Contract` must preserve:
 
 If requirements or solution design define a structured output, copy the substance into the goal and forbid runtime substitution. If the output contract affects execution or acceptance and no safe default exists, stop and route back to requirements analysis or solution design instead of guessing.
 
+## Purpose Feedback Contract
+
+The goal's success condition must describe purpose achievement, not merely
+sensor success.
+
+Do not define success as internal sensor success unless the human purpose is internal-state correctness.
+
+The goal must preserve or define:
+
+- Purpose-realizing outcome observed: what must be observed for the human purpose to count as achieved;
+- Supporting Evidence: internal checks, scripts, lint, API smoke, reports, or other sensors that support progress but do not alone prove purpose achievement unless justified;
+- Purpose feedback status wording: how runtime should report achieved, partially observed, pending, unavailable, or not-required purpose feedback.
+
+When requirements analysis includes a `Purpose Feedback Boundary`, preserve it
+in the goal as the `Purpose Feedback Contract`.
+
 ## Goal Modes
 
 ### Mode A: Complex Control Contract
@@ -142,17 +158,18 @@ The goal file must include:
 1. Human Purpose
 2. Objective
 3. Success Condition
-4. Source of Truth
-5. Scope and Boundaries
-6. Invariants
-7. Verification Surface
-8. Checkpoint Loop
-9. Repair Policy
-10. Progress Log
-11. Stop Conditions
-12. Blocked Report Format
-13. Final Report Format
-14. Final Output Contract, when output shape affects execution, acceptance, handoff, persistence, or downstream consumption
+4. Purpose Feedback Contract
+5. Source of Truth
+6. Scope and Boundaries
+7. Invariants
+8. Verification Surface
+9. Checkpoint Loop
+10. Repair Policy
+11. Progress Log
+12. Stop Conditions
+13. Blocked Report Format
+14. Final Report Format
+15. Final Output Contract, when output shape affects execution, acceptance, handoff, persistence, or downstream consumption
 
 The goal must preserve confirmed semantics. It must not reinterpret or downscope them.
 
@@ -168,6 +185,7 @@ Map requirements analysis to:
 
 - Objective: observable target state
 - Sensors: approved sensors, checks, evidence channels, and reviews
+- Purpose feedback: purpose-realizing outcome, beneficiary/observer boundary, sufficient evidence level, and allowed completion wording
 - Error function: rubric for interpreting sensor output when the task is evaluative
 - Output contract: final audience, purpose, medium, structure, detail level, evidence references, destination, and acceptance condition
 - Constraints: invariants and non-goals
@@ -271,6 +289,8 @@ If the user explicitly requests a small inline `/goal` and the task is low-risk,
 - [ ] If Design Gate is required, the goal file references the solution design or blocks before creating the final goal.
 - [ ] The goal preserves design invariants without freezing tactical design details.
 - [ ] Success conditions and stop conditions are explicit.
+- [ ] The goal includes Purpose Feedback Contract when requirements define Purpose Feedback Boundary or purpose-achievement evidence is non-obvious.
+- [ ] Success Condition is Purpose-realizing outcome observed, not internal sensor success unless the human purpose is internal-state correctness.
 - [ ] Sensors are named but not treated as the objective.
 - [ ] Evaluation tasks define an explicit rubric before any executable goal is emitted.
 - [ ] Output-sensitive tasks include a `Final Output Contract`.

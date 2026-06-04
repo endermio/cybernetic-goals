@@ -51,6 +51,18 @@ Outside scope:
 | Disturbances | [ambiguities/risks/unobservables] |
 | Stop conditions | [where Codex must stop] |
 
+## Purpose Feedback Boundary
+
+| Element | Value |
+|---|---|
+| Human purpose | [what the human wants to change or understand] |
+| Beneficiary / observer | [who can observe whether the purpose is realized] |
+| Purpose-realizing outcome | [observable change when the purpose is realized] |
+| Feedback needed | [evidence that can judge purpose realization] |
+| Internal sensors role | [what internal checks can and cannot prove] |
+| Sufficient evidence level | `internal / integration / purpose-boundary / operational` |
+| If feedback unavailable | [honest status and smallest next observation] |
+
 ## Blocking Human Decisions
 
 | Decision | Why it matters | Recommended default | Risk if wrong |

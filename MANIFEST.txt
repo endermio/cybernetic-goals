@@ -91,4 +91,5 @@ tests/skills/test_context_topology.py
 tests/skills/test_evidence_lifecycle_budget.py
 tests/skills/test_intent_framing.py
 tests/skills/test_invariant_consumer_matrix.py
+tests/skills/test_purpose_feedback_boundary.py
 tests/skills/test_skill_repository_integrity.py

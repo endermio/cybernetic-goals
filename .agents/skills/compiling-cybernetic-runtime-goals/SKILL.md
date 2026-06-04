@@ -36,6 +36,9 @@ The final command must instruct runtime Codex to:
 - treat subagent outputs as candidate results until main-agent integration against approved artifacts, progress log, evidence requirements, and stop conditions;
 - use `$superpowers:systematic-debugging` for unclear or repeated failures;
 - use `$superpowers:verification-before-completion` before claiming completion;
+- Report completion status according to the highest purpose-relevant evidence actually observed.
+- Do not claim the human purpose is achieved from internal sensors alone unless the approved goal says internal evidence is sufficient.
+- If purpose feedback is missing, report what is verified, what is not yet observed, and the smallest next observation needed.
 - if runtime cannot load these skills, follow the equivalent discipline already written in the approved plan and control review.
 
 ## Preconditions
@@ -81,6 +84,9 @@ The final `/goal` must:
 - state that subagent outputs remain candidate results until main-agent integration;
 - use `$superpowers:systematic-debugging` for unclear or repeated failures;
 - use `$superpowers:verification-before-completion` before claiming completion;
+- Report completion status according to the highest purpose-relevant evidence actually observed.
+- Do not claim the human purpose is achieved from internal sensors alone unless the approved goal says internal evidence is sufficient.
+- If purpose feedback is missing, report what is verified, what is not yet observed, and the smallest next observation needed.
 - follow equivalent discipline already written in the approved plan and control review if runtime cannot load those skills;
 - stop if any referenced artifact is missing, not approved, or internally inconsistent;
 - stop if artifacts conflict or become insufficient.
@@ -158,5 +164,6 @@ Do not create or modify target-work artifacts.
 - [ ] The final `/goal` does not ask runtime Codex to write a new plan.
 - [ ] The final `/goal` does not ask runtime Codex to create or revise solution design.
 - [ ] The final `/goal` includes executing, debugging, and completion-verification discipline.
+- [ ] The final `/goal` calibrates completion claims to the highest purpose-relevant evidence actually observed.
 - [ ] If guard or preconditions fail, the response includes a response-only next step and no final `/goal`.
 - [ ] The skill did not execute target work.

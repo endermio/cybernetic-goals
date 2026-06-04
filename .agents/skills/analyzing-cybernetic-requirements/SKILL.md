@@ -49,6 +49,7 @@ This skill may:
 - identify requirement objects, actors, terms, boundaries, and non-goals;
 - classify success, failure, completion, closure, usability, readiness, or pass/fail semantics;
 - identify the final output audience, purpose, medium, required structure level, detail level, evidence-reference needs, machine-readable needs, destination path, and acceptance condition;
+- identify the Purpose Feedback Boundary: who can observe purpose realization, what outcome realizes the human purpose, what feedback can judge it, and what internal sensors can or cannot prove;
 - identify constraints, invariants, assumptions, and stop conditions;
 - decide whether Semantic, Rubric, Output Contract, Design, Goal Contract, Execution Policy, Control Review, or Risk gates are required;
 - ask high-value human questions;
@@ -148,6 +149,26 @@ Negative status means only placeholders/plans exist, or no usable entrypoint exi
 Unknown/unverifiable status means external credentials, production-only environment, third-party service, or current environment prevents observation.
 ```
 
+## Purpose Feedback Boundary
+
+When a task exists to realize a human purpose, evidence must be selected and
+interpreted by how well it observes purpose realization, not by how easy it is
+to execute.
+
+Requirements analysis must identify:
+
+- Human purpose: what the human wants to change or understand;
+- Beneficiary / observer: who can observe whether the purpose is realized;
+- Purpose-realizing outcome: the observable change when the purpose is realized;
+- Feedback needed: evidence that can judge purpose realization;
+- Internal sensors role: what internal checks can and cannot prove;
+- Sufficient evidence level: `internal`, `integration`, `purpose-boundary`, or `operational`;
+- If feedback unavailable: honest status and the smallest next observation.
+
+Internal sensors may support progress, diagnosis, and risk reduction, but they
+must not be treated as purpose-achievement evidence unless the human purpose
+itself is internal-state correctness.
+
 ## Design Gate Boundary
 
 This skill identifies whether Design Gate is required. It does not resolve it.
@@ -177,14 +198,15 @@ For Level 3/4 or full pre-goal work, pass Design Gate to `$orchestrating-cyberne
 3. Extract confirmed requirement semantics, terms, objects, boundaries, constraints, and non-goals.
 4. Build a requirements control map: objective, controlled object, candidate sensors, actuators, constraints, disturbances, stop conditions.
 5. If the task is evaluative, identify the rubric/error function and classify missing rubric elements as decisions.
-6. Identify output-contract needs and whether a safe default is sufficient.
-7. Identify required gates: Semantic, Rubric, Output Contract, Design, Goal Contract, Execution Policy, Control Review, Risk.
-8. Classify uncertainty as blocking human decision, safe default assumption, or deferred design/planning/execution detail.
-9. Ask 3-7 high-value questions, preferably no more than 5.
-10. Create or update the requirements analysis brief.
-11. If the human answers, update `Confirmed Requirement Decisions` and `Requirements Analysis Status`.
-12. Do not create a solution design, goal, plan, control review, runtime `/goal`, or target-work artifacts.
-13. If analysis is complete and the brief path deterministically identifies a date/slug, output queue-friendly next commands as described below.
+6. Identify the Purpose Feedback Boundary and whether internal sensors are sufficient or only supporting evidence.
+7. Identify output-contract needs and whether a safe default is sufficient.
+8. Identify required gates: Semantic, Rubric, Output Contract, Design, Goal Contract, Execution Policy, Control Review, Risk.
+9. Classify uncertainty as blocking human decision, safe default assumption, or deferred design/planning/execution detail.
+10. Ask 3-7 high-value questions, preferably no more than 5.
+11. Create or update the requirements analysis brief.
+12. If the human answers, update `Confirmed Requirement Decisions` and `Requirements Analysis Status`.
+13. Do not create a solution design, goal, plan, control review, runtime `/goal`, or target-work artifacts.
+14. If analysis is complete and the brief path deterministically identifies a date/slug, output queue-friendly next commands as described below.
 
 ## Queue-Friendly Next Commands
 

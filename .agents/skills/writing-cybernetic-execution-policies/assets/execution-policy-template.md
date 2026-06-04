@@ -27,6 +27,7 @@ Cybernetic constraints supplied to the substrate:
 - batch cadence;
 - destructive intermediate-state policy;
 - output material/evidence collection;
+- purpose feedback strategy;
 - evidence lifecycle / evidence budget;
 - sensor/evidence governance;
 - stale sensor retirement and rewrite policy.
@@ -207,6 +208,38 @@ Final output readiness:
 Blocking missing material:
 
 - [missing material that forces stop or revision]
+
+## Purpose Feedback Strategy
+
+### Internal feedback
+
+- [supports progress/diagnosis, not purpose achievement unless justified]
+
+### Integration feedback
+
+- [shows cross-component or cross-artifact behavior]
+
+### Purpose-boundary feedback
+
+- [smallest feedback that observes the purpose-realizing outcome]
+
+### Operational feedback, if relevant
+
+- [deployment/runtime/external observer evidence]
+
+### Feedback cadence
+
+- Per batch: [feedback used to keep execution oriented]
+- Integration gates: [feedback used at integration boundaries]
+- Final: [feedback required before claiming purpose achieved]
+- Deferred feedback and reason: [feedback not available now and why]
+
+### Evidence unavailable handling
+
+- Verified: [what has been verified]
+- Not yet observed: [purpose-relevant outcome not yet observed]
+- Smallest next observation: [next feedback needed]
+- Allowed completion wording: [achieved / partially observed / pending / unavailable / not required with justification]
 
 ## Evidence Lifecycle / Evidence Budget
 

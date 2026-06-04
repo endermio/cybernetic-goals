@@ -155,6 +155,29 @@
         "Does not mark Approved.",
         "Does not output a final runtime /goal."
       ]
+    },
+    {
+      "id": "purpose-visible-outcome-cannot-be-claimed-from-internal-sensors-only",
+      "prompt": "A goal exists to improve an observer-visible workflow. The plan verifies only internal checks and API smoke.",
+      "expected_output": "The review says internal checks are useful progress evidence but insufficient to claim the human purpose is achieved; it asks for the smallest purpose-boundary feedback or marks purpose feedback pending.",
+      "assertions": [
+        "Identifies the human purpose and beneficiary/observer boundary.",
+        "Distinguishes internal progress evidence from purpose-achievement evidence.",
+        "Does not require heavy end-to-end evidence by default.",
+        "Requires the smallest sufficient purpose-boundary or equivalent feedback before claiming purpose achieved.",
+        "Allows honest pending, partial, or unavailable purpose-feedback status instead of only blocking."
+      ]
+    },
+    {
+      "id": "internal-purpose-can-use-internal-feedback",
+      "prompt": "A goal exists to correct an internal deterministic transformation with no external observer-visible outcome. The plan uses focused internal checks.",
+      "expected_output": "The review accepts internal evidence as sufficient when the human purpose is internal-state correctness.",
+      "assertions": [
+        "Identifies the purpose as internal-state correctness.",
+        "Does not demand purpose-boundary workflow evidence.",
+        "Explains why internal feedback is sufficient for this purpose.",
+        "Allows completion claim if approved internal checks pass."
+      ]
     }
   ]
 }

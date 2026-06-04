@@ -12,8 +12,21 @@
 
 Codex may stop only when:
 
-- [condition]
-- [verification evidence]
+- Purpose-realizing outcome observed: [observable purpose achievement]
+- Supporting Evidence: [verification evidence that supports the outcome]
+
+Do not define success as internal sensor success unless the human purpose is internal-state correctness.
+
+## Purpose Feedback Contract
+
+| Element | Requirement |
+|---|---|
+| Beneficiary / observer | [who can observe whether purpose is realized] |
+| Purpose-realizing outcome observed | [what observable change counts as purpose achievement] |
+| Supporting Evidence | [internal/integration checks that support progress or diagnosis] |
+| Sufficient evidence level | `internal / integration / purpose-boundary / operational` |
+| Purpose feedback unavailable handling | [honest status and smallest next observation] |
+| Allowed completion wording | [achieved / partially observed / pending / unavailable / not required with justification] |
 
 ## Source of Truth
 
@@ -41,6 +54,10 @@ Do not regress:
 - [security/permission invariant]
 
 ## Verification Surface
+
+Supporting Evidence:
+
+- [internal checks, scripts, lint, API smoke, reports, or other sensors]
 
 Focused checks:
 

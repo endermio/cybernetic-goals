@@ -20,6 +20,7 @@ Status: `Needs Revision`
   - Output contract fidelity: `yes/no`
   - Goal fidelity: `yes/no`
   - Context management / execution topology: `yes/no`
+  - Purpose feedback adequacy: `yes/no`
   - Execution granularity / sensor load: `yes/no`
   - Sensor governance: `yes/no`
   - Execution cadence: `yes/no`
@@ -127,6 +128,24 @@ Findings:
 
 - [finding]
 
+## Purpose Feedback Adequacy
+
+Classification:
+
+- `Purpose feedback adequate / Internally verified, purpose feedback pending / Purpose partially observed / Purpose feedback unavailable, honest handoff required / Purpose-boundary evidence not required, justified`
+
+Check:
+
+- Block false completion claims, not necessarily continued execution.
+- Internal progress evidence is not treated as purpose-achievement evidence unless the human purpose is internal-state correctness.
+- Purpose-boundary feedback is the smallest sufficient feedback for the human purpose, not heavy end-to-end evidence by default.
+- Missing purpose feedback results in honest pending, partial, unavailable, or handoff wording instead of claiming purpose achieved.
+- Goal success is tied to purpose-realizing outcome observed or justified internal-state correctness.
+
+Findings:
+
+- [finding]
+
 ## Evidence Lifecycle / Evidence Budget
 
 Check:
@@ -192,6 +211,7 @@ The control structure may be approved only if:
 - execution topology is explicit and does not create main-agent context overload;
 - execution granularity and sensor load do not create micro-step overcontrol or sensor overcoupling;
 - evidence lifecycle keeps tracked evidence reviewable and prevents raw sensor output explosion;
+- purpose feedback adequacy supports the permitted completion wording and does not confuse internal progress evidence with purpose achievement;
 - sensor/evidence governance is explicit;
 - batch cadence is explicit;
 - runtime execution does not need to synthesize a new plan.

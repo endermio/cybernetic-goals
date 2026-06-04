@@ -46,6 +46,7 @@ This skill supplies the cybernetic constraints that the planning substrate must 
 - batch cadence;
 - destructive intermediate-state policy;
 - output material/evidence collection for the final output contract;
+- purpose feedback strategy for judging purpose realization without sensor convenience bias;
 - evidence lifecycle / evidence budget for sensor output retention;
 - sensor/evidence governance;
 - stale sensor retirement and rewrite policy.
@@ -68,14 +69,15 @@ The execution policy must include:
 8. Batch Cadence
 9. Destructive Intermediate-State Policy
 10. Output Material / Evidence Collection
-11. Evidence Lifecycle / Evidence Budget
-12. Sensor / Evidence Governance
-13. Stale Sensor Retirement and Rewrite Policy
-14. Phase Gates
-15. Execution Rhythm
-16. Stop Conditions
-17. Progress Log Rules
-18. Candidate Plan Tasks
+11. Purpose Feedback Strategy
+12. Evidence Lifecycle / Evidence Budget
+13. Sensor / Evidence Governance
+14. Stale Sensor Retirement and Rewrite Policy
+15. Phase Gates
+16. Execution Rhythm
+17. Stop Conditions
+18. Progress Log Rules
+19. Candidate Plan Tasks
 
 ## Context Management / Execution Topology
 
@@ -175,6 +177,25 @@ When the goal `Final Output Contract` or design `Output Contract Design` require
 
 Do not leave final output material discovery until the end of runtime execution.
 
+## Purpose Feedback Strategy
+
+The execution policy must explain how runtime will observe or honestly bound
+purpose realization.
+
+Define:
+
+- Internal feedback: supports progress and diagnosis, not purpose achievement unless justified;
+- Integration feedback: shows cross-component or cross-artifact behavior;
+- Purpose-boundary feedback: the smallest feedback that observes the purpose-realizing outcome;
+- Operational feedback: deployment/runtime/external observer evidence when relevant;
+- Feedback cadence: per-batch, integration-gate, final, and deferred feedback;
+- Evidence unavailable handling: verified, not yet observed, smallest next observation, and Allowed completion wording.
+
+Do not require heavy purpose-boundary feedback at every batch by default. Do
+not claim purpose achievement from internal feedback alone unless the approved
+goal says internal evidence is sufficient because the human purpose is
+internal-state correctness.
+
 ## Evidence Lifecycle / Evidence Budget
 
 The execution policy must prevent evidence artifacts from outgrowing the controlled work.
@@ -259,6 +280,7 @@ Control-law summary:
 - Batch cadence: ...
 - Execution topology: ...
 - Sensor budget: ...
+- Purpose feedback: ...
 - Evidence lifecycle: ...
 - Sensor governance: ...
 - Phase gates: ...
@@ -314,6 +336,9 @@ Response-only next step:
 - [ ] Each batch ends in an openable/verifiable state.
 - [ ] Broad verification is assigned to integration/final gates unless justified per batch.
 - [ ] The plan defines output material/evidence collection when the final output contract requires structured output.
+- [ ] The plan includes Purpose Feedback Strategy.
+- [ ] Purpose-boundary feedback is the smallest sufficient feedback for the human purpose, not heavy end-to-end evidence by default.
+- [ ] Internal feedback is not treated as purpose achievement unless the human purpose is internal-state correctness.
 - [ ] The plan includes Evidence Lifecycle / Evidence Budget.
 - [ ] Repeated full raw evidence snapshots are forbidden unless explicitly justified.
 - [ ] Intermediate sensor output defaults to summary + delta with raw pointer when raw exists.

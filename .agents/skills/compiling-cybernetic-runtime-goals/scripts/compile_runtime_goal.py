@@ -180,6 +180,11 @@ def main() -> int:
 
     output_contract_clause = final_output_contract_clause(args.goal)
     topology_clause = execution_topology_clause(args.plan)
+    purpose_feedback_clause = (
+        "Report completion status according to the highest purpose-relevant evidence actually observed. "
+        "Do not claim the human purpose is achieved from internal sensors alone unless the approved goal says internal evidence is sufficient. "
+        "If purpose feedback is missing, report what is verified, what is not yet observed, and the smallest next observation needed. "
+    )
 
     command = (
         f"/goal Execute the approved execution policy in {args.plan} "
@@ -190,6 +195,7 @@ def main() -> int:
         "Use `$superpowers:executing-plans` discipline against the approved plan. "
         "Use `$superpowers:systematic-debugging` for unclear or repeated failures. "
         "Use `$superpowers:verification-before-completion` before claiming completion. "
+        f"{purpose_feedback_clause}"
         "If runtime cannot load these skills, follow the equivalent discipline already written in the approved plan and control review. "
         f"{topology_clause}"
         "Follow the approved batch rhythm. "

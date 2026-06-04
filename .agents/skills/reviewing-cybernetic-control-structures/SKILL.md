@@ -63,6 +63,7 @@ Substantive changes include changes to:
 - execution policy or batch cadence;
 - context management / execution topology;
 - sensor or evidence structure;
+- purpose feedback boundary, purpose feedback strategy, or completion-claim wording;
 - evidence lifecycle, retention, budget, or tracked-evidence policy;
 - progress log required fields;
 - stop conditions;
@@ -137,7 +138,27 @@ Flag plans that:
 - lack stale sensor retirement rules;
 - lack target-state evidence.
 
-### 7. Evidence Lifecycle / Evidence Budget
+### 7. Purpose Feedback Adequacy
+
+Block false completion claims, not necessarily continued execution.
+
+Classify purpose feedback as one of:
+
+- Purpose feedback adequate
+- Internally verified, purpose feedback pending
+- Purpose partially observed
+- Purpose feedback unavailable, honest handoff required
+- Purpose-boundary evidence not required, justified
+
+Flag as Major or Blocking when:
+
+- evidence does not observe the human purpose or beneficiary/observer boundary but is used to claim purpose achieved;
+- internal checks, scripts, lint, API smoke, or other convenient sensors are treated as purpose-achievement evidence without justification;
+- purpose-boundary feedback is missing and the plan does not provide honest pending, partial, or unavailable status wording;
+- the plan demands heavy end-to-end or operational feedback when a smaller purpose-boundary observation would suffice;
+- the goal defines success as sensor success rather than purpose-realizing outcome observed, unless the purpose is internal-state correctness.
+
+### 8. Evidence Lifecycle / Evidence Budget
 
 Flag as Major or Blocking when:
 
@@ -153,7 +174,7 @@ Flag as Major or Blocking when:
 
 Use `Major` when execution-policy revision can repair evidence lifecycle. Use `Blocking` when sensor output would likely swamp review, context management, or runtime completion.
 
-### 8. Execution Granularity / Sensor Load
+### 9. Execution Granularity / Sensor Load
 
 Flag as Major or Blocking when:
 
@@ -168,7 +189,7 @@ Flag as Major or Blocking when:
 
 Use `Major` when execution-policy revision can repair the control law. Use `Blocking` when the granularity or sensor load would prevent runtime completion or let sensors override confirmed semantics.
 
-### 9. Context Management / Execution Topology
+### 10. Context Management / Execution Topology
 
 Flag as Major or Blocking when:
 
@@ -185,7 +206,7 @@ Flag as Major or Blocking when:
 
 Use `Major` when execution-policy revision can repair topology. Use `Blocking` when context overload would likely make runtime lose requirements, design invariants, output contract, stop conditions, or approval boundaries.
 
-### 10. Batch Rhythm
+### 11. Batch Rhythm
 
 Flag:
 
@@ -194,15 +215,17 @@ Flag:
 - no batch-end openability requirement;
 - no destructive intermediate-state policy.
 
-### 11. Semantic vs Tactical Boundary
+### 12. Semantic vs Tactical Boundary
 
 Semantic invariants must be frozen. Tactical execution details must remain adjustable.
 
-### 12. Runtime Suitability
+### 13. Runtime Suitability
 
 The runtime `/goal` must be able to execute the approved artifacts without inventing new control structures. Any required runtime discipline, including approved execution topology, bounded subagent delegation protocol, and conditionally selected Superpowers substrate, must be precompiled into the approved plan, review, or final `/goal`.
 
-### 13. Review Independence
+Runtime completion claims must be calibrated to the highest purpose-relevant evidence actually observed. If purpose feedback is missing, runtime must report what is verified, what is not yet observed, and the smallest next observation needed instead of claiming the human purpose achieved.
+
+### 14. Review Independence
 
 The review must record:
 
@@ -211,7 +234,7 @@ The review must record:
 - whether approval is allowed;
 - why approval is blocked when independent review is missing.
 
-### 14. Final Observer Check
+### 15. Final Observer Check
 
 The review must record whether any substantive artifact changed after the latest independent review pass and whether a final independent observer confirmed no Blocking or Major findings after that change.
 
@@ -248,6 +271,7 @@ Only mark `Approved` when:
 - execution policy does not self-authorize uncontrolled changes;
 - execution topology is explicit and does not create main-agent context overload;
 - execution granularity and sensor load do not create micro-step overcontrol or sensor overcoupling;
+- purpose feedback adequacy supports the permitted completion wording and does not confuse internal progress evidence with purpose achievement;
 - evidence lifecycle keeps tracked evidence reviewable and prevents raw sensor output explosion;
 - sensor/evidence governance is explicit;
 - runtime `/goal` can execute without writing or approving a new plan.
@@ -301,6 +325,7 @@ Response-only next step:
 - [ ] Critical findings distinguish semantic, design, goal, plan, sensor, and runtime issues.
 - [ ] Output contract fidelity was checked when any upstream output contract exists.
 - [ ] Evidence lifecycle and evidence budget were checked.
+- [ ] Purpose feedback adequacy was checked.
 - [ ] Execution granularity and sensor load were checked.
 - [ ] Required revisions are actionable.
 - [ ] Response-only handoff matches the review status and does not bypass `$orchestrating-cybernetic-pregoal` when full pre-goal orchestration owns the chain.
