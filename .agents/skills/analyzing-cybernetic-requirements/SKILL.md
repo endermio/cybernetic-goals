@@ -276,6 +276,15 @@ For Level 3/4 or full pre-goal work, when `Human Setpoint Approval: Approved` is
 1. A pre-goal orchestration command using the concrete requirements path.
 2. A predicted queue-friendly `/goal` command using the expected artifact paths for the same date/slug.
 
+When available, generate both with:
+
+```bash
+python3 .agents/skills/analyzing-cybernetic-requirements/scripts/predict_pregoal_handoff.py \
+  --requirements docs/cybernetics/requirements/YYYY-MM-DD-<slug>.md
+```
+
+Use the script output instead of hand-writing the predicted `/goal`. The script checks `Requirements Analysis Status: Complete`, `Human Setpoint Approval: Approved`, deterministic path shape, Design Gate, and same-slug artifact paths.
+
 If `Design Gate: required`, state that `$orchestrating-cybernetic-pregoal` must invoke or request `$designing-cybernetic-solutions` before goal writing. Do not output `$designing-cybernetic-solutions` as a standalone command before orchestration for Level 3/4 or full pre-goal work.
 
 The predicted `/goal` is not the final approved runtime command. Label it as predicted or queue-friendly, and make it depend on artifacts that the pre-goal orchestrator must create and approve.
@@ -443,6 +452,13 @@ Requirements analysis is complete.
 Updated requirements analysis brief:
 `docs/cybernetics/requirements/YYYY-MM-DD-slug.md`
 
+Generated queue-friendly handoff:
+
+```bash
+python3 .agents/skills/analyzing-cybernetic-requirements/scripts/predict_pregoal_handoff.py \
+  --requirements docs/cybernetics/requirements/YYYY-MM-DD-slug.md
+```
+
 Response-only queue suggestions:
 
 ```text
@@ -497,5 +513,6 @@ $writing-cybernetic-goals 使用 docs/cybernetics/requirements/YYYY-MM-DD-slug.m
 - [ ] If Human Setpoint Approval is not `Approved`, the response asks for approval or revision and does not output the orchestration command or predicted `/goal`.
 - [ ] No solution design, goal, plan, control review, or approved runtime `/goal` was created.
 - [ ] Level 1/2 work with `Rubric Gate: required` routes to `$writing-cybernetic-goals`, not full pre-goal orchestration by default.
+- [ ] When the predictor script is available, Level 3/4 queue-friendly commands are generated with `.agents/skills/analyzing-cybernetic-requirements/scripts/predict_pregoal_handoff.py`.
 - [ ] Any predicted queue-friendly `/goal` is clearly labeled as predicted and includes the missing/not-approved/inconsistent artifact precondition.
 - [ ] For Level 3/4 or full pre-goal work, `Design Gate: required` is passed to `$orchestrating-cybernetic-pregoal`; requirements analysis does not output standalone `$designing-cybernetic-solutions` before orchestration.

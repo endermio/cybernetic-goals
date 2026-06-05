@@ -3,6 +3,7 @@
 .agents/skills/analyzing-cybernetic-requirements/assets/requirements-analysis-template.md
 .agents/skills/analyzing-cybernetic-requirements/evals/evals.json
 .agents/skills/analyzing-cybernetic-requirements/references/decision-levels.md
+.agents/skills/analyzing-cybernetic-requirements/scripts/predict_pregoal_handoff.py
 .agents/skills/clarifying-cybernetic-tasks/SKILL.md
 .agents/skills/clarifying-cybernetic-tasks/agents/openai.yaml
 .agents/skills/clarifying-cybernetic-tasks/assets/clarification-brief-template.md
@@ -93,5 +94,6 @@ tests/skills/test_human_setpoint_approval.py
 tests/skills/test_intent_framing.py
 tests/skills/test_invariant_consumer_matrix.py
 tests/skills/test_purpose_feedback_boundary.py
+tests/skills/test_pregoal_handoff_predictor.py
 tests/skills/test_realization_surface_closure.py
 tests/skills/test_skill_repository_integrity.py
