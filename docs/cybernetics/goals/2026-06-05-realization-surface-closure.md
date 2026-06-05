@@ -69,6 +69,18 @@ The target implementation is successful only after approved runtime work later d
 
 ## Realization Surface Contract
 
+| Element | Requirement |
+|---|---|
+| Target state | `INV-RSC-001` is represented across the core control chain so target-state realization cannot be claimed from local action alone when realization surfaces are distributed. |
+| Required surfaces | Requirements analysis, goal contracts, execution policies, control reviews, runtime compiler, invariant matrix, tests/evals, and domain-adapter boundary wording. |
+| Surface actions | Act on core control artifacts, inspect adapter responsibility wording, preserve PFB separation, and exclude domain-specific software checklist implementation from core. |
+| Residual reconciliation | Account for old local-action-overclaim wording, missing invariant consumers, unknown docs/evals that carry invariant semantics, intentionally preserved PFB rules, and excluded adapter-specific mechanics. |
+| RSC status wording | Strongest positive target-realization claim requires RSC adequate. |
+| Partial/unavailable handling | Report partial, missing, unavailable, or not applicable with justification; include pending or unknown surfaces and smallest next reconciliation. |
+| RSC / PFB boundary | RSC calibrates target-state and surface-closure claims; Purpose Feedback Boundary calibrates human-purpose realization claims. |
+
+### Surface Model
+
 | Surface | Role in target realization | Required action | Verification / reconciliation |
 |---|---|---|---|
 | Requirements analysis | Defines RSC semantics, rubric, and high-value questions | act | Confirm RSC appears as a requirement-analysis responsibility and does not absorb PFB. |

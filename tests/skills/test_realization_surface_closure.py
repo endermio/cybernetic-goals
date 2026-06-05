@@ -18,6 +18,8 @@ class RealizationSurfaceClosureTest(unittest.TestCase):
         tmp: Path,
         *,
         include_goal_rsc: bool = True,
+        complete_goal_rsc_fields: bool = True,
+        include_plan_rsc: bool = True,
         include_review_rsc: bool = True,
         review_independence_rsc: str = "yes",
     ) -> tuple[Path, Path, Path, Path]:
@@ -51,57 +53,84 @@ class RealizationSurfaceClosureTest(unittest.TestCase):
             "",
         ]
         if include_goal_rsc:
-            goal_parts.extend(
+            rsc_rows = [
+                "| Target state | target semantics are represented across realization surfaces |",
+                "| Required surfaces | surface model, action classification, residual reconciliation |",
+            ]
+            if complete_goal_rsc_fields:
+                rsc_rows.extend(
+                    [
+                        "| Surface actions | act / inspect / preserve / exclude / discover |",
+                        "| Residual reconciliation | account for old state, unknown surfaces, exclusions, preserved surfaces, and remaining mismatches |",
+                        "| RSC status wording | strongest target-realization claim requires RSC adequate |",
+                        "| Partial/unavailable handling | report partial, missing, unavailable, or not applicable with justification |",
+                        "| RSC / PFB boundary | RSC calibrates target-state and surface-closure claims while PFB calibrates human-purpose realization claims |",
+                    ]
+                )
+            goal_parts.extend(["## Realization Surface Contract", "", "| Element | Requirement |", "|---|---|", *rsc_rows, ""])
+        goal.write_text("\n".join(goal_parts), encoding="utf-8")
+
+        plan_parts = [
+            "# Plan",
+            "",
+            "## Execution Policy Status",
+            "",
+            "Status: `Candidate`",
+            "",
+            "## Source Contracts",
+            "",
+            f"- Requirements analysis: `{requirements}`",
+            f"- Goal contract: `{goal}`",
+            "",
+        ]
+        if include_plan_rsc:
+            plan_parts.extend(
                 [
-                    "## Realization Surface Contract",
+                    "## Realization Surface Closure Strategy",
                     "",
-                    "| Element | Requirement |",
-                    "|---|---|",
-                    "| Target state | target semantics are represented across realization surfaces |",
-                    "| Required surfaces | surface model, action classification, residual reconciliation |",
-                    "| RSC status wording | strongest target-realization claim requires RSC adequate |",
-                    "| Partial/unavailable handling | report partial, missing, unavailable, or not applicable with justification |",
+                    "### Surface Model",
+                    "",
+                    "| Surface | Role in target realization | Required action | Verification / reconciliation |",
+                    "|---|---|---|---|",
+                    "| controlled surfaces | carry target semantics | act / inspect | reconcile residual old state |",
+                    "",
+                    "### Surface Classes",
+                    "",
+                    "- Must act: controlled surfaces that must change.",
+                    "- Must inspect: supporting surfaces that may retain old state.",
+                    "- Must preserve: surfaces intentionally unchanged.",
+                    "- Explicitly out of scope: excluded surfaces with reason.",
+                    "- Unknown or requires discovery: surfaces needing runtime discovery.",
+                    "",
+                    "### Residual Reconciliation",
+                    "",
+                    "- Reconcile old state, unknown surfaces, exclusions, preserved surfaces, and remaining mismatches.",
                     "",
                 ]
             )
-        goal.write_text("\n".join(goal_parts), encoding="utf-8")
-
-        plan.write_text(
-            "\n".join(
-                [
-                    "# Plan",
-                    "",
-                    "## Execution Policy Status",
-                    "",
-                    "Status: `Candidate`",
-                    "",
-                    "## Source Contracts",
-                    "",
-                    f"- Requirements analysis: `{requirements}`",
-                    f"- Goal contract: `{goal}`",
-                    "",
-                    "## Context Management / Execution Topology",
-                    "",
-                    "Task level: `Level 2`",
-                    "",
-                    "Selected topology: `Main-only`",
-                    "",
-                    "Selected delegation substrate: `none`",
-                    "",
-                    "Topology rationale:",
-                    "",
-                    "- Bounded work fits main-only execution.",
-                    "",
-                    "Main agent owns:",
-                    "",
-                    "- approved control artifacts",
-                    "- progress log",
-                    "- stop-condition detection",
-                    "",
-                ]
-            ),
-            encoding="utf-8",
+        plan_parts.extend(
+            [
+                "## Context Management / Execution Topology",
+                "",
+                "Task level: `Level 2`",
+                "",
+                "Selected topology: `Main-only`",
+                "",
+                "Selected delegation substrate: `none`",
+                "",
+                "Topology rationale:",
+                "",
+                "- Bounded work fits main-only execution.",
+                "",
+                "Main agent owns:",
+                "",
+                "- approved control artifacts",
+                "- progress log",
+                "- stop-condition detection",
+                "",
+            ]
         )
+        plan.write_text("\n".join(plan_parts), encoding="utf-8")
 
         review_parts = [
             "# Review",
@@ -182,10 +211,21 @@ class RealizationSurfaceClosureTest(unittest.TestCase):
             self.assertIn("RSC status", text)
             self.assertIn("RSC is distinct from Purpose Feedback Boundary", text)
 
+        high_value_questions = skill.split("## Ask Only High-Value Human Questions", 1)[1].split(
+            "## Output Contract Gate", 1
+        )[0]
+        self.assertIn("realization surface closure", high_value_questions)
+        self.assertIn("target state surface model", high_value_questions)
+        self.assertIn("required surface action", high_value_questions)
+        self.assertIn("residual reconciliation", high_value_questions)
+        self.assertIn("preserved/excluded surfaces", high_value_questions)
+
     def test_goal_preserves_rsc_contract_and_completion_wording(self):
         skill = self.read(".agents/skills/writing-cybernetic-goals/SKILL.md")
         template = self.read(".agents/skills/writing-cybernetic-goals/assets/goal-contract-template.md")
 
+        self.assertIn("always for compiled runtime goals", skill)
+        self.assertIn("RSC not applicable with justification", skill)
         for text in (skill, template):
             self.assertIn("Realization Surface Contract", text)
             self.assertIn("Target state", text)
@@ -327,6 +367,74 @@ class RealizationSurfaceClosureTest(unittest.TestCase):
         self.assertNotEqual(result.returncode, 0)
         self.assertIn("NEXT: RunGoalWriting", output)
         self.assertIn("Realization Surface Contract", output)
+
+    def test_control_chain_guard_rejects_goal_rsc_contract_missing_required_fields(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            requirements, goal, plan, review = self.write_guard_artifacts(
+                Path(tmpdir),
+                complete_goal_rsc_fields=False,
+            )
+
+            result = subprocess.run(
+                [
+                    sys.executable,
+                    str(
+                        ROOT
+                        / ".agents/skills/compiling-cybernetic-runtime-goals/scripts/control_chain_guard.py"
+                    ),
+                    "--requirements",
+                    str(requirements),
+                    "--goal",
+                    str(goal),
+                    "--plan",
+                    str(plan),
+                    "--review",
+                    str(review),
+                ],
+                cwd=ROOT,
+                text=True,
+                capture_output=True,
+            )
+
+        output = result.stdout + result.stderr
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("NEXT: RunGoalWriting", output)
+        self.assertIn("goal Realization Surface Contract missing Surface actions", output)
+        self.assertIn("goal Realization Surface Contract missing Residual reconciliation", output)
+        self.assertIn("goal Realization Surface Contract missing RSC / PFB boundary", output)
+
+    def test_control_chain_guard_rejects_plan_missing_rsc_strategy(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            requirements, goal, plan, review = self.write_guard_artifacts(
+                Path(tmpdir),
+                include_plan_rsc=False,
+            )
+
+            result = subprocess.run(
+                [
+                    sys.executable,
+                    str(
+                        ROOT
+                        / ".agents/skills/compiling-cybernetic-runtime-goals/scripts/control_chain_guard.py"
+                    ),
+                    "--requirements",
+                    str(requirements),
+                    "--goal",
+                    str(goal),
+                    "--plan",
+                    str(plan),
+                    "--review",
+                    str(review),
+                ],
+                cwd=ROOT,
+                text=True,
+                capture_output=True,
+            )
+
+        output = result.stdout + result.stderr
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("NEXT: RunExecutionPolicy", output)
+        self.assertIn("Realization Surface Closure Strategy", output)
 
     def test_control_chain_guard_rejects_review_missing_rsc_adequacy(self):
         with tempfile.TemporaryDirectory() as tmpdir:

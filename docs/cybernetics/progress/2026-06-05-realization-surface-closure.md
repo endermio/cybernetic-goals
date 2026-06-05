@@ -40,3 +40,17 @@
   - `git diff --check`: clean;
   - residual scan confirmed RSC status wording uses `adequate / partial / missing / unavailable / not applicable with justification`; remaining `pending` mentions are PFB status or pending/unknown surface reporting fields;
 - next gate: operator packaging decision.
+
+## 2026-06-05 Post-Review Guard Strengthening
+
+- batch/status: follow-up review items implemented;
+- surfaces acted on or inspected: runtime control-chain guard, RSC regression tests, requirements skill high-value question rule, goal skill compiled-runtime RSC wording, PFB/topology guard fixtures, and current RSC goal artifact;
+- residuals and reconciliation: guard now rejects missing plan `Realization Surface Closure Strategy` and incomplete goal `Realization Surface Contract` fields; existing PFB/topology tests were reconciled with compact RSC fixtures so they still isolate their intended behavior;
+- commands run and summarized results:
+  - `python3 -m unittest tests.skills.test_realization_surface_closure`: `OK`, 12 tests;
+  - `python3 -m unittest tests.skills.test_realization_surface_closure tests.skills.test_purpose_feedback_boundary tests.skills.test_context_topology`: `OK`, 40 tests;
+  - `python3 -m unittest`: `OK`, 160 tests;
+  - `control_chain_guard.py` on the current RSC artifact chain: `PASS`, `NEXT: CompileRuntimeGoal`;
+  - `control_artifact_lint.py` on the current RSC artifact chain: `PASS`;
+  - `git diff --check`: clean;
+- next gate: final verification-before-completion audit.

@@ -475,8 +475,39 @@ def check_review_purpose_feedback(review: str, errors: list[str]) -> None:
 
 
 def check_goal_realization_surface(goal: str, errors: list[str]) -> None:
-    if not section_has_meaningful_content(goal, "Realization Surface Contract"):
+    body = section_body(goal, "Realization Surface Contract")
+    if body is None:
         errors.append("goal missing ## Realization Surface Contract")
+        return
+
+    required_fields = [
+        "Target state",
+        "Required surfaces",
+        "Surface actions",
+        "Residual reconciliation",
+        "RSC status wording",
+        "Partial/unavailable handling",
+        "RSC / PFB boundary",
+    ]
+    for field in required_fields:
+        if not labeled_or_table_field_has_content(body, field):
+            errors.append(f"goal Realization Surface Contract missing {field}")
+
+
+def check_plan_realization_surface(plan: str, errors: list[str]) -> None:
+    body = section_body(plan, "Realization Surface Closure Strategy")
+    if body is None:
+        errors.append("execution policy missing ## Realization Surface Closure Strategy")
+        return
+
+    required_sections = [
+        "Surface Model",
+        "Surface Classes",
+        "Residual Reconciliation",
+    ]
+    for heading in required_sections:
+        if not section_has_meaningful_content(body, heading):
+            errors.append(f"execution policy Realization Surface Closure Strategy missing {heading}")
 
 
 def check_review_realization_surface(review: str, errors: list[str]) -> None:
@@ -516,6 +547,8 @@ def suggest_next_action(errors: list[str]) -> str:
         return "RunGoalWriting"
     if (
         "execution policy status" in joined
+        or "execution policy missing ## realization surface closure strategy" in joined
+        or "execution policy realization surface closure strategy missing" in joined
         or "plan does not reference" in joined
         or any(
             error.startswith(
@@ -606,6 +639,7 @@ def main() -> int:
         plan_status = section_status(plan, "Execution Policy Status")
         if plan_status != "Candidate":
             errors.append(f"execution policy status under ## Execution Policy Status must be Candidate: {plan_status!r}")
+        check_plan_realization_surface(plan, errors)
         check_execution_topology(plan, errors)
 
     if review:

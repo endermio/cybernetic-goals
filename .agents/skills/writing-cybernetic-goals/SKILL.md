@@ -102,14 +102,25 @@ in the goal as the `Purpose Feedback Contract`.
 When requirements analysis or solution design defines Realization Surface
 Closure, preserve it in the goal as `Realization Surface Contract`.
 
+For any goal that may be passed to the runtime compiler, include a compact
+`Realization Surface Contract`; it is always for compiled runtime goals. If no
+target-state surface closure is required, record `RSC not applicable with
+justification`.
+
 The goal must preserve or define:
 
 - Target state: the state or semantic change that must be realized;
 - Required surfaces: the surface model or classes that carry target-state
   realization;
+- Surface actions: whether each surface class must be acted on, inspected,
+  preserved, excluded, or discovered;
+- Residual reconciliation: how old state, unknown surfaces, exclusions,
+  preserved surfaces, and remaining mismatches will be accounted for;
 - RSC status wording: the strongest positive target-realization claim requires RSC adequate;
 - Partial/unavailable handling: runtime must report partial, missing,
-  unavailable, or not applicable with justification when RSC is not adequate.
+  unavailable, or not applicable with justification when RSC is not adequate;
+- RSC / PFB boundary: RSC calibrates target-state and surface-closure claims,
+  while Purpose Feedback Boundary calibrates human-purpose realization claims.
 
 RSC is distinct from Purpose Feedback Boundary. RSC calibrates target-state and
 surface-closure claims. Purpose Feedback Boundary calibrates human-purpose
@@ -177,7 +188,7 @@ The goal file must include:
 2. Objective
 3. Success Condition
 4. Purpose Feedback Contract
-5. Realization Surface Contract, when RSC is required or non-obvious
+5. Realization Surface Contract, always for compiled runtime goals; record `RSC not applicable with justification` when no target-state surface closure is required
 6. Source of Truth
 7. Scope and Boundaries
 8. Invariants
@@ -310,7 +321,7 @@ If the user explicitly requests a small inline `/goal` and the task is low-risk,
 - [ ] The goal preserves design invariants without freezing tactical design details.
 - [ ] Success conditions and stop conditions are explicit.
 - [ ] The goal includes Purpose Feedback Contract when requirements define Purpose Feedback Boundary or purpose-achievement evidence is non-obvious.
-- [ ] The goal includes Realization Surface Contract when requirements define Realization Surface Closure or target-state realization spans surfaces.
+- [ ] The goal includes Realization Surface Contract for compiled runtime goals; direct bounded goals include it when requirements define Realization Surface Closure or target-state realization spans surfaces.
 - [ ] Success Condition is Purpose-realizing outcome observed, not internal sensor success unless the human purpose is internal-state correctness.
 - [ ] Any strongest positive target-realization claim requires RSC adequate; partial, missing, unavailable, or not applicable with justification receives calibrated wording.
 - [ ] Sensors are named but not treated as the objective.
