@@ -4,6 +4,33 @@
 
 Status: `Incomplete`
 
+## Human Setpoint Approval
+
+Status: `Pending / Approved / Rejected / Needs Revision / Not required`
+
+Approval applies only to this compact control commitment.
+
+| Element | Commitment |
+|---|---|
+| Human purpose | [what the human wants to change or understand] |
+| Input role binding | [source material / declared state / requested transformation / method preference] |
+| Primary object | [what this task is actually about] |
+| Requested transformation | [what should be transformed into what] |
+| Non-goals | [what must not be done] |
+| Purpose Feedback Boundary | [how purpose realization will be observed or honestly reported] |
+| Realization Surface Closure | [which surfaces carry target-state realization and how residuals are reconciled] |
+| Output Contract | [audience, purpose, medium, structure, destination, acceptance] |
+| Workflow fit | [why full pre-goal orchestration is required / or why it is not] |
+| Known assumptions | [safe defaults and assumptions] |
+
+Approval record:
+
+- Approved by: `[human / explicit current-message approval / not approved]`
+- Approval phrase or source: `[quote or reference]`
+- Approval time/context: `[optional]`
+
+If Status is not `Approved`, downstream full pre-goal orchestration must not start.
+
 ## Human Purpose
 
 [What the human appears to want and why it matters.]

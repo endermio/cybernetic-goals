@@ -27,6 +27,12 @@ Use `assets/execution-policy-template.md`.
 
 This skill does not analyze requirements, does not write the control contract, does not review its own policy, and does not execute target work.
 
+## Required Input
+
+Use a completed requirements analysis brief and a goal contract, plus solution design when Design Gate was required or a design artifact exists.
+
+For Level 3, Level 4, or full pre-goal work, do not create an execution policy unless the requirements analysis contains `Human Setpoint Approval: Approved`, or the current user message explicitly approves the compact control commitment. Level 1/2 bounded work does not require Human Setpoint Approval unless the requirements analysis records it as required.
+
 ## Required Infrastructure
 
 Follow `$cybernetic-superpowers-infrastructure`.
@@ -355,6 +361,7 @@ Response-only next step:
 ## Validation Checklist
 
 - [ ] Non-trivial execution policies invoke `$superpowers:writing-plans` or load and follow its `SKILL.md` instructions, otherwise stop/report missing infrastructure.
+- [ ] For Level 3/4 or full pre-goal work, Human Setpoint Approval is Approved before execution-policy writing starts.
 - [ ] The plan records planning substrate status.
 - [ ] The plan does not self-substitute for a missing required planning substrate.
 - [ ] If blocked, the assistant response includes a response-only next step.

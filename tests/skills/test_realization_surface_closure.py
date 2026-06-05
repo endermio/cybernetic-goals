@@ -8,6 +8,29 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 
+HSA_FIXTURE = """## Human Setpoint Approval
+
+Status: `Approved`
+
+| Element | Commitment |
+|---|---|
+| Human purpose | keep realization surface guard fixtures focused on RSC behavior |
+| Input role binding | test fixture source material is approved background |
+| Primary object | realization surface guard fixture |
+| Requested transformation | approved control chain to RSC guard checks |
+| Non-goals | do not test HSA behavior in this fixture |
+| Purpose Feedback Boundary | covered by compact fixture |
+| Realization Surface Closure | dedicated test target |
+| Output Contract | guard output |
+| Workflow fit | full pre-goal guard fixture |
+| Known assumptions | fixture-only assumptions |
+
+Approval record:
+
+- Approved by: `test fixture`
+- Approval phrase or source: `approved fixture setpoint`
+"""
+
 
 class RealizationSurfaceClosureTest(unittest.TestCase):
     def read(self, path: str) -> str:
@@ -30,7 +53,7 @@ class RealizationSurfaceClosureTest(unittest.TestCase):
         review = tmp / "review.md"
 
         requirements.write_text(
-            "# Requirements\n\n## Requirements Analysis Status\n\nStatus: `Complete`\n",
+            f"# Requirements\n\n## Requirements Analysis Status\n\nStatus: `Complete`\n\n{HSA_FIXTURE}\n",
             encoding="utf-8",
         )
 

@@ -190,12 +190,17 @@ def main() -> int:
         "Strongest positive target-realization claims require RSC adequate. "
         "Report surfaces covered, required surface actions completed or justified, residuals reconciled, pending or unknown surfaces, and smallest next reconciliation when RSC is partial, missing, unavailable, or not applicable with justification. "
     )
+    human_setpoint_clause = (
+        f"Execute only against the human-approved setpoint in {args.requirements}. "
+        "Do not reinterpret the human purpose, primary object, requested transformation, non-goals, Purpose Feedback Boundary, Realization Surface Closure, output contract, or workflow fit. "
+    )
 
     command = (
         f"/goal Execute the approved execution policy in {args.plan} "
         f"{context_clause}"
         f"Use the approved control review in {args.review} as the phase-gate record. "
         f"{output_contract_clause}"
+        f"{human_setpoint_clause}"
         f"Do not reinterpret requirements, {design_boundary}rewrite the control strategy, replace approved sensors, or start unreviewed work. "
         "Use `$superpowers:executing-plans` discipline against the approved plan. "
         "Use `$superpowers:systematic-debugging` for unclear or repeated failures. "

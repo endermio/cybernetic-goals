@@ -16,6 +16,18 @@
       ]
     },
     {
+      "id": "requires-human-setpoint-approval",
+      "prompt": "requirements analysis Complete, goal exists, execution policy exists, control review Approved, but requirements lacks Human Setpoint Approval. Compile final /goal.",
+      "expected_output": "Refuse to compile runtime /goal and return to requirements analysis for Human Setpoint Approval.",
+      "assertions": [
+        "Does not output final /goal.",
+        "Requires Human Setpoint Approval: Approved.",
+        "Does not treat Requirements Analysis Status: Complete as approval.",
+        "Routes back to requirements analysis or orchestration with the guard failure.",
+        "Does not ask the user to review downstream execution artifacts as a substitute."
+      ]
+    },
+    {
       "id": "requires-final-observer-check",
       "prompt": "control review 写了 Status: Approved，但缺少 Final Observer Check，或者 Final Observer Check 写 Approval allowed after final observer check: no。请编译最终 /goal。",
       "expected_output": "Refuse to compile runtime /goal because Approved status is not enough without a Final Observer Check that allows approval.",
@@ -42,10 +54,11 @@
     },
     {
       "id": "compiles-runtime-goal",
-      "prompt": "requirements analysis Complete, goal exists, execution policy status Candidate, control review Approved, Final Observer Check allows approval；编译最终 /goal。",
+      "prompt": "requirements analysis Complete with Human Setpoint Approval: Approved, goal exists, execution policy status Candidate, control review Approved, Final Observer Check allows approval；编译最终 /goal。",
       "expected_output": "Outputs a final /goal referencing requirements analysis, goal, plan, and review paths.",
       "assertions": [
         "References all four artifact paths.",
+        "Preserves the human-approved setpoint.",
         "Requires Final Observer Check to allow approval.",
         "Forbids reinterpretation of requirements.",
         "Forbids rewriting control strategy.",

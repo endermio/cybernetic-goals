@@ -12,6 +12,7 @@ Produce the final executable `/goal` command from approved control artifacts.
 Inputs:
 
 - requirements analysis brief with status Complete
+- Human Setpoint Approval: Approved in the requirements analysis
 - solution design, when Design Gate was required or a design exists
 - goal contract
 - execution policy / plan
@@ -34,6 +35,7 @@ The final command must instruct runtime Codex to:
 - use the approved bounded subagent delegation protocol when the approved topology selects serial or parallel subagent-driven execution;
 - use `$superpowers:subagent-driven-development` only when the approved plan records `Selected delegation substrate: superpowers-subagent-driven-development` for work packages that fit that implementation-plan, current-session workflow;
 - treat subagent outputs as candidate results until main-agent integration against approved artifacts, progress log, evidence requirements, and stop conditions;
+- execute only against the human-approved setpoint in the requirements analysis; do not reinterpret the human purpose, primary object, requested transformation, non-goals, Purpose Feedback Boundary, Realization Surface Closure, output contract, or workflow fit;
 - use `$superpowers:systematic-debugging` for unclear or repeated failures;
 - use `$superpowers:verification-before-completion` before claiming completion;
 - Report completion status according to the highest purpose-relevant evidence actually observed.
@@ -49,6 +51,7 @@ The final command must instruct runtime Codex to:
 Do not output `/goal` unless:
 
 - requirements analysis status is Complete;
+- requirements analysis includes `Human Setpoint Approval: Approved`;
 - goal contract exists;
 - solution design exists when Design Gate was required or a design artifact exists;
 - execution policy exists;
@@ -82,6 +85,8 @@ The final `/goal` must:
 - reference the concrete execution policy path;
 - reference the concrete control review path;
 - carry the final output contract from the goal when one is present or required;
+- execute only against the human-approved setpoint in the requirements analysis;
+- forbid reinterpreting the human purpose, primary object, requested transformation, non-goals, Purpose Feedback Boundary, Realization Surface Closure, output contract, or workflow fit;
 - forbid reinterpreting requirements;
 - forbid rewriting the control strategy;
 - forbid rewriting the solution design;
@@ -134,6 +139,7 @@ Runtime /goal is ready:
 
 Preflight:
 - Requirements analysis: Complete
+- Human Setpoint Approval: Approved
 - Goal: present
 - Solution design: present or not required
 - Execution policy: present
@@ -166,6 +172,7 @@ Do not create or modify target-work artifacts.
 ## Validation Checklist
 
 - [ ] Guard passed or equivalent checks passed.
+- [ ] Requirements analysis contains Human Setpoint Approval: Approved.
 - [ ] No control artifact was rewritten.
 - [ ] Control review records `Context management / execution topology: yes` in Review Independence.
 - [ ] Control review includes meaningful `Context Management / Execution Topology` findings.
@@ -173,6 +180,7 @@ Do not create or modify target-work artifacts.
 - [ ] The final `/goal` references all approved files.
 - [ ] The final `/goal` carries the goal's Final Output Contract when present or required.
 - [ ] The final `/goal` preserves the approved execution topology.
+- [ ] The final `/goal` preserves the human-approved setpoint, including primary object, requested transformation, non-goals, Purpose Feedback Boundary, Realization Surface Closure, output contract, and workflow fit.
 - [ ] The final `/goal` treats subagent outputs as candidate results until main-agent integration.
 - [ ] The final `/goal` does not ask runtime Codex to write a new plan.
 - [ ] The final `/goal` does not ask runtime Codex to create or revise solution design.

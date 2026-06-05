@@ -8,6 +8,29 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 
+HSA_FIXTURE = """## Human Setpoint Approval
+
+Status: `Approved`
+
+| Element | Commitment |
+|---|---|
+| Human purpose | keep purpose feedback guard fixtures focused on PFB behavior |
+| Input role binding | test fixture source material is approved background |
+| Primary object | purpose feedback guard fixture |
+| Requested transformation | approved control chain to PFB guard checks |
+| Non-goals | do not test HSA behavior in this fixture |
+| Purpose Feedback Boundary | dedicated test target |
+| Realization Surface Closure | covered by compact fixture |
+| Output Contract | guard output |
+| Workflow fit | full pre-goal guard fixture |
+| Known assumptions | fixture-only assumptions |
+
+Approval record:
+
+- Approved by: `test fixture`
+- Approval phrase or source: `approved fixture setpoint`
+"""
+
 
 class PurposeFeedbackBoundaryTest(unittest.TestCase):
     def read(self, path: str) -> str:
@@ -27,7 +50,7 @@ class PurposeFeedbackBoundaryTest(unittest.TestCase):
         review = tmp / "review.md"
 
         requirements.write_text(
-            "# Requirements\n\n## Requirements Analysis Status\n\nStatus: `Complete`\n",
+            f"# Requirements\n\n## Requirements Analysis Status\n\nStatus: `Complete`\n\n{HSA_FIXTURE}\n",
             encoding="utf-8",
         )
 
@@ -321,7 +344,10 @@ class PurposeFeedbackBoundaryTest(unittest.TestCase):
             goal = tmp / "goal.md"
             plan = tmp / "plan.md"
             review = tmp / "review.md"
-            requirements.write_text("## Requirements Analysis Status\n\nStatus: `Complete`\n", encoding="utf-8")
+            requirements.write_text(
+                f"## Requirements Analysis Status\n\nStatus: `Complete`\n\n{HSA_FIXTURE}",
+                encoding="utf-8",
+            )
             goal.write_text("## Source Contracts\n\n- Requirements analysis: `requirements.md`\n", encoding="utf-8")
             plan.write_text("## Context Management / Execution Topology\n\nSelected topology: `Main-only`\n", encoding="utf-8")
             review.write_text("## Review Status\n\nStatus: `Approved`\n", encoding="utf-8")

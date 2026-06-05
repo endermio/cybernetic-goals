@@ -66,6 +66,8 @@ docs/cybernetics/designs/YYYY-MM-DD-<slug>.md
 
 If the requirements analysis is missing, incomplete, or has open blocking human decisions, stop and return to `$analyzing-cybernetic-requirements`.
 
+For Level 3, Level 4, or full pre-goal work, do not proceed unless the requirements analysis contains `Human Setpoint Approval: Approved`, or the current user message explicitly approves the compact control commitment. Level 1/2 bounded design work does not require Human Setpoint Approval unless the requirements analysis records it as required.
+
 ## Optional Infrastructure
 
 Use `$superpowers:brainstorming` only when the design space is exploratory or the user explicitly asks for design exploration.
@@ -152,17 +154,18 @@ Open design questions that affect requirement semantics, controlled relationship
 ## Process
 
 1. Read the completed requirements analysis brief.
-2. Derive the design path from the requirements path.
-3. Inspect the routing context from the user request, router output, and requirements gates.
-4. Inspect only enough context to avoid generic design.
-5. Identify whether `$superpowers:brainstorming` is required, used, blocked, or not required.
-6. Build the conceptual model: core objects/actors/roles, relationships, flows, boundaries, alternatives, invariants.
-7. Build the detailed model: mechanisms, interfaces/contracts, state/lifecycle, failure model, evidence/sensor model, compatibility/integration, decisions.
-8. If Output Contract Gate requires structure synthesis, design the output structure and evidence-reference rules.
-9. Separate design invariants from tactical degrees of freedom.
-10. Map design elements to goal implications and execution-policy implications.
-11. If material design questions remain, record them and stop without marking Approved.
-12. Do not create goal, plan, review, runtime `/goal`, or target-work files.
+2. For Level 3/4 or full pre-goal work, verify `Human Setpoint Approval: Approved` before deriving or writing the design.
+3. Derive the design path from the requirements path.
+4. Inspect the routing context from the user request, router output, and requirements gates.
+5. Inspect only enough context to avoid generic design.
+6. Identify whether `$superpowers:brainstorming` is required, used, blocked, or not required.
+7. Build the conceptual model: core objects/actors/roles, relationships, flows, boundaries, alternatives, invariants.
+8. Build the detailed model: mechanisms, interfaces/contracts, state/lifecycle, failure model, evidence/sensor model, compatibility/integration, decisions.
+9. If Output Contract Gate requires structure synthesis, design the output structure and evidence-reference rules.
+10. Separate design invariants from tactical degrees of freedom.
+11. Map design elements to goal implications and execution-policy implications.
+12. If material design questions remain, record them and stop without marking Approved.
+13. Do not create goal, plan, review, runtime `/goal`, or target-work files.
 
 ## Response-Only Handoff Rule
 
@@ -216,6 +219,7 @@ Smallest input needed:
 
 Response-only next step:
 - If requirements analysis is incomplete or has blocking human decisions: return to `$analyzing-cybernetic-requirements` with the missing decision.
+- If Level 3/4 or full pre-goal work lacks `Human Setpoint Approval: Approved`: return to `$analyzing-cybernetic-requirements` for setpoint approval or revision.
 - If a design decision is missing: answer the smallest design question, then rerun `$designing-cybernetic-solutions`.
 - For Level 3/4 or full pre-goal work: return this blocked status to `$orchestrating-cybernetic-pregoal`; do not write the goal contract.
 - If the human explicitly says Design Gate is unnecessary: return to the route-appropriate next stage.
@@ -226,6 +230,7 @@ Do not write the goal contract until this design decision is resolved or the hum
 ## Validation Checklist
 
 - [ ] Requirements analysis is complete before design is approved.
+- [ ] For Level 3/4 or full pre-goal work, Human Setpoint Approval is Approved before design starts.
 - [ ] The design path uses the requirements analysis date/slug.
 - [ ] The design stays within core cybernetic vocabulary unless an explicit adapter supplies additional terms.
 - [ ] Conceptual design and detailed design are both present.

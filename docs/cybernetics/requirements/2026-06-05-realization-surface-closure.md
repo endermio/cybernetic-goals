@@ -4,6 +4,31 @@
 
 Status: `Complete`
 
+## Human Setpoint Approval
+
+Status: `Approved`
+
+Approval applies only to this compact control commitment.
+
+| Element | Commitment |
+|---|---|
+| Human purpose | Add a core invariant that prevents target-state realization from being overclaimed from local action. |
+| Input role binding | User-provided RSC framing is source material and confirmed direction; software code-change completeness is an example, not the primary object. |
+| Primary object | The cybernetic-goals core invariant chain. |
+| Requested transformation | Turn the RSC concept into cross-artifact requirements, design, goal, execution policy, review, runtime compiler, matrix, tests, and evals. |
+| Non-goals | Do not create a software-only Code Change Completeness Gate; do not hard-code software adapter terms into core. |
+| Purpose Feedback Boundary | Purpose realization is reported as pre-goal/control integration until runtime implementation applies RSC to a concrete target-state task. |
+| Realization Surface Closure | RSC must be represented across requirements, goal, execution policy, review, runtime compiler, matrix, tests, and evals, with residuals reconciled. |
+| Output Contract | Persistent cybernetic artifacts plus compiled runtime command or blocked status. |
+| Workflow fit | Level 3 full pre-goal orchestration is required because the invariant crosses core artifacts and runtime compiler behavior. |
+| Known assumptions | Existing PFB/RSC/topology guard style remains the structural precedent; semantic adequacy remains review-governed. |
+
+Approval record:
+
+- Approved by: `human`
+- Approval phrase or source: `user explicitly requested $orchestrating-cybernetic-pregoal for this requirements brief with subagent review`
+- Approval time/context: `2026-06-05 RSC pre-goal dogfood run`
+
 ## Human Purpose
 
 Add a core cybernetic invariant that keeps target realization from collapsing

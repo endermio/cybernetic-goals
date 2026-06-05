@@ -29,6 +29,8 @@ For Level 3, Level 4, or full pre-goal work, stop after creating the goal contra
 
 Recommend `$writing-cybernetic-execution-policies` or `$reviewing-cybernetic-control-structures` directly only when the user explicitly chose a manual pre-goal chain or `$orchestrating-cybernetic-pregoal` is unavailable.
 
+For Level 3, Level 4, or full pre-goal work, do not create the goal contract unless the requirements analysis contains `Human Setpoint Approval: Approved`, or the current user message explicitly approves the compact control commitment. Human answers to requirements questions are inputs, not approval.
+
 Do not put “first write a plan, then execute it” inside an execution `/goal` for complex work.
 
 For Level 2 bounded file goals, output a direct `/goal` command after creating the small goal file only when the task boundaries and any required evaluation rubric are explicit. Do not recommend `$writing-cybernetic-execution-policies` or `$reviewing-cybernetic-control-structures` by default unless the user explicitly requests them or the task reveals unresolved control decisions.
@@ -170,6 +172,7 @@ Before creating a goal contract for complex work, check:
 
 - a requirements analysis brief exists;
 - `Requirements Analysis Status` is `Complete` or the user explicitly states the semantics are confirmed;
+- for Level 3/4 or full pre-goal work, `Human Setpoint Approval: Approved` is present unless the current user message explicitly approves the compact control commitment;
 - confirmed decisions are recorded;
 - required solution design exists, or the user explicitly says the Design Gate is unnecessary;
 - no blocking human decision remains unresolved.
@@ -202,6 +205,8 @@ The goal file must include:
 16. Final Output Contract, when output shape affects execution, acceptance, handoff, persistence, or downstream consumption
 
 The goal must preserve confirmed semantics. It must not reinterpret or downscope them.
+
+For Level 3/4 or full pre-goal work, the goal must preserve the approved compact control commitment from `Human Setpoint Approval`: human purpose, input role binding, primary object, requested transformation, non-goals, Purpose Feedback Boundary, Realization Surface Closure, Output Contract, workflow fit, and known assumptions.
 
 When a solution design is present, the goal must reference it under `Source of Truth`, preserve design invariants, and avoid freezing tactical design details as semantic invariants unless the design explicitly marks them as invariant.
 
@@ -322,6 +327,7 @@ If the user explicitly requests a small inline `/goal` and the task is low-risk,
 - [ ] Success conditions and stop conditions are explicit.
 - [ ] The goal includes Purpose Feedback Contract when requirements define Purpose Feedback Boundary or purpose-achievement evidence is non-obvious.
 - [ ] The goal includes Realization Surface Contract for compiled runtime goals; direct bounded goals include it when requirements define Realization Surface Closure or target-state realization spans surfaces.
+- [ ] For Level 3/4 or full pre-goal work, Human Setpoint Approval is Approved before the goal is written.
 - [ ] Success Condition is Purpose-realizing outcome observed, not internal sensor success unless the human purpose is internal-state correctness.
 - [ ] Any strongest positive target-realization claim requires RSC adequate; partial, missing, unavailable, or not applicable with justification receives calibrated wording.
 - [ ] Sensors are named but not treated as the objective.

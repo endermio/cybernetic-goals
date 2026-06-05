@@ -75,6 +75,18 @@
       ]
     },
     {
+      "id": "downstream-setpoint-change-requires-reapproval",
+      "prompt": "A requirements analysis has Human Setpoint Approval: Approved. A later design changes the primary object and removes a non-goal from the approved compact control commitment.",
+      "expected_output": "The review marks the chain Needs Revision or requires returning to requirements approval because downstream artifacts changed the approved setpoint.",
+      "assertions": [
+        "Checks Human Setpoint Fidelity.",
+        "Detects mismatch with the approved compact control commitment.",
+        "Identifies the changed primary object or non-goal.",
+        "Does not approve the control chain.",
+        "Requires setpoint revision or explicit human reapproval."
+      ]
+    },
+    {
       "id": "level-3-review-handoff-returns-to-orchestrator",
       "prompt": "审查 requirements analysis、solution design、goal、plan。路由结果是 Level 3 full pre-goal pipeline，$orchestrating-cybernetic-pregoal 正在调度该链路，review status 为 Approved。",
       "expected_output": "Create the review file, mark Approved only if review conditions are satisfied, then hand the review path and status back to $orchestrating-cybernetic-pregoal instead of directly compiling runtime /goal.",

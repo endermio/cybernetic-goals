@@ -438,6 +438,17 @@ def check_review_context_topology(review: str, errors: list[str]) -> None:
         errors.append("control review Context Management / Execution Topology section has no meaningful findings")
 
 
+def check_human_setpoint_approval(requirements: str, errors: list[str]) -> None:
+    body = section_body(requirements, "Human Setpoint Approval")
+    if body is None:
+        errors.append("requirements missing ## Human Setpoint Approval")
+        return
+
+    status = section_status(requirements, "Human Setpoint Approval")
+    if status != "Approved":
+        errors.append(f"Human Setpoint Approval is not Approved: {status!r}")
+
+
 def check_goal_purpose_feedback(goal: str, errors: list[str]) -> None:
     body = section_body(goal, "Purpose Feedback Contract")
     if body is None:
@@ -547,7 +558,7 @@ def suggest_next_action(errors: list[str]) -> str:
     joined = "\n".join(errors).casefold()
     lowered_errors = [error.casefold() for error in errors]
 
-    if "requirements analysis status is not complete" in joined:
+    if "requirements analysis status is not complete" in joined or "human setpoint approval" in joined:
         return "ReturnToRequirementsAnalysis"
     if "design gate is required" in joined or "design status" in joined or "design does not reference" in joined:
         return "RunDesign"
@@ -632,6 +643,7 @@ def main() -> int:
         requirements_status = first_section_status(requirements, "Requirements Analysis Status", "Clarification Status")
         if requirements_status != "Complete":
             errors.append(f"requirements analysis status is not Complete: {requirements_status!r}")
+        check_human_setpoint_approval(requirements, errors)
 
     if design:
         design_status = section_status(design, "Design Status")

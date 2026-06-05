@@ -7,6 +7,29 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 
+HSA_FIXTURE = """## Human Setpoint Approval
+
+Status: `Approved`
+
+| Element | Commitment |
+|---|---|
+| Human purpose | keep context topology guard fixtures focused on topology behavior |
+| Input role binding | test fixture source material is approved background |
+| Primary object | context topology guard fixture |
+| Requested transformation | approved control chain to topology guard checks |
+| Non-goals | do not test HSA behavior in this fixture |
+| Purpose Feedback Boundary | covered by dedicated PFB tests |
+| Realization Surface Closure | covered by dedicated RSC tests |
+| Output Contract | guard output |
+| Workflow fit | full pre-goal guard fixture |
+| Known assumptions | fixture-only assumptions |
+
+Approval record:
+
+- Approved by: `test fixture`
+- Approval phrase or source: `approved fixture setpoint`
+"""
+
 
 class ContextTopologySkillTest(unittest.TestCase):
     def complete_serial_topology(
@@ -159,7 +182,7 @@ class ContextTopologySkillTest(unittest.TestCase):
         review = tmp / "review.md"
 
         requirements.write_text(
-            "# Requirements\n\n## Requirements Analysis Status\n\nStatus: `Complete`\n",
+            f"# Requirements\n\n## Requirements Analysis Status\n\nStatus: `Complete`\n\n{HSA_FIXTURE}\n",
             encoding="utf-8",
         )
         goal.write_text(

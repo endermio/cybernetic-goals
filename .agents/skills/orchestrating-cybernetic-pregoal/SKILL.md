@@ -79,6 +79,10 @@ one of these fit checks is satisfied:
 - `$routing-cybernetic-workflows` has recommended a Level 3 or Level 4 workflow or full pre-goal pipeline;
 - `$analyzing-cybernetic-requirements` has explicitly recorded that full pre-goal orchestration is required.
 
+The same requirements brief must record `Human Setpoint Approval: Approved`,
+or the current user message must explicitly approve the compact control
+commitment recorded in that requirements brief.
+
 A user request to use full pre-goal compilation is not sufficient by itself.
 If the request expresses method preference, uncertainty, dissatisfaction, or
 process distrust, route to `$framing-cybernetic-intent` or
@@ -115,6 +119,23 @@ Reject or downgrade when:
 - full orchestration would produce formal artifacts without reducing runtime
   uncertainty;
 - evidence/context/review budget cannot be bounded.
+
+## Human Setpoint Gate
+
+Before invoking or validating solution design, goal writing, execution-policy
+writing, control review, or runtime compilation, verify Human Setpoint
+Approval.
+
+If missing or not `Approved`, stop before design and output:
+
+```text
+Blocked: Human Setpoint Approval missing.
+Next: ask the user to approve or revise the compact control commitment in the requirements analysis.
+```
+
+Do not compensate by asking the user to review design, goal, or execution
+policy later. Human answers are inputs; they are not approval unless the user
+explicitly approves the compact control commitment.
 
 ## Required Input
 
@@ -222,14 +243,14 @@ python3 .agents/skills/orchestrating-cybernetic-pregoal/scripts/orchestration_gu
 
 If the script path is not available, perform the same checks manually.
 
-The requirements analysis is acceptable only if one of the following is true:
+The requirements analysis is acceptable only if both are true:
 
-- it contains `Requirements Analysis Status` with `Complete`
-- it contains `Requirements analysis is complete`
-- it states `No open blocking questions`
-- it records confirmed decisions and has no open blocking questions
+- it contains `Requirements Analysis Status` with `Complete`;
+- it contains `Human Setpoint Approval` with `Status: Approved`.
 
-If requirements analysis is incomplete, stop. Do not create design, goal, plan, review, or runtime `/goal`.
+If requirements analysis is incomplete or Human Setpoint Approval is missing
+or not Approved, stop. Do not create design, goal, plan, review, or runtime
+`/goal`.
 
 ### Step 1: Determine Artifact Paths
 
@@ -307,8 +328,8 @@ Before each stage, run `scripts/orchestration_guard.py` for that stage if availa
 
 | Current State | Required condition | Next Action | Forbidden Action |
 |---|---|---|---|
-| `RequirementsMissing` | requirements absent or incomplete | `Blocked` | design / goal / policy / review / runtime compile |
-| `RequirementsComplete` | Design Gate required and design missing | `RunDesign` | goal writing |
+| `RequirementsMissing` | requirements absent, incomplete, or Human Setpoint Approval missing/not Approved | `Blocked` / `ReturnToRequirementsAnalysis` | design / goal / policy / review / runtime compile |
+| `RequirementsComplete` | requirements Complete and Human Setpoint Approval Approved; Design Gate required and design missing | `RunDesign` | goal writing |
 | `DesignReady` | design exists, references requirements, and has no blocking open questions | `RunGoalWriting` | execution policy |
 | `GoalReady` | goal exists and references requirements plus any design path | `RunExecutionPolicy` | review |
 | `PolicyReady` | execution policy exists, references requirements, goal, any design path, and records selected execution topology | `RunReview` | runtime compile |
@@ -500,6 +521,7 @@ python3 .agents/skills/orchestrating-cybernetic-pregoal/scripts/orchestration_gu
 Before outputting runtime `/goal`, ensure:
 
 - requirements analysis is complete
+- requirements analysis includes `Human Setpoint Approval: Approved`
 - solution design exists when Design Gate was required or a design artifact exists
 - final output contract exists in the goal when Output Contract Gate was required or an output contract exists upstream
 - goal contract exists
@@ -553,6 +575,7 @@ It must not instruct Codex to:
 - reinterpret requirements
 - change confirmed semantics
 - rewrite the solution design
+- reinterpret the human-approved setpoint, human purpose, primary object, requested transformation, non-goals, Purpose Feedback Boundary, Realization Surface Closure, output contract, or workflow fit
 - replace the final output contract
 - replace approved sensors
 - redesign the execution policy

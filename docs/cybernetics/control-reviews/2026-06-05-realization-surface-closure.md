@@ -16,6 +16,7 @@ Status: `Approved`
 - Pre-goal review subagents authorized: `yes`
 - Independent review passes completed:
   - Requirement traceability: `yes`
+  - Human setpoint fidelity: `yes`
   - Design fidelity: `yes`
   - Output contract fidelity: `yes`
   - Goal fidelity: `yes`
@@ -62,6 +63,14 @@ Findings:
 
 - Approved. The design, goal, and plan trace `INV-RSC-001` to the requirements brief and preserve the central claim: code-change completeness is an adapter instance of the more general realization-surface closure problem.
 - Approved. The downstream artifacts preserve the required RSC status categories, including not applicable with justification.
+
+## Human Setpoint Fidelity
+
+Findings:
+
+- Approved. The design, goal, and execution policy preserve the approved compact control commitment: RSC is a core invariant, software code-change completeness is only an adapter example, and the primary object is the cybernetic-goals core chain.
+- Approved. Downstream artifacts do not change the non-goals: they avoid a software-only gate and keep domain-specific surface discovery in adapters.
+- Approved. PFB and RSC boundaries remain separate in downstream artifacts and runtime completion wording.
 
 ## Goal Fidelity
 

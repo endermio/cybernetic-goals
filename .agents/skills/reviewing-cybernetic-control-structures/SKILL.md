@@ -57,6 +57,7 @@ Deterministic-only changes may skip subagent re-review only when all of the foll
 Substantive changes include changes to:
 
 - confirmed semantics;
+- Human Setpoint Approval or the approved compact control commitment;
 - solution design objects, relationships, flows, boundaries, interfaces/contracts, evidence model, or design invariants;
 - goal success conditions;
 - scope, boundaries, or invariants;
@@ -89,11 +90,30 @@ The author of a post-review revision must not be the sole approver of that revis
 
 Every confirmed human decision in the requirements analysis brief must appear in the goal and execution policy.
 
-### 2. Goal Fidelity
+### 2. Human Setpoint Fidelity
+
+For Level 3/4 or full pre-goal work, requirements analysis must contain `Human Setpoint Approval: Approved`.
+
+Check that design, goal, and execution policy preserve the approved compact control commitment:
+
+- human purpose;
+- input role binding;
+- primary object;
+- requested transformation;
+- non-goals;
+- Purpose Feedback Boundary;
+- Realization Surface Closure;
+- Output Contract;
+- workflow fit;
+- known assumptions.
+
+Flag as Major or Blocking when downstream artifacts reinterpret, expand, remove, or contradict the approved compact control commitment. If a downstream artifact changes the primary object, requested transformation, non-goals, PFB, RSC, output contract, or workflow fit, require setpoint revision or explicit human reapproval before approval.
+
+### 3. Goal Fidelity
 
 The goal must not add, remove, downscope, or reinterpret requirement semantics.
 
-### 3. Design Fidelity
+### 4. Design Fidelity
 
 When a solution design exists or Design Gate was required:
 
@@ -103,7 +123,7 @@ When a solution design exists or Design Gate was required:
 - tactical degrees of freedom must not be frozen as semantic invariants unless the design explicitly says so;
 - the plan must not redesign the solution model.
 
-### 4. Output Contract Fidelity
+### 5. Output Contract Fidelity
 
 When requirements analysis, solution design, or goal includes an output contract:
 
@@ -113,7 +133,7 @@ When requirements analysis, solution design, or goal includes an output contract
 - evidence-reference, destination, machine-readable, and acceptance-condition requirements must not be weakened;
 - runtime `/goal` must not be able to replace the audience, purpose, medium, structure, detail level, destination, or machine-readable shape.
 
-### 5. Control Law Quality
+### 6. Control Law Quality
 
 The execution policy must define a sane control law:
 
@@ -128,7 +148,7 @@ The execution policy must define a sane control law:
 - repair policy
 - stop conditions
 
-### 6. Sensor / Evidence Governance
+### 7. Sensor / Evidence Governance
 
 Approved sensors, checks, and evidence channels are sensors, not objectives.
 
@@ -139,7 +159,7 @@ Flag plans that:
 - lack stale sensor retirement rules;
 - lack target-state evidence.
 
-### 7. Purpose Feedback Adequacy
+### 8. Purpose Feedback Adequacy
 
 Block false completion claims, not necessarily continued execution.
 
@@ -159,7 +179,7 @@ Flag as Major or Blocking when:
 - the plan demands heavy end-to-end or operational feedback when a smaller purpose-boundary observation would suffice;
 - the goal defines success as sensor success; purpose-realizing outcome evidence is required unless the purpose is internal-state correctness.
 
-### 8. Evidence Lifecycle / Evidence Budget
+### 9. Evidence Lifecycle / Evidence Budget
 
 Flag as Major or Blocking when:
 
@@ -175,7 +195,7 @@ Flag as Major or Blocking when:
 
 Use `Major` when execution-policy revision can repair evidence lifecycle. Use `Blocking` when sensor output would likely swamp review, context management, or runtime completion.
 
-### 9. Realization Surface Closure Adequacy
+### 10. Realization Surface Closure Adequacy
 
 Classify RSC as one of:
 
@@ -199,7 +219,7 @@ Use `Major` when policy or goal revision can repair RSC wording. Use
 `Blocking` when runtime could claim target-state realization while important
 surfaces or residuals remain unresolved.
 
-### 10. Execution Granularity / Sensor Load
+### 11. Execution Granularity / Sensor Load
 
 Flag as Major or Blocking when:
 
@@ -214,7 +234,7 @@ Flag as Major or Blocking when:
 
 Use `Major` when execution-policy revision can repair the control law. Use `Blocking` when the granularity or sensor load would prevent runtime completion or let sensors override confirmed semantics.
 
-### 11. Context Management / Execution Topology
+### 12. Context Management / Execution Topology
 
 Flag as Major or Blocking when:
 
@@ -231,7 +251,7 @@ Flag as Major or Blocking when:
 
 Use `Major` when execution-policy revision can repair topology. Use `Blocking` when context overload would likely make runtime lose requirements, design invariants, output contract, stop conditions, or approval boundaries.
 
-### 12. Batch Rhythm
+### 13. Batch Rhythm
 
 Flag:
 
@@ -240,11 +260,11 @@ Flag:
 - no batch-end openability requirement;
 - no destructive intermediate-state policy.
 
-### 13. Semantic vs Tactical Boundary
+### 14. Semantic vs Tactical Boundary
 
 Semantic invariants must be frozen. Tactical execution details must remain adjustable.
 
-### 14. Runtime Suitability
+### 15. Runtime Suitability
 
 The runtime `/goal` must be able to execute the approved artifacts without inventing new control structures. Any required runtime discipline, including approved execution topology, bounded subagent delegation protocol, and conditionally selected Superpowers substrate, must be precompiled into the approved plan, review, or final `/goal`.
 
@@ -255,7 +275,7 @@ Closure status. Do not claim target-state realization from local action alone
 when Realization Surface Closure is required. Strongest positive
 target-realization claims require RSC adequate.
 
-### 15. Review Independence
+### 16. Review Independence
 
 The review must record:
 
@@ -264,7 +284,7 @@ The review must record:
 - whether approval is allowed;
 - why approval is blocked when independent review is missing.
 
-### 16. Final Observer Check
+### 17. Final Observer Check
 
 The review must record whether any substantive artifact changed after the latest independent review pass and whether a final independent observer confirmed no Blocking or Major findings after that change.
 
@@ -295,6 +315,7 @@ The review must be either:
 Only mark `Approved` when:
 
 - requirements analysis, required design, goal, and plan are consistent;
+- Human Setpoint Approval is Approved when full pre-goal orchestration is used, and Human Setpoint Fidelity has no Blocking/Major findings;
 - required design exists and is consistent with requirements analysis, goal, and plan;
 - any upstream output contract is preserved in the goal and supported by the execution policy;
 - no unresolved semantic decision remains;
@@ -348,6 +369,7 @@ Response-only next step:
 - [ ] The review file was created.
 - [ ] Review status is explicit.
 - [ ] Review independence is recorded.
+- [ ] Human Setpoint Fidelity was checked when full pre-goal orchestration is used.
 - [ ] Final observer check is recorded.
 - [ ] The review does not mark self-review as `Approved`.
 - [ ] If subagents were not authorized and no human approval exists, status is `Needs Independent Review`.

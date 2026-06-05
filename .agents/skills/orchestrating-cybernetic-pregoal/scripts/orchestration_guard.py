@@ -45,6 +45,8 @@ NEXT_ACTION = {
 def blocked_next_action(errors: list[str]) -> str:
     """Return the next corrective orchestration action for a blocked transition."""
     joined = "\n".join(errors).casefold()
+    if "human setpoint approval" in joined:
+        return "ReturnToRequirementsAnalysis"
     if "$designing-cybernetic-solutions is unavailable" in joined:
         return "Blocked"
     if "design artifact is missing" in joined:
@@ -485,6 +487,13 @@ def check_requirements(requirements: str | None, errors: list[str]) -> None:
     status = first_section_status(requirements, "Requirements Analysis Status", "Clarification Status")
     if status != "Complete":
         errors.append(f"requirements analysis status is not Complete: {status!r}")
+    hsa_body = section_body(requirements, "Human Setpoint Approval")
+    if hsa_body is None:
+        errors.append("requirements missing ## Human Setpoint Approval")
+        return
+    hsa_status = section_status(requirements, "Human Setpoint Approval")
+    if hsa_status != "Approved":
+        errors.append(f"Human Setpoint Approval is not Approved: {hsa_status!r}")
 
 
 def check_design_ready(

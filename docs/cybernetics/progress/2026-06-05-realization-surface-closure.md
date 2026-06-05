@@ -68,3 +68,21 @@
   - `compile_runtime_goal.py --out docs/cybernetics/runtime-goals/2026-06-05-realization-surface-closure.goal`: regenerated runtime goal;
   - `git diff --check`: clean;
 - next gate: operator packaging decision.
+
+## 2026-06-05 Human Setpoint Approval Invariant
+
+- batch/status: `INV-HSA-001` implemented as a core pre-design approval invariant;
+- surfaces acted on or inspected: requirements skill/template/evals, router wording/evals, orchestrator skill/evals/guard, design/goal/execution-policy skills, review skill/template/evals, runtime compiler skill/template/script/evals, control-chain guard, invariant matrix, MANIFEST, tests, and current RSC dogfood requirements/review/runtime-goal artifacts;
+- residuals and reconciliation: `Requirements Analysis Status: Complete` no longer implies human approval; answered clarification questions remain inputs; full pre-goal orchestration and runtime compile now require `Human Setpoint Approval: Approved`; downstream review checks Human Setpoint Fidelity rather than asking humans to review execution artifacts later;
+- commands run and summarized results:
+  - `python3 -m unittest tests.skills.test_human_setpoint_approval`: `OK`, 7 tests;
+  - `python3 -m unittest tests.skills.test_context_topology tests.skills.test_purpose_feedback_boundary tests.skills.test_realization_surface_closure tests.skills.test_human_setpoint_approval`: `OK`, 48 tests;
+  - `python3 -m unittest`: `OK`, 168 tests;
+  - `python3 -m json.tool` on updated eval files: `OK`;
+  - `orchestration_guard.py --state before-design` on the current RSC requirements: `PASS`, `NEXT: RunDesign`;
+  - `orchestration_guard.py --state before-runtime-compile` on the current RSC artifact chain: `PASS`, `NEXT: RunRuntimeCompile`;
+  - `control_chain_guard.py` on the current RSC artifact chain: `PASS`, `NEXT: CompileRuntimeGoal`;
+  - `control_artifact_lint.py` on the current RSC artifact chain: `PASS`;
+  - `compile_runtime_goal.py --out docs/cybernetics/runtime-goals/2026-06-05-realization-surface-closure.goal`: regenerated runtime goal with human-approved setpoint preservation;
+  - `git diff --check`: clean;
+- next gate: operator review / packaging decision.

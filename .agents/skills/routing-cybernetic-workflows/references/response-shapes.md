@@ -162,7 +162,7 @@ Required gates:
 
 Recommended next step:
 1. `$analyzing-cybernetic-requirements <需求>`
-2. After requirements analysis is complete: `$orchestrating-cybernetic-pregoal 根据 <requirements-path> 完成 pre-goal 编译，允许使用 subagents review。`
+2. After requirements analysis is complete and Human Setpoint Approval is Approved: `$orchestrating-cybernetic-pregoal 根据 <requirements-path> 完成 pre-goal 编译，允许使用 subagents review。`
 
 If Design Gate is required, keep it listed under Required gates. The orchestrator must invoke or request `$designing-cybernetic-solutions` before goal writing; do not list solution design as a separate manual step before orchestration for Level 3/4 work.
 

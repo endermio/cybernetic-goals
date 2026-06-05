@@ -39,6 +39,7 @@ Owned analysis:
 - identify the final output audience, purpose, medium, required structure level, detail level, evidence-reference needs, machine-readable needs, destination path, and acceptance condition;
 - identify the Purpose Feedback Boundary: who can observe purpose realization, what outcome realizes the human purpose, what feedback can judge it, and what internal sensors can or cannot prove;
 - identify the Realization Surface Closure boundary when target state must be realized across a controlled object: Target state, Realization surfaces, Required surface action, Residual reconciliation, and RSC status;
+- prepare the Human Setpoint Approval compact control commitment for Level 3/4 or full pre-goal work: Human purpose, Input role binding, Primary object, Requested transformation, Non-goals, Purpose Feedback Boundary, Realization Surface Closure, Output Contract, Workflow fit, and Known assumptions;
 - identify constraints, invariants, assumptions, and stop conditions;
 - decide whether Semantic, Rubric, Output Contract, Design, Goal Contract, Execution Policy, Control Review, or Risk gates are required;
 - ask high-value human questions;
@@ -74,6 +75,35 @@ Ask the human a question only if all are true:
 Do not ask the human about routine execution tactics, obvious resilience behavior, execution mechanics, or design details that belong in `$designing-cybernetic-solutions`.
 
 Use `references/decision-levels.md` for decision classification.
+
+## Human Setpoint Approval Rule
+
+For Level 3, Level 4, or full pre-goal orchestration, `Requirements Analysis Status: Complete` is not sufficient to start downstream orchestration.
+
+The requirements analysis must also include:
+
+```text
+Human Setpoint Approval: Approved
+```
+
+unless the user explicitly approves the compact control commitment in the current message.
+
+Human answers to clarification questions are inputs, not approval. Do not infer approval from the user merely answering questions.
+
+Before handoff to `$orchestrating-cybernetic-pregoal`, present a compact control commitment for approval. The commitment must include:
+
+- Human purpose;
+- Input role binding;
+- Primary object;
+- Requested transformation;
+- Non-goals;
+- Purpose Feedback Boundary;
+- Realization Surface Closure;
+- Output Contract;
+- Workflow fit;
+- Known assumptions.
+
+If the commitment is `Pending`, `Rejected`, or `Needs Revision`, keep the workflow at requirements analysis and ask the user to approve or revise the compact commitment. Do not route the user into design review, plan review, or artifact-by-artifact approval as a substitute for setpoint approval.
 
 ## Output Contract Gate
 
@@ -220,19 +250,28 @@ For Level 3/4 or full pre-goal work, pass Design Gate to `$orchestrating-cyberne
 6. Identify the Purpose Feedback Boundary and whether internal sensors are sufficient or only supporting evidence.
 7. Identify the Realization Surface Closure boundary when target-state realization spans surfaces.
 8. Identify output-contract needs and whether a safe default is sufficient.
-9. Identify required gates: Semantic, Rubric, Output Contract, Design, Goal Contract, Execution Policy, Control Review, Risk.
-10. Classify uncertainty as blocking human decision, safe default assumption, or deferred design/planning/execution detail.
-11. Ask 3-7 high-value questions, preferably no more than 5.
-12. Create or update the requirements analysis brief.
-13. If the human answers, update `Confirmed Requirement Decisions` and `Requirements Analysis Status`.
-14. Do not create a solution design, goal, plan, control review, runtime `/goal`, or target-work artifacts.
-15. If analysis is complete and the brief path deterministically identifies a date/slug, output queue-friendly next commands as described below.
+9. For Level 3/4 or full pre-goal work, build or update the Human Setpoint Approval compact control commitment.
+10. Identify required gates: Semantic, Rubric, Output Contract, Design, Goal Contract, Execution Policy, Control Review, Risk.
+11. Classify uncertainty as blocking human decision, safe default assumption, or deferred design/planning/execution detail.
+12. Ask 3-7 high-value questions, preferably no more than 5.
+13. Create or update the requirements analysis brief.
+14. If the human answers, update `Confirmed Requirement Decisions`, `Requirements Analysis Status`, and the Human Setpoint Approval record without treating answers as approval.
+15. Do not create a solution design, goal, plan, control review, runtime `/goal`, or target-work artifacts.
+16. If analysis is complete and the brief path deterministically identifies a date/slug, output the approval request or queue-friendly next commands as described below.
 
 ## Queue-Friendly Next Commands
 
 When requirements analysis is complete, choose the next command from the intended workflow.
 
-For Level 3/4 or full pre-goal work, and when the requirements path is deterministic, output:
+If requirements analysis is complete but Human Setpoint Approval is not Approved for Level 3/4 or full pre-goal work, do not output the orchestration command or predicted `/goal`.
+
+Instead, output only the compact approval request:
+
+```text
+Human Setpoint Approval is Pending. Please approve or revise the compact control commitment before orchestration.
+```
+
+For Level 3/4 or full pre-goal work, when `Human Setpoint Approval: Approved` is recorded and the requirements path is deterministic, output:
 
 1. A pre-goal orchestration command using the concrete requirements path.
 2. A predicted queue-friendly `/goal` command using the expected artifact paths for the same date/slug.
@@ -284,6 +323,8 @@ Mark `Complete` only when:
 - confirmed requirement decisions are recorded;
 - remaining assumptions are low-risk and explicit;
 - the next step can safely create a solution design or goal contract.
+
+For Level 3/4 or full pre-goal work, `Complete` only means requirement semantics are sufficiently analyzed. Downstream orchestration still requires `Human Setpoint Approval: Approved`.
 
 ## Output Format
 
@@ -339,6 +380,19 @@ Deferred to design:
 Deferred to planning/execution:
 - ...
 
+Human Setpoint Approval:
+- Status: ...
+- Human purpose: ...
+- Input role binding: ...
+- Primary object: ...
+- Requested transformation: ...
+- Non-goals: ...
+- Purpose Feedback Boundary: ...
+- Realization Surface Closure: ...
+- Output Contract: ...
+- Workflow fit: ...
+- Known assumptions: ...
+
 Questions:
 1. ...
 2. ...
@@ -353,6 +407,35 @@ Reply with one of:
 ```
 
 If all blocking decisions are resolved for full pre-goal work:
+
+If `Human Setpoint Approval` is not `Approved`, use this response instead of queue suggestions:
+
+```markdown
+Requirements analysis is complete, but Human Setpoint Approval is pending.
+
+Updated requirements analysis brief:
+`docs/cybernetics/requirements/YYYY-MM-DD-slug.md`
+
+Approve or revise this compact control commitment:
+
+- Human purpose: ...
+- Input role binding: ...
+- Primary object: ...
+- Requested transformation: ...
+- Non-goals: ...
+- Purpose Feedback Boundary: ...
+- Realization Surface Closure: ...
+- Output Contract: ...
+- Workflow fit: ...
+- Known assumptions: ...
+
+Response choices:
+- `批准这个 setpoint，进入 orchestration`
+- revised setpoint fields
+- cancel/postpone
+```
+
+If `Human Setpoint Approval: Approved`, use:
 
 ````markdown
 Requirements analysis is complete.
@@ -409,6 +492,9 @@ $writing-cybernetic-goals 使用 docs/cybernetics/requirements/YYYY-MM-DD-slug.m
 - [ ] Obvious defaults are not asked as blocking questions.
 - [ ] There are no more than 7 questions.
 - [ ] The brief includes `Requirements Analysis Status`.
+- [ ] Level 3/4 or full pre-goal work includes `Human Setpoint Approval`.
+- [ ] Human answers to clarification questions are not treated as approval.
+- [ ] If Human Setpoint Approval is not `Approved`, the response asks for approval or revision and does not output the orchestration command or predicted `/goal`.
 - [ ] No solution design, goal, plan, control review, or approved runtime `/goal` was created.
 - [ ] Level 1/2 work with `Rubric Gate: required` routes to `$writing-cybernetic-goals`, not full pre-goal orchestration by default.
 - [ ] Any predicted queue-friendly `/goal` is clearly labeled as predicted and includes the missing/not-approved/inconsistent artifact precondition.

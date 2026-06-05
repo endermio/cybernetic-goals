@@ -16,6 +16,7 @@ Status: `Needs Revision`
 - Pre-goal review subagents authorized: `yes/no`
 - Independent review passes completed:
   - Requirement traceability: `yes/no`
+  - Human setpoint fidelity: `yes/no`
   - Design fidelity: `yes/no`
   - Output contract fidelity: `yes/no`
   - Goal fidelity: `yes/no`
@@ -54,6 +55,19 @@ Rationale:
 - [pass/fail summary]
 
 ## Requirement Traceability
+
+Findings:
+
+- [finding]
+
+## Human Setpoint Fidelity
+
+Check:
+
+- requirements analysis contains `Human Setpoint Approval: Approved` when full pre-goal orchestration is used;
+- goal preserves the approved compact control commitment;
+- design, goal, and execution policy do not reinterpret human purpose, input role binding, primary object, requested transformation, non-goals, Purpose Feedback Boundary, Realization Surface Closure, Output Contract, workflow fit, or known assumptions;
+- downstream artifacts do not expand or change the approved setpoint without explicit human reapproval.
 
 Findings:
 
