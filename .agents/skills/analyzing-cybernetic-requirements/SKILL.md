@@ -38,6 +38,7 @@ Owned analysis:
 - classify success, failure, completion, closure, usability, readiness, or pass/fail semantics;
 - identify the final output audience, purpose, medium, required structure level, detail level, evidence-reference needs, machine-readable needs, destination path, and acceptance condition;
 - identify the Purpose Feedback Boundary: who can observe purpose realization, what outcome realizes the human purpose, what feedback can judge it, and what internal sensors can or cannot prove;
+- identify the Realization Surface Closure boundary when target state must be realized across a controlled object: Target state, Realization surfaces, Required surface action, Residual reconciliation, and RSC status;
 - identify constraints, invariants, assumptions, and stop conditions;
 - decide whether Semantic, Rubric, Output Contract, Design, Goal Contract, Execution Policy, Control Review, or Risk gates are required;
 - ask high-value human questions;
@@ -166,6 +167,27 @@ Internal sensors may support progress, diagnosis, and risk reduction, but they
 must not be treated as purpose-achievement evidence unless the human purpose
 itself is internal-state correctness.
 
+## Realization Surface Closure
+
+When a task changes or realizes target state across a controlled object,
+requirements analysis must identify how the target state is carried and how
+closure will be judged.
+
+Requirements analysis must define:
+
+- Target state: the state or semantic change to realize;
+- Realization surfaces: the controlled-object surfaces that carry, expose,
+  enforce, record, explain, or preserve the target state;
+- Required surface action: act, inspect, preserve, exclude, or discover;
+- Residual reconciliation: how old state, unknown surfaces, exclusions,
+  preserved surfaces, and remaining mismatches will be accounted for;
+- RSC status: `RSC adequate`, `RSC partial`, `RSC missing`,
+  `RSC unavailable`, or `RSC not applicable with justification`.
+
+RSC is distinct from Purpose Feedback Boundary. RSC calibrates target-state and
+surface-closure claims. Purpose Feedback Boundary calibrates human-purpose
+realization claims.
+
 ## Design Gate Boundary
 
 This skill identifies whether Design Gate is required. It does not resolve it.
@@ -196,14 +218,15 @@ For Level 3/4 or full pre-goal work, pass Design Gate to `$orchestrating-cyberne
 4. Build a requirements control map: objective, controlled object, candidate sensors, actuators, constraints, disturbances, stop conditions.
 5. If the task is evaluative, identify the rubric/error function and classify missing rubric elements as decisions.
 6. Identify the Purpose Feedback Boundary and whether internal sensors are sufficient or only supporting evidence.
-7. Identify output-contract needs and whether a safe default is sufficient.
-8. Identify required gates: Semantic, Rubric, Output Contract, Design, Goal Contract, Execution Policy, Control Review, Risk.
-9. Classify uncertainty as blocking human decision, safe default assumption, or deferred design/planning/execution detail.
-10. Ask 3-7 high-value questions, preferably no more than 5.
-11. Create or update the requirements analysis brief.
-12. If the human answers, update `Confirmed Requirement Decisions` and `Requirements Analysis Status`.
-13. Do not create a solution design, goal, plan, control review, runtime `/goal`, or target-work artifacts.
-14. If analysis is complete and the brief path deterministically identifies a date/slug, output queue-friendly next commands as described below.
+7. Identify the Realization Surface Closure boundary when target-state realization spans surfaces.
+8. Identify output-contract needs and whether a safe default is sufficient.
+9. Identify required gates: Semantic, Rubric, Output Contract, Design, Goal Contract, Execution Policy, Control Review, Risk.
+10. Classify uncertainty as blocking human decision, safe default assumption, or deferred design/planning/execution detail.
+11. Ask 3-7 high-value questions, preferably no more than 5.
+12. Create or update the requirements analysis brief.
+13. If the human answers, update `Confirmed Requirement Decisions` and `Requirements Analysis Status`.
+14. Do not create a solution design, goal, plan, control review, runtime `/goal`, or target-work artifacts.
+15. If analysis is complete and the brief path deterministically identifies a date/slug, output queue-friendly next commands as described below.
 
 ## Queue-Friendly Next Commands
 

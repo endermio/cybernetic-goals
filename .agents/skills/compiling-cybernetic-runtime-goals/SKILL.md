@@ -39,6 +39,9 @@ The final command must instruct runtime Codex to:
 - Report completion status according to the highest purpose-relevant evidence actually observed.
 - Do not claim the human purpose is achieved from internal sensors alone unless the approved goal says internal evidence is sufficient.
 - If purpose feedback is missing, report what is verified, what is not yet observed, and the smallest next observation needed.
+- Do not claim target-state realization from local action alone when Realization Surface Closure is required.
+- Strongest positive target-realization claims require RSC adequate.
+- Report surfaces covered, required surface actions completed or justified, residuals reconciled, pending or unknown surfaces, and smallest next reconciliation when RSC is partial, missing, unavailable, or not applicable with justification.
 - if runtime cannot load these skills, follow the equivalent discipline already written in the approved plan and control review.
 
 ## Preconditions
@@ -52,6 +55,9 @@ Do not output `/goal` unless:
 - control review status is Approved;
 - control review records `Context management / execution topology: yes` in Review Independence;
 - control review includes meaningful `Context Management / Execution Topology` findings;
+- goal includes a compact `Realization Surface Contract`; simple direct tasks may record `RSC not applicable with justification`;
+- control review records `Realization surface closure adequacy: yes` in Review Independence;
+- control review includes meaningful `Realization Surface Closure Adequacy` findings;
 - control review includes `Final Observer Check`;
 - final observer check allows approval;
 - any substantive post-review change has final re-review recorded;
@@ -87,6 +93,9 @@ The final `/goal` must:
 - Report completion status according to the highest purpose-relevant evidence actually observed.
 - Do not claim the human purpose is achieved from internal sensors alone unless the approved goal says internal evidence is sufficient.
 - If purpose feedback is missing, report what is verified, what is not yet observed, and the smallest next observation needed.
+- Do not claim target-state realization from local action alone when Realization Surface Closure is required.
+- Strongest positive target-realization claims require RSC adequate.
+- Report surfaces covered, required surface actions completed or justified, residuals reconciled, pending or unknown surfaces, and smallest next reconciliation when RSC is partial, missing, unavailable, or not applicable with justification.
 - follow equivalent discipline already written in the approved plan and control review if runtime cannot load those skills;
 - stop if any referenced artifact is missing, not approved, or internally inconsistent;
 - stop if artifacts conflict or become insufficient.
@@ -165,5 +174,6 @@ Do not create or modify target-work artifacts.
 - [ ] The final `/goal` does not ask runtime Codex to create or revise solution design.
 - [ ] The final `/goal` includes executing, debugging, and completion-verification discipline.
 - [ ] The final `/goal` calibrates completion claims to the highest purpose-relevant evidence actually observed.
+- [ ] The final `/goal` calibrates target-realization claims to Realization Surface Closure status.
 - [ ] If guard or preconditions fail, the response includes a response-only next step and no final `/goal`.
 - [ ] The skill did not execute target work.

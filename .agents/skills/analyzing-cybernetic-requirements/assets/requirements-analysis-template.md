@@ -63,6 +63,17 @@ Outside scope:
 | Sufficient evidence level | `internal / integration / purpose-boundary / operational` |
 | If feedback unavailable | [honest status and smallest next observation] |
 
+## Realization Surface Closure
+
+| Element | Value |
+|---|---|
+| Target state | [state or semantic change to realize] |
+| Realization surfaces | [controlled-object surfaces that carry, expose, enforce, record, explain, or preserve the target state] |
+| Required surface action | [act / inspect / preserve / exclude / discover] |
+| Residual reconciliation | [old state, unknown surfaces, exclusions, preserved surfaces, remaining mismatches, and accounting method] |
+| RSC status | `RSC adequate / RSC partial / RSC missing / RSC unavailable / RSC not applicable with justification` |
+| RSC / PFB boundary | RSC is distinct from Purpose Feedback Boundary; RSC calibrates target-state and surface-closure claims, while PFB calibrates human-purpose realization claims. |
+
 ## Blocking Human Decisions
 
 | Decision | Why it matters | Recommended default | Risk if wrong |

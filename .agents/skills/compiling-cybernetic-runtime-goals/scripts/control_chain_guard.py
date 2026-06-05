@@ -474,6 +474,28 @@ def check_review_purpose_feedback(review: str, errors: list[str]) -> None:
         errors.append("control review Purpose Feedback Adequacy section has no meaningful findings")
 
 
+def check_goal_realization_surface(goal: str, errors: list[str]) -> None:
+    if not section_has_meaningful_content(goal, "Realization Surface Contract"):
+        errors.append("goal missing ## Realization Surface Contract")
+
+
+def check_review_realization_surface(review: str, errors: list[str]) -> None:
+    independence = section_body(review, "Review Independence")
+    if independence is None:
+        errors.append("control review missing ## Review Independence for Realization Surface Closure Adequacy")
+    else:
+        reviewed = yes_no_value(independence, "Realization surface closure adequacy")
+        if reviewed != "yes":
+            errors.append("control review did not record Realization surface closure adequacy: yes in ## Review Independence")
+
+    body = section_body(review, "Realization Surface Closure Adequacy")
+    if body is None:
+        errors.append("control review missing ## Realization Surface Closure Adequacy")
+        return
+    if not labeled_block_has_content(body, "Findings"):
+        errors.append("control review Realization Surface Closure Adequacy section has no meaningful findings")
+
+
 def suggest_next_action(errors: list[str]) -> str:
     joined = "\n".join(errors).casefold()
     lowered_errors = [error.casefold() for error in errors]
@@ -488,6 +510,8 @@ def suggest_next_action(errors: list[str]) -> str:
         or "goal contains runtime control-structure" in joined
         or "goal missing ## purpose feedback contract" in joined
         or "goal purpose feedback contract missing" in joined
+        or "goal missing ## realization surface contract" in joined
+        or "goal realization surface contract missing" in joined
     ):
         return "RunGoalWriting"
     if (
@@ -515,8 +539,11 @@ def suggest_next_action(errors: list[str]) -> str:
         or "control review missing ## review independence" in joined
         or "control review missing ## context management / execution topology" in joined
         or "control review missing ## purpose feedback adequacy" in joined
+        or "control review missing ## realization surface closure adequacy" in joined
         or "purpose feedback adequacy section has no meaningful findings" in joined
+        or "realization surface closure adequacy section has no meaningful findings" in joined
         or "did not record purpose feedback adequacy" in joined
+        or "did not record realization surface closure adequacy" in joined
         or "context management / execution topology section has no meaningful findings" in joined
         or "did not record context management / execution topology" in joined
     ):
@@ -573,6 +600,7 @@ def main() -> int:
 
     if goal:
         check_goal_purpose_feedback(goal, errors)
+        check_goal_realization_surface(goal, errors)
 
     if plan:
         plan_status = section_status(plan, "Execution Policy Status")
@@ -587,6 +615,7 @@ def main() -> int:
         check_final_observer(review, errors)
         check_review_context_topology(review, errors)
         check_review_purpose_feedback(review, errors)
+        check_review_realization_surface(review, errors)
 
     for path, text, label in [
         (args.requirements, goal, "goal"),

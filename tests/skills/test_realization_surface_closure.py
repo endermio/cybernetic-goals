@@ -9,7 +9,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[2]
 
 
-class PurposeFeedbackBoundaryTest(unittest.TestCase):
+class RealizationSurfaceClosureTest(unittest.TestCase):
     def read(self, path: str) -> str:
         return (ROOT / path).read_text(encoding="utf-8")
 
@@ -17,9 +17,9 @@ class PurposeFeedbackBoundaryTest(unittest.TestCase):
         self,
         tmp: Path,
         *,
-        include_goal_pfb: bool = True,
-        include_review_pfb: bool = True,
-        review_independence_pfb: str = "yes",
+        include_goal_rsc: bool = True,
+        include_review_rsc: bool = True,
+        review_independence_rsc: str = "yes",
     ) -> tuple[Path, Path, Path, Path]:
         requirements = tmp / "requirements.md"
         goal = tmp / "goal.md"
@@ -38,36 +38,32 @@ class PurposeFeedbackBoundaryTest(unittest.TestCase):
             "",
             f"- Requirements analysis: `{requirements}`",
             "",
+            "## Purpose Feedback Contract",
+            "",
+            "| Element | Requirement |",
+            "|---|---|",
+            "| Beneficiary / observer | operator |",
+            "| Purpose-realizing outcome observed | operator can observe the intended result |",
+            "| Supporting Evidence | internal checks support progress only |",
+            "| Sufficient evidence level | purpose-boundary |",
+            "| Purpose feedback unavailable handling | report pending and next observation |",
+            "| Allowed completion wording | pending until purpose feedback is observed |",
+            "",
         ]
-        if include_goal_pfb:
+        if include_goal_rsc:
             goal_parts.extend(
                 [
-                    "## Purpose Feedback Contract",
+                    "## Realization Surface Contract",
                     "",
                     "| Element | Requirement |",
                     "|---|---|",
-                    "| Beneficiary / observer | operator |",
-                    "| Purpose-realizing outcome observed | operator can observe the intended result |",
-                    "| Supporting Evidence | internal checks support progress only |",
-                    "| Sufficient evidence level | purpose-boundary |",
-                    "| Purpose feedback unavailable handling | report pending and next observation |",
-                    "| Allowed completion wording | pending until purpose feedback is observed |",
+                    "| Target state | target semantics are represented across realization surfaces |",
+                    "| Required surfaces | surface model, action classification, residual reconciliation |",
+                    "| RSC status wording | strongest target-realization claim requires RSC adequate |",
+                    "| Partial/unavailable handling | report partial, missing, unavailable, or not applicable with justification |",
                     "",
                 ]
             )
-        goal_parts.extend(
-            [
-                "## Realization Surface Contract",
-                "",
-                "| Element | Requirement |",
-                "|---|---|",
-                "| Target state | guard fixture target state |",
-                "| Required surfaces | guard fixture surface model |",
-                "| RSC status wording | strongest target-realization claim requires RSC adequate |",
-                "| Partial/unavailable handling | report partial, missing, unavailable, or not applicable with justification |",
-                "",
-            ]
-        )
         goal.write_text("\n".join(goal_parts), encoding="utf-8")
 
         plan.write_text(
@@ -122,41 +118,36 @@ class PurposeFeedbackBoundaryTest(unittest.TestCase):
             "- Goal contract: `yes`",
             "- Execution policy: `yes`",
             "- Context management / execution topology: `yes`",
-            f"- Purpose feedback adequacy: `{review_independence_pfb}`",
-            "- Realization surface closure adequacy: `yes`",
+            "- Purpose feedback adequacy: `yes`",
+            f"- Realization surface closure adequacy: `{review_independence_rsc}`",
             "",
             "## Context Management / Execution Topology",
             "",
             "Findings:",
             "- Reviewed selected topology and no Blocking/Major findings.",
             "",
+            "## Purpose Feedback Adequacy",
+            "",
+            "Classification:",
+            "- Internally verified, purpose feedback pending",
+            "",
+            "Findings:",
+            "- Internal checks are progress evidence; purpose achievement claim waits for purpose-boundary feedback.",
+            "",
         ]
-        if include_review_pfb:
+        if include_review_rsc:
             review_parts.extend(
                 [
-                    "## Purpose Feedback Adequacy",
+                    "## Realization Surface Closure Adequacy",
                     "",
                     "Classification:",
-                    "",
-                    "- Internally verified, purpose feedback pending",
+                    "- RSC adequate",
                     "",
                     "Findings:",
-                    "- Internal checks are progress evidence; purpose achievement claim waits for purpose-boundary feedback.",
+                    "- Surface model, residual reconciliation, and target-realization wording were reviewed.",
                     "",
                 ]
             )
-        review_parts.extend(
-            [
-                "## Realization Surface Closure Adequacy",
-                "",
-                "Classification:",
-                "- RSC adequate",
-                "",
-                "Findings:",
-                "- Guard fixture includes RSC structure so PFB tests isolate purpose-feedback behavior.",
-                "",
-            ]
-        )
         review_parts.extend(
             [
                 "## Final Observer Check",
@@ -176,103 +167,81 @@ class PurposeFeedbackBoundaryTest(unittest.TestCase):
         review.write_text("\n".join(review_parts), encoding="utf-8")
         return requirements, goal, plan, review
 
-    def test_requirements_define_purpose_feedback_boundary(self):
+    def test_requirements_define_realization_surface_closure_boundary(self):
         skill = self.read(".agents/skills/analyzing-cybernetic-requirements/SKILL.md")
         template = self.read(
             ".agents/skills/analyzing-cybernetic-requirements/assets/requirements-analysis-template.md"
         )
 
         for text in (skill, template):
-            self.assertIn("Purpose Feedback Boundary", text)
-            self.assertIn("Human purpose", text)
-            self.assertIn("Beneficiary / observer", text)
-            self.assertIn("Purpose-realizing outcome", text)
-            self.assertIn("Feedback needed", text)
-            self.assertIn("Internal sensors role", text)
-            self.assertIn("Sufficient evidence level", text)
-            self.assertIn("If feedback unavailable", text)
-        self.assertIn("purpose feedback boundary", skill.casefold())
-        self.assertIn("beneficiary/observer", skill)
-        self.assertIn("sufficient evidence level", skill)
-        self.assertIn("feedback-unavailable handling", skill)
+            self.assertIn("Realization Surface Closure", text)
+            self.assertIn("Target state", text)
+            self.assertIn("Realization surfaces", text)
+            self.assertIn("Required surface action", text)
+            self.assertIn("Residual reconciliation", text)
+            self.assertIn("RSC status", text)
+            self.assertIn("RSC is distinct from Purpose Feedback Boundary", text)
 
-    def test_goal_separates_purpose_achievement_from_supporting_sensors(self):
+    def test_goal_preserves_rsc_contract_and_completion_wording(self):
         skill = self.read(".agents/skills/writing-cybernetic-goals/SKILL.md")
         template = self.read(".agents/skills/writing-cybernetic-goals/assets/goal-contract-template.md")
 
         for text in (skill, template):
-            self.assertIn("Purpose Feedback Contract", text)
-            self.assertIn("Purpose-realizing outcome observed", text)
-            self.assertIn("Supporting Evidence", text)
-            self.assertIn(
-                "Do not define success as internal sensor success unless the human purpose is internal-state correctness.",
-                text,
-            )
+            self.assertIn("Realization Surface Contract", text)
+            self.assertIn("Target state", text)
+            self.assertIn("Required surfaces", text)
+            self.assertIn("RSC status wording", text)
+            self.assertIn("strongest positive target-realization claim requires RSC adequate", text)
+            self.assertIn("partial, missing, unavailable, or not applicable with justification", text)
+            self.assertIn("RSC is distinct from Purpose Feedback Boundary", text)
 
-    def test_goal_final_report_uses_purpose_feedback_status(self):
-        template = self.read(".agents/skills/writing-cybernetic-goals/assets/goal-contract-template.md")
-        final_report = template.split("## Final Report Format", 1)[1]
-
-        self.assertNotIn("- goal achieved", final_report)
-        for required in (
-            "purpose feedback status",
-            "highest purpose-relevant evidence observed",
-            "supporting internal/integration evidence",
-            "not yet observed",
-            "smallest next observation needed",
-            "commands run",
-            "files changed",
-            "known residual risks",
-        ):
-            self.assertIn(required, final_report)
-
-    def test_execution_policy_defines_purpose_feedback_strategy(self):
+    def test_execution_policy_defines_rsc_strategy(self):
         skill = self.read(".agents/skills/writing-cybernetic-execution-policies/SKILL.md")
         template = self.read(
             ".agents/skills/writing-cybernetic-execution-policies/assets/execution-policy-template.md"
         )
 
         for text in (skill, template):
-            self.assertIn("Purpose Feedback Strategy", text)
-            self.assertIn("Internal feedback", text)
-            self.assertIn("Integration feedback", text)
-            self.assertIn("Purpose-boundary feedback", text)
-            self.assertIn("Operational feedback", text)
-            self.assertIn("Feedback cadence", text)
-            self.assertIn("Evidence unavailable handling", text)
-            self.assertIn("Allowed completion wording", text)
+            self.assertIn("Realization Surface Closure Strategy", text)
+            self.assertIn("Surface Model", text)
+            self.assertIn("Surface Classes", text)
+            self.assertIn("Residual Reconciliation", text)
+            self.assertIn("Must act", text)
+            self.assertIn("Must inspect", text)
+            self.assertIn("Must preserve", text)
+            self.assertIn("Explicitly out of scope", text)
+            self.assertIn("Unknown or requires discovery", text)
 
-    def test_execution_policy_progress_log_records_purpose_feedback_status(self):
+    def test_execution_policy_progress_log_records_rsc_status(self):
         template = self.read(
             ".agents/skills/writing-cybernetic-execution-policies/assets/execution-policy-template.md"
         )
         progress_log = template.split("## Progress Log Rules", 1)[1]
 
         for required in (
-            "purpose feedback status",
-            "highest purpose-relevant evidence observed",
-            "purpose feedback not yet observed",
-            "smallest next observation needed",
-            "allowed completion wording",
+            "RSC status",
+            "surfaces acted on or inspected",
+            "residuals and reconciliation",
+            "allowed target-realization wording",
         ):
             self.assertIn(required, progress_log)
 
-    def test_review_classifies_purpose_feedback_adequacy(self):
+    def test_review_classifies_rsc_adequacy(self):
         skill = self.read(".agents/skills/reviewing-cybernetic-control-structures/SKILL.md")
         template = self.read(
             ".agents/skills/reviewing-cybernetic-control-structures/assets/control-review-template.md"
         )
 
         for text in (skill, template):
-            self.assertIn("Purpose Feedback Adequacy", text)
-            self.assertIn("Purpose feedback adequate", text)
-            self.assertIn("Internally verified, purpose feedback pending", text)
-            self.assertIn("Purpose partially observed", text)
-            self.assertIn("Purpose feedback unavailable, honest handoff required", text)
-            self.assertIn("Purpose-boundary evidence not required, justified", text)
-            self.assertIn("Block false completion claims, not necessarily continued execution.", text)
+            self.assertIn("Realization Surface Closure Adequacy", text)
+            self.assertIn("RSC adequate", text)
+            self.assertIn("RSC partial", text)
+            self.assertIn("RSC missing", text)
+            self.assertIn("RSC unavailable", text)
+            self.assertIn("RSC not applicable with justification", text)
+            self.assertIn("local action is being treated as global target-state realization", text)
 
-    def test_runtime_compiler_calibrates_completion_claims_to_purpose_feedback(self):
+    def test_runtime_compiler_calibrates_rsc_completion_claims(self):
         skill = self.read(".agents/skills/compiling-cybernetic-runtime-goals/SKILL.md")
         template = self.read(
             ".agents/skills/compiling-cybernetic-runtime-goals/assets/runtime-goal-template.txt"
@@ -283,26 +252,21 @@ class PurposeFeedbackBoundaryTest(unittest.TestCase):
 
         for text in (skill, template, compiler):
             self.assertIn(
-                "Report completion status according to the highest purpose-relevant evidence actually observed.",
+                "Do not claim target-state realization from local action alone when Realization Surface Closure is required.",
                 text,
             )
             self.assertIn(
-                "Do not claim the human purpose is achieved from internal sensors alone",
+                "Strongest positive target-realization claims require RSC adequate.",
                 text,
             )
-            self.assertIn("smallest next observation needed", text)
+            self.assertIn(
+                "surfaces covered, required surface actions completed or justified, residuals reconciled, pending or unknown surfaces, and smallest next reconciliation",
+                text,
+            )
 
         with tempfile.TemporaryDirectory() as tmpdir:
             tmp = Path(tmpdir)
-            requirements = tmp / "requirements.md"
-            goal = tmp / "goal.md"
-            plan = tmp / "plan.md"
-            review = tmp / "review.md"
-            requirements.write_text("## Requirements Analysis Status\n\nStatus: `Complete`\n", encoding="utf-8")
-            goal.write_text("## Source Contracts\n\n- Requirements analysis: `requirements.md`\n", encoding="utf-8")
-            plan.write_text("## Context Management / Execution Topology\n\nSelected topology: `Main-only`\n", encoding="utf-8")
-            review.write_text("## Review Status\n\nStatus: `Approved`\n", encoding="utf-8")
-
+            requirements, goal, plan, review = self.write_guard_artifacts(tmp)
             result = subprocess.run(
                 [
                     sys.executable,
@@ -318,8 +282,6 @@ class PurposeFeedbackBoundaryTest(unittest.TestCase):
                     str(plan),
                     "--review",
                     str(review),
-                    "--skip-guard",
-                    "--i-understand-this-bypasses-phase-gates",
                 ],
                 cwd=ROOT,
                 text=True,
@@ -327,14 +289,17 @@ class PurposeFeedbackBoundaryTest(unittest.TestCase):
             )
 
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
-        self.assertIn("highest purpose-relevant evidence actually observed", result.stdout)
-        self.assertIn("smallest next observation needed", result.stdout)
+        self.assertIn("target-state realization", result.stdout)
+        self.assertIn("RSC adequate", result.stdout)
+        self.assertIn("surfaces covered", result.stdout)
+        self.assertIn("required surface actions completed or justified", result.stdout)
+        self.assertIn("smallest next reconciliation", result.stdout)
 
-    def test_control_chain_guard_rejects_goal_missing_purpose_feedback_contract(self):
+    def test_control_chain_guard_rejects_goal_missing_rsc_contract(self):
         with tempfile.TemporaryDirectory() as tmpdir:
             requirements, goal, plan, review = self.write_guard_artifacts(
                 Path(tmpdir),
-                include_goal_pfb=False,
+                include_goal_rsc=False,
             )
 
             result = subprocess.run(
@@ -361,14 +326,14 @@ class PurposeFeedbackBoundaryTest(unittest.TestCase):
         output = result.stdout + result.stderr
         self.assertNotEqual(result.returncode, 0)
         self.assertIn("NEXT: RunGoalWriting", output)
-        self.assertIn("Purpose Feedback Contract", output)
+        self.assertIn("Realization Surface Contract", output)
 
-    def test_control_chain_guard_rejects_review_missing_purpose_feedback_adequacy(self):
+    def test_control_chain_guard_rejects_review_missing_rsc_adequacy(self):
         with tempfile.TemporaryDirectory() as tmpdir:
             requirements, goal, plan, review = self.write_guard_artifacts(
                 Path(tmpdir),
-                include_review_pfb=False,
-                review_independence_pfb="no",
+                include_review_rsc=False,
+                review_independence_rsc="no",
             )
 
             result = subprocess.run(
@@ -395,10 +360,10 @@ class PurposeFeedbackBoundaryTest(unittest.TestCase):
         output = result.stdout + result.stderr
         self.assertNotEqual(result.returncode, 0)
         self.assertIn("NEXT: RunReview", output)
-        self.assertIn("Purpose Feedback Adequacy", output)
-        self.assertIn("Purpose feedback adequacy: yes", output)
+        self.assertIn("Realization Surface Closure Adequacy", output)
+        self.assertIn("Realization surface closure adequacy: yes", output)
 
-    def test_purpose_feedback_evals_cover_false_completion_and_overcontrol(self):
+    def test_rsc_evals_cover_false_completion_and_not_applicable_justification(self):
         review_evals = json.loads(
             self.read(".agents/skills/reviewing-cybernetic-control-structures/evals/evals.json")
         )
@@ -409,17 +374,18 @@ class PurposeFeedbackBoundaryTest(unittest.TestCase):
         review_ids = {item["id"] for item in review_evals["evals"]}
         compiler_ids = {item["id"] for item in compiler_evals["evals"]}
 
-        self.assertIn("purpose-visible-outcome-cannot-be-claimed-from-internal-sensors-only", review_ids)
-        self.assertIn("internal-purpose-can-use-internal-feedback", review_ids)
-        self.assertIn("runtime-calibrates-purpose-feedback-claims", compiler_ids)
+        self.assertIn("local-action-cannot-claim-target-realization-without-rsc", review_ids)
+        self.assertIn("rsc-not-applicable-requires-justification", review_ids)
+        self.assertIn("runtime-calibrates-realization-surface-closure-claims", compiler_ids)
 
-    def test_invariant_matrix_tracks_purpose_feedback_boundary(self):
+    def test_invariant_matrix_tracks_realization_surface_closure(self):
         matrix = self.read("docs/cybernetic-framework/invariant-artifact-consumer-matrix.md")
 
-        self.assertIn("INV-PFB-001", matrix)
-        self.assertIn("Purpose Feedback Boundary", matrix)
-        self.assertIn("Purpose Feedback Adequacy", matrix)
-        self.assertIn("tests/skills/test_purpose_feedback_boundary.py", matrix)
+        self.assertIn("INV-RSC-001", matrix)
+        self.assertIn("Realization Surface Closure", matrix)
+        self.assertIn("Realization Surface Closure Strategy", matrix)
+        self.assertIn("Realization Surface Closure Adequacy", matrix)
+        self.assertIn("tests/skills/test_realization_surface_closure.py", matrix)
 
 
 if __name__ == "__main__":

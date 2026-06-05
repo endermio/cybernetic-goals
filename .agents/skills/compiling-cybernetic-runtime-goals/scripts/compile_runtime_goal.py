@@ -185,6 +185,11 @@ def main() -> int:
         "Do not claim the human purpose is achieved from internal sensors alone unless the approved goal says internal evidence is sufficient. "
         "If purpose feedback is missing, report what is verified, what is not yet observed, and the smallest next observation needed. "
     )
+    realization_surface_clause = (
+        "Do not claim target-state realization from local action alone when Realization Surface Closure is required. "
+        "Strongest positive target-realization claims require RSC adequate. "
+        "Report surfaces covered, required surface actions completed or justified, residuals reconciled, pending or unknown surfaces, and smallest next reconciliation when RSC is partial, missing, unavailable, or not applicable with justification. "
+    )
 
     command = (
         f"/goal Execute the approved execution policy in {args.plan} "
@@ -196,6 +201,7 @@ def main() -> int:
         "Use `$superpowers:systematic-debugging` for unclear or repeated failures. "
         "Use `$superpowers:verification-before-completion` before claiming completion. "
         f"{purpose_feedback_clause}"
+        f"{realization_surface_clause}"
         "If runtime cannot load these skills, follow the equivalent discipline already written in the approved plan and control review. "
         f"{topology_clause}"
         "Follow the approved batch rhythm. "

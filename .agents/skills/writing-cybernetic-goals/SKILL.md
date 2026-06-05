@@ -97,6 +97,24 @@ The goal must preserve or define:
 When requirements analysis includes a `Purpose Feedback Boundary`, preserve it
 in the goal as the `Purpose Feedback Contract`.
 
+## Realization Surface Contract
+
+When requirements analysis or solution design defines Realization Surface
+Closure, preserve it in the goal as `Realization Surface Contract`.
+
+The goal must preserve or define:
+
+- Target state: the state or semantic change that must be realized;
+- Required surfaces: the surface model or classes that carry target-state
+  realization;
+- RSC status wording: the strongest positive target-realization claim requires RSC adequate;
+- Partial/unavailable handling: runtime must report partial, missing,
+  unavailable, or not applicable with justification when RSC is not adequate.
+
+RSC is distinct from Purpose Feedback Boundary. RSC calibrates target-state and
+surface-closure claims. Purpose Feedback Boundary calibrates human-purpose
+realization claims.
+
 ## Goal Modes
 
 ### Mode A: Complex Control Contract
@@ -159,17 +177,18 @@ The goal file must include:
 2. Objective
 3. Success Condition
 4. Purpose Feedback Contract
-5. Source of Truth
-6. Scope and Boundaries
-7. Invariants
-8. Verification Surface
-9. Checkpoint Loop
-10. Repair Policy
-11. Progress Log
-12. Stop Conditions
-13. Blocked Report Format
-14. Final Report Format
-15. Final Output Contract, when output shape affects execution, acceptance, handoff, persistence, or downstream consumption
+5. Realization Surface Contract, when RSC is required or non-obvious
+6. Source of Truth
+7. Scope and Boundaries
+8. Invariants
+9. Verification Surface
+10. Checkpoint Loop
+11. Repair Policy
+12. Progress Log
+13. Stop Conditions
+14. Blocked Report Format
+15. Final Report Format
+16. Final Output Contract, when output shape affects execution, acceptance, handoff, persistence, or downstream consumption
 
 The goal must preserve confirmed semantics. It must not reinterpret or downscope them.
 
@@ -186,6 +205,7 @@ Map requirements analysis to:
 - Objective: observable target state
 - Sensors: approved sensors, checks, evidence channels, and reviews
 - Purpose feedback: purpose-realizing outcome, beneficiary/observer boundary, sufficient evidence level, and allowed completion wording
+- Realization surface closure: target state, required surfaces, RSC status wording, residual reconciliation, and target-realization claim calibration
 - Error function: rubric for interpreting sensor output when the task is evaluative
 - Output contract: final audience, purpose, medium, structure, detail level, evidence references, destination, and acceptance condition
 - Constraints: invariants and non-goals
@@ -290,7 +310,9 @@ If the user explicitly requests a small inline `/goal` and the task is low-risk,
 - [ ] The goal preserves design invariants without freezing tactical design details.
 - [ ] Success conditions and stop conditions are explicit.
 - [ ] The goal includes Purpose Feedback Contract when requirements define Purpose Feedback Boundary or purpose-achievement evidence is non-obvious.
+- [ ] The goal includes Realization Surface Contract when requirements define Realization Surface Closure or target-state realization spans surfaces.
 - [ ] Success Condition is Purpose-realizing outcome observed, not internal sensor success unless the human purpose is internal-state correctness.
+- [ ] Any strongest positive target-realization claim requires RSC adequate; partial, missing, unavailable, or not applicable with justification receives calibrated wording.
 - [ ] Sensors are named but not treated as the objective.
 - [ ] Evaluation tasks define an explicit rubric before any executable goal is emitted.
 - [ ] Output-sensitive tasks include a `Final Output Contract`.

@@ -64,6 +64,7 @@ Substantive changes include changes to:
 - context management / execution topology;
 - sensor or evidence structure;
 - purpose feedback boundary, purpose feedback strategy, or completion-claim wording;
+- realization surface closure strategy, residual reconciliation, or target-realization wording;
 - evidence lifecycle, retention, budget, or tracked-evidence policy;
 - progress log required fields;
 - stop conditions;
@@ -174,7 +175,31 @@ Flag as Major or Blocking when:
 
 Use `Major` when execution-policy revision can repair evidence lifecycle. Use `Blocking` when sensor output would likely swamp review, context management, or runtime completion.
 
-### 9. Execution Granularity / Sensor Load
+### 9. Realization Surface Closure Adequacy
+
+Classify RSC as one of:
+
+- RSC adequate
+- RSC partial
+- RSC missing
+- RSC unavailable
+- RSC not applicable with justification
+
+Flag as Major or Blocking when:
+
+- local action is being treated as global target-state realization;
+- the target state spans surfaces but the policy lacks a surface model;
+- required actions are unclear for surfaces that carry the target state;
+- old-state residuals, unknown surfaces, preserved surfaces, or excluded
+  surfaces lack reconciliation;
+- RSC evidence is used as human-purpose achievement evidence without PFB support;
+- RSC not applicable is claimed without justification.
+
+Use `Major` when policy or goal revision can repair RSC wording. Use
+`Blocking` when runtime could claim target-state realization while important
+surfaces or residuals remain unresolved.
+
+### 10. Execution Granularity / Sensor Load
 
 Flag as Major or Blocking when:
 
@@ -189,7 +214,7 @@ Flag as Major or Blocking when:
 
 Use `Major` when execution-policy revision can repair the control law. Use `Blocking` when the granularity or sensor load would prevent runtime completion or let sensors override confirmed semantics.
 
-### 10. Context Management / Execution Topology
+### 11. Context Management / Execution Topology
 
 Flag as Major or Blocking when:
 
@@ -206,7 +231,7 @@ Flag as Major or Blocking when:
 
 Use `Major` when execution-policy revision can repair topology. Use `Blocking` when context overload would likely make runtime lose requirements, design invariants, output contract, stop conditions, or approval boundaries.
 
-### 11. Batch Rhythm
+### 12. Batch Rhythm
 
 Flag:
 
@@ -215,17 +240,22 @@ Flag:
 - no batch-end openability requirement;
 - no destructive intermediate-state policy.
 
-### 12. Semantic vs Tactical Boundary
+### 13. Semantic vs Tactical Boundary
 
 Semantic invariants must be frozen. Tactical execution details must remain adjustable.
 
-### 13. Runtime Suitability
+### 14. Runtime Suitability
 
 The runtime `/goal` must be able to execute the approved artifacts without inventing new control structures. Any required runtime discipline, including approved execution topology, bounded subagent delegation protocol, and conditionally selected Superpowers substrate, must be precompiled into the approved plan, review, or final `/goal`.
 
 Runtime completion claims must be calibrated to the highest purpose-relevant evidence actually observed. If purpose feedback is missing, runtime must report what is verified, what is not yet observed, and the smallest next observation needed. Purpose-achieved wording is reserved for observed or approved purpose feedback.
 
-### 14. Review Independence
+Runtime target-realization claims must also be calibrated to Realization Surface
+Closure status. Do not claim target-state realization from local action alone
+when Realization Surface Closure is required. Strongest positive
+target-realization claims require RSC adequate.
+
+### 15. Review Independence
 
 The review must record:
 
@@ -234,7 +264,7 @@ The review must record:
 - whether approval is allowed;
 - why approval is blocked when independent review is missing.
 
-### 15. Final Observer Check
+### 16. Final Observer Check
 
 The review must record whether any substantive artifact changed after the latest independent review pass and whether a final independent observer confirmed no Blocking or Major findings after that change.
 
@@ -272,6 +302,7 @@ Only mark `Approved` when:
 - execution topology is explicit and does not create main-agent context overload;
 - execution granularity and sensor load do not create micro-step overcontrol or sensor overcoupling;
 - purpose feedback adequacy supports the permitted completion wording and does not confuse internal progress evidence with purpose achievement;
+- realization surface closure adequacy supports target-realization wording and does not confuse local action with global realization;
 - evidence lifecycle keeps tracked evidence reviewable and prevents raw sensor output explosion;
 - sensor/evidence governance is explicit;
 - runtime `/goal` can execute without writing or approving a new plan.
@@ -326,6 +357,7 @@ Response-only next step:
 - [ ] Output contract fidelity was checked when any upstream output contract exists.
 - [ ] Evidence lifecycle and evidence budget were checked.
 - [ ] Purpose feedback adequacy was checked.
+- [ ] Realization Surface Closure adequacy was checked.
 - [ ] Execution granularity and sensor load were checked.
 - [ ] Required revisions are actionable.
 - [ ] Response-only handoff matches the review status and does not bypass `$orchestrating-cybernetic-pregoal` when full pre-goal orchestration owns the chain.

@@ -28,6 +28,20 @@ Do not define success as internal sensor success unless the human purpose is int
 | Purpose feedback unavailable handling | [honest status and smallest next observation] |
 | Allowed completion wording | [achieved / partially observed / pending / unavailable / not required with justification] |
 
+## Realization Surface Contract
+
+Use this section when the task changes or realizes target state across controlled-object surfaces.
+
+| Element | Requirement |
+|---|---|
+| Target state | [state or semantic change that must be realized] |
+| Required surfaces | [surface model or classes that carry target-state realization] |
+| Surface actions | [act / inspect / preserve / exclude / discover] |
+| Residual reconciliation | [old state, unknown surfaces, exclusions, preserved surfaces, and remaining mismatches to account for] |
+| RSC status wording | strongest positive target-realization claim requires RSC adequate |
+| Partial/unavailable handling | partial, missing, unavailable, or not applicable with justification |
+| RSC / PFB boundary | RSC is distinct from Purpose Feedback Boundary; RSC calibrates target-state and surface-closure claims, while PFB calibrates human-purpose realization claims. |
+
 ## Source of Truth
 
 Read first:
@@ -163,6 +177,9 @@ When complete, report:
 
 - purpose feedback status: achieved / partially observed / pending / unavailable / not required with justification
 - highest purpose-relevant evidence observed
+- RSC status: adequate / partial / missing / unavailable / not applicable with justification
+- highest target-realization evidence observed
+- residuals, unknown surfaces, and smallest next reconciliation
 - supporting internal/integration evidence
 - not yet observed
 - smallest next observation needed

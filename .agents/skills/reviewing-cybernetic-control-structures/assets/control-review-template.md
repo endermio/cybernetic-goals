@@ -21,6 +21,7 @@ Status: `Needs Revision`
   - Goal fidelity: `yes/no`
   - Context management / execution topology: `yes/no`
   - Purpose feedback adequacy: `yes/no`
+  - Realization surface closure adequacy: `yes/no`
   - Execution granularity / sensor load: `yes/no`
   - Sensor governance: `yes/no`
   - Execution cadence: `yes/no`
@@ -146,6 +147,25 @@ Findings:
 
 - [finding]
 
+## Realization Surface Closure Adequacy
+
+Classification:
+
+- `RSC adequate / RSC partial / RSC missing / RSC unavailable / RSC not applicable with justification`
+
+Check:
+
+- Strongest positive target-realization claims require RSC adequate.
+- Partial, missing, unavailable, or not applicable with justification RSC receives matching completion wording.
+- Flag when local action is being treated as global target-state realization.
+- Required surfaces are acted on, inspected, preserved, excluded, or discovered as planned.
+- Old-state residuals, unknown surfaces, preserved surfaces, and excluded surfaces are reconciled.
+- RSC is distinct from Purpose Feedback Boundary.
+
+Findings:
+
+- [finding]
+
 ## Evidence Lifecycle / Evidence Budget
 
 Check:
@@ -212,6 +232,7 @@ The control structure may be approved only if:
 - execution granularity and sensor load do not create micro-step overcontrol or sensor overcoupling;
 - evidence lifecycle keeps tracked evidence reviewable and prevents raw sensor output explosion;
 - purpose feedback adequacy supports the permitted completion wording and does not confuse internal progress evidence with purpose achievement;
+- realization surface closure adequacy supports target-realization wording and does not confuse local action with global realization;
 - sensor/evidence governance is explicit;
 - batch cadence is explicit;
 - runtime execution does not need to synthesize a new plan.

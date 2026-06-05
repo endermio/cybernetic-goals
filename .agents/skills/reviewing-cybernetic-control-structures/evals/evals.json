@@ -178,6 +178,29 @@
         "Explains why internal feedback is sufficient for this purpose.",
         "Allows completion claim if approved internal checks pass."
       ]
+    },
+    {
+      "id": "local-action-cannot-claim-target-realization-without-rsc",
+      "prompt": "A goal changes a target state carried by multiple controlled-object surfaces. The plan changes one local artifact and then claims the target state is fully realized without a surface model or residual reconciliation.",
+      "expected_output": "The review marks Realization Surface Closure as missing or inadequate, treats local action as insufficient for target-state realization, and requires a surface model plus residual reconciliation before strongest positive wording.",
+      "assertions": [
+        "Identifies the target state and controlled-object realization surfaces.",
+        "Distinguishes local action from global target-state realization.",
+        "Requires surface/action/residual/reconciliation structure.",
+        "Says strongest positive target-realization claims require RSC adequate.",
+        "Keeps RSC separate from Purpose Feedback Boundary."
+      ]
+    },
+    {
+      "id": "rsc-not-applicable-requires-justification",
+      "prompt": "A plan labels Realization Surface Closure as not applicable without explaining why the task has no target-state realization across controlled-object surfaces.",
+      "expected_output": "The review does not accept bare RSC not applicable wording; it requires justification or downgrades the RSC status.",
+      "assertions": [
+        "Requires RSC not applicable with justification.",
+        "Does not treat an empty not-applicable label as adequate RSC.",
+        "Allows justified not-applicable status for simple direct tasks.",
+        "Does not demand heavy surface discovery when no target state is being changed or realized."
+      ]
     }
   ]
 }

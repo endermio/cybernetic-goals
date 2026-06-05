@@ -42,6 +42,7 @@ This skill supplies the cybernetic constraints that the planning substrate must 
 - tactical degrees of freedom;
 - dependency matrix requirement;
 - context management / execution topology;
+- realization surface closure strategy for target-state surface coverage and residual reconciliation;
 - execution granularity and sensor budget;
 - batch cadence;
 - destructive intermediate-state policy;
@@ -65,19 +66,20 @@ The execution policy must include:
 4. Tactical Degrees of Freedom
 5. Dependency Matrix
 6. Context Management / Execution Topology
-7. Execution Granularity and Sensor Budget
-8. Batch Cadence
-9. Destructive Intermediate-State Policy
-10. Output Material / Evidence Collection
-11. Purpose Feedback Strategy
-12. Evidence Lifecycle / Evidence Budget
-13. Sensor / Evidence Governance
-14. Stale Sensor Retirement and Rewrite Policy
-15. Phase Gates
-16. Execution Rhythm
-17. Stop Conditions
-18. Progress Log Rules
-19. Candidate Plan Tasks
+7. Realization Surface Closure Strategy
+8. Execution Granularity and Sensor Budget
+9. Batch Cadence
+10. Destructive Intermediate-State Policy
+11. Output Material / Evidence Collection
+12. Purpose Feedback Strategy
+13. Evidence Lifecycle / Evidence Budget
+14. Sensor / Evidence Governance
+15. Stale Sensor Retirement and Rewrite Policy
+16. Phase Gates
+17. Execution Rhythm
+18. Stop Conditions
+19. Progress Log Rules
+20. Candidate Plan Tasks
 
 ## Context Management / Execution Topology
 
@@ -129,6 +131,41 @@ For serial or parallel subagent-driven topology, `Selected delegation substrate`
 For `Main-only` Level 3/4 work, include a meaningful `Main-only context-load justification` explaining why the main agent will not become an overloaded coordinator, worker, integrator, and verifier.
 
 At each batch boundary, the progress log must compress active context: current control summary, completed work packages, integrated subagent outputs, evidence produced, deferred sensors, unresolved blockers, policy deviations, and next allowed action.
+
+## Realization Surface Closure Strategy
+
+When a task changes or realizes target state across controlled-object surfaces,
+the execution policy must define Realization Surface Closure Strategy.
+For simple direct tasks, include a compact entry that marks
+`RSC not applicable with justification`.
+
+Define Surface Model:
+
+- Surface
+- Role in target realization
+- Required action
+- Verification / reconciliation
+
+Define Surface Classes:
+
+- Must act
+- Must inspect
+- Must preserve
+- Explicitly out of scope
+- Unknown or requires discovery
+
+Define Residual Reconciliation:
+
+- old-state residuals;
+- unhandled surfaces;
+- unexplained differences;
+- preserved or excluded surfaces and rationale;
+- surfaces requiring later observation;
+- allowed target-realization wording for RSC adequate, partial, missing,
+  unavailable, or not applicable with justification.
+
+Domain adapters own concrete discovery and verification methods. The core
+policy owns surface/action/residual/reconciliation structure.
 
 ## Execution Granularity and Sensor Budget
 
@@ -318,6 +355,7 @@ Response-only next step:
 - [ ] The plan does not invent or revise the solution model.
 - [ ] The plan has dependency matrix.
 - [ ] The plan includes Context Management / Execution Topology.
+- [ ] The plan includes Realization Surface Closure Strategy when target-state realization spans surfaces.
 - [ ] The plan selects `Main-only`, `Serial subagent-driven`, or `Parallel subagent-driven`.
 - [ ] The plan records `Selected delegation substrate`.
 - [ ] Level 3/4 main-only execution has an explicit context-load justification.
@@ -337,6 +375,7 @@ Response-only next step:
 - [ ] Broad verification is assigned to integration/final gates unless justified per batch.
 - [ ] The plan defines output material/evidence collection when the final output contract requires structured output.
 - [ ] The plan includes Purpose Feedback Strategy.
+- [ ] The plan keeps RSC target-state claims distinct from PFB human-purpose claims.
 - [ ] Purpose-boundary feedback is the smallest sufficient feedback for the human purpose, not heavy end-to-end evidence by default.
 - [ ] Internal feedback is not treated as purpose achievement unless the human purpose is internal-state correctness.
 - [ ] The plan includes Evidence Lifecycle / Evidence Budget.

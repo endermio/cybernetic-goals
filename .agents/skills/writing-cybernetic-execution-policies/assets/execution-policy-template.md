@@ -23,6 +23,7 @@ Cybernetic constraints supplied to the substrate:
 - tactical degrees of freedom;
 - dependency matrix;
 - context management / execution topology;
+- realization surface closure strategy;
 - execution granularity and sensor budget;
 - batch cadence;
 - destructive intermediate-state policy;
@@ -140,6 +141,51 @@ At each batch boundary, update the progress log with:
 - Unresolved blockers: [blockers requiring revision or human input]
 - Deviations from policy: [deviations and whether execution must stop]
 - Next allowed action: [next policy-approved action]
+
+## Realization Surface Closure Strategy
+
+Use this section when the task changes or realizes target state across controlled-object surfaces.
+
+### Surface Model
+
+| Surface | Role in target realization | Required action | Verification / reconciliation |
+|---|---|---|---|
+| [surface] | [state carrier / interface / evidence surface / decision point / policy surface / compatibility boundary] | [act / inspect / preserve / exclude / discover] | [how closure, residuals, or bounded status will be checked] |
+
+### Surface Classes
+
+Must act:
+
+- [surface]
+
+Must inspect:
+
+- [surface]
+
+Must preserve:
+
+- [surface and rationale]
+
+Explicitly out of scope:
+
+- [surface and reason]
+
+Unknown or requires discovery:
+
+- [surface or discovery question]
+
+### Residual Reconciliation
+
+After action, reconcile:
+
+- old-state residuals;
+- unhandled surfaces;
+- unexplained differences;
+- preserved or excluded surfaces and rationale;
+- surfaces requiring later observation;
+- allowed target-realization wording for RSC adequate, partial, missing, unavailable, or not applicable with justification.
+
+Domain adapters own concrete surface discovery and verification methods. The core policy owns surface/action/residual/reconciliation structure.
 
 ## Execution Granularity and Sensor Budget
 
@@ -348,6 +394,10 @@ Each entry must include:
 - result
 - sensor interpretation
 - purpose feedback status
+- RSC status
+- surfaces acted on or inspected
+- residuals and reconciliation
+- allowed target-realization wording
 - highest purpose-relevant evidence observed
 - purpose feedback not yet observed
 - smallest next observation needed
