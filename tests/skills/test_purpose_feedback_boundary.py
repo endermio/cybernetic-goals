@@ -442,6 +442,8 @@ class PurposeFeedbackBoundaryTest(unittest.TestCase):
         self.assertIn("INV-PFB-001", matrix)
         self.assertIn("Purpose Feedback Boundary", matrix)
         self.assertIn("Purpose Feedback Adequacy", matrix)
+        self.assertIn("goal Purpose Feedback Contract", matrix)
+        self.assertIn("review Purpose Feedback Adequacy section", matrix)
         self.assertIn("tests/skills/test_purpose_feedback_boundary.py", matrix)
 
 

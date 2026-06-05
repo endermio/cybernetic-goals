@@ -144,7 +144,16 @@ At each batch boundary, update the progress log with:
 
 ## Realization Surface Closure Strategy
 
-Use this section when the task changes or realizes target state across controlled-object surfaces.
+For compiled runtime goals, always include this section.
+
+When the task changes or realizes target state across controlled-object surfaces, use the full structure below.
+
+If RSC is not applicable, record this compact structure instead:
+
+- RSC status: `RSC not applicable with justification`
+- Why no target-state surface closure is required: [reason]
+- Why no surface discovery / residual reconciliation is needed: [reason]
+- Allowed target-realization wording: [wording]
 
 ### Surface Model
 

@@ -134,10 +134,18 @@ At each batch boundary, the progress log must compress active context: current c
 
 ## Realization Surface Closure Strategy
 
-When a task changes or realizes target state across controlled-object surfaces,
-the execution policy must define Realization Surface Closure Strategy.
-For simple direct tasks, include a compact entry that marks
-`RSC not applicable with justification`.
+Compiled runtime execution policies must always include Realization Surface
+Closure Strategy. When a task changes or realizes target state across
+controlled-object surfaces, define the full surface/action/residual structure.
+If RSC is not applicable, include a compact entry that marks `RSC not
+applicable with justification`.
+
+For the not-applicable path, record:
+
+- RSC status: `RSC not applicable with justification`;
+- Why no target-state surface closure is required;
+- Why no surface discovery / residual reconciliation is needed;
+- Allowed target-realization wording.
 
 Define Surface Model:
 
@@ -355,7 +363,7 @@ Response-only next step:
 - [ ] The plan does not invent or revise the solution model.
 - [ ] The plan has dependency matrix.
 - [ ] The plan includes Context Management / Execution Topology.
-- [ ] The plan includes Realization Surface Closure Strategy when target-state realization spans surfaces.
+- [ ] The plan includes Realization Surface Closure Strategy for compiled runtime goals, with either full surface/action/residual structure or `RSC not applicable with justification`.
 - [ ] The plan selects `Main-only`, `Serial subagent-driven`, or `Parallel subagent-driven`.
 - [ ] The plan records `Selected delegation substrate`.
 - [ ] Level 3/4 main-only execution has an explicit context-load justification.

@@ -20,6 +20,7 @@ class RealizationSurfaceClosureTest(unittest.TestCase):
         include_goal_rsc: bool = True,
         complete_goal_rsc_fields: bool = True,
         include_plan_rsc: bool = True,
+        plan_rsc_not_applicable: bool = False,
         include_review_rsc: bool = True,
         review_independence_rsc: str = "yes",
     ) -> tuple[Path, Path, Path, Path]:
@@ -84,30 +85,43 @@ class RealizationSurfaceClosureTest(unittest.TestCase):
             "",
         ]
         if include_plan_rsc:
-            plan_parts.extend(
-                [
-                    "## Realization Surface Closure Strategy",
-                    "",
-                    "### Surface Model",
-                    "",
-                    "| Surface | Role in target realization | Required action | Verification / reconciliation |",
-                    "|---|---|---|---|",
-                    "| controlled surfaces | carry target semantics | act / inspect | reconcile residual old state |",
-                    "",
-                    "### Surface Classes",
-                    "",
-                    "- Must act: controlled surfaces that must change.",
-                    "- Must inspect: supporting surfaces that may retain old state.",
-                    "- Must preserve: surfaces intentionally unchanged.",
-                    "- Explicitly out of scope: excluded surfaces with reason.",
-                    "- Unknown or requires discovery: surfaces needing runtime discovery.",
-                    "",
-                    "### Residual Reconciliation",
-                    "",
-                    "- Reconcile old state, unknown surfaces, exclusions, preserved surfaces, and remaining mismatches.",
-                    "",
-                ]
-            )
+            if plan_rsc_not_applicable:
+                plan_parts.extend(
+                    [
+                        "## Realization Surface Closure Strategy",
+                        "",
+                        "- RSC status: `RSC not applicable with justification`",
+                        "- Why no target-state surface closure is required: this fixture only checks runtime chain structure.",
+                        "- Why no surface discovery / residual reconciliation is needed: no controlled-object target state is changed.",
+                        "- Allowed target-realization wording: do not claim target-state realization; report RSC not applicable with justification.",
+                        "",
+                    ]
+                )
+            else:
+                plan_parts.extend(
+                    [
+                        "## Realization Surface Closure Strategy",
+                        "",
+                        "### Surface Model",
+                        "",
+                        "| Surface | Role in target realization | Required action | Verification / reconciliation |",
+                        "|---|---|---|---|",
+                        "| controlled surfaces | carry target semantics | act / inspect | reconcile residual old state |",
+                        "",
+                        "### Surface Classes",
+                        "",
+                        "- Must act: controlled surfaces that must change.",
+                        "- Must inspect: supporting surfaces that may retain old state.",
+                        "- Must preserve: surfaces intentionally unchanged.",
+                        "- Explicitly out of scope: excluded surfaces with reason.",
+                        "- Unknown or requires discovery: surfaces needing runtime discovery.",
+                        "",
+                        "### Residual Reconciliation",
+                        "",
+                        "- Reconcile old state, unknown surfaces, exclusions, preserved surfaces, and remaining mismatches.",
+                        "",
+                    ]
+                )
         plan_parts.extend(
             [
                 "## Context Management / Execution Topology",
@@ -243,6 +257,8 @@ class RealizationSurfaceClosureTest(unittest.TestCase):
 
         for text in (skill, template):
             self.assertIn("Realization Surface Closure Strategy", text)
+            self.assertIn("always include", text)
+            self.assertIn("RSC not applicable with justification", text)
             self.assertIn("Surface Model", text)
             self.assertIn("Surface Classes", text)
             self.assertIn("Residual Reconciliation", text)
@@ -303,6 +319,12 @@ class RealizationSurfaceClosureTest(unittest.TestCase):
                 "surfaces covered, required surface actions completed or justified, residuals reconciled, pending or unknown surfaces, and smallest next reconciliation",
                 text,
             )
+        preconditions = skill.split("## Preconditions", 1)[1].split("## Runtime Goal Contract", 1)[0]
+        self.assertIn("goal includes a compact `Purpose Feedback Contract`", preconditions)
+        self.assertIn("control review records `Purpose feedback adequacy: yes`", preconditions)
+        self.assertIn("goal includes a compact `Realization Surface Contract`", preconditions)
+        self.assertIn("execution policy includes `Realization Surface Closure Strategy`", preconditions)
+        self.assertIn("control review records `Realization surface closure adequacy: yes`", preconditions)
 
         with tempfile.TemporaryDirectory() as tmpdir:
             tmp = Path(tmpdir)
@@ -436,6 +458,37 @@ class RealizationSurfaceClosureTest(unittest.TestCase):
         self.assertIn("NEXT: RunExecutionPolicy", output)
         self.assertIn("Realization Surface Closure Strategy", output)
 
+    def test_control_chain_guard_accepts_rsc_not_applicable_plan_strategy(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            requirements, goal, plan, review = self.write_guard_artifacts(
+                Path(tmpdir),
+                plan_rsc_not_applicable=True,
+            )
+
+            result = subprocess.run(
+                [
+                    sys.executable,
+                    str(
+                        ROOT
+                        / ".agents/skills/compiling-cybernetic-runtime-goals/scripts/control_chain_guard.py"
+                    ),
+                    "--requirements",
+                    str(requirements),
+                    "--goal",
+                    str(goal),
+                    "--plan",
+                    str(plan),
+                    "--review",
+                    str(review),
+                ],
+                cwd=ROOT,
+                text=True,
+                capture_output=True,
+            )
+
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        self.assertIn("PASS", result.stdout)
+
     def test_control_chain_guard_rejects_review_missing_rsc_adequacy(self):
         with tempfile.TemporaryDirectory() as tmpdir:
             requirements, goal, plan, review = self.write_guard_artifacts(
@@ -493,6 +546,7 @@ class RealizationSurfaceClosureTest(unittest.TestCase):
         self.assertIn("Realization Surface Closure", matrix)
         self.assertIn("Realization Surface Closure Strategy", matrix)
         self.assertIn("Realization Surface Closure Adequacy", matrix)
+        self.assertIn("execution policy RSC strategy", matrix)
         self.assertIn("tests/skills/test_realization_surface_closure.py", matrix)
 
 

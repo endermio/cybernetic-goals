@@ -500,6 +500,9 @@ def check_plan_realization_surface(plan: str, errors: list[str]) -> None:
         errors.append("execution policy missing ## Realization Surface Closure Strategy")
         return
 
+    if plan_realization_surface_not_applicable(body):
+        return
+
     required_sections = [
         "Surface Model",
         "Surface Classes",
@@ -508,6 +511,19 @@ def check_plan_realization_surface(plan: str, errors: list[str]) -> None:
     for heading in required_sections:
         if not section_has_meaningful_content(body, heading):
             errors.append(f"execution policy Realization Surface Closure Strategy missing {heading}")
+
+
+def plan_realization_surface_not_applicable(body: str) -> bool:
+    status = labeled_value(body, "RSC status")
+    if status is None or status.casefold() != "rsc not applicable with justification":
+        return False
+
+    required_fields = [
+        "Why no target-state surface closure is required",
+        "Why no surface discovery / residual reconciliation is needed",
+        "Allowed target-realization wording",
+    ]
+    return all(labeled_or_table_field_has_content(body, field) for field in required_fields)
 
 
 def check_review_realization_surface(review: str, errors: list[str]) -> None:

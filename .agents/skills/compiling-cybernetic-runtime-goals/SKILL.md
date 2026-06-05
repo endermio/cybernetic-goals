@@ -55,7 +55,11 @@ Do not output `/goal` unless:
 - control review status is Approved;
 - control review records `Context management / execution topology: yes` in Review Independence;
 - control review includes meaningful `Context Management / Execution Topology` findings;
+- goal includes a compact `Purpose Feedback Contract`;
+- control review records `Purpose feedback adequacy: yes` in Review Independence;
+- control review includes meaningful `Purpose Feedback Adequacy` findings;
 - goal includes a compact `Realization Surface Contract`; simple direct tasks may record `RSC not applicable with justification`;
+- execution policy includes `Realization Surface Closure Strategy`;
 - control review records `Realization surface closure adequacy: yes` in Review Independence;
 - control review includes meaningful `Realization Surface Closure Adequacy` findings;
 - control review includes `Final Observer Check`;
