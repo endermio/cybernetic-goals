@@ -1,6 +1,6 @@
 ---
 name: writing-cybernetic-goals
-description: 'Use when requirements analysis and any required design exist, and a router-selected Level 2 bounded task or low-risk task needs a goal contract or inline /goal while preserving confirmed semantics before execution.'
+description: 'Use when confirmed requirements and any required design exist and a control contract must be written, either for a Level 2 bounded goal or for Level 3/4 full pre-goal orchestration. For Level 3/4, require Human Setpoint Approval before creating the goal contract and do not emit executable /goal without approved execution policy and review.'
 ---
 
 # Writing Cybernetic Goals
@@ -30,6 +30,8 @@ For Level 3, Level 4, or full pre-goal work, stop after creating the goal contra
 Recommend `$writing-cybernetic-execution-policies` or `$reviewing-cybernetic-control-structures` directly only when the user explicitly chose a manual pre-goal chain or `$orchestrating-cybernetic-pregoal` is unavailable.
 
 For Level 3, Level 4, or full pre-goal work, do not create the goal contract unless the requirements analysis contains `Human Setpoint Approval: Approved`, or the current user message explicitly approves the compact control commitment. Human answers to requirements questions are inputs, not approval.
+
+If the current user message approves the compact control commitment, update the requirements analysis `Human Setpoint Approval` section first, quoting or referencing that approval, then continue. Do not rely on in-memory approval to pass orchestration or runtime guards.
 
 Do not put “first write a plan, then execute it” inside an execution `/goal` for complex work.
 

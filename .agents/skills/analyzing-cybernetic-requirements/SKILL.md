@@ -88,6 +88,8 @@ Human Setpoint Approval: Approved
 
 unless the user explicitly approves the compact control commitment in the current message.
 
+If the current user message approves the compact control commitment, update the requirements analysis `Human Setpoint Approval` section first, quoting or referencing that approval, then continue. Do not rely on in-memory approval to pass orchestration or runtime guards.
+
 Human answers to clarification questions are inputs, not approval. Do not infer approval from the user merely answering questions.
 
 Before handoff to `$orchestrating-cybernetic-pregoal`, present a compact control commitment for approval. The commitment must include:

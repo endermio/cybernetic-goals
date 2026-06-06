@@ -83,6 +83,8 @@ The same requirements brief must record `Human Setpoint Approval: Approved`,
 or the current user message must explicitly approve the compact control
 commitment recorded in that requirements brief.
 
+If the current user message approves the compact control commitment, update the requirements analysis `Human Setpoint Approval` section first, quoting or referencing that approval, then continue. Do not rely on in-memory approval to pass orchestration or runtime guards.
+
 A user request to use full pre-goal compilation is not sufficient by itself.
 If the request expresses method preference, uncertainty, dissatisfaction, or
 process distrust, route to `$framing-cybernetic-intent` or
@@ -135,7 +137,9 @@ Next: ask the user to approve or revise the compact control commitment in the re
 
 Do not compensate by asking the user to review design, goal, or execution
 policy later. Human answers are inputs; they are not approval unless the user
-explicitly approves the compact control commitment.
+explicitly approves the compact control commitment. If the current user message
+approves the compact control commitment, update the requirements analysis
+`Human Setpoint Approval` section first before downstream guard checks.
 
 ## Required Input
 
@@ -176,7 +180,7 @@ If pre-goal review subagents are not authorized:
 - You may create candidate design, goal, and execution policy files.
 - You may create a draft control review marked `Needs Independent Review`.
 - You must not claim independent review or mark the control structure `Approved` unless a separate reviewer, explicit human approval, or an authorized subagent review exists.
-- Ask the user to authorize pre-goal review subagents or manually approve the artifacts before compiling a final runtime `/goal`.
+- Ask the user to authorize pre-goal review subagents or provide explicit control-review approval of the review findings before compiling a final runtime `/goal`.
 
 ## Pre-goal Orchestration Modes
 
@@ -191,7 +195,7 @@ Behavior:
 3. Create or update goal contract.
 4. Create or update execution policy only if required planning substrate is satisfied or not required.
 5. Create a control review draft marked `Needs Independent Review`.
-6. Do not compile final runtime `/goal` unless the user explicitly approves the artifacts.
+6. Do not compile final runtime `/goal` unless the control review has independent approval or the user gives explicit control-review approval of the review findings. Do not ask for artifact-by-artifact review as a substitute for Human Setpoint Approval.
 
 ### Mode B: Subagent-Reviewed Compilation Mode
 

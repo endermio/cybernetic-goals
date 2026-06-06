@@ -2,6 +2,7 @@ import subprocess
 import sys
 import tempfile
 import unittest
+import json
 from pathlib import Path
 
 
@@ -354,6 +355,60 @@ class HumanSetpointApprovalTest(unittest.TestCase):
         self.assertIn("control_chain_guard.py", matrix)
         self.assertIn("Human Setpoint Fidelity", matrix)
         self.assertIn("tests/skills/test_human_setpoint_approval.py", matrix)
+
+    def test_orchestrator_evals_do_not_bypass_hsa(self):
+        evals = json.loads(
+            self.read(".agents/skills/orchestrating-cybernetic-pregoal/evals/evals.json")
+        )["evals"]
+        eval_by_id = {entry["id"]: entry for entry in evals}
+
+        hsa_required_ids = [
+            "orchestrates-complete-requirements-analysis-with-subagents",
+            "no-subagents-candidate-only",
+            "runtime-goal-does-not-write-plan",
+            "uses-requirements-analysis-slug-for-artifacts",
+            "review-nonconvergence-blocks",
+            "no-independent-review-no-approval",
+            "post-review-revision-requires-final-observer",
+            "inserts-design-stage-when-design-gate-required",
+            "orchestrator-cannot-skip-required-design",
+            "orchestrator-blocks-when-design-skill-unavailable",
+            "existing-design-artifact-propagates-downstream",
+            "orchestrator-cannot-compile-before-review",
+            "orchestrator-propagates-execution-topology-without-deciding-it",
+        ]
+        for eval_id in hsa_required_ids:
+            self.assertIn(eval_id, eval_by_id)
+            self.assertIn("Human Setpoint Approval: Approved", eval_by_id[eval_id]["prompt"])
+
+    def test_orchestrator_candidate_mode_does_not_request_artifact_by_artifact_approval(self):
+        skill = self.read(".agents/skills/orchestrating-cybernetic-pregoal/SKILL.md")
+
+        self.assertNotIn("manually approve the artifacts", skill)
+        self.assertNotIn("approves the artifacts", skill)
+        self.assertIn("explicit control-review approval of the review findings", skill)
+        self.assertIn("Do not ask for artifact-by-artifact review as a substitute for Human Setpoint Approval", skill)
+
+    def test_current_message_approval_must_be_recorded_before_downstream_guards(self):
+        required_phrase = (
+            "update the requirements analysis `Human Setpoint Approval` section first"
+        )
+        for path in (
+            ".agents/skills/analyzing-cybernetic-requirements/SKILL.md",
+            ".agents/skills/orchestrating-cybernetic-pregoal/SKILL.md",
+            ".agents/skills/designing-cybernetic-solutions/SKILL.md",
+            ".agents/skills/writing-cybernetic-goals/SKILL.md",
+            ".agents/skills/writing-cybernetic-execution-policies/SKILL.md",
+        ):
+            self.assertIn(required_phrase, self.read(path))
+
+    def test_goal_skill_frontmatter_covers_complex_goal_contracts(self):
+        skill = self.read(".agents/skills/writing-cybernetic-goals/SKILL.md")
+        frontmatter = skill.split("---", 2)[1]
+
+        self.assertIn("control contract must be written", frontmatter)
+        self.assertIn("Level 3/4 full pre-goal orchestration", frontmatter)
+        self.assertIn("Human Setpoint Approval", frontmatter)
 
 
 if __name__ == "__main__":

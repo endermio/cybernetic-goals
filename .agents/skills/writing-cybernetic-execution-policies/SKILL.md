@@ -33,6 +33,8 @@ Use a completed requirements analysis brief and a goal contract, plus solution d
 
 For Level 3, Level 4, or full pre-goal work, do not create an execution policy unless the requirements analysis contains `Human Setpoint Approval: Approved`, or the current user message explicitly approves the compact control commitment. Level 1/2 bounded work does not require Human Setpoint Approval unless the requirements analysis records it as required.
 
+If the current user message approves the compact control commitment, update the requirements analysis `Human Setpoint Approval` section first, quoting or referencing that approval, then continue. Do not rely on in-memory approval to pass orchestration or runtime guards.
+
 ## Required Infrastructure
 
 Follow `$cybernetic-superpowers-infrastructure`.
