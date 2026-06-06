@@ -89,10 +89,12 @@
     {
       "id": "complete-level-3-analysis-routes-to-orchestrator-not-manual-design",
       "prompt": "Level 3 full pre-goal requirements analysis is complete. Requirements brief is docs/cybernetics/requirements/2026-05-31-complex-training.md. Required gates include Design Gate: required, there are no open blocking requirement questions, and Human Setpoint Approval: Approved.",
-      "expected_output": "Emit a pre-goal orchestration command using the concrete requirements path, not a standalone solution-design command before orchestration. Explain that the orchestrator owns design dispatch when Design Gate is required.",
+      "expected_output": "Emit a pre-goal orchestration command and a predicted queue-friendly /goal using the concrete requirements path, not a standalone solution-design command before orchestration. Explain that the orchestrator owns design dispatch when Design Gate is required, but the Design Gate dispatch note must not replace the predicted /goal.",
       "assertions": [
         "Outputs a command invoking $orchestrating-cybernetic-pregoal with docs/cybernetics/requirements/2026-05-31-complex-training.md.",
         "Requires Human Setpoint Approval: Approved before handoff.",
+        "Outputs a predicted /goal that references docs/cybernetics/designs/2026-05-31-complex-training.md as the expected design path.",
+        "States that the Design Gate dispatch note does not replace the predicted /goal.",
         "Does not output a standalone $designing-cybernetic-solutions command as a separate next step before orchestration.",
         "States that the orchestrator must invoke or request $designing-cybernetic-solutions before goal writing because Design Gate is required.",
         "Does not create a solution design inside requirements analysis.",

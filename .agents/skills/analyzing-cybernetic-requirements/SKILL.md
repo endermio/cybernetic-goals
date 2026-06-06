@@ -287,7 +287,7 @@ python3 .agents/skills/analyzing-cybernetic-requirements/scripts/predict_pregoal
 
 Use the script output instead of hand-writing the predicted `/goal`. The script checks `Requirements Analysis Status: Complete`, `Human Setpoint Approval: Approved`, deterministic path shape, Design Gate, and same-slug artifact paths.
 
-If `Design Gate: required`, state that `$orchestrating-cybernetic-pregoal` must invoke or request `$designing-cybernetic-solutions` before goal writing. Do not output `$designing-cybernetic-solutions` as a standalone command before orchestration for Level 3/4 or full pre-goal work.
+If `Design Gate: required`, still output the predicted queue-friendly `/goal`. State that `$orchestrating-cybernetic-pregoal` must invoke or request `$designing-cybernetic-solutions` before goal writing, and make the predicted `/goal` reference the expected solution design path. Design Gate dispatch note must not replace the predicted `/goal`. Do not output `$designing-cybernetic-solutions` as a standalone command before orchestration for Level 3/4 or full pre-goal work.
 
 The predicted `/goal` is not the final approved runtime command. Label it as predicted or queue-friendly, and make it depend on artifacts that the pre-goal orchestrator must create and approve.
 
@@ -467,7 +467,7 @@ Response-only queue suggestions:
 $orchestrating-cybernetic-pregoal 根据 docs/cybernetics/requirements/YYYY-MM-DD-slug.md 完成 pre-goal 编译，允许使用 subagents review。
 ```
 
-Design dispatch: when `Design Gate: required`, `$orchestrating-cybernetic-pregoal` must invoke or request `$designing-cybernetic-solutions` before goal writing.
+Design dispatch: when `Design Gate: required`, `$orchestrating-cybernetic-pregoal` must invoke or request `$designing-cybernetic-solutions` before goal writing. This dispatch note does not replace the predicted `/goal`.
 
 Response-only predicted runtime command:
 

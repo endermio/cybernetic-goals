@@ -2,6 +2,7 @@ import subprocess
 import sys
 import tempfile
 import unittest
+import json
 from pathlib import Path
 
 
@@ -134,6 +135,28 @@ class PregoalHandoffPredictorTest(unittest.TestCase):
         self.assertIn("Use the script output instead of hand-writing the predicted `/goal`", skill)
         self.assertIn(script_path, manifest)
         self.assertIn(test_path, manifest)
+
+    def test_design_gate_dispatch_note_does_not_replace_predicted_goal(self):
+        skill = (ROOT / ".agents/skills/analyzing-cybernetic-requirements/SKILL.md").read_text(
+            encoding="utf-8"
+        )
+        evals = json.loads(
+            (ROOT / ".agents/skills/analyzing-cybernetic-requirements/evals/evals.json").read_text(
+                encoding="utf-8"
+            )
+        )["evals"]
+        complete_level_3 = {
+            entry["id"]: entry for entry in evals
+        }["complete-level-3-analysis-routes-to-orchestrator-not-manual-design"]
+
+        self.assertIn(
+            "Design Gate dispatch note must not replace the predicted `/goal`",
+            skill,
+        )
+        self.assertIn("predicted queue-friendly /goal", complete_level_3["expected_output"])
+        self.assertTrue(
+            any("predicted /goal" in assertion for assertion in complete_level_3["assertions"])
+        )
 
 
 if __name__ == "__main__":
