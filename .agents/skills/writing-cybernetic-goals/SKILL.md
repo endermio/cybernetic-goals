@@ -1,6 +1,6 @@
 ---
 name: writing-cybernetic-goals
-description: 'Use when confirmed requirements and any required design exist and a control contract must be written, either for a Level 2 bounded goal or for Level 3/4 full pre-goal orchestration. For Level 3/4, require Human Setpoint Approval before creating the goal contract and do not emit executable /goal without approved execution policy and review.'
+description: 'Use when confirmed requirements and any required design exist and a control contract must be written for a Level 2 bounded goal or Level 3/4 full pre-goal orchestration. For Level 3/4, Human Setpoint Approval is required.'
 ---
 
 # Writing Cybernetic Goals

@@ -91,6 +91,7 @@ tests/skills/__init__.py
 tests/skills/test_context_topology.py
 tests/skills/test_evidence_lifecycle_budget.py
 tests/skills/test_human_setpoint_approval.py
+tests/skills/test_skill_hot_path_compression.py
 tests/skills/test_intent_framing.py
 tests/skills/test_invariant_consumer_matrix.py
 tests/skills/test_purpose_feedback_boundary.py

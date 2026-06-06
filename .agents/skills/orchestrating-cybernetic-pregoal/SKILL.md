@@ -229,36 +229,26 @@ Do not continue self-revising indefinitely.
 
 ## Workflow
 
-### Step 0: Validate the Requirements Analysis Brief
+Read `references/orchestration-protocol.md` for the control-layer map, then use
+the state machine below. Before each transition, run
+`scripts/orchestration_guard.py` with the matching `--state` when available. If
+the guard fails, stop and report the next allowed action from the guard.
 
-Read the requirements analysis brief. If available, run:
+### Validate Inputs
 
-```bash
-python3 ~/.agents/skills/orchestrating-cybernetic-pregoal/scripts/check_pregoal_inputs.py --requirements <path>
-```
+The requirements analysis is acceptable only when:
 
-Then, if available, run:
+- `Requirements Analysis Status: Complete`;
+- `Human Setpoint Approval: Approved`;
+- routing or requirements recorded Level 3/4 or full pre-goal fit.
 
-```bash
-python3 .agents/skills/orchestrating-cybernetic-pregoal/scripts/orchestration_guard.py \
-  --state before-design \
-  --requirements <requirements>
-```
+If requirements analysis is incomplete or HSA is missing/not Approved, stop
+before design.
 
-If the script path is not available, perform the same checks manually.
+### Determine Artifact Paths
 
-The requirements analysis is acceptable only if both are true:
-
-- it contains `Requirements Analysis Status` with `Complete`;
-- it contains `Human Setpoint Approval` with `Status: Approved`.
-
-If requirements analysis is incomplete or Human Setpoint Approval is missing
-or not Approved, stop. Do not create design, goal, plan, review, or runtime
-`/goal`.
-
-### Step 1: Determine Artifact Paths
-
-Derive the date and slug from the requirements path unless the user specifies paths.
+Derive the date and slug from the requirements path unless the user specifies
+paths.
 
 From:
 
@@ -328,8 +318,6 @@ If any non-emulatable stage is required and unavailable, stop and report the mis
 
 ## Orchestration State Machine
 
-Before each stage, run `scripts/orchestration_guard.py` for that stage if available. If the guard fails, stop. Do not continue based on confidence or natural-language reasoning.
-
 | Current State | Required condition | Next Action | Forbidden Action |
 |---|---|---|---|
 | `RequirementsMissing` | requirements absent, incomplete, or Human Setpoint Approval missing/not Approved | `Blocked` / `ReturnToRequirementsAnalysis` | design / goal / policy / review / runtime compile |
@@ -341,222 +329,20 @@ Before each stage, run `scripts/orchestration_guard.py` for that stage if availa
 | `RuntimeGoalReady` | final `/goal` is compiled | output command | start `/goal` |
 | `Blocked` | any required gate fails | report blocker | continue |
 
-### Step 2: Create or Validate the Solution Design
+### Stage Responsibilities
 
-Before goal writing, if available, run:
+- `RunDesign`: invoke/request `$designing-cybernetic-solutions` when Design Gate is required or a design artifact must be validated.
+- `RunGoalWriting`: invoke/request `$writing-cybernetic-goals`; goal writing consumes requirements and any required design.
+- `RunExecutionPolicy`: invoke/request `$writing-cybernetic-execution-policies`; the orchestrator passes topology decisions through and does not choose them.
+- `RunReview`: invoke/request `$reviewing-cybernetic-control-structures`; use authorized independent review, and apply Final Observer discipline after substantive mutations.
+- `RunRuntimeCompile`: invoke/request `$compiling-cybernetic-runtime-goals`; runtime compilation must pass the compiler guard and must not start `/goal`.
 
-```bash
-python3 .agents/skills/orchestrating-cybernetic-pregoal/scripts/orchestration_guard.py \
-  --state before-goal \
-  --requirements <requirements> \
-  --design <design-if-present>
-```
+If a required downstream skill or required Superpowers substrate is unavailable,
+stop and report the missing dependency. If review returns `Needs Revision`,
+`Dirty`, `Needs Re-review`, or `Needs Independent Review`, return to the
+required prior stage instead of compiling runtime `/goal`.
 
-Use `$designing-cybernetic-solutions` when `Design Gate: required` appears in the requirements analysis, router output, user request, or existing artifact chain.
-
-The solution design must:
-
-- reference the requirements analysis brief;
-- define core objects/actors/roles, relationships, flows, and boundaries;
-- define interfaces/contracts, lifecycle or state model, failure model, and evidence/sensor model when relevant;
-- distinguish design invariants from tactical degrees of freedom;
-- map design elements to goal and execution-policy implications;
-- not create goal, plan, review, runtime `/goal`, or target-work artifacts.
-
-The orchestrator must not synthesize these design contents itself. If the design is missing and required, the next allowed action is `RunDesign`.
-
-Expected artifact:
-
-```text
-docs/cybernetics/designs/YYYY-MM-DD-<slug>.md
-```
-
-If Design Gate is required but the design cannot be created because of unresolved design questions, stop and report the smallest required human decision.
-
-### Step 3: Create or Update the Goal Contract
-
-Use `$writing-cybernetic-goals` when available.
-
-The goal contract must:
-
-- reference the requirements analysis brief
-- reference the solution design when Design Gate is required or a design exists
-- include `Final Output Contract` when Output Contract Gate was required, satisfied by a requirements/design artifact, or otherwise present upstream
-- preserve all confirmed decisions
-- define success conditions
-- define invariants and forbidden scope
-- define verification surfaces
-- define stop conditions
-- not instruct `/goal` to write or approve its own plan
-- not output the final runtime `/goal` command yet
-
-Expected artifact:
-
-```text
-docs/cybernetics/goals/YYYY-MM-DD-<slug>.md
-```
-
-### Step 4: Create or Update the Execution Policy
-
-Before writing the execution policy, if available, run:
-
-```bash
-python3 .agents/skills/orchestrating-cybernetic-pregoal/scripts/orchestration_guard.py \
-  --state before-policy \
-  --requirements <requirements> \
-  --design <design-if-present> \
-  --goal <goal>
-```
-
-Use `$writing-cybernetic-execution-policies` when available.
-
-The execution policy must:
-
-- reference the requirements analysis and goal files
-- reference the solution design when Design Gate is required or a design exists
-- record `$superpowers:writing-plans` substrate status for non-trivial execution policies
-- include a dependency matrix
-- select and justify Context Management / Execution Topology
-- record `Selected delegation substrate`
-- distinguish semantic invariants from tactical degrees of freedom
-- define execution granularity and sensor budget
-- define batch cadence
-- define destructive intermediate-state policy
-- define batch-end openable/verifiable requirements
-- define sensor/evidence governance
-- define stale/obsolete sensor retirement and rewrite policy
-- define phase gates
-- define stop conditions
-- define progress log rules
-
-If `$superpowers:writing-plans` is required but unavailable, stop and report missing planning infrastructure. Do not write an ad hoc approved plan as a substitute.
-
-The orchestrator does not choose runtime topology. It only verifies that the execution policy selected one of `Main-only`, `Serial subagent-driven`, or `Parallel subagent-driven` and passes that policy downstream.
-
-Expected artifact:
-
-```text
-docs/cybernetics/plans/YYYY-MM-DD-<slug>.md
-```
-
-### Step 5: Review the Control Structure
-
-Before control review, if available, run:
-
-```bash
-python3 .agents/skills/orchestrating-cybernetic-pregoal/scripts/orchestration_guard.py \
-  --state before-review \
-  --requirements <requirements> \
-  --design <design-if-present> \
-  --goal <goal> \
-  --plan <plan>
-```
-
-Use `$reviewing-cybernetic-control-structures` when available.
-
-If pre-goal review subagents are authorized, use independent reviewer roles. At minimum:
-
-1. Requirement Traceability Reviewer
-2. Solution Design Fidelity Reviewer
-3. Control Contract Reviewer
-4. Execution Policy / Cadence Reviewer
-5. Sensor Governance Reviewer
-6. Runtime Boundary Reviewer
-
-Do not run target execution and do not dispatch execution agents during pre-goal review.
-
-Review the whole chain:
-
-```text
-requirements analysis → solution design → goal → execution policy → runtime goal readiness
-```
-
-Do not review only the plan.
-
-Expected artifact:
-
-```text
-docs/cybernetics/control-reviews/YYYY-MM-DD-<slug>.md
-```
-
-If independent review discipline is missing and no explicit human approval exists, the review status must be `Needs Independent Review`, not `Approved`.
-
-If review flags execution granularity or sensor load as Major or Blocking, return to execution-policy revision. The orchestrator must not tune batch granularity or sensor budget itself, and must not compile runtime `/goal` until review no longer reports that issue as Major or Blocking.
-
-Apply the Final Observer Rule:
-
-- If a reviewer reports a Blocking or Major finding and the orchestrator changes any control artifact to address it, the modified artifact is `Dirty`.
-- Dirty artifacts cannot be marked `Approved`.
-- Run final independent re-review on the changed sections before approval.
-- The final re-review prompt must ask whether prior blockers were resolved, whether new blockers were introduced, and whether approval is recommended.
-- Lint PASS is a structural sensor only; it does not replace semantic or control-policy re-review.
-- Deterministic-only exceptions are allowed only for guard-covered formatting or lint-only repairs, and must be recorded in the control review.
-
-### Step 6: Revise and Re-Review
-
-If review status is `Needs Revision`:
-
-1. Apply only the required revisions.
-2. Avoid over-correcting non-critical suggestions.
-3. If the revision concerns execution granularity, sensor load, or execution topology, route it to `$writing-cybernetic-execution-policies`; do not repair it inside the orchestrator.
-4. Mark changed control artifacts `Dirty` unless every change is deterministic-only and guard-covered.
-5. Re-run independent review for substantive changes, focused on the changed sections and prior blockers.
-6. Record the final observer check in the control review.
-7. Stop after two review-revision cycles if not approved.
-
-Do not alter confirmed human decisions. If a revision would change requirement semantics, stop and ask for human input.
-
-### Step 7: Compile the Runtime `/goal`
-
-Use `$compiling-cybernetic-runtime-goals` when available.
-
-Before runtime compilation, if available, run:
-
-```bash
-python3 .agents/skills/orchestrating-cybernetic-pregoal/scripts/orchestration_guard.py \
-  --state before-runtime-compile \
-  --requirements <requirements> \
-  --design <design-if-present> \
-  --goal <goal> \
-  --plan <plan> \
-  --review <review>
-```
-
-Before outputting runtime `/goal`, ensure:
-
-- requirements analysis is complete
-- requirements analysis includes `Human Setpoint Approval: Approved`
-- solution design exists when Design Gate was required or a design artifact exists
-- final output contract exists in the goal when Output Contract Gate was required or an output contract exists upstream
-- goal contract exists
-- execution policy exists
-- execution policy records selected execution topology
-- control review exists
-- control review is `Approved`
-- no substantive post-review artifact mutation remains unobserved by final independent re-review
-- deterministic-only exceptions, if used, are explicitly recorded and guard-covered
-- all files reference the same feature
-- artifact paths use the same date/slug unless the user explicitly specified alternatives
-- the runtime `/goal` references all approved files
-- the runtime `/goal` carries the final output contract from the goal when present or required
-- the runtime `/goal` preserves the approved execution topology
-- the runtime `/goal` uses the approved bounded subagent delegation protocol when the topology delegates work
-- the runtime `/goal` uses `$superpowers:subagent-driven-development` only when the execution policy records `Selected delegation substrate: superpowers-subagent-driven-development` for compatible implementation-plan work packages
-
-If available, run:
-
-```bash
-python3 ~/.agents/skills/compiling-cybernetic-runtime-goals/scripts/control_chain_guard.py \
-  --requirements <requirements> \
-  --design <design-if-required-or-present> \
-  --goal <goal> \
-  --plan <plan> \
-  --review <review>
-```
-
-Then compile the runtime command.
-
-### Step 8: Final Output
+### Final Output
 
 Output:
 
@@ -568,75 +354,10 @@ Output:
 
 Do not start `/goal`.
 
-## Runtime `/goal` Requirements
-
-The final `/goal` must instruct Codex to execute approved control artifacts only.
-
-It must not instruct Codex to:
-
-- write a new execution policy
-- approve its own plan
-- reinterpret requirements
-- change confirmed semantics
-- rewrite the solution design
-- reinterpret the human-approved setpoint, human purpose, primary object, requested transformation, non-goals, Purpose Feedback Boundary, Realization Surface Closure, output contract, or workflow fit
-- replace the final output contract
-- replace approved sensors
-- redesign the execution policy
-
-It must instruct Codex to:
-
-- use `$superpowers:executing-plans` discipline against the approved plan;
-- use the approved execution topology from the execution policy;
-- use the approved bounded subagent delegation protocol when the approved topology selects serial or parallel subagent-driven execution;
-- use `$superpowers:subagent-driven-development` only when the execution policy records `Selected delegation substrate: superpowers-subagent-driven-development` for compatible implementation-plan, current-session work packages;
-- keep the main agent responsible for coordination, integration, progress log ownership, and stop-condition detection when work is delegated;
-- treat subagent outputs as candidate results until main-agent integration;
-- not replace the approved execution topology during runtime;
-- use `$superpowers:systematic-debugging` for unclear or repeated failures;
-- use `$superpowers:verification-before-completion` before claiming completion;
-- follow equivalent approved artifact discipline if runtime cannot load those skills.
-
-The command must reference:
-
-- requirements analysis file
-- solution design file, when Design Gate was required or a design exists
-- goal file
-- execution policy / plan file
-- control review file
-
-The command must carry the final output contract from the goal when one is present or required.
-
-The command must include this precondition:
-
-```text
-If any referenced artifact is missing, not approved, or internally inconsistent, stop and report the smallest required human decision.
-```
-
-## Stop Conditions
-
-Stop and report if:
-
-- requirements analysis is incomplete
-- requirements analysis has unresolved blocking questions
-- goal changes confirmed semantics
-- required solution design is missing or conflicts with requirements analysis
-- required final output contract is missing from the goal or conflicts with upstream output-contract requirements
-- execution policy changes goal semantics
-- execution policy redesigns the solution model
-- review does not converge after two cycles
-- reviewer disagreements imply a requirement decision
-- pre-goal review subagents are needed but not authorized
-- required Superpowers planning substrate is unavailable
-- independent review discipline is missing and no explicit human approval exists
-- any substantive post-review artifact mutation remains dirty or lacks final independent re-review
-- lint PASS is the only evidence for resolving a semantic/control-policy reviewer blocker
-- final runtime `/goal` would need to invent or approve its own control structure
-- final runtime `/goal` would need to invent solution design
-
 ## Output And Final Checks Reference
 
 After the orchestration state machine reaches `RuntimeGoalReady` or `Blocked`,
 read `references/output-and-final-checks.md` for response-only output shapes,
-the final validation checklist, and common mistakes. Do not write those
-response-only prompts into control artifacts.
+the final validation checklist, common mistakes, and runtime `/goal`
+precondition reminders. Do not write those response-only prompts into control
+artifacts.
