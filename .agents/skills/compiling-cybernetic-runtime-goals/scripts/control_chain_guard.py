@@ -14,6 +14,18 @@ from pathlib import Path
 HEADING_RE = re.compile(r"^(#{1,6})\s+(.+?)\s*$", re.MULTILINE)
 STATUS_LINE_RE = re.compile(r"(?im)^\s*Status\s*:\s*`?([^`\n]+?)`?\s*$")
 YES_NO_LINE_RE = re.compile(r"(?im)^\s*-\s*{label}\s*:\s*`?([^`\n]+?)`?\s*$")
+ENUM_STATUS_RE = re.compile(r"(?im)^\s*Status\s*:\s*`?([^`\n]*\s/\s[^`\n]*)`?\s*$")
+PLACEHOLDER_RE = re.compile(r"\[[^\]\n]{3,}\](?!\()|YYYY-MM-DD(?:-slug|-<slug>)?")
+DUPLICATE_PARAGRAPH_MIN_CHARS = 120
+
+RESPONSE_ONLY_PROMPTS = (
+    "$orchestrating-cybernetic-pregoal",
+    "$writing-cybernetic-goals",
+    "$designing-cybernetic-solutions",
+    "/goal Execute",
+    "Recommended next step:",
+    "Response-only handoff:",
+)
 
 STATUS_ALIASES = {
     "complete": "Complete",
@@ -150,6 +162,54 @@ def meaningful_line(line: str) -> bool:
     if text in {"yes/no", "yes / no"}:
         return False
     return True
+
+
+def line_number(text: str, index: int) -> int:
+    return text.count("\n", 0, index) + 1
+
+
+def normalize_paragraph(paragraph: str) -> str:
+    return re.sub(r"\s+", " ", paragraph).strip()
+
+
+def check_artifact_hygiene(label: str, text: str, errors: list[str]) -> None:
+    for match in ENUM_STATUS_RE.finditer(text):
+        errors.append(f"{label} artifact hygiene line {line_number(text, match.start())}: unresolved enum status")
+
+    for match in PLACEHOLDER_RE.finditer(text):
+        errors.append(f"{label} artifact hygiene line {line_number(text, match.start())}: unresolved placeholder")
+
+    lowered = text.casefold()
+    for prompt in RESPONSE_ONLY_PROMPTS:
+        index = lowered.find(prompt.casefold())
+        if index >= 0:
+            errors.append(
+                f"{label} artifact hygiene line {line_number(text, index)}: response-only prompt leaked into artifact: {prompt}"
+            )
+
+    seen_headings: set[str] = set()
+    for match in HEADING_RE.finditer(text):
+        heading = match.group(2).strip().rstrip("#").strip()
+        normalized = f"{len(match.group(1))}:{heading.casefold()}"
+        if normalized in seen_headings:
+            errors.append(f"{label} artifact hygiene line {line_number(text, match.start())}: duplicate heading: {heading}")
+        else:
+            seen_headings.add(normalized)
+
+    seen_paragraphs: set[str] = set()
+    offset = 0
+    for paragraph in re.split(r"\n\s*\n", text):
+        normalized = normalize_paragraph(paragraph)
+        paragraph_start = text.find(paragraph, offset)
+        offset = paragraph_start + len(paragraph) if paragraph_start >= 0 else offset
+        if len(normalized) < DUPLICATE_PARAGRAPH_MIN_CHARS:
+            continue
+        if normalized.startswith("#") or normalized.startswith("|"):
+            continue
+        if normalized in seen_paragraphs:
+            errors.append(f"{label} artifact hygiene line {line_number(text, max(paragraph_start, 0))}: duplicate paragraph")
+        else:
+            seen_paragraphs.add(normalized)
 
 
 def has_section(text: str, heading: str) -> bool:
@@ -566,6 +626,7 @@ def suggest_next_action(errors: list[str]) -> str:
         "output contract" in joined
         or "goal lacks" in joined
         or "goal contains runtime control-structure" in joined
+        or "goal artifact hygiene" in joined
         or "goal missing ## purpose feedback contract" in joined
         or "goal purpose feedback contract missing" in joined
         or "goal missing ## realization surface contract" in joined
@@ -574,6 +635,7 @@ def suggest_next_action(errors: list[str]) -> str:
         return "RunGoalWriting"
     if (
         "execution policy status" in joined
+        or "plan artifact hygiene" in joined
         or "execution policy missing ## realization surface closure strategy" in joined
         or "execution policy realization surface closure strategy missing" in joined
         or "plan does not reference" in joined
@@ -592,6 +654,7 @@ def suggest_next_action(errors: list[str]) -> str:
         return "RunExecutionPolicy"
     if (
         "control review status" in joined
+        or "review artifact hygiene" in joined
         or "final observer" in joined
         or "post-review" in joined
         or "deterministic-only exception" in joined
@@ -610,6 +673,8 @@ def suggest_next_action(errors: list[str]) -> str:
         return "RunReview"
     if "missing file" in joined:
         return "ProvideMissingArtifact"
+    if "requirements artifact hygiene" in joined:
+        return "ReturnToRequirementsAnalysis"
     if "does not reference required path" in joined:
         return "FixSourceContracts"
     return "Blocked"
@@ -640,12 +705,14 @@ def main() -> int:
         design = None
 
     if requirements:
+        check_artifact_hygiene("requirements", requirements, errors)
         requirements_status = first_section_status(requirements, "Requirements Analysis Status", "Clarification Status")
         if requirements_status != "Complete":
             errors.append(f"requirements analysis status is not Complete: {requirements_status!r}")
         check_human_setpoint_approval(requirements, errors)
 
     if design:
+        check_artifact_hygiene("design", design, errors)
         design_status = section_status(design, "Design Status")
         if design_status not in {"Candidate", "Reviewed", "Approved"}:
             errors.append(f"design status under ## Design Status must be Candidate, Reviewed, or Approved: {design_status!r}")
@@ -660,10 +727,12 @@ def main() -> int:
         errors.append("Output contract is required by gate or upstream artifact, but goal lacks meaningful ## Final Output Contract")
 
     if goal:
+        check_artifact_hygiene("goal", goal, errors)
         check_goal_purpose_feedback(goal, errors)
         check_goal_realization_surface(goal, errors)
 
     if plan:
+        check_artifact_hygiene("plan", plan, errors)
         plan_status = section_status(plan, "Execution Policy Status")
         if plan_status != "Candidate":
             errors.append(f"execution policy status under ## Execution Policy Status must be Candidate: {plan_status!r}")
@@ -671,6 +740,7 @@ def main() -> int:
         check_execution_topology(plan, errors)
 
     if review:
+        check_artifact_hygiene("review", review, errors)
         review_status = section_status(review, "Review Status")
         if review_status != "Approved":
             errors.append(f"control review status under ## Review Status is not Approved: {review_status!r}")

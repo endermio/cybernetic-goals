@@ -6,7 +6,9 @@ Status: `Incomplete`
 
 ## Human Setpoint Approval
 
-Status: `Pending / Approved / Rejected / Needs Revision / Not required`
+Status: `Pending`
+
+Allowed values: `Pending / Approved / Rejected / Needs Revision / Not required`
 
 Approval applies only to this compact control commitment.
 

@@ -54,6 +54,12 @@ Rationale:
 
 - [pass/fail summary]
 
+## Artifact Hygiene / Signal-to-Noise
+
+Findings:
+
+- [generated artifacts are compact/non-conversational/non-duplicative, or note required cleanup]
+
 ## Requirement Traceability
 
 Findings:
