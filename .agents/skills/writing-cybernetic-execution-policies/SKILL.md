@@ -151,7 +151,7 @@ For serial or parallel subagent-driven topology, `Selected delegation substrate`
 
 For serial subagent-driven topology, record `Ordered work package sequence` and `Integration gate after each package`.
 
-For parallel subagent-driven topology, record `Concurrency frontier rule`, `Conflict / lock model`, `Parallel wave matrix`, `Failure policy`, and `Main-agent integration rule`.
+For parallel subagent-driven topology, record `Concurrency frontier rule`, `Conflict / lock model`, `Parallel wave matrix`, `Failure policy`, and `Main-agent integration rule`. The `Parallel wave matrix` must include a `Spine frontier` column so parallel waves are based on target-producing frontier state, not only component work package independence.
 
 For `Main-only` Level 3/4 work, include a meaningful `Main-only context-load justification` explaining why the main agent will not become an overloaded coordinator, worker, integrator, and verifier.
 
@@ -431,6 +431,7 @@ Response-only next step:
 - [ ] Serial or parallel subagent-driven topology does not use `Selected delegation substrate: none`.
 - [ ] Serial subagent-driven topology uses `serial-single-active`, max concurrency `1`, ordered sequence, and per-package integration.
 - [ ] Parallel subagent-driven topology uses `parallel-max-safe`, wave matrix, lock model, failure policy, and integration barriers.
+- [ ] Parallel wave matrix records `Spine frontier`.
 - [ ] `$superpowers:subagent-driven-development` is used only when `Selected delegation substrate` is `superpowers-subagent-driven-development` for compatible implementation-plan, current-session work packages.
 - [ ] Parallel subagent-driven execution records human approval, dependency independence, and review approval as explicitly `yes` or `approved`.
 - [ ] The plan includes Execution Granularity and Sensor Budget.

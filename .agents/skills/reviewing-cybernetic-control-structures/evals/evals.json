@@ -216,6 +216,18 @@
       ]
     },
     {
+      "id": "component-labelled-spine-is-not-valid-spine",
+      "prompt": "Review an implementation plan whose Target-Producing Spine says S1 implement ledger, S2 implement runner, S3 implement CLI, and Candidate Plan Tasks map component work to those labels. There is no actor-centered state transition from initial state to target-achieved predicate.",
+      "expected_output": "The review marks Target-Producing Spine Fidelity as inadequate because the plan renamed component inventory as a spine instead of modeling target-producing state transitions.",
+      "assertions": [
+        "Identifies S1/S2/S3 as component inventory rather than target-producing state transitions.",
+        "Requires an actor-centered path from initial state to target-achieved predicate.",
+        "Flags component evidence replacing spine transition evidence.",
+        "Does not approve merely because Candidate Plan Tasks have Spine node(s).",
+        "Requires execution-policy revision before runtime compilation."
+      ]
+    },
+    {
       "id": "local-action-cannot-claim-target-realization-without-rsc",
       "prompt": "A goal changes a target state carried by multiple controlled-object surfaces. The plan changes one local artifact and then claims the target state is fully realized without a surface model or residual reconciliation.",
       "expected_output": "The review marks Realization Surface Closure as missing or inadequate, treats local action as insufficient for target-state realization, and requires a surface model plus residual reconciliation before strongest positive wording.",

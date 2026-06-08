@@ -440,6 +440,16 @@ class TargetProducingSpineTest(unittest.TestCase):
         self.assertIn("Target-Producing Spine", contract_text)
         self.assertIn("Target-Producing Spine Fidelity", contract_text)
 
+    def test_progress_log_rules_track_spine_node_status(self):
+        template = self.read(".agents/skills/writing-cybernetic-execution-policies/assets/execution-policy-template.md")
+        progress_log = template.split("## Progress Log Rules", 1)[1]
+
+        self.assertIn("target-producing spine node status", progress_log)
+        self.assertIn("spine transitions satisfied", progress_log)
+        self.assertIn("spine transitions failed / blocked / unobserved", progress_log)
+        self.assertIn("supporting-only work completed", progress_log)
+        self.assertIn("supporting-only work not counted as goal progress", progress_log)
+
 
 if __name__ == "__main__":
     unittest.main()

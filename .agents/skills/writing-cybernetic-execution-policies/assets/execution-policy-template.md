@@ -87,9 +87,9 @@ Conflict / lock model:
 
 Parallel wave matrix:
 
-| Wave | Work packages | Independence proof | Shared surfaces / locks | Integration barrier |
-|---|---|---|---|---|
-| [Wave 1] | [packages] | [why they can run together] | [locks or disjoint surfaces] | [main-agent barrier] |
+| Wave | Spine frontier | Work packages | Independence proof | Shared surfaces / locks | Integration barrier |
+|---|---|---|---|---|---|
+| [Wave 1] | [spine node(s) whose dependencies are satisfied] | [packages] | [why they can run together] | [locks or disjoint surfaces] | [main-agent barrier] |
 
 Failure policy:
 
@@ -488,6 +488,11 @@ Each entry must include:
 - purpose feedback status
 - single target-achieved predicate met
 - target-producing evidence
+- target-producing spine node status
+- spine transitions satisfied
+- spine transitions failed / blocked / unobserved
+- supporting-only work completed
+- supporting-only work not counted as goal progress
 - non-achieved reason
 - target-producing action attempted or proof of impossibility
 - smallest next target-producing attempt

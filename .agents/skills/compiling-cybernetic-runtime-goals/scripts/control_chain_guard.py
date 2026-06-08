@@ -343,6 +343,26 @@ def labeled_value(text: str, label: str) -> str | None:
     return None
 
 
+def table_field_value(text: str, field: str) -> str | None:
+    for line in text.splitlines():
+        stripped = line.strip()
+        if "|" not in stripped:
+            continue
+        if re.fullmatch(r"\|?\s*:?-{3,}:?\s*(\|\s*:?-{3,}:?\s*)+\|?", stripped):
+            continue
+        cells = [cell.strip().strip("`") for cell in stripped.strip("|").split("|")]
+        if len(cells) < 2 or field.casefold() not in cells[0].casefold():
+            continue
+        for cell in cells[1:]:
+            if meaningful_line(cell):
+                return cell
+    return None
+
+
+def field_value(text: str, label: str) -> str | None:
+    return labeled_value(text, label) or table_field_value(text, label)
+
+
 def approval_value_is_yes(text: str, label: str) -> bool:
     value = labeled_value(text, label)
     return value is not None and value.casefold() in APPROVAL_YES_VALUES
@@ -526,8 +546,8 @@ def check_execution_topology(plan: str | None, errors: list[str]) -> None:
                     errors.append(f"Parallel subagent-driven topology missing {label}")
             if not has_table_with_data_row(body, ["Surface / artifact / state", "Lock owner", "Conflict rule"]):
                 errors.append("Parallel subagent-driven topology missing meaningful Conflict / lock model")
-            if not has_table_with_data_row(body, ["Wave", "Work packages", "Independence proof", "Shared surfaces / locks", "Integration barrier"]):
-                errors.append("Parallel subagent-driven topology missing meaningful Parallel wave matrix")
+            if not has_table_with_data_row(body, ["Wave", "Spine frontier", "Work packages", "Independence proof", "Shared surfaces / locks", "Integration barrier"]):
+                errors.append("Parallel subagent-driven topology missing meaningful Parallel wave matrix with Spine frontier")
 
     if topology in {"Serial subagent-driven", "Parallel subagent-driven"} or level in {3, 4}:
         check_labeled_requirements(body, "Context Compression Rule", CONTEXT_COMPRESSION_FIELDS, errors)
@@ -610,6 +630,27 @@ def check_human_setpoint_approval(requirements: str, errors: list[str]) -> None:
     status = section_status(requirements, "Human Setpoint Approval")
     if status != "Approved":
         errors.append(f"Human Setpoint Approval is not Approved: {status!r}")
+
+
+def check_max_safe_parallel_preference(requirements: str, plan: str | None, errors: list[str]) -> None:
+    hsa = section_body(requirements, "Human Setpoint Approval")
+    if hsa is None or plan is None:
+        return
+
+    preference = field_value(hsa, "Runtime delegation preference")
+    if preference is None or preference.casefold() != "max-safe-parallel":
+        return
+
+    topology = selected_execution_topology(plan)
+    if topology == "Parallel subagent-driven":
+        return
+
+    topology_body = section_body(plan, "Context Management / Execution Topology") or ""
+    rationale = field_value(topology_body, "Concurrency selection rationale")
+    if rationale is None or "safe frontier" not in rationale.casefold():
+        errors.append(
+            "HSA Runtime delegation preference is max-safe-parallel but execution policy is not Parallel subagent-driven; Concurrency selection rationale must mention safe frontier"
+        )
 
 
 def check_goal_purpose_feedback(goal: str, errors: list[str]) -> None:
@@ -1029,6 +1070,8 @@ def suggest_next_action(errors: list[str]) -> str:
         or "conflict / lock model" in joined
         or "failure policy" in joined
         or "concurrency frontier rule" in joined
+        or "safe frontier" in joined
+        or "runtime delegation preference" in joined
         or "main-agent integration rule" in joined
         or any(
             error.startswith(
@@ -1147,6 +1190,7 @@ def main() -> int:
         check_candidate_plan_tasks_spine_nodes(plan, errors)
         check_plan_horizon_authority(plan, errors)
         check_execution_topology(plan, errors)
+        check_max_safe_parallel_preference(requirements, plan, errors)
 
     if review:
         check_artifact_hygiene("review", review, errors)

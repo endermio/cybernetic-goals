@@ -29,6 +29,9 @@ Status: `Approved`
 | Forbidden live / irreversible actions | none |
 | Required handling for unauthorized actions | none |
 | Explicitly out-of-scope items | none |
+| Runtime delegation preference | no preference |
+| Parallel execution authority | not applicable |
+| Parallelism cap | not specified |
 | Output Contract | guard output |
 | Workflow fit | full pre-goal guard fixture |
 | Known assumptions | fixture-only assumptions |
@@ -162,9 +165,9 @@ class ContextTopologySkillTest(unittest.TestCase):
                 "",
                 "Parallel wave matrix:",
                 "",
-                "| Wave | Work packages | Independence proof | Shared surfaces / locks | Integration barrier |",
-                "|---|---|---|---|---|",
-                "| Wave 1 | Package A, Package B | areas are disjoint | exclusive per-area locks | main integrates both before next wave |",
+                "| Wave | Spine frontier | Work packages | Independence proof | Shared surfaces / locks | Integration barrier |",
+                "|---|---|---|---|---|---|",
+                "| Wave 1 | S1 | Package A, Package B | areas are disjoint | exclusive per-area locks | main integrates both before next wave |",
                 "",
                 "Failure policy:",
                 "",
@@ -1126,6 +1129,7 @@ class ContextTopologySkillTest(unittest.TestCase):
             "Concurrency selection rationale",
             "Conflict / lock model",
             "Parallel wave matrix",
+            "Spine frontier",
             "Failure policy",
             "Main-agent integration rule",
         ):
@@ -1133,6 +1137,93 @@ class ContextTopologySkillTest(unittest.TestCase):
 
         self.assertIn("Subagent Concurrency Fidelity", review_template)
         self.assertIn("Subagent concurrency fidelity", review_template)
+
+    def test_parallel_wave_matrix_requires_spine_frontier(self):
+        old_wave_matrix = self.complete_parallel_topology().replace(
+            "| Wave | Spine frontier | Work packages | Independence proof | Shared surfaces / locks | Integration barrier |",
+            "| Wave | Work packages | Independence proof | Shared surfaces / locks | Integration barrier |",
+        ).replace(
+            "|---|---|---|---|---|---|",
+            "|---|---|---|---|---|",
+        ).replace(
+            "| Wave 1 | S1 | Package A, Package B | areas are disjoint | exclusive per-area locks | main integrates both before next wave |",
+            "| Wave 1 | Package A, Package B | areas are disjoint | exclusive per-area locks | main integrates both before next wave |",
+        )
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            requirements, goal, plan, review = self.write_artifact_chain(Path(tmpdir), old_wave_matrix)
+            result = subprocess.run(
+                [
+                    sys.executable,
+                    str(
+                        ROOT
+                        / ".agents/skills/compiling-cybernetic-runtime-goals/scripts/control_chain_guard.py"
+                    ),
+                    "--requirements",
+                    str(requirements),
+                    "--goal",
+                    str(goal),
+                    "--plan",
+                    str(plan),
+                    "--review",
+                    str(review),
+                ],
+                cwd=ROOT,
+                text=True,
+                capture_output=True,
+            )
+
+        output = result.stdout + result.stderr
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("NEXT: RunExecutionPolicy", output)
+        self.assertIn("Spine frontier", output)
+
+    def test_max_safe_parallel_hsa_requires_serial_downgrade_rationale(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            tmp = Path(tmpdir)
+            requirements, goal, plan, review = self.write_artifact_chain(
+                tmp,
+                self.complete_serial_topology(),
+            )
+            requirements.write_text(
+                requirements.read_text(encoding="utf-8").replace(
+                    "| Runtime delegation preference | no preference |",
+                    "| Runtime delegation preference | max-safe-parallel |",
+                ).replace(
+                    "| Parallel execution authority | not applicable |",
+                    "| Parallel execution authority | approved |",
+                ).replace(
+                    "| Parallelism cap | not specified |",
+                    "| Parallelism cap | auto |",
+                ),
+                encoding="utf-8",
+            )
+            result = subprocess.run(
+                [
+                    sys.executable,
+                    str(
+                        ROOT
+                        / ".agents/skills/compiling-cybernetic-runtime-goals/scripts/control_chain_guard.py"
+                    ),
+                    "--requirements",
+                    str(requirements),
+                    "--goal",
+                    str(goal),
+                    "--plan",
+                    str(plan),
+                    "--review",
+                    str(review),
+                ],
+                cwd=ROOT,
+                text=True,
+                capture_output=True,
+            )
+
+        output = result.stdout + result.stderr
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("NEXT: RunExecutionPolicy", output)
+        self.assertIn("max-safe-parallel", output)
+        self.assertIn("safe frontier", output)
 
     def test_serial_superpowers_subagent_topology_requires_single_active_mode(self):
         with tempfile.TemporaryDirectory() as tmpdir:
