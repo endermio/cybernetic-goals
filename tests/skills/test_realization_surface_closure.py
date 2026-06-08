@@ -21,6 +21,14 @@ Status: `Approved`
 | Non-goals | do not test HSA behavior in this fixture |
 | Purpose Feedback Boundary | covered by compact fixture |
 | Realization Surface Closure | dedicated test target |
+| Single target-achieved predicate | target-producing evidence is observed |
+| Target-producing evidence required | target-producing evidence is observed |
+| Non-achieved terminal report handling | report goal achieved: no |
+| Execution horizon | RSC guard fixture horizon |
+| Runtime authority | local guard fixture checks |
+| Forbidden live / irreversible actions | none |
+| Required handling for unauthorized actions | none |
+| Explicitly out-of-scope items | none |
 | Output Contract | guard output |
 | Workflow fit | full pre-goal guard fixture |
 | Known assumptions | fixture-only assumptions |
@@ -108,6 +116,17 @@ class RealizationSurfaceClosureTest(unittest.TestCase):
                     "| Required target-producing evidence | target-producing evidence is observed |",
                 "| Allowed achieved claim | only target-achieved predicate supports goal achieved: yes |",
                 "",
+                "## Execution Horizon and Authority Contract",
+                "",
+                "| Element | Requirement |",
+                "|---|---|",
+                "| Approved horizon | RSC guard fixture horizon |",
+                "| Runtime-authorized actions | local guard fixture checks |",
+                "| Forbidden actions | none |",
+                "| Prepare-only / observe-only actions | none |",
+                "| Explicitly out-of-scope items | none |",
+                "| Horizon completion rule | every horizon item is accounted for in this fixture |",
+                "",
             ]
         )
         goal.write_text("\n".join(goal_parts), encoding="utf-8")
@@ -123,6 +142,12 @@ class RealizationSurfaceClosureTest(unittest.TestCase):
             "",
             f"- Requirements analysis: `{requirements}`",
             f"- Goal contract: `{goal}`",
+            "",
+            "## Horizon and Authority Coverage Matrix",
+            "",
+            "| Batch / surface | In approved horizon? | Runtime authority | Required runtime handling | Counts as achieved? |",
+            "|---|---|---|---|---|",
+            "| RSC guard fixture | yes | execute | run guard / compiler fixture checks | yes if fixture passes |",
             "",
             "## Target-Producing Action Strategy",
             "",
@@ -219,6 +244,7 @@ class RealizationSurfaceClosureTest(unittest.TestCase):
             "- Purpose feedback adequacy: `yes`",
             f"- Realization surface closure adequacy: `{review_independence_rsc}`",
             "- Target achievement predicate fidelity: `yes`",
+            "- Execution horizon and authority fidelity: `yes`",
             "",
             "## Context Management / Execution Topology",
             "",
@@ -253,6 +279,11 @@ class RealizationSurfaceClosureTest(unittest.TestCase):
                 "",
                 "Findings:",
                 "- The single target-achieved predicate is separated from non-achieved terminal reports.",
+                "",
+                "## Execution Horizon and Authority Fidelity",
+                "",
+                "Findings:",
+                "- Approved horizon and runtime authority are compact and fixture-bounded.",
                 "",
             ]
         )

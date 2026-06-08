@@ -57,6 +57,19 @@ Non-achieved terminal reports are not target states and must not be listed here.
 
 Target Achievement Predicate Fidelity calibrates whether the achieved claim matches the approved predicate. PFB calibrates purpose feedback. RSC calibrates target-state surface closure.
 
+## Execution Horizon and Authority Contract
+
+| Element | Requirement |
+|---|---|
+| Approved horizon | [complete execution scope approved for this goal; do not shrink it to the first safe segment] |
+| Runtime-authorized actions | [actions runtime may execute directly] |
+| Forbidden actions | [live, remote, destructive, irreversible, or externally risky actions runtime must not execute] |
+| Prepare-only / observe-only actions | [actions in the approved horizon that runtime may only prepare, observe, document, or report not executed] |
+| Explicitly out-of-scope items | [items excluded from this goal by HSA, not merely unauthorized] |
+| Horizon completion rule | [how every horizon item is accounted for: executed / prepared-only / forbidden-not-executed / explicitly out-of-scope by HSA] |
+
+Authority limits change runtime handling, not the approved horizon. Do not move approved horizon items to future roadmap or handoff unless Human Setpoint Approval explicitly excludes them from this goal.
+
 ## Source of Truth
 
 Read first:
@@ -196,6 +209,12 @@ When complete, report:
 - if no: non-achieved reason
 - if no: target-producing action attempted or proof of impossibility
 - if no: smallest next target-producing attempt
+- approved execution horizon
+- horizon coverage: complete / partial / unavailable / explicitly bounded by HSA
+- executed
+- prepared-only
+- forbidden-not-executed
+- explicitly out-of-scope by HSA
 - purpose feedback status: achieved / partially observed / pending / unavailable / not required with justification
 - highest purpose-relevant evidence observed
 - RSC status: adequate / partial / missing / unavailable / not applicable with justification

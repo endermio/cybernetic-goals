@@ -24,6 +24,11 @@ Approval applies only to this compact control commitment.
 | Single target-achieved predicate | [the only condition that allows "goal achieved: yes"] |
 | Target-producing evidence required | [evidence/action/observation required for the achieved predicate] |
 | Non-achieved terminal report handling | [how to report "goal achieved: no" without making it an alternate goal] |
+| Execution horizon | [complete scope this goal covers, including items the runtime may not execute directly] |
+| Runtime authority | [actions runtime may execute / prepare / observe / report] |
+| Forbidden live / irreversible actions | [live, remote, destructive, irreversible, or externally risky actions runtime must not execute] |
+| Required handling for unauthorized actions | [prepare-only / observe-only / forbidden-not-executed handling and required artifacts] |
+| Explicitly out-of-scope items | [items excluded from this goal by HSA, not merely unauthorized] |
 | Output Contract | [audience, purpose, medium, structure, destination, acceptance] |
 | Workflow fit | [why full pre-goal orchestration is required / or why it is not] |
 | Known assumptions | [safe defaults and assumptions] |

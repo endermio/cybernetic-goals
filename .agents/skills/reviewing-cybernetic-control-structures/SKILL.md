@@ -66,6 +66,7 @@ Substantive changes include changes to:
 - sensor or evidence structure;
 - purpose feedback boundary, purpose feedback strategy, or completion-claim wording;
 - realization surface closure strategy, residual reconciliation, or target-realization wording;
+- execution horizon, runtime authority, forbidden-action handling, or horizon coverage matrix;
 - evidence lifecycle, retention, budget, or tracked-evidence policy;
 - progress log required fields;
 - stop conditions;
@@ -107,6 +108,11 @@ Check that design, goal, and execution policy preserve the approved compact cont
 - Target-producing evidence required;
 - Non-achieved terminal report handling;
 - Output Contract;
+- Execution horizon;
+- Runtime authority;
+- Forbidden live / irreversible actions;
+- Required handling for unauthorized actions;
+- Explicitly out-of-scope items;
 - workflow fit;
 - known assumptions.
 
@@ -233,7 +239,18 @@ Flag as Major or Blocking when:
 - the plan can terminate with `goal achieved: yes` without satisfying the single target-achieved predicate;
 - "valid final status" is used without separating `goal achieved: yes` from `goal achieved: no`.
 
-### 12. Execution Granularity / Sensor Load
+### 12. Execution Horizon and Authority Fidelity
+
+Flag as Major or Blocking when:
+
+- approved full horizon is silently reduced to the first safe segment;
+- runtime authority limits are used as scope removal instead of execute / prepare-only / observe-only / forbidden-not-executed handling;
+- unauthorized live or irreversible actions are moved to future roadmap, handoff, or later goal while still inside the approved horizon;
+- approved horizon items lack coverage in the execution policy;
+- prepare-only or forbidden-not-executed work is claimed as executed or live complete;
+- the final report cannot distinguish executed, prepared-only, forbidden-not-executed, and explicitly out-of-scope by HSA.
+
+### 13. Execution Granularity / Sensor Load
 
 Flag as Major or Blocking when:
 
@@ -332,6 +349,7 @@ Only mark `Approved` when:
 
 - requirements analysis, required design, goal, and plan are consistent;
 - Human Setpoint Approval is Approved when full pre-goal orchestration is used, and Human Setpoint Fidelity has no Blocking/Major findings;
+- Execution Horizon and Authority Fidelity has no Blocking/Major findings for full-route or multi-batch work;
 - required design exists and is consistent with requirements analysis, goal, and plan;
 - any upstream output contract is preserved in the goal and supported by the execution policy;
 - no unresolved semantic decision remains;
@@ -398,6 +416,7 @@ Response-only next step:
 - [ ] Purpose feedback adequacy was checked.
 - [ ] Realization Surface Closure adequacy was checked.
 - [ ] Target Achievement Predicate Fidelity was checked.
+- [ ] Execution Horizon and Authority Fidelity was checked.
 - [ ] Execution granularity and sensor load were checked.
 - [ ] Required revisions are actionable.
 - [ ] Response-only handoff matches the review status and does not bypass `$orchestrating-cybernetic-pregoal` when full pre-goal orchestration owns the chain.

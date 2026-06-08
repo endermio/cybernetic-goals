@@ -24,6 +24,7 @@ Status: `Needs Revision`
   - Purpose feedback adequacy: `yes/no`
   - Realization surface closure adequacy: `yes/no`
   - Target achievement predicate fidelity: `yes/no`
+  - Execution horizon and authority fidelity: `yes/no`
   - Execution granularity / sensor load: `yes/no`
   - Sensor governance: `yes/no`
   - Execution cadence: `yes/no`
@@ -202,6 +203,22 @@ Findings:
 
 - [finding]
 
+## Execution Horizon and Authority Fidelity
+
+Check:
+
+- approved execution horizon is not silently reduced to the first safe segment;
+- runtime authority limits define execute / prepare-only / observe-only / forbidden-not-executed handling, not scope removal;
+- unauthorized live or irreversible actions remain in horizon accounting unless explicitly out of scope by HSA;
+- approved horizon items are not moved to future roadmap, handoff, or later goal because runtime lacks direct authority;
+- execution policy can continue authorized downstream work that does not depend on forbidden actions;
+- prepare-only or forbidden-not-executed items are not claimed as live complete;
+- final report can distinguish executed, prepared-only, forbidden-not-executed, and explicitly out-of-scope by HSA.
+
+Findings:
+
+- [finding]
+
 ## Evidence Lifecycle / Evidence Budget
 
 Check:
@@ -270,6 +287,7 @@ The control structure may be approved only if:
 - purpose feedback adequacy supports the permitted completion wording and does not confuse internal progress evidence with purpose achievement;
 - realization surface closure adequacy supports target-realization wording and does not confuse local action with global realization;
 - target achievement predicate fidelity preserves a single target-achieved predicate;
+- execution horizon and authority fidelity preserves the approved horizon and does not convert authority limits into out-of-scope roadmap items;
 - sensor/evidence governance is explicit;
 - batch cadence is explicit;
 - runtime execution does not need to synthesize a new plan.

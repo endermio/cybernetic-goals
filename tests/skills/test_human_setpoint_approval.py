@@ -24,6 +24,14 @@ Approval applies only to this compact control commitment.
 | Non-goals | do not reinterpret the setpoint downstream |
 | Purpose Feedback Boundary | purpose feedback remains separately calibrated |
 | Realization Surface Closure | target-state surfaces remain separately calibrated |
+| Single target-achieved predicate | approved HSA guard target is observed |
+| Target-producing evidence required | target-producing evidence is observed |
+| Non-achieved terminal report handling | report goal achieved: no |
+| Execution horizon | HSA guard fixture horizon |
+| Runtime authority | local guard fixture checks |
+| Forbidden live / irreversible actions | none |
+| Required handling for unauthorized actions | none |
+| Explicitly out-of-scope items | none |
 | Output Contract | final runtime command preserves approved artifacts |
 | Workflow fit | full pre-goal orchestration is required for this fixture |
 | Known assumptions | test fixture assumptions only |
@@ -111,6 +119,17 @@ class HumanSetpointApprovalTest(unittest.TestCase):
                     "| Required target-producing evidence | target-producing evidence is observed |",
                     "| Allowed achieved claim | only target-achieved predicate supports goal achieved: yes |",
                     "",
+                    "## Execution Horizon and Authority Contract",
+                    "",
+                    "| Element | Requirement |",
+                    "|---|---|",
+                    "| Approved horizon | HSA guard fixture horizon |",
+                    "| Runtime-authorized actions | local guard fixture checks |",
+                    "| Forbidden actions | none |",
+                    "| Prepare-only / observe-only actions | none |",
+                    "| Explicitly out-of-scope items | none |",
+                    "| Horizon completion rule | every horizon item is accounted for in this fixture |",
+                    "",
                     "## Final Output Contract",
                     "",
                     "| Element | Requirement |",
@@ -143,6 +162,12 @@ class HumanSetpointApprovalTest(unittest.TestCase):
                     "",
                     f"- Requirements analysis: `{requirements}`",
                     f"- Goal contract: `{goal}`",
+                    "",
+                    "## Horizon and Authority Coverage Matrix",
+                    "",
+                    "| Batch / surface | In approved horizon? | Runtime authority | Required runtime handling | Counts as achieved? |",
+                    "|---|---|---|---|---|",
+                    "| HSA guard fixture | yes | execute | run guard / compiler fixture checks | yes if fixture passes |",
                     "",
                     "## Target-Producing Action Strategy",
                     "",
@@ -209,6 +234,7 @@ class HumanSetpointApprovalTest(unittest.TestCase):
                     "- Purpose feedback adequacy: `yes`",
                     "- Realization surface closure adequacy: `yes`",
                     "- Target achievement predicate fidelity: `yes`",
+                    "- Execution horizon and authority fidelity: `yes`",
                     "",
                     "## Human Setpoint Fidelity",
                     "",
@@ -240,6 +266,11 @@ class HumanSetpointApprovalTest(unittest.TestCase):
                     "",
                     "Findings:",
                     "- The single target-achieved predicate is separated from non-achieved terminal reports.",
+                    "",
+                    "## Execution Horizon and Authority Fidelity",
+                    "",
+                    "Findings:",
+                    "- Approved horizon and runtime authority are compact and fixture-bounded.",
                     "",
                     "## Final Observer Check",
                     "",

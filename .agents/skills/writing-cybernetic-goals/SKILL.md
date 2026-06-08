@@ -143,6 +143,23 @@ The goal must preserve or define:
 Non-achieved terminal reports are stop/report protocol, not alternate goals,
 target-achievement predicates, or success states.
 
+## Execution Horizon and Authority Contract
+
+For full-route or multi-batch controlled work, include `Execution Horizon and
+Authority Contract`.
+
+The goal must preserve or define:
+
+- Approved horizon: the complete scope this goal covers;
+- Runtime-authorized actions: what runtime may execute directly;
+- Forbidden actions: live, remote, destructive, irreversible, or externally risky actions runtime must not execute;
+- Prepare-only / observe-only actions: horizon items runtime may only prepare, observe, document, or report not executed;
+- Explicitly out-of-scope items: items excluded by Human Setpoint Approval;
+- Horizon completion rule: how each horizon item is counted as executed, prepared-only, forbidden-not-executed, or explicitly out of scope by HSA.
+
+Authority limits must not shrink the approved horizon or move approved horizon
+items to future roadmap.
+
 ## Goal Modes
 
 ### Mode A: Complex Control Contract
@@ -208,21 +225,22 @@ The goal file must include:
 4. Purpose Feedback Contract
 5. Realization Surface Contract, always for compiled runtime goals; record `RSC not applicable with justification` when no target-state surface closure is required
 6. Target Achievement Contract
-7. Source of Truth
-8. Scope and Boundaries
-9. Invariants
-10. Verification Surface
-11. Checkpoint Loop
-12. Repair Policy
-13. Progress Log
-14. Stop Conditions
-15. Blocked Report Format
-16. Final Report Format
-17. Final Output Contract, when output shape affects execution, acceptance, handoff, persistence, or downstream consumption
+7. Execution Horizon and Authority Contract, always for full-route or multi-batch work
+8. Source of Truth
+9. Scope and Boundaries
+10. Invariants
+11. Verification Surface
+12. Checkpoint Loop
+13. Repair Policy
+14. Progress Log
+15. Stop Conditions
+16. Blocked Report Format
+17. Final Report Format
+18. Final Output Contract, when output shape affects execution, acceptance, handoff, persistence, or downstream consumption
 
 The goal must preserve confirmed semantics. It must not reinterpret or downscope them.
 
-For Level 3/4 or full pre-goal work, the goal must preserve the approved compact control commitment from `Human Setpoint Approval`: human purpose, input role binding, primary object, requested transformation, non-goals, Purpose Feedback Boundary, Realization Surface Closure, Single target-achieved predicate, Target-producing evidence required, Non-achieved terminal report handling, Output Contract, workflow fit, and known assumptions.
+For Level 3/4 or full pre-goal work, the goal must preserve the approved compact control commitment from `Human Setpoint Approval`: human purpose, input role binding, primary object, requested transformation, non-goals, Purpose Feedback Boundary, Realization Surface Closure, Single target-achieved predicate, Target-producing evidence required, Non-achieved terminal report handling, Execution horizon, Runtime authority, Forbidden live / irreversible actions, Required handling for unauthorized actions, Explicitly out-of-scope items, Output Contract, workflow fit, and known assumptions.
 
 When a solution design is present, the goal must reference it under `Source of Truth`, preserve design invariants, and avoid freezing tactical design details as semantic invariants unless the design explicitly marks them as invariant.
 

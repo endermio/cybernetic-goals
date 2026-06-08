@@ -50,6 +50,7 @@ This skill supplies the cybernetic constraints that the planning substrate must 
 - tactical degrees of freedom;
 - dependency matrix requirement;
 - context management / execution topology;
+- horizon and authority coverage matrix for separating approved execution horizon from runtime authority limits;
 - realization surface closure strategy for target-state surface coverage and residual reconciliation;
 - target-producing action strategy for satisfying the single target-achieved predicate;
 - execution granularity and sensor budget;
@@ -75,21 +76,22 @@ The execution policy must include:
 4. Tactical Degrees of Freedom
 5. Dependency Matrix
 6. Context Management / Execution Topology
-7. Realization Surface Closure Strategy
-8. Target-Producing Action Strategy
-9. Execution Granularity and Sensor Budget
-10. Batch Cadence
-11. Destructive Intermediate-State Policy
-12. Output Material / Evidence Collection
-13. Purpose Feedback Strategy
-14. Evidence Lifecycle / Evidence Budget
-15. Sensor / Evidence Governance
-16. Stale Sensor Retirement and Rewrite Policy
-17. Phase Gates
-18. Execution Rhythm
-19. Stop Conditions
-20. Progress Log Rules
-21. Candidate Plan Tasks
+7. Horizon and Authority Coverage Matrix
+8. Realization Surface Closure Strategy
+9. Target-Producing Action Strategy
+10. Execution Granularity and Sensor Budget
+11. Batch Cadence
+12. Destructive Intermediate-State Policy
+13. Output Material / Evidence Collection
+14. Purpose Feedback Strategy
+15. Evidence Lifecycle / Evidence Budget
+16. Sensor / Evidence Governance
+17. Stale Sensor Retirement and Rewrite Policy
+18. Phase Gates
+19. Execution Rhythm
+20. Stop Conditions
+21. Progress Log Rules
+22. Candidate Plan Tasks
 
 ## Context Management / Execution Topology
 
@@ -141,6 +143,12 @@ For serial or parallel subagent-driven topology, `Selected delegation substrate`
 For `Main-only` Level 3/4 work, include a meaningful `Main-only context-load justification` explaining why the main agent will not become an overloaded coordinator, worker, integrator, and verifier.
 
 At each batch boundary, the progress log must compress active context: current control summary, completed work packages, integrated subagent outputs, evidence produced, deferred sensors, unresolved blockers, policy deviations, and next allowed action.
+
+## Horizon and Authority Coverage Matrix
+
+For full-route or multi-batch work, the execution policy must account for every approved horizon item and classify runtime handling as execute, prepare-only, observe-only, forbidden-not-executed, or explicitly out-of-scope by HSA.
+
+Runtime authority limits must not move approved horizon items to future roadmap, handoff, later goal, or out-of-scope status. If the approved horizon is too broad, return to requirements/HSA revision.
 
 ## Realization Surface Closure Strategy
 
@@ -383,6 +391,7 @@ Response-only next step:
 - [ ] The plan has dependency matrix.
 - [ ] The plan includes Context Management / Execution Topology.
 - [ ] The plan includes Realization Surface Closure Strategy for compiled runtime goals, with either full surface/action/residual structure or `RSC not applicable with justification`.
+- [ ] The plan includes Horizon and Authority Coverage Matrix for full-route or multi-batch work.
 - [ ] The plan includes Target-Producing Action Strategy.
 - [ ] The plan selects `Main-only`, `Serial subagent-driven`, or `Parallel subagent-driven`.
 - [ ] The plan records `Selected delegation substrate`.

@@ -23,6 +23,7 @@ Cybernetic constraints supplied to the substrate:
 - tactical degrees of freedom;
 - dependency matrix;
 - context management / execution topology;
+- horizon and authority coverage matrix;
 - realization surface closure strategy;
 - target-producing action strategy;
 - execution granularity and sensor budget;
@@ -142,6 +143,22 @@ At each batch boundary, update the progress log with:
 - Unresolved blockers: [blockers requiring revision or human input]
 - Deviations from policy: [deviations and whether execution must stop]
 - Next allowed action: [next policy-approved action]
+
+## Horizon and Authority Coverage Matrix
+
+Use this section for full-route or multi-batch controlled work. Authority limits define runtime handling; they must not silently shrink the approved horizon.
+
+| Batch / surface | In approved horizon? | Runtime authority | Required runtime handling | Counts as achieved? |
+|---|---|---|---|---|
+| [batch or surface] | `yes/no; if no, cite HSA out-of-scope item` | `execute / prepare-only / observe-only / forbidden-not-executed / explicitly out-of-scope by HSA` | [execute, prepare runbook, observe, report not executed, or exclude by HSA] | [yes/no and claim wording] |
+
+Rules:
+
+- Every approved horizon item must be accounted for as executed, prepared-only, observe-only, forbidden-not-executed, or explicitly out-of-scope by HSA.
+- Runtime authority limits change handling, not scope.
+- Do not move approved horizon items to future roadmap, handoff, or later goal because they are unauthorized for direct execution.
+- Unauthorized live or irreversible actions must be reported as not executed, with required preparation evidence when applicable.
+- If the approved horizon itself is too broad, stop and return to requirements/HSA revision instead of narrowing it inside the execution policy.
 
 ## Realization Surface Closure Strategy
 
