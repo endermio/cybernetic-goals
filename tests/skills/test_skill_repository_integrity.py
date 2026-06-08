@@ -19,6 +19,9 @@ class SkillRepositoryIntegrityTest(unittest.TestCase):
             [
                 "git",
                 "ls-files",
+                "--cached",
+                "--others",
+                "--exclude-standard",
                 ".agents/skills",
                 "docs/cybernetic-framework",
                 "observability",
@@ -31,7 +34,13 @@ class SkillRepositoryIntegrityTest(unittest.TestCase):
             cwd=ROOT,
             text=True,
         ).splitlines()
-        required_paths = set(tracked_paths)
+        required_paths = {
+            path
+            for path in tracked_paths
+            if (ROOT / path).exists()
+            and "__pycache__" not in path
+            and not path.endswith(".pyc")
+        }
         required_paths.add("tests/skills/test_skill_repository_integrity.py")
 
         missing = sorted(required_paths - manifest_paths)

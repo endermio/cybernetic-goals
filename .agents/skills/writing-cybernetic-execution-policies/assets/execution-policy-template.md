@@ -24,7 +24,7 @@ Cybernetic constraints supplied to the substrate:
 - dependency matrix;
 - context management / execution topology;
 - realization surface closure strategy;
-- completion predicate strategy;
+- target-producing action strategy;
 - execution granularity and sensor budget;
 - batch cadence;
 - destructive intermediate-state policy;
@@ -197,19 +197,20 @@ After action, reconcile:
 
 Domain adapters own concrete surface discovery and verification methods. The core policy owns surface/action/residual/reconciliation structure.
 
-## Completion Predicate Strategy
+## Target-Producing Action Strategy
 
-Target-achieving action:
+Target-producing action required:
 
-- [what must be attempted or observed before "goal achieved" may be claimed]
+- [the action, probe, experiment, change, or observation that must be attempted to satisfy the single target-achieved predicate]
 
-Fallback report statuses:
+Proof of impossibility, if any:
 
-- [partial / diagnostic / unavailable / invalid / blocked, if applicable]
+- [what would prove the target-producing action cannot be attempted in this environment]
 
-Fallback cannot replace:
+Non-achieved terminal report rule:
 
-- [target-producing action or proof of impossibility]
+- A non-achieved report may be produced only after the target-producing action is attempted and fails, or after impossibility is proven.
+- A non-achieved report cannot satisfy the single target-achieved predicate.
 
 ## Execution Granularity and Sensor Budget
 
@@ -418,11 +419,10 @@ Each entry must include:
 - result
 - sensor interpretation
 - purpose feedback status
-- completion predicate status
-- target-achieved status
-- report status
+- single target-achieved predicate met
 - target-producing evidence
-- fallback reason
+- non-achieved reason
+- target-producing action attempted or proof of impossibility
 - smallest next target-producing attempt
 - RSC status
 - surfaces acted on or inspected

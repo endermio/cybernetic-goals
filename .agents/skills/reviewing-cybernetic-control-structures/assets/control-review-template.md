@@ -23,7 +23,7 @@ Status: `Needs Revision`
   - Context management / execution topology: `yes/no`
   - Purpose feedback adequacy: `yes/no`
   - Realization surface closure adequacy: `yes/no`
-  - Completion predicate fidelity: `yes/no`
+  - Target achievement predicate fidelity: `yes/no`
   - Execution granularity / sensor load: `yes/no`
   - Sensor governance: `yes/no`
   - Execution cadence: `yes/no`
@@ -187,13 +187,16 @@ Findings:
 
 - [finding]
 
-## Completion Predicate Fidelity
+## Target Achievement Predicate Fidelity
 
 Check:
 
-- target-achieved status is separate from valid report status;
-- fallback, partial, diagnostic, unavailable, invalid, or blocked report statuses are not treated as goal achieved;
-- fallback report handling cannot replace target-producing action or proof of impossibility.
+- there is exactly one target-achieved predicate;
+- no partial, diagnostic, blocked, invalid, unavailable, fallback, or non-achieved report appears in Success Condition;
+- no non-achieved report status is listed under target-achieved states;
+- execution policy includes a target-producing action or proof-of-impossibility path;
+- the plan cannot terminate with `goal achieved: yes` without satisfying the single target-achieved predicate;
+- any use of "valid final status" separates `goal achieved: yes` from `goal achieved: no`.
 
 Findings:
 
@@ -266,7 +269,7 @@ The control structure may be approved only if:
 - evidence lifecycle keeps tracked evidence reviewable and prevents raw sensor output explosion;
 - purpose feedback adequacy supports the permitted completion wording and does not confuse internal progress evidence with purpose achievement;
 - realization surface closure adequacy supports target-realization wording and does not confuse local action with global realization;
-- completion predicate fidelity separates target-achieved completion from non-achieved report statuses;
+- target achievement predicate fidelity preserves a single target-achieved predicate;
 - sensor/evidence governance is explicit;
 - batch cadence is explicit;
 - runtime execution does not need to synthesize a new plan.

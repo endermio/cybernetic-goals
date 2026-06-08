@@ -10,12 +10,15 @@
 
 ## Success Condition
 
-Codex may stop only when:
+Codex may report `goal achieved: yes` only when the Single target-achieved predicate in `Target Achievement Contract` is satisfied.
+
+Codex may stop successfully only when:
 
 - Purpose-realizing outcome observed: [observable purpose achievement]
 - Supporting Evidence: [verification evidence that supports the outcome]
 
 Do not define success as internal sensor success unless the human purpose is internal-state correctness.
+No partial, diagnostic, blocked, invalid, unavailable, fallback, or non-achieved report status may satisfy this success condition.
 
 ## Purpose Feedback Contract
 
@@ -42,15 +45,17 @@ Use this section when the task changes or realizes target state across controlle
 | Partial/unavailable handling | partial, missing, unavailable, or not applicable with justification |
 | RSC / PFB boundary | RSC is distinct from Purpose Feedback Boundary; RSC calibrates target-state and surface-closure claims, while PFB calibrates human-purpose realization claims. |
 
-## Completion Predicate Contract
+## Target Achievement Contract
 
 | Element | Requirement |
 |---|---|
-| Target-achieved predicate | [status/evidence that allows "goal achieved"] |
-| Valid non-achieved report statuses | [partial / diagnostic / unavailable / invalid / blocked, if applicable] |
-| Fallback report handling | [how to stop or report honestly without claiming achieved] |
-| Allowed goal-achieved claim | [wording allowed only when target-achieved predicate is met] |
-| CPF / PFB / RSC boundary | CPF calibrates completion claims; PFB calibrates purpose feedback; RSC calibrates target-state surface closure. |
+| Single target-achieved predicate | [the only predicate that allows `goal achieved: yes`] |
+| Required target-producing evidence | [what must be observed, produced, run, or measured] |
+| Allowed achieved claim | [exact wording allowed only when the predicate is met] |
+
+Non-achieved terminal reports are not target states and must not be listed here.
+
+Target Achievement Predicate Fidelity calibrates whether the achieved claim matches the approved predicate. PFB calibrates purpose feedback. RSC calibrates target-state surface closure.
 
 ## Source of Truth
 
@@ -186,11 +191,11 @@ If blocked, report:
 When complete, report:
 
 - goal achieved: yes/no
-- target-achieved status
-- report status
+- single target-achieved predicate met: yes/no
 - target-producing evidence
-- fallback reason
-- smallest next target-producing attempt
+- if no: non-achieved reason
+- if no: target-producing action attempted or proof of impossibility
+- if no: smallest next target-producing attempt
 - purpose feedback status: achieved / partially observed / pending / unavailable / not required with justification
 - highest purpose-relevant evidence observed
 - RSC status: adequate / partial / missing / unavailable / not applicable with justification

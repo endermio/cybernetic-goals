@@ -65,6 +65,7 @@
 .agents/skills/writing-cybernetic-goals/references/control-contract-rules.md
 .github/ISSUE_TEMPLATE/cybernetic-improvement-pattern.md
 .github/workflows/aggregate-cybernetic-outcomes.yml
+AGENTS.md
 docs/cybernetic-framework/invariant-artifact-consumer-matrix.md
 docs/cybernetic-framework/superpowers-infrastructure-policy.md
 MANIFEST.txt
@@ -90,7 +91,7 @@ tests/observability/test_run_event_scripts.py
 tests/observability/test_validate_run_events.py
 tests/skills/test_artifact_hygiene.py
 tests/skills/__init__.py
-tests/skills/test_completion_predicate_fidelity.py
+tests/skills/test_target_achievement_predicate_fidelity.py
 tests/skills/test_context_topology.py
 tests/skills/test_evidence_lifecycle_budget.py
 tests/skills/test_human_setpoint_approval.py

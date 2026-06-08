@@ -190,13 +190,14 @@ def main() -> int:
         "Strongest positive target-realization claims require RSC adequate. "
         "Report surfaces covered, required surface actions completed or justified, residuals reconciled, pending or unknown surfaces, and smallest next reconciliation when RSC is partial, missing, unavailable, or not applicable with justification. "
     )
-    completion_predicate_clause = (
-        "Do not treat fallback, partial, diagnostic, unavailable, invalid, or blocked report statuses as goal achieved unless the approved Human Setpoint Approval explicitly defines the task as classification/reporting rather than target realization or measurement. "
-        "Final reports must include goal achieved: yes/no, target-achieved status, report status, target-producing evidence, fallback reason, and smallest next target-producing attempt. "
+    target_achievement_clause = (
+        "Calibrate goal-achieved claims to the single target-achieved predicate in the approved goal. "
+        "Non-achieved terminal reports may explain why the target was not achieved, but they are never alternate goals, target-achieved states, or success states. "
+        "Final reports must include goal achieved: yes/no, single target-achieved predicate met: yes/no, target-producing evidence, if no: non-achieved reason, if no: target-producing action attempted or proof of impossibility, and if no: smallest next target-producing attempt. "
     )
     human_setpoint_clause = (
         f"Execute only against the human-approved setpoint in {args.requirements}. "
-        "Do not reinterpret the human purpose, primary object, requested transformation, non-goals, Purpose Feedback Boundary, Realization Surface Closure, Completion Predicate, output contract, or workflow fit. "
+        "Do not reinterpret the human purpose, primary object, requested transformation, non-goals, Purpose Feedback Boundary, Realization Surface Closure, Single target-achieved predicate, output contract, or workflow fit. "
     )
 
     command = (
@@ -211,7 +212,7 @@ def main() -> int:
         "Use `$superpowers:verification-before-completion` before claiming completion. "
         f"{purpose_feedback_clause}"
         f"{realization_surface_clause}"
-        f"{completion_predicate_clause}"
+        f"{target_achievement_clause}"
         "If runtime cannot load these skills, follow the equivalent discipline already written in the approved plan and control review. "
         f"{topology_clause}"
         "Follow the approved batch rhythm. "

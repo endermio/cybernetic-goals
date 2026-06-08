@@ -103,14 +103,14 @@ Check that design, goal, and execution policy preserve the approved compact cont
 - non-goals;
 - Purpose Feedback Boundary;
 - Realization Surface Closure;
-- Completion Predicate;
-- Non-achieved report statuses;
-- Fallback report handling;
+- Single target-achieved predicate;
+- Target-producing evidence required;
+- Non-achieved terminal report handling;
 - Output Contract;
 - workflow fit;
 - known assumptions.
 
-Flag as Major or Blocking when downstream artifacts reinterpret, expand, remove, or contradict the approved compact control commitment. If a downstream artifact changes the primary object, requested transformation, non-goals, PFB, RSC, CPF, output contract, or workflow fit, require setpoint revision or explicit human reapproval before approval.
+Flag as Major or Blocking when downstream artifacts reinterpret, expand, remove, or contradict the approved compact control commitment. If a downstream artifact changes the primary object, requested transformation, non-goals, PFB, RSC, target-achievement predicate, output contract, or workflow fit, require setpoint revision or explicit human reapproval before approval.
 
 ### 3. Goal Fidelity
 
@@ -222,14 +222,16 @@ Use `Major` when policy or goal revision can repair RSC wording. Use
 `Blocking` when runtime could claim target-state realization while important
 surfaces or residuals remain unresolved.
 
-### 11. Completion Predicate Fidelity
+### 11. Target Achievement Predicate Fidelity
 
 Flag as Major or Blocking when:
 
-- fallback, partial, diagnostic, unavailable, invalid, or blocked report statuses are listed as target-achieved completion;
-- valid report status is not separated from target-achieved status;
-- execution policy allows fallback to replace target-producing action or proof of impossibility;
-- success condition can be satisfied without the target-achieved predicate.
+- there is more than one target-achieved predicate;
+- any partial, diagnostic, blocked, invalid, unavailable, fallback, or non-achieved report appears in Success Condition;
+- any non-achieved report status is listed under target-achieved states;
+- the execution policy lacks a target-producing action or proof-of-impossibility path;
+- the plan can terminate with `goal achieved: yes` without satisfying the single target-achieved predicate;
+- "valid final status" is used without separating `goal achieved: yes` from `goal achieved: no`.
 
 ### 11. Execution Granularity / Sensor Load
 
@@ -287,7 +289,7 @@ Closure status. Do not claim target-state realization from local action alone
 when Realization Surface Closure is required. Strongest positive
 target-realization claims require RSC adequate.
 
-Runtime completion predicate claims must separate target-achieved status from valid report status. Fallback, partial, diagnostic, unavailable, invalid, or blocked reports may stop execution honestly, but they do not support `goal achieved`.
+Runtime target-achievement claims must be calibrated to the single target-achieved predicate. Non-achieved terminal reports may stop execution honestly, but they do not support `goal achieved: yes`.
 
 ### 16. Review Independence
 
@@ -338,7 +340,7 @@ Only mark `Approved` when:
 - execution granularity and sensor load do not create micro-step overcontrol or sensor overcoupling;
 - purpose feedback adequacy supports the permitted completion wording and does not confuse internal progress evidence with purpose achievement;
 - realization surface closure adequacy supports target-realization wording and does not confuse local action with global realization;
-- completion predicate fidelity separates target-achieved completion from non-achieved report statuses;
+- target achievement predicate fidelity preserves the single target-achieved predicate;
 - evidence lifecycle keeps tracked evidence reviewable and prevents raw sensor output explosion;
 - sensor/evidence governance is explicit;
 - runtime `/goal` can execute without writing or approving a new plan.
@@ -395,7 +397,7 @@ Response-only next step:
 - [ ] Evidence lifecycle and evidence budget were checked.
 - [ ] Purpose feedback adequacy was checked.
 - [ ] Realization Surface Closure adequacy was checked.
-- [ ] Completion Predicate Fidelity was checked.
+- [ ] Target Achievement Predicate Fidelity was checked.
 - [ ] Execution granularity and sensor load were checked.
 - [ ] Required revisions are actionable.
 - [ ] Response-only handoff matches the review status and does not bypass `$orchestrating-cybernetic-pregoal` when full pre-goal orchestration owns the chain.

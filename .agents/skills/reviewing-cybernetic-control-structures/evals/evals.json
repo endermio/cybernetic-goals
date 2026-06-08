@@ -192,27 +192,27 @@
       ]
     },
     {
-      "id": "fallback-report-status-cannot-be-goal-achieved",
-      "prompt": "A target-achieving goal lists partial, diagnostic, blocked, and invalid as valid final report statuses, then says one valid final status reached allows completion.",
-      "expected_output": "The review marks Completion Predicate Fidelity as inadequate because valid report statuses are being treated as target-achieved completion statuses.",
+      "id": "non-achieved-terminal-report-cannot-be-target-achieved",
+      "prompt": "A target-achieving goal lists partial, diagnostic, blocked, and invalid as valid final statuses, then says one valid final status reached allows goal achieved: yes.",
+      "expected_output": "The review marks Target Achievement Predicate Fidelity as inadequate because non-achieved terminal reports are being treated as target-achieved states.",
       "assertions": [
-        "Identifies the target-achieved predicate.",
-        "Separates valid report status from target-achieved status.",
+        "Identifies the single target-achieved predicate.",
         "Flags partial, diagnostic, blocked, unavailable, or invalid being treated as goal achieved.",
-        "Requires fallback report handling without claiming achieved.",
-        "Does not reject honest non-achieved reporting itself."
+        "Requires a target-producing action or proof-of-impossibility path.",
+        "Allows honest non-achieved terminal reporting only as goal achieved: no.",
+        "Does not let valid final status replace the target-achieved predicate."
       ]
     },
     {
-      "id": "classification-task-may-use-report-status-without-achieved-claim",
-      "prompt": "A Human Setpoint Approval says the human purpose is classification/reporting. The goal reports one of several valid classification statuses and does not claim target realization.",
-      "expected_output": "The review allows report statuses as valid output for the classification purpose, while preserving that target-achieved wording is only used when the approved setpoint defines it.",
+      "id": "target-contract-cannot-contain-alternate-report-statuses",
+      "prompt": "A goal's Target Achievement Contract includes a target predicate, then also lists valid final status values such as ready, partial, diagnostic, blocked, and invalid.",
+      "expected_output": "The review rejects the target contract because alternate report statuses are being placed inside the target-achievement structure instead of the non-achieved terminal report protocol.",
       "assertions": [
-        "Recognizes classification/reporting as the approved human purpose.",
-        "Does not require target-producing action for a pure reporting task.",
-        "Allows valid report statuses as output status.",
-        "Does not let report status imply target achieved unless approved by HSA.",
-        "Keeps Completion Predicate Fidelity separate from PFB and RSC."
+        "Requires exactly one target-achieved predicate.",
+        "Says non-achieved terminal reports are not target states.",
+        "Flags valid final status values inside the target contract.",
+        "Requires non-achieved reports to remain goal achieved: no.",
+        "Keeps Target Achievement Predicate Fidelity separate from PFB and RSC."
       ]
     },
     {

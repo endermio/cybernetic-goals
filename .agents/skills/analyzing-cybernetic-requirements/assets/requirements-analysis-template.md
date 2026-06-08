@@ -21,9 +21,9 @@ Approval applies only to this compact control commitment.
 | Non-goals | [what must not be done] |
 | Purpose Feedback Boundary | [how purpose realization will be observed or honestly reported] |
 | Realization Surface Closure | [which surfaces carry target-state realization and how residuals are reconciled] |
-| Completion Predicate | [what status/evidence allows "goal achieved"] |
-| Non-achieved report statuses | [partial / diagnostic / blocked / invalid, if applicable] |
-| Fallback report handling | [how to report honestly without claiming achieved] |
+| Single target-achieved predicate | [the only condition that allows "goal achieved: yes"] |
+| Target-producing evidence required | [evidence/action/observation required for the achieved predicate] |
+| Non-achieved terminal report handling | [how to report "goal achieved: no" without making it an alternate goal] |
 | Output Contract | [audience, purpose, medium, structure, destination, acceptance] |
 | Workflow fit | [why full pre-goal orchestration is required / or why it is not] |
 | Known assumptions | [safe defaults and assumptions] |

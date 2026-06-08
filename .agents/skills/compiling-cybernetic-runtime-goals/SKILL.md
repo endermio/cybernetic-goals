@@ -35,7 +35,7 @@ The final command must instruct runtime Codex to:
 - use the approved bounded subagent delegation protocol when the approved topology selects serial or parallel subagent-driven execution;
 - use `$superpowers:subagent-driven-development` only when the approved plan records `Selected delegation substrate: superpowers-subagent-driven-development` for work packages that fit that implementation-plan, current-session workflow;
 - treat subagent outputs as candidate results until main-agent integration against approved artifacts, progress log, evidence requirements, and stop conditions;
-- execute only against the human-approved setpoint in the requirements analysis; do not reinterpret the human purpose, primary object, requested transformation, non-goals, Purpose Feedback Boundary, Realization Surface Closure, Completion Predicate, output contract, or workflow fit;
+- execute only against the human-approved setpoint in the requirements analysis; do not reinterpret the human purpose, primary object, requested transformation, non-goals, Purpose Feedback Boundary, Realization Surface Closure, Single target-achieved predicate, output contract, or workflow fit;
 - use `$superpowers:systematic-debugging` for unclear or repeated failures;
 - use `$superpowers:verification-before-completion` before claiming completion;
 - Report completion status according to the highest purpose-relevant evidence actually observed.
@@ -44,8 +44,9 @@ The final command must instruct runtime Codex to:
 - Do not claim target-state realization from local action alone when Realization Surface Closure is required.
 - Strongest positive target-realization claims require RSC adequate.
 - Report surfaces covered, required surface actions completed or justified, residuals reconciled, pending or unknown surfaces, and smallest next reconciliation when RSC is partial, missing, unavailable, or not applicable with justification.
-- Do not treat fallback, partial, diagnostic, unavailable, invalid, or blocked report statuses as goal achieved unless the approved Human Setpoint Approval explicitly defines the task as classification/reporting rather than target realization or measurement.
-- Final reports must include goal achieved: yes/no, target-achieved status, report status, target-producing evidence, fallback reason, and smallest next target-producing attempt.
+- Calibrate goal-achieved claims to the single target-achieved predicate in the approved goal.
+- Non-achieved terminal reports may explain why the target was not achieved, but they are never alternate goals, target-achieved states, or success states.
+- Final reports must include goal achieved: yes/no, single target-achieved predicate met: yes/no, target-producing evidence, if no: non-achieved reason, if no: target-producing action attempted or proof of impossibility, and if no: smallest next target-producing attempt.
 - if runtime cannot load these skills, follow the equivalent discipline already written in the approved plan and control review.
 
 ## Preconditions
@@ -67,9 +68,10 @@ Do not output `/goal` unless:
 - execution policy includes `Realization Surface Closure Strategy`;
 - control review records `Realization surface closure adequacy: yes` in Review Independence;
 - control review includes meaningful `Realization Surface Closure Adequacy` findings;
-- goal includes a compact `Completion Predicate Contract`;
-- control review records `Completion predicate fidelity: yes` in Review Independence;
-- control review includes meaningful `Completion Predicate Fidelity` findings;
+- goal includes a compact `Target Achievement Contract`;
+- execution policy includes `Target-Producing Action Strategy`;
+- control review records `Target achievement predicate fidelity: yes` in Review Independence;
+- control review includes meaningful `Target Achievement Predicate Fidelity` findings;
 - control review includes `Final Observer Check`;
 - final observer check allows approval;
 - any substantive post-review change has final re-review recorded;
@@ -91,7 +93,7 @@ The final `/goal` must:
 - reference the concrete control review path;
 - carry the final output contract from the goal when one is present or required;
 - execute only against the human-approved setpoint in the requirements analysis;
-- forbid reinterpreting the human purpose, primary object, requested transformation, non-goals, Purpose Feedback Boundary, Realization Surface Closure, Completion Predicate, output contract, or workflow fit;
+- forbid reinterpreting the human purpose, primary object, requested transformation, non-goals, Purpose Feedback Boundary, Realization Surface Closure, Single target-achieved predicate, output contract, or workflow fit;
 - forbid reinterpreting requirements;
 - forbid rewriting the control strategy;
 - forbid rewriting the solution design;
@@ -110,8 +112,9 @@ The final `/goal` must:
 - Do not claim target-state realization from local action alone when Realization Surface Closure is required.
 - Strongest positive target-realization claims require RSC adequate.
 - Report surfaces covered, required surface actions completed or justified, residuals reconciled, pending or unknown surfaces, and smallest next reconciliation when RSC is partial, missing, unavailable, or not applicable with justification.
-- Do not treat fallback, partial, diagnostic, unavailable, invalid, or blocked report statuses as goal achieved unless the approved Human Setpoint Approval explicitly defines the task as classification/reporting rather than target realization or measurement.
-- Final reports must include goal achieved: yes/no, target-achieved status, report status, target-producing evidence, fallback reason, and smallest next target-producing attempt.
+- Calibrate goal-achieved claims to the single target-achieved predicate in the approved goal.
+- Non-achieved terminal reports may explain why the target was not achieved, but they are never alternate goals, target-achieved states, or success states.
+- Final reports must include goal achieved: yes/no, single target-achieved predicate met: yes/no, target-producing evidence, if no: non-achieved reason, if no: target-producing action attempted or proof of impossibility, and if no: smallest next target-producing attempt.
 - follow equivalent discipline already written in the approved plan and control review if runtime cannot load those skills;
 - stop if any referenced artifact is missing, not approved, or internally inconsistent;
 - stop if artifacts conflict or become insufficient.
@@ -187,13 +190,13 @@ Do not create or modify target-work artifacts.
 - [ ] The final `/goal` references all approved files.
 - [ ] The final `/goal` carries the goal's Final Output Contract when present or required.
 - [ ] The final `/goal` preserves the approved execution topology.
-- [ ] The final `/goal` preserves the human-approved setpoint, including primary object, requested transformation, non-goals, Purpose Feedback Boundary, Realization Surface Closure, Completion Predicate, output contract, and workflow fit.
+- [ ] The final `/goal` preserves the human-approved setpoint, including primary object, requested transformation, non-goals, Purpose Feedback Boundary, Realization Surface Closure, Single target-achieved predicate, output contract, and workflow fit.
 - [ ] The final `/goal` treats subagent outputs as candidate results until main-agent integration.
 - [ ] The final `/goal` does not ask runtime Codex to write a new plan.
 - [ ] The final `/goal` does not ask runtime Codex to create or revise solution design.
 - [ ] The final `/goal` includes executing, debugging, and completion-verification discipline.
 - [ ] The final `/goal` calibrates completion claims to the highest purpose-relevant evidence actually observed.
 - [ ] The final `/goal` calibrates target-realization claims to Realization Surface Closure status.
-- [ ] The final `/goal` calibrates goal-achieved claims to Completion Predicate Fidelity.
+- [ ] The final `/goal` calibrates goal-achieved claims to Target Achievement Predicate Fidelity.
 - [ ] If guard or preconditions fail, the response includes a response-only next step and no final `/goal`.
 - [ ] The skill did not execute target work.

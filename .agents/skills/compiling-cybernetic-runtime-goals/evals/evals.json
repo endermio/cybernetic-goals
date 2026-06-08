@@ -91,15 +91,15 @@
       ]
     },
     {
-      "id": "runtime-calibrates-completion-predicate-claims",
-      "prompt": "requirements analysis Complete, goal includes Completion Predicate Contract, execution policy includes Completion Predicate Strategy, and review Approved says fallback statuses are valid reports but not achieved completion. Compile runtime /goal.",
-      "expected_output": "The final /goal says fallback, partial, diagnostic, unavailable, invalid, or blocked report statuses must not be treated as goal achieved, and requires final reporting of achieved status, report status, target-producing evidence, fallback reason, and smallest next target-producing attempt.",
+      "id": "runtime-calibrates-target-achievement-predicate-claims",
+      "prompt": "requirements analysis Complete, goal includes Target Achievement Contract, execution policy includes Target-Producing Action Strategy, and review Approved says non-achieved terminal reports are goal achieved: no. Compile runtime /goal.",
+      "expected_output": "The final /goal calibrates achieved claims to the single target-achieved predicate and requires final reporting of goal achieved yes/no, predicate met yes/no, target-producing evidence, non-achieved reason, target-producing action attempted or proof of impossibility, and smallest next target-producing attempt.",
       "assertions": [
-        "Forbids treating fallback, partial, diagnostic, unavailable, invalid, or blocked report statuses as goal achieved unless HSA defines the task as classification/reporting.",
+        "Calibrates goal-achieved claims to the single target-achieved predicate.",
+        "Says non-achieved terminal reports are not alternate goals, target-achieved states, or success states.",
         "Requires goal achieved: yes/no in the final report.",
-        "Requires target-achieved status and report status to be separate.",
-        "Requires target-producing evidence and fallback reason.",
-        "Requires smallest next target-producing attempt when target achievement is missing."
+        "Requires single target-achieved predicate met: yes/no.",
+        "Requires target-producing evidence, non-achieved reason, target-producing action attempted or proof of impossibility, and smallest next target-producing attempt."
       ]
     },
     {
