@@ -113,6 +113,9 @@ Check that design, goal, and execution policy preserve the approved compact cont
 - Forbidden live / irreversible actions;
 - Required handling for unauthorized actions;
 - Explicitly out-of-scope items;
+- Runtime delegation preference;
+- Parallel execution authority;
+- Parallelism cap;
 - workflow fit;
 - known assumptions.
 
@@ -262,22 +265,7 @@ Flag as Major or Blocking when:
 - prepare-only or forbidden-not-executed work is claimed as executed or live complete;
 - the final report cannot distinguish executed, prepared-only, forbidden-not-executed, and explicitly out-of-scope by HSA.
 
-### 14. Execution Granularity / Sensor Load
-
-Flag as Major or Blocking when:
-
-- batches are mechanical micro-steps; coherent target-state slices are the required form;
-- every step requires full observability;
-- sensor cost dominates execution cost;
-- broad verification is required after every small edit;
-- stale sensors can block approved structural change;
-- batch-end gates are too weak to detect drift;
-- batch-end gates are so heavy that they prevent progress;
-- the plan does not explain why batch size is diagnosable.
-
-Use `Major` when execution-policy revision can repair the control law. Use `Blocking` when the granularity or sensor load would prevent runtime completion or let sensors override confirmed semantics.
-
-### 13. Context Management / Execution Topology
+### 14. Context Management / Execution Topology
 
 Flag as Major or Blocking when:
 
@@ -294,7 +282,34 @@ Flag as Major or Blocking when:
 
 Use `Major` when execution-policy revision can repair topology. Use `Blocking` when context overload would likely make runtime lose requirements, design invariants, output contract, stop conditions, or approval boundaries.
 
-### 14. Batch Rhythm
+### 15. Subagent Concurrency Fidelity
+
+Flag as Major or Blocking when:
+
+- the human-approved setpoint requests max-safe-parallel but the plan selects serial without a concrete safe-frontier reason;
+- selected subagent execution mode does not match selected topology or delegation substrate;
+- serial subagent-driven execution lacks `serial-single-active`, `Max concurrent subagents: 1`, ordered sequence, or integration after each package;
+- parallel subagent-driven execution lacks dependency independence, concurrency frontier, wave matrix, conflict / lock model, integration barriers, or failure policy;
+- two parallel work packages can touch the same surface without a lock rule or barrier;
+- subagent outputs can become final without main-agent integration;
+- selected delegation substrate does not fit the approved work packages.
+
+### 16. Execution Granularity / Sensor Load
+
+Flag as Major or Blocking when:
+
+- batches are mechanical micro-steps; coherent target-state slices are the required form;
+- every step requires full observability;
+- sensor cost dominates execution cost;
+- broad verification is required after every small edit;
+- stale sensors can block approved structural change;
+- batch-end gates are too weak to detect drift;
+- batch-end gates are so heavy that they prevent progress;
+- the plan does not explain why batch size is diagnosable.
+
+Use `Major` when execution-policy revision can repair the control law. Use `Blocking` when the granularity or sensor load would prevent runtime completion or let sensors override confirmed semantics.
+
+### 17. Batch Rhythm
 
 Flag:
 
@@ -303,11 +318,11 @@ Flag:
 - no batch-end openability requirement;
 - no destructive intermediate-state policy.
 
-### 15. Semantic vs Tactical Boundary
+### 18. Semantic vs Tactical Boundary
 
 Semantic invariants must be frozen. Tactical execution details must remain adjustable.
 
-### 16. Runtime Suitability
+### 19. Runtime Suitability
 
 The runtime `/goal` must be able to execute the approved artifacts without inventing new control structures. Any required runtime discipline, including approved execution topology, bounded subagent delegation protocol, and conditionally selected Superpowers substrate, must be precompiled into the approved plan, review, or final `/goal`.
 
@@ -320,7 +335,7 @@ target-realization claims require RSC adequate.
 
 Runtime target-achievement claims must be calibrated to the single target-achieved predicate. Non-achieved terminal reports may stop execution honestly, but they do not support `goal achieved: yes`.
 
-### 17. Review Independence
+### 20. Review Independence
 
 The review must record:
 
@@ -329,7 +344,7 @@ The review must record:
 - whether approval is allowed;
 - why approval is blocked when independent review is missing.
 
-### 18. Final Observer Check
+### 21. Final Observer Check
 
 The review must record whether any substantive artifact changed after the latest independent review pass and whether a final independent observer confirmed no Blocking or Major findings after that change.
 
@@ -430,6 +445,7 @@ Response-only next step:
 - [ ] Target Achievement Predicate Fidelity was checked.
 - [ ] Target-Producing Spine Fidelity was checked.
 - [ ] Execution Horizon and Authority Fidelity was checked.
+- [ ] Subagent Concurrency Fidelity was checked.
 - [ ] Execution granularity and sensor load were checked.
 - [ ] Required revisions are actionable.
 - [ ] Response-only handoff matches the review status and does not bypass `$orchestrating-cybernetic-pregoal` when full pre-goal orchestration owns the chain.

@@ -23,6 +23,7 @@ Cybernetic constraints supplied to the substrate:
 - tactical degrees of freedom;
 - dependency matrix;
 - context management / execution topology;
+- subagent execution mode and concurrency policy;
 - horizon and authority coverage matrix;
 - realization surface closure strategy;
 - target-producing spine;
@@ -65,6 +66,38 @@ Task level: `Level 0 / Level 1 / Level 2 / Level 3 / Level 4`
 Selected topology: `Main-only / Serial subagent-driven / Parallel subagent-driven`
 
 Selected delegation substrate: `bounded-protocol / superpowers-subagent-driven-development / adapter-specific / none`
+
+Subagent execution mode: `none / serial-single-active / parallel-max-safe`
+
+Max concurrent subagents: `1 / auto / N`
+
+Concurrency selection rationale:
+
+- [why serial-single-active or parallel-max-safe is selected; if max-safe-parallel was requested but safe frontier is 1, explain why]
+
+Concurrency frontier rule:
+
+- [which work packages can launch together after dependencies are satisfied]
+
+Conflict / lock model:
+
+| Surface / artifact / state | Lock owner | Conflict rule |
+|---|---|---|
+| [surface] | [main / work package / not shared] | [disjoint / exclusive lock / read-only / barrier required] |
+
+Parallel wave matrix:
+
+| Wave | Work packages | Independence proof | Shared surfaces / locks | Integration barrier |
+|---|---|---|---|---|
+| [Wave 1] | [packages] | [why they can run together] | [locks or disjoint surfaces] | [main-agent barrier] |
+
+Failure policy:
+
+- [what happens when one subagent blocks, fails, or returns conflicting evidence]
+
+Main-agent integration rule:
+
+- [when candidate outputs become accepted progress state]
 
 Topology rationale:
 
@@ -125,7 +158,8 @@ Rules:
 
 - Use `Main-only` for small, local, low-context work.
 - Use `Serial subagent-driven` when Level 2 wide inspection or Level 3/4 context load would overload the main agent.
-- Use `Parallel subagent-driven` only when Human approval, Dependency independence, and Control-review approval are explicitly `yes` or `approved`.
+- Use `Parallel subagent-driven` only when Human approval, Dependency independence, and Control-review approval are explicitly `yes` or `approved`; pair it with `Subagent execution mode: parallel-max-safe`.
+- Use `Serial subagent-driven` with `Subagent execution mode: serial-single-active` and `Max concurrent subagents: 1`.
 - The main agent must coordinate, integrate, maintain the progress log, and detect stop conditions.
 - A subagent must not modify control artifacts, widen scope, replace topology, or bypass the integration gate.
 - Do not treat `$superpowers:subagent-driven-development` as the generic delegation substrate; it applies only when `Selected delegation substrate` is `superpowers-subagent-driven-development` for compatible implementation-plan work packages.
@@ -423,7 +457,7 @@ Before completion:
 - Execute according to the selected Context Management / Execution Topology.
 - For `Main-only`, keep all target work in the main agent only when the context-load rationale remains valid.
 - For `Serial subagent-driven`, only one execution subagent is active at a time.
-- For `Parallel subagent-driven`, dispatch only work packages marked independent by the dependency matrix and approved by control review.
+- For `Parallel subagent-driven`, dispatch only work packages in the current approved wave whose dependencies are satisfied and whose conflict locks are disjoint.
 - Do not let runtime `/goal` rewrite this policy.
 
 ## Stop Conditions

@@ -78,6 +78,57 @@ def selected_delegation_substrate(plan_path: str) -> str | None:
     return None
 
 
+def selected_subagent_execution_mode(plan_path: str) -> str | None:
+    body = topology_section(plan_path)
+    match = re.search(r"(?im)^\s*Subagent execution mode\s*:\s*`?([^`\n]+?)`?\s*$", body)
+    if not match:
+        return None
+
+    value = match.group(1).strip().strip("`").casefold()
+    if "/" in value:
+        return None
+    if value in {"none", "not applicable", "n/a"}:
+        return "none"
+    if value in {"serial-single-active", "serial single active"}:
+        return "serial-single-active"
+    if value in {"parallel-max-safe", "parallel max safe"}:
+        return "parallel-max-safe"
+    return None
+
+
+def max_concurrent_subagents(plan_path: str) -> str | None:
+    body = topology_section(plan_path)
+    match = re.search(r"(?im)^\s*Max concurrent subagents\s*:\s*`?([^`\n]+?)`?\s*$", body)
+    if not match:
+        return None
+    value = match.group(1).strip().strip("`")
+    if "/" in value:
+        return None
+    return value
+
+
+def normalize_expected_topology(value: str) -> str | None:
+    lowered = value.strip().strip("`").casefold()
+    if lowered in {"main-only", "main only"}:
+        return "Main-only"
+    if lowered in {"serial-subagent-driven", "serial subagent-driven", "serial"}:
+        return "Serial subagent-driven"
+    if lowered in {"parallel-subagent-driven", "parallel subagent-driven", "parallel"}:
+        return "Parallel subagent-driven"
+    return None
+
+
+def normalize_expected_subagent_mode(value: str) -> str | None:
+    lowered = value.strip().strip("`").casefold()
+    if lowered in {"none", "not applicable", "n/a"}:
+        return "none"
+    if lowered in {"serial-single-active", "serial single active", "serial"}:
+        return "serial-single-active"
+    if lowered in {"parallel-max-safe", "parallel max safe", "parallel"}:
+        return "parallel-max-safe"
+    return None
+
+
 def derive_runtime_goal_path(requirements_path: str) -> Path:
     path = Path(requirements_path)
     stem = path.stem
@@ -112,6 +163,8 @@ def runtime_goal_contract(
     design_line = f"- Design: `{design}`" if design else "- Design: `not required`"
     topology = selected_execution_topology(plan) or "read from approved execution policy"
     substrate = selected_delegation_substrate(plan) or "read from approved execution policy"
+    subagent_mode = selected_subagent_execution_mode(plan) or "read from approved execution policy"
+    max_concurrent = max_concurrent_subagents(plan) or "read from approved execution policy"
     substrate_line = (
         "- If the selected delegation substrate is `superpowers-subagent-driven-development`, use `$superpowers:subagent-driven-development` only for approved matching work packages."
         if substrate == "superpowers-subagent-driven-development"
@@ -137,13 +190,15 @@ def runtime_goal_contract(
             "",
             f"- Selected topology: `{topology}`",
             f"- Selected delegation substrate: `{substrate}`",
+            f"- Subagent execution mode: `{subagent_mode}`",
+            f"- Max concurrent subagents: `{max_concurrent}`",
             "",
             "## Required Sections To Read",
             "",
             f"- Requirements `{requirements}`: `Human Setpoint Approval`, `Purpose Feedback Boundary`, `Realization Surface Closure`, `Output Contract`.",
             f"- Goal `{goal}`: `Success Condition`, `Target Achievement Contract`, `Execution Horizon and Authority Contract`, `Purpose Feedback Contract`, `Realization Surface Contract`, `Final Output Contract`.",
-            f"- Execution policy `{plan}`: `Horizon and Authority Coverage Matrix`, `Target-Producing Spine`, `Target-Producing Action Strategy`, `Candidate Plan Tasks`, `Context Management / Execution Topology`, `Phase Gates`, `Progress Log Rules`, `Purpose Feedback Strategy`, `Realization Surface Closure Strategy`, `Sensor / Evidence Governance`.",
-            f"- Control review `{review}`: `Execution Horizon and Authority Fidelity`, `Target-Producing Spine Fidelity`, `Target Achievement Predicate Fidelity`, `Purpose Feedback Adequacy`, `Realization Surface Closure Adequacy`, `Context Management / Execution Topology`, `Final Observer Check`.",
+            f"- Execution policy `{plan}`: `Horizon and Authority Coverage Matrix`, `Target-Producing Spine`, `Target-Producing Action Strategy`, `Candidate Plan Tasks`, `Context Management / Execution Topology`, `Subagent execution mode`, `Parallel wave matrix`, `Conflict / lock model`, `Failure policy`, `Phase Gates`, `Progress Log Rules`, `Purpose Feedback Strategy`, `Realization Surface Closure Strategy`, `Sensor / Evidence Governance`.",
+            f"- Control review `{review}`: `Execution Horizon and Authority Fidelity`, `Subagent Concurrency Fidelity`, `Target-Producing Spine Fidelity`, `Target Achievement Predicate Fidelity`, `Purpose Feedback Adequacy`, `Realization Surface Closure Adequacy`, `Context Management / Execution Topology`, `Final Observer Check`.",
             "",
             "## Runtime Discipline",
             "",
@@ -152,6 +207,8 @@ def runtime_goal_contract(
             "- Use `$superpowers:verification-before-completion` before claiming completion.",
             "- Follow the approved execution topology and delegation substrate recorded in the execution policy.",
             substrate_line,
+            "- If `Subagent execution mode` is `serial-single-active`, run exactly one execution subagent at a time and integrate before launching the next.",
+            "- If `Subagent execution mode` is `parallel-max-safe`, launch only the current approved wave up to the approved cap, after dependencies are satisfied and conflict locks are disjoint; integrate at the approved barrier before launching the next wave.",
             "- Treat subagent work as governed by the execution policy's bounded delegation protocol and integration gates.",
             "- Treat approved sensors, checks, and evidence channels as sensors, not objectives.",
             "",
@@ -190,6 +247,8 @@ def main() -> int:
     ap.add_argument("--plan", required=True)
     ap.add_argument("--review", required=True)
     ap.add_argument("--out")
+    ap.add_argument("--expect-topology", help="Optional compile-time assertion; validates the approved plan topology but does not override it.")
+    ap.add_argument("--expect-subagent-mode", help="Optional compile-time assertion; validates the approved plan subagent execution mode but does not override it.")
     ap.add_argument("--skip-guard", action="store_true", help="Internal validation only. Bypasses phase-gate checks and must not be used for official runtime goal compilation.")
     ap.add_argument("--i-understand-this-bypasses-phase-gates", action="store_true", help="Required with --skip-guard to make phase-gate bypass explicit.")
     args = ap.parse_args()
@@ -210,6 +269,26 @@ def main() -> int:
             sys.stdout.write(result.stdout)
             sys.stderr.write(result.stderr)
             return result.returncode
+
+    if args.expect_topology:
+        expected = normalize_expected_topology(args.expect_topology)
+        actual = selected_execution_topology(args.plan)
+        if expected is None:
+            print(f"ERROR: invalid expected topology: {args.expect_topology}", file=sys.stderr)
+            return 2
+        if actual != expected:
+            print(f"ERROR: expected topology {expected}, got {actual}", file=sys.stderr)
+            return 2
+
+    if args.expect_subagent_mode:
+        expected_mode = normalize_expected_subagent_mode(args.expect_subagent_mode)
+        actual_mode = selected_subagent_execution_mode(args.plan)
+        if expected_mode is None:
+            print(f"ERROR: invalid expected subagent execution mode: {args.expect_subagent_mode}", file=sys.stderr)
+            return 2
+        if actual_mode != expected_mode:
+            print(f"ERROR: expected subagent execution mode {expected_mode}, got {actual_mode}", file=sys.stderr)
+            return 2
 
     out_path = Path(args.out) if args.out else derive_runtime_goal_path(args.requirements)
     if not validate_runtime_contract_path(out_path):

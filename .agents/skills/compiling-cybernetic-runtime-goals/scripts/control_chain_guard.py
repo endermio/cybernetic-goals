@@ -285,6 +285,39 @@ def selected_delegation_substrate(plan: str | None) -> str | None:
     return None
 
 
+def selected_subagent_execution_mode(plan: str | None) -> str | None:
+    body = section_body(plan or "", "Context Management / Execution Topology")
+    if body is None:
+        return None
+    match = re.search(r"(?im)^\s*Subagent execution mode\s*:\s*`?([^`\n]+?)`?\s*$", body)
+    if not match:
+        return None
+
+    value = match.group(1).strip().strip("`").casefold()
+    if "/" in value:
+        return None
+    if value in {"none", "not applicable", "n/a"}:
+        return "none"
+    if value in {"serial-single-active", "serial single active"}:
+        return "serial-single-active"
+    if value in {"parallel-max-safe", "parallel max safe"}:
+        return "parallel-max-safe"
+    return None
+
+
+def max_concurrent_subagents(plan: str | None) -> str | None:
+    body = section_body(plan or "", "Context Management / Execution Topology")
+    if body is None:
+        return None
+    value = labeled_value(body, "Max concurrent subagents")
+    if value is None:
+        return None
+    value = value.strip().strip("`")
+    if "/" in value:
+        return None
+    return value
+
+
 def task_level(plan: str | None) -> int | None:
     body = section_body(plan or "", "Context Management / Execution Topology")
     if body is None:
@@ -382,6 +415,26 @@ def has_meaningful_delegation_matrix(body: str) -> bool:
     return False
 
 
+def has_table_with_data_row(body: str, required_columns: list[str]) -> bool:
+    lowered = body.casefold()
+    if not all(column.casefold() in lowered for column in required_columns):
+        return False
+
+    for line in body.splitlines():
+        stripped = line.strip()
+        if "|" not in stripped:
+            continue
+        if re.fullmatch(r"\|?\s*:?-{3,}:?\s*(\|\s*:?-{3,}:?\s*)+\|?", stripped):
+            continue
+        row_lowered = stripped.casefold()
+        if all(column.casefold() in row_lowered for column in required_columns):
+            continue
+        cells = [cell.strip() for cell in stripped.strip("|").split("|")]
+        if len(cells) >= len(required_columns) and all(meaningful_line(cell) for cell in cells[: len(required_columns)]):
+            return True
+    return False
+
+
 CONTEXT_PACK_FIELDS = [
     "Relevant control excerpts",
     "Current batch objective",
@@ -447,6 +500,35 @@ def check_execution_topology(plan: str | None, errors: list[str]) -> None:
         if not labeled_block_has_content(body, "Subagent delegation substrate"):
             errors.append("subagent-driven topology missing approved bounded subagent delegation substrate")
 
+        mode = selected_subagent_execution_mode(plan)
+        max_concurrent = max_concurrent_subagents(plan)
+        if topology == "Serial subagent-driven":
+            if mode != "serial-single-active":
+                errors.append("Serial subagent-driven topology requires Subagent execution mode: serial-single-active")
+            if max_concurrent != "1":
+                errors.append("Serial subagent-driven topology requires Max concurrent subagents: 1")
+            if not labeled_block_has_content(body, "Ordered work package sequence"):
+                errors.append("Serial subagent-driven topology missing Ordered work package sequence")
+            if not labeled_block_has_content(body, "Integration gate after each package"):
+                errors.append("Serial subagent-driven topology missing Integration gate after each package")
+        elif topology == "Parallel subagent-driven":
+            if mode != "parallel-max-safe":
+                errors.append("Parallel subagent-driven topology requires Subagent execution mode: parallel-max-safe")
+            if max_concurrent is None or not (max_concurrent.casefold() == "auto" or re.fullmatch(r"[1-9][0-9]*", max_concurrent)):
+                errors.append("Parallel subagent-driven topology requires Max concurrent subagents: auto or N")
+            for label in (
+                "Concurrency selection rationale",
+                "Concurrency frontier rule",
+                "Failure policy",
+                "Main-agent integration rule",
+            ):
+                if not labeled_block_has_content(body, label):
+                    errors.append(f"Parallel subagent-driven topology missing {label}")
+            if not has_table_with_data_row(body, ["Surface / artifact / state", "Lock owner", "Conflict rule"]):
+                errors.append("Parallel subagent-driven topology missing meaningful Conflict / lock model")
+            if not has_table_with_data_row(body, ["Wave", "Work packages", "Independence proof", "Shared surfaces / locks", "Integration barrier"]):
+                errors.append("Parallel subagent-driven topology missing meaningful Parallel wave matrix")
+
     if topology in {"Serial subagent-driven", "Parallel subagent-driven"} or level in {3, 4}:
         check_labeled_requirements(body, "Context Compression Rule", CONTEXT_COMPRESSION_FIELDS, errors)
 
@@ -496,6 +578,27 @@ def check_review_context_topology(review: str, errors: list[str]) -> None:
         return
     if not labeled_block_has_content(body, "Findings"):
         errors.append("control review Context Management / Execution Topology section has no meaningful findings")
+
+
+def check_review_subagent_concurrency(plan: str, review: str, errors: list[str]) -> None:
+    topology = selected_execution_topology(plan)
+    if topology not in {"Serial subagent-driven", "Parallel subagent-driven"}:
+        return
+
+    independence = section_body(review, "Review Independence")
+    if independence is None:
+        errors.append("control review missing ## Review Independence for Subagent Concurrency Fidelity")
+    else:
+        reviewed = yes_no_value(independence, "Subagent concurrency fidelity")
+        if reviewed != "yes":
+            errors.append("control review did not record Subagent concurrency fidelity: yes in ## Review Independence")
+
+    body = section_body(review, "Subagent Concurrency Fidelity")
+    if body is None:
+        errors.append("control review missing ## Subagent Concurrency Fidelity")
+        return
+    if not labeled_block_has_content(body, "Findings"):
+        errors.append("control review Subagent Concurrency Fidelity section has no meaningful findings")
 
 
 def check_human_setpoint_approval(requirements: str, errors: list[str]) -> None:
@@ -918,6 +1021,15 @@ def suggest_next_action(errors: list[str]) -> str:
         or "execution policy horizon and authority coverage matrix" in joined
         or "future roadmap cannot replace approved horizon" in joined
         or "plan does not reference" in joined
+        or "subagent execution mode" in joined
+        or "max concurrent subagents" in joined
+        or "ordered work package sequence" in joined
+        or "integration gate after each package" in joined
+        or "parallel wave matrix" in joined
+        or "conflict / lock model" in joined
+        or "failure policy" in joined
+        or "concurrency frontier rule" in joined
+        or "main-agent integration rule" in joined
         or any(
             error.startswith(
                 (
@@ -945,16 +1057,19 @@ def suggest_next_action(errors: list[str]) -> str:
         or "control review missing ## target achievement predicate fidelity" in joined
         or "control review missing ## target-producing spine fidelity" in joined
         or "control review missing ## execution horizon and authority fidelity" in joined
+        or "control review missing ## subagent concurrency fidelity" in joined
         or "purpose feedback adequacy section has no meaningful findings" in joined
         or "realization surface closure adequacy section has no meaningful findings" in joined
         or "target achievement predicate fidelity section has no meaningful findings" in joined
         or "target-producing spine fidelity section has no meaningful findings" in joined
         or "execution horizon and authority fidelity section has no meaningful findings" in joined
+        or "subagent concurrency fidelity section has no meaningful findings" in joined
         or "did not record purpose feedback adequacy" in joined
         or "did not record realization surface closure adequacy" in joined
         or "did not record target achievement predicate fidelity" in joined
         or "did not record target-producing spine fidelity" in joined
         or "did not record execution horizon and authority fidelity" in joined
+        or "did not record subagent concurrency fidelity" in joined
         or "context management / execution topology section has no meaningful findings" in joined
         or "did not record context management / execution topology" in joined
     ):
@@ -1040,6 +1155,8 @@ def main() -> int:
             errors.append(f"control review status under ## Review Status is not Approved: {review_status!r}")
         check_final_observer(review, errors)
         check_review_context_topology(review, errors)
+        if plan:
+            check_review_subagent_concurrency(plan, review, errors)
         check_review_purpose_feedback(review, errors)
         check_review_realization_surface(review, errors)
         check_review_target_achievement_predicate(review, errors)

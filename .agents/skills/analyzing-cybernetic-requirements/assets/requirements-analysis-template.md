@@ -30,6 +30,9 @@ Approval applies only to this compact control commitment.
 | Forbidden live / irreversible actions | [live, remote, destructive, irreversible, or externally risky actions runtime must not execute] |
 | Required handling for unauthorized actions | [prepare-only / observe-only / forbidden-not-executed handling and required artifacts] |
 | Explicitly out-of-scope items | [items excluded from this goal by HSA, not merely unauthorized] |
+| Runtime delegation preference | [serial / max-safe-parallel / no preference] |
+| Parallel execution authority | [approved / not approved / not applicable] |
+| Parallelism cap | [auto / N / not specified] |
 | Output Contract | [audience, purpose, medium, structure, destination, acceptance] |
 | Workflow fit | [why full pre-goal orchestration is required / or why it is not] |
 | Known assumptions | [safe defaults and assumptions] |

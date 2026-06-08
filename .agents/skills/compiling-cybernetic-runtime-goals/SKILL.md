@@ -42,6 +42,8 @@ Do not output `/goal` unless:
 - control review status is Approved;
 - control review records `Context management / execution topology: yes` in Review Independence;
 - control review includes meaningful `Context Management / Execution Topology` findings;
+- when subagent-driven topology is selected, execution policy records `Subagent execution mode` and `Max concurrent subagents`;
+- when subagent-driven topology is selected, control review records `Subagent concurrency fidelity: yes` in Review Independence and includes meaningful `Subagent Concurrency Fidelity` findings;
 - goal includes a compact `Purpose Feedback Contract`;
 - control review records `Purpose feedback adequacy: yes` in Review Independence;
 - control review includes meaningful `Purpose Feedback Adequacy` findings;
@@ -79,7 +81,7 @@ The contract artifact must be an index-style control contract, not a long copied
 - approved control chain paths for requirements, design when present, goal, execution policy, and control review;
 - a runtime execution rule that forbids reinterpreting the approved setpoint, target-achieved predicate, output contract, topology, sensors, or control strategy;
 - a human-approved setpoint rule that treats primary object, requested transformation, non-goals, execution horizon, runtime authority, forbidden actions, purpose feedback, realization surface closure, single target-achieved predicate, output contract, workflow fit, and known assumptions as source-owned by requirements;
-- required sections to read, including `Human Setpoint Approval`, `Target Achievement Contract`, `Execution Horizon and Authority Contract`, `Purpose Feedback Contract`, `Realization Surface Contract`, `Horizon and Authority Coverage Matrix`, `Target-Producing Spine`, `Target-Producing Action Strategy`, `Candidate Plan Tasks`, `Context Management / Execution Topology`, `Execution Horizon and Authority Fidelity`, `Target-Producing Spine Fidelity`, `Target Achievement Predicate Fidelity`, `Purpose Feedback Adequacy`, `Realization Surface Closure Adequacy`, and `Final Observer Check`;
+- required sections to read, including `Human Setpoint Approval`, `Target Achievement Contract`, `Execution Horizon and Authority Contract`, `Purpose Feedback Contract`, `Realization Surface Contract`, `Horizon and Authority Coverage Matrix`, `Target-Producing Spine`, `Target-Producing Action Strategy`, `Candidate Plan Tasks`, `Context Management / Execution Topology`, subagent execution mode/concurrency sections, `Execution Horizon and Authority Fidelity`, `Subagent Concurrency Fidelity`, `Target-Producing Spine Fidelity`, `Target Achievement Predicate Fidelity`, `Purpose Feedback Adequacy`, `Realization Surface Closure Adequacy`, and `Final Observer Check`;
 - final report fields: `goal achieved: yes/no`, `single target-achieved predicate met: yes/no`, target-producing evidence, target-producing spine coverage and transition evidence, non-achieved reason when no, target-producing action attempted or proof of impossibility when no, smallest next target-producing attempt when no, approved execution horizon, horizon coverage, executed, prepared-only, forbidden-not-executed, explicitly out-of-scope by HSA, purpose feedback status and highest purpose-relevant evidence observed, and realization surfaces covered, actions completed or justified, residuals reconciled, and pending or unknown surfaces when RSC applies;
 - a stop rule for missing, unapproved, inconsistent, or insufficient referenced artifacts.
 
@@ -158,6 +160,8 @@ Do not create or modify target-work artifacts.
 - [ ] No control artifact was rewritten.
 - [ ] Control review records `Context management / execution topology: yes` in Review Independence.
 - [ ] Control review includes meaningful `Context Management / Execution Topology` findings.
+- [ ] Subagent-driven topology records `Subagent execution mode` and `Max concurrent subagents`.
+- [ ] Subagent-driven topology has `Subagent Concurrency Fidelity` review evidence.
 - [ ] Final Observer Check is present and allows approval.
 - [ ] Runtime goal contract references all approved files.
 - [ ] Runtime goal contract indexes the goal's Final Output Contract when present or required.

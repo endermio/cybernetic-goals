@@ -102,7 +102,7 @@ The execution policy must choose one approved topology:
 - `Serial subagent-driven`
 - `Parallel subagent-driven`
 
-The execution policy must record `Task level` and `Selected delegation substrate` next to the selected topology.
+The execution policy must record `Task level`, `Selected delegation substrate`, `Subagent execution mode`, and `Max concurrent subagents` next to the selected topology.
 
 Allowed `Selected delegation substrate` values:
 
@@ -117,6 +117,14 @@ Default topology rules:
 - Level 2: use `Main-only` unless the work is a wide inspection, audit, or verification pass; then use `Serial subagent-driven`.
 - Level 3: use `Serial subagent-driven` by default unless `Main-only` has an explicit context-load justification.
 - Level 4: use `Serial subagent-driven` by default. Use `Parallel subagent-driven` only when human approval, dependency-matrix independence, and control-review approval are explicitly `yes` or `approved`.
+
+Subagent execution modes:
+
+- `none`: selected only for `Main-only`.
+- `serial-single-active`: selected for `Serial subagent-driven`; `Max concurrent subagents` must be `1`.
+- `parallel-max-safe`: selected for `Parallel subagent-driven`; `Max concurrent subagents` must be `auto` or an explicit cap.
+
+When Human Setpoint Approval records `Runtime delegation preference: max-safe-parallel`, preserve that preference as the runtime topology target. Do not silently downgrade to `Serial subagent-driven` unless the dependency matrix has no independent frontier, shared surfaces cannot be safely locked, subagent context packs cannot be bounded, or review rejects parallelism. If safe frontier is effectively one, record the reason in `Concurrency selection rationale`.
 
 For every delegated work package, define:
 
@@ -140,6 +148,10 @@ The main agent owns approved control artifacts, current batch state, dispatch, i
 A subagent owns one bounded work package, bounded investigation, or bounded verification pass. A subagent must not change control artifacts, widen scope, replace the execution topology, or bypass integration gates.
 
 For serial or parallel subagent-driven topology, `Selected delegation substrate` must be `bounded-protocol`, `superpowers-subagent-driven-development`, or `adapter-specific`; it must not be `none`. Record the matching approved bounded subagent delegation protocol under `Subagent delegation substrate`. Do not treat `$superpowers:subagent-driven-development` as the generic delegation substrate. Use it only when the work packages fit its implementation-plan, current-session workflow and `Selected delegation substrate` is `superpowers-subagent-driven-development`.
+
+For serial subagent-driven topology, record `Ordered work package sequence` and `Integration gate after each package`.
+
+For parallel subagent-driven topology, record `Concurrency frontier rule`, `Conflict / lock model`, `Parallel wave matrix`, `Failure policy`, and `Main-agent integration rule`.
 
 For `Main-only` Level 3/4 work, include a meaningful `Main-only context-load justification` explaining why the main agent will not become an overloaded coordinator, worker, integrator, and verifier.
 
@@ -410,12 +422,15 @@ Response-only next step:
 - [ ] The plan includes Target-Producing Action Strategy.
 - [ ] The plan selects `Main-only`, `Serial subagent-driven`, or `Parallel subagent-driven`.
 - [ ] The plan records `Selected delegation substrate`.
+- [ ] The plan records `Subagent execution mode` and `Max concurrent subagents`.
 - [ ] Level 3/4 main-only execution has an explicit context-load justification.
 - [ ] Delegated work packages define Context pack, Return format, and Integration gate.
 - [ ] Delegated work packages define Context Pack Requirements with relevant control excerpts, batch objective, allowed artifacts/surfaces, forbidden changes, required sensors/evidence, stop conditions, and expected return format.
 - [ ] The plan defines a Context Compression Rule for batch boundaries.
 - [ ] Serial or parallel subagent-driven topology records an approved bounded subagent delegation substrate.
 - [ ] Serial or parallel subagent-driven topology does not use `Selected delegation substrate: none`.
+- [ ] Serial subagent-driven topology uses `serial-single-active`, max concurrency `1`, ordered sequence, and per-package integration.
+- [ ] Parallel subagent-driven topology uses `parallel-max-safe`, wave matrix, lock model, failure policy, and integration barriers.
 - [ ] `$superpowers:subagent-driven-development` is used only when `Selected delegation substrate` is `superpowers-subagent-driven-development` for compatible implementation-plan, current-session work packages.
 - [ ] Parallel subagent-driven execution records human approval, dependency independence, and review approval as explicitly `yes` or `approved`.
 - [ ] The plan includes Execution Granularity and Sensor Budget.

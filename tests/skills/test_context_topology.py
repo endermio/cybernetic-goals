@@ -46,12 +46,33 @@ class ContextTopologySkillTest(unittest.TestCase):
         delegation_substrate: str | None = None,
         *,
         selected_delegation_substrate: str | None = "bounded-protocol",
+        include_concurrency_policy: bool = True,
     ) -> str:
         substrate = delegation_substrate or "Approved bounded subagent delegation protocol for serial bounded work packages."
         selected_substrate_lines = []
         if selected_delegation_substrate is not None:
             selected_substrate_lines = [
                 f"Selected delegation substrate: `{selected_delegation_substrate}`",
+                "",
+            ]
+        concurrency_lines = []
+        if include_concurrency_policy:
+            concurrency_lines = [
+                "Subagent execution mode: `serial-single-active`",
+                "",
+                "Max concurrent subagents: `1`",
+                "",
+                "Concurrency selection rationale:",
+                "",
+                "- Serial execution keeps dependent work packages integrated one at a time.",
+                "",
+                "Ordered work package sequence:",
+                "",
+                "- Package A",
+                "",
+                "Integration gate after each package:",
+                "",
+                "- Main agent integrates Package A before launching any next package.",
                 "",
             ]
         return "\n".join(
@@ -61,6 +82,7 @@ class ContextTopologySkillTest(unittest.TestCase):
                 "Task level: `Level 3`",
                 "",
                 *selected_substrate_lines,
+                *concurrency_lines,
                 "Topology rationale:",
                 "",
                 "- Level 3 context load needs bounded delegation.",
@@ -114,7 +136,45 @@ class ContextTopologySkillTest(unittest.TestCase):
         human_approval: str = "yes",
         dependency_independence: str = "yes",
         control_review_approval: str = "yes",
+        include_concurrency_policy: bool = True,
     ) -> str:
+        concurrency_lines = []
+        if include_concurrency_policy:
+            concurrency_lines = [
+                "Subagent execution mode: `parallel-max-safe`",
+                "",
+                "Max concurrent subagents: `auto`",
+                "",
+                "Concurrency selection rationale:",
+                "",
+                "- Independent packages can run in the same reviewed wave with disjoint locks.",
+                "",
+                "Concurrency frontier rule:",
+                "",
+                "- Launch Wave 1 packages only after dependencies are satisfied.",
+                "",
+                "Conflict / lock model:",
+                "",
+                "| Surface / artifact / state | Lock owner | Conflict rule |",
+                "|---|---|---|",
+                "| area A files | Package A | exclusive lock during Wave 1 |",
+                "| area B files | Package B | exclusive lock during Wave 1 |",
+                "",
+                "Parallel wave matrix:",
+                "",
+                "| Wave | Work packages | Independence proof | Shared surfaces / locks | Integration barrier |",
+                "|---|---|---|---|---|",
+                "| Wave 1 | Package A, Package B | areas are disjoint | exclusive per-area locks | main integrates both before next wave |",
+                "",
+                "Failure policy:",
+                "",
+                "- A blocking subagent result stops the current wave at the integration barrier.",
+                "",
+                "Main-agent integration rule:",
+                "",
+                "- Candidate outputs become progress only after main-agent integration at the wave barrier.",
+                "",
+            ]
         return "\n".join(
             [
                 "Selected topology: `Parallel subagent-driven`",
@@ -123,6 +183,7 @@ class ContextTopologySkillTest(unittest.TestCase):
                 "",
                 "Selected delegation substrate: `bounded-protocol`",
                 "",
+                *concurrency_lines,
                 "Topology rationale:",
                 "",
                 "- Independent packages can run in parallel without shared control artifacts.",
@@ -360,6 +421,7 @@ class ContextTopologySkillTest(unittest.TestCase):
                     "- Target achievement predicate fidelity: `yes`",
                     "- Target-producing spine fidelity: `yes`",
                     "- Execution horizon and authority fidelity: `yes`",
+                    "- Subagent concurrency fidelity: `yes`",
                     "",
                     "## Context Management / Execution Topology",
                     "",
@@ -396,6 +458,11 @@ class ContextTopologySkillTest(unittest.TestCase):
                     "",
                     "Findings:",
                     "- Approved horizon and runtime authority are compact and fixture-bounded.",
+                    "",
+                    "## Subagent Concurrency Fidelity",
+                    "",
+                    "Findings:",
+                    "- Subagent execution mode matches the selected topology and fixture delegation substrate.",
                     "",
                 ]
             )
@@ -1042,6 +1109,172 @@ class ContextTopologySkillTest(unittest.TestCase):
 
         self.assertEqual(control_guard.returncode, 0, control_guard.stdout + control_guard.stderr)
         self.assertEqual(orchestration_guard.returncode, 0, orchestration_guard.stdout + orchestration_guard.stderr)
+
+    def test_subagent_execution_mode_is_first_class_template_field(self):
+        plan_template = (
+            ROOT
+            / ".agents/skills/writing-cybernetic-execution-policies/assets/execution-policy-template.md"
+        ).read_text(encoding="utf-8")
+        review_template = (
+            ROOT
+            / ".agents/skills/reviewing-cybernetic-control-structures/assets/control-review-template.md"
+        ).read_text(encoding="utf-8")
+
+        for expected in (
+            "Subagent execution mode",
+            "Max concurrent subagents",
+            "Concurrency selection rationale",
+            "Conflict / lock model",
+            "Parallel wave matrix",
+            "Failure policy",
+            "Main-agent integration rule",
+        ):
+            self.assertIn(expected, plan_template)
+
+        self.assertIn("Subagent Concurrency Fidelity", review_template)
+        self.assertIn("Subagent concurrency fidelity", review_template)
+
+    def test_serial_superpowers_subagent_topology_requires_single_active_mode(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            requirements, goal, plan, review = self.write_artifact_chain(
+                Path(tmpdir),
+                self.complete_serial_topology(
+                    "Implementation-plan same-session delegation uses `$superpowers:subagent-driven-development` discipline for bounded work packages.",
+                    selected_delegation_substrate="superpowers-subagent-driven-development",
+                    include_concurrency_policy=False,
+                ),
+            )
+
+            result = subprocess.run(
+                [
+                    sys.executable,
+                    str(
+                        ROOT
+                        / ".agents/skills/compiling-cybernetic-runtime-goals/scripts/control_chain_guard.py"
+                    ),
+                    "--requirements",
+                    str(requirements),
+                    "--goal",
+                    str(goal),
+                    "--plan",
+                    str(plan),
+                    "--review",
+                    str(review),
+                ],
+                cwd=ROOT,
+                text=True,
+                capture_output=True,
+            )
+
+        output = result.stdout + result.stderr
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("NEXT: RunExecutionPolicy", output)
+        self.assertIn("Subagent execution mode", output)
+        self.assertIn("serial-single-active", output)
+        self.assertIn("Max concurrent subagents", output)
+
+    def test_parallel_subagent_topology_requires_wave_locks_and_failure_policy(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            requirements, goal, plan, review = self.write_artifact_chain(
+                Path(tmpdir),
+                self.complete_parallel_topology(include_concurrency_policy=False),
+            )
+
+            result = subprocess.run(
+                [
+                    sys.executable,
+                    str(
+                        ROOT
+                        / ".agents/skills/compiling-cybernetic-runtime-goals/scripts/control_chain_guard.py"
+                    ),
+                    "--requirements",
+                    str(requirements),
+                    "--goal",
+                    str(goal),
+                    "--plan",
+                    str(plan),
+                    "--review",
+                    str(review),
+                ],
+                cwd=ROOT,
+                text=True,
+                capture_output=True,
+            )
+
+        output = result.stdout + result.stderr
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("NEXT: RunExecutionPolicy", output)
+        self.assertIn("parallel-max-safe", output)
+        self.assertIn("Parallel wave matrix", output)
+        self.assertIn("Conflict / lock model", output)
+        self.assertIn("Failure policy", output)
+
+    def test_runtime_compiler_preserves_and_can_expect_subagent_execution_mode(self):
+        topology = self.complete_serial_topology(
+            "Implementation-plan same-session delegation uses `$superpowers:subagent-driven-development` discipline for bounded work packages.",
+            selected_delegation_substrate="superpowers-subagent-driven-development",
+        )
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            tmp = Path(tmpdir)
+            requirements, goal, plan, review = self.write_artifact_chain(tmp, topology)
+            runtime_contract = tmp / "runtime.goal.md"
+
+            result = subprocess.run(
+                [
+                    sys.executable,
+                    str(
+                        ROOT
+                        / ".agents/skills/compiling-cybernetic-runtime-goals/scripts/compile_runtime_goal.py"
+                    ),
+                    "--requirements",
+                    str(requirements),
+                    "--goal",
+                    str(goal),
+                    "--plan",
+                    str(plan),
+                    "--review",
+                    str(review),
+                    "--expect-subagent-mode",
+                    "parallel-max-safe",
+                    "--out",
+                    str(runtime_contract),
+                ],
+                cwd=ROOT,
+                text=True,
+                capture_output=True,
+            )
+
+            passing_result = subprocess.run(
+                [
+                    sys.executable,
+                    str(
+                        ROOT
+                        / ".agents/skills/compiling-cybernetic-runtime-goals/scripts/compile_runtime_goal.py"
+                    ),
+                    "--requirements",
+                    str(requirements),
+                    "--goal",
+                    str(goal),
+                    "--plan",
+                    str(plan),
+                    "--review",
+                    str(review),
+                    "--expect-subagent-mode",
+                    "serial-single-active",
+                    "--out",
+                    str(runtime_contract),
+                ],
+                cwd=ROOT,
+                text=True,
+                capture_output=True,
+            )
+            contract_text = runtime_contract.read_text(encoding="utf-8") if runtime_contract.exists() else ""
+
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("expected subagent execution mode", result.stdout + result.stderr)
+        self.assertEqual(passing_result.returncode, 0, passing_result.stdout + passing_result.stderr)
+        self.assertIn("Subagent execution mode: `serial-single-active`", contract_text)
 
     def test_guards_reject_weak_context_pack_requirements(self):
         weak_topology = "\n".join(

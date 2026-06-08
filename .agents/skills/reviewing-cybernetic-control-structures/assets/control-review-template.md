@@ -26,6 +26,7 @@ Status: `Needs Revision`
   - Target achievement predicate fidelity: `yes/no`
   - Target-producing spine fidelity: `yes/no`
   - Execution horizon and authority fidelity: `yes/no`
+  - Subagent concurrency fidelity: `yes/no`
   - Execution granularity / sensor load: `yes/no`
   - Sensor governance: `yes/no`
   - Execution cadence: `yes/no`
@@ -235,6 +236,22 @@ Findings:
 
 - [finding]
 
+## Subagent Concurrency Fidelity
+
+Check:
+
+- max-safe-parallel requests are preserved unless the policy records a concrete safe-frontier reason for serial execution;
+- selected subagent execution mode matches selected topology and delegation substrate;
+- serial subagent-driven execution uses one active subagent, ordered work package sequence, and integration after each package;
+- parallel subagent-driven execution has dependency independence, concurrency frontier, wave matrix, conflict / lock model, integration barriers, and failure policy;
+- no parallel work package can modify the same surface without a lock rule or barrier;
+- subagent outputs remain candidate results until main-agent integration;
+- selected delegation substrate fits the approved work packages.
+
+Findings:
+
+- [finding]
+
 ## Evidence Lifecycle / Evidence Budget
 
 Check:
@@ -305,6 +322,7 @@ The control structure may be approved only if:
 - target achievement predicate fidelity preserves a single target-achieved predicate;
 - target-producing spine fidelity preserves an actor-centered state-transition path and work-package mapping;
 - execution horizon and authority fidelity preserves the approved horizon and does not convert authority limits into out-of-scope roadmap items;
+- subagent concurrency fidelity preserves the approved execution mode, wave/barrier model, and main-agent integration rule;
 - sensor/evidence governance is explicit;
 - batch cadence is explicit;
 - runtime execution does not need to synthesize a new plan.
