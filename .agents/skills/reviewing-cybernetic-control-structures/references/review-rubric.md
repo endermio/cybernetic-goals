@@ -2,22 +2,22 @@
 
 ## Fail the review if
 
-- the plan rewrites confirmed semantics;
+- the plan rewrites confirmed meaning;
 - required solution design is missing;
 - goal or plan contradicts the solution design;
 - the goal omits a confirmed decision;
 - the runtime goal would need to write or approve a plan;
-- approved sensors, checks, or evidence channels are treated as the objective;
-- batches are mechanical micro-steps rather than coherent target-state slices;
+- approved evidence checks, checks, or evidence channels are treated as the objective;
+- batches are mechanical micro-steps rather than coherent intended-result slices;
 - broad verification is required after every small edit without justification;
-- sensor cost dominates execution cost;
-- stale sensors can block approved structural change;
-- no stale-sensor policy exists;
+- evidence check cost dominates execution cost;
+- stale evidence checks can block approved structural change;
+- no stale-evidence check policy exists;
 - batch cadence is missing;
 - destructive intermediate-state policy is missing;
-- semantic invariants and tactical details are mixed;
+- meaning invariants and tactical details are mixed;
 - unresolved human or design decisions remain.
 
 ## Approve only when
 
-The control structure can be executed as a runtime without inventing new solution design or control structure.
+The approved work chain can be executed as a runtime without inventing new solution design or approved work chain.

@@ -3,11 +3,11 @@
   "evals": [
     {
       "id": "reject-unapproved-plan",
-      "prompt": "审查 requirements analysis、goal、plan，plan 还没有 sensor governance。",
-      "expected_output": "Review status is Needs Revision, identifies missing sensor governance, and includes a response-only next step for revision and re-review.",
+      "prompt": "审查 requirements analysis、goal、plan，plan 还没有 evidence check governance。",
+      "expected_output": "Review status is Needs Revision, identifies missing evidence check governance, and includes a response-only next step for revision and re-review.",
       "assertions": [
         "Does not approve.",
-        "Mentions sensor/evidence governance.",
+        "Mentions evidence check/evidence governance.",
         "Does not output final /goal.",
         "Does not execute target work.",
         "Includes a response-only next step to revise the execution policy and rerun review, or return to $orchestrating-cybernetic-pregoal when orchestration owns the chain."
@@ -41,10 +41,10 @@
     {
       "id": "authorized-independent-review-passes",
       "prompt": "审查 requirements analysis、goal、plan，用户明确允许 subagents 做独立 control review。",
-      "expected_output": "The review uses independent reviewer passes for requirement traceability, goal fidelity, sensor governance, execution cadence, and runtime safety before Approved status is allowed.",
+      "expected_output": "The review uses independent reviewer passes for requirement traceability, goal match, evidence check governance, execution cadence, and runtime safety before Approved status is allowed.",
       "assertions": [
         "Mentions independent review passes.",
-        "Includes requirement traceability, goal fidelity, sensor governance, execution cadence, and runtime safety.",
+        "Includes requirement traceability, goal match, evidence check governance, execution cadence, and runtime safety.",
         "Does not run target execution.",
         "Does not dispatch execution agents.",
         "Approval is allowed only after independent review discipline is satisfied."
@@ -57,33 +57,33 @@
       "assertions": [
         "Mentions the Final Observer Rule or equivalent no-approval-after-unreviewed-mutation rule.",
         "Classifies evidence structure and progress log field changes as substantive changes.",
-        "Does not treat lint PASS as semantic or control-policy approval.",
+        "Does not treat lint PASS as meaning or control-policy approval.",
         "Uses Dirty or Needs Re-review instead of Approved.",
         "Requires final independent re-review reporting no Blocking or Major findings before Approved is allowed."
       ]
     },
     {
-      "id": "reviews-design-fidelity",
-      "prompt": "审查 requirements analysis、solution design、goal、plan。plan 把 design 中的实时 direct-observation 信息流改成 mediated-reporting，并把 tactical observer-surface name 当成 semantic invariant。",
-      "expected_output": "Review status is Needs Revision and identifies design fidelity violations.",
+      "id": "reviews-design-match",
+      "prompt": "审查 requirements analysis、solution design、goal、plan。plan 把 design 中的实时 direct-observation 信息流改成 mediated-reporting，并把 tactical observer-place name 当成 meaning rule。",
+      "expected_output": "Review status is Needs Revision and identifies design match violations.",
       "assertions": [
         "Reviews the chain as requirements analysis → design → goal → plan.",
-        "Includes Design Fidelity as a review dimension.",
-        "Flags changing direct-observation information flow to mediated-reporting as a design fidelity issue.",
-        "Flags tactical observer-surface naming being frozen as semantic invariant.",
+        "Includes Design Match as a review dimension.",
+        "Flags changing direct-observation information flow to mediated-reporting as a design match issue.",
+        "Flags tactical observer-place naming being frozen as meaning rule.",
         "Does not output a final /goal."
       ]
     },
     {
-      "id": "downstream-setpoint-change-requires-reapproval",
+      "id": "downstream-approved target-change-requires-reapproval",
       "prompt": "A requirements analysis has What the User Approved: Approved. A later design changes the primary object and removes a non-goal from the approved compact control commitment.",
       "expected_output": "The review marks the chain Needs Revision or requires returning to requirements approval because downstream artifacts changed the what the user approved.",
       "assertions": [
-        "Checks Human Setpoint Fidelity.",
+        "Checks What the User Approved Match.",
         "Detects mismatch with the approved compact control commitment.",
         "Identifies the changed primary object or non-goal.",
         "Does not approve the control chain.",
-        "Requires setpoint revision or explicit human reapproval."
+        "Requires approved target revision or explicit human reapproval."
       ]
     },
     {
@@ -98,24 +98,24 @@
       ]
     },
     {
-      "id": "flags-overheavy-sensor-plan",
-      "prompt": "Review a plan where every tiny step requires broad verification and stale sensors can block approved structural change.",
-      "expected_output": "The review flags sensor overcoupling and excessive granularity as Major or Blocking, and requires execution-policy revision before runtime compilation.",
+      "id": "flags-overheavy-evidence-check-plan",
+      "prompt": "Review a plan where every tiny step requires broad verification and stale evidence checks can block approved structural change.",
+      "expected_output": "The review flags evidence check overcoupling and excessive granularity as Major or Blocking, and requires execution-policy revision before runtime compilation.",
       "assertions": [
         "Flags excessive micro-step granularity.",
-        "Flags sensor load as too heavy.",
-        "Explains that sensors are not objectives.",
+        "Flags evidence check load as too heavy.",
+        "Explains that evidence checks are not objectives.",
         "Requires revising the execution policy.",
         "Does not approve runtime /goal compilation.",
         "Does not adjust batch granularity inside the orchestrator."
       ]
     },
     {
-      "id": "reviews-output-contract-fidelity",
+      "id": "reviews-output-contract-match",
       "prompt": "审查 requirements analysis、solution design、goal、plan。requirements 定义 Output Contract: management decision report, markdown artifact, status matrix, evidence references, unresolved decisions；design 定义 Output Contract Design；goal 省略 evidence references 和 unresolved decisions；plan 没有收集 final report 所需材料。",
-      "expected_output": "Review status is Needs Revision and identifies Output Contract Fidelity violations.",
+      "expected_output": "Review status is Needs Revision and identifies Output Contract Match violations.",
       "assertions": [
-        "Includes Output Contract Fidelity as a review dimension.",
+        "Includes Output Contract Match as a review dimension.",
         "Flags goal omitting or weakening requirements Output Contract.",
         "Flags goal failing to preserve design Output Contract Design.",
         "Flags execution policy missing output material or evidence collection needed for the final output.",
@@ -125,28 +125,28 @@
     },
     {
       "id": "flags-main-agent-context-overload",
-      "prompt": "Review a Level 3 execution policy that assigns coordination, investigation, execution, verification, and integration to the main agent, has no selected topology, and defines no context packs or subagent return formats.",
-      "expected_output": "The review flags Context Management / Execution Topology as Major or Blocking, requires execution-policy revision, and does not approve runtime compilation.",
+      "prompt": "Review a Level 3 execution policy that assigns coordination, investigation, execution, verification, and integration to the main agent, has no selected work assignment, and defines no context packs or subagent return formats.",
+      "expected_output": "The review flags Who Does The Work / Context Use as Major or Blocking, requires execution-policy revision, and does not approve runtime compilation.",
       "assertions": [
-        "Includes Context Management / Execution Topology as a review dimension.",
-        "Flags missing selected topology.",
+        "Includes Who Does The Work / Context Use as a review dimension.",
+        "Flags missing selected work assignment.",
         "Flags Level 3 main-agent context overload.",
-        "Requires Context pack, Return format, and Integration gate for delegated work.",
+        "Requires Context pack, Return format, and Integration check for delegated work.",
         "Requires revising the execution policy.",
         "Does not approve runtime /goal compilation.",
-        "Does not decide the execution topology inside the orchestrator."
+        "Does not decide the execution work assignment inside the orchestrator."
       ]
     },
     {
       "id": "flags-weak-context-pack",
-      "prompt": "Review a Serial subagent-driven execution policy whose delegation matrix says Context pack: requirements, goal, plan; Return format: summary; Integration gate: review, but lacks relevant control excerpts, current batch objective, allowed artifacts/surfaces, forbidden changes, required sensors/evidence, stop conditions, expected return format, and context compression.",
-      "expected_output": "The review flags Context Management / Execution Topology as Needs Revision because the context pack is not a bounded operating context and batch-boundary context compression is missing.",
+      "prompt": "Review a Serial subagent-driven execution policy whose delegation matrix says Context pack: requirements, goal, plan; Return format: summary; Integration check: review, but lacks relevant control excerpts, current batch objective, allowed artifacts/surfaces, forbidden changes, required evidence checks/evidence, stop conditions, expected return format, and context compression.",
+      "expected_output": "The review flags Who Does The Work / Context Use as Needs Revision because the context pack is not a bounded operating context and batch-limit context compression is missing.",
       "assertions": [
         "Flags that context pack is only an artifact path list.",
         "Requires relevant control excerpts.",
         "Requires current batch objective.",
         "Requires allowed artifacts/surfaces and forbidden changes.",
-        "Requires required sensors/evidence and stop conditions.",
+        "Requires required evidence checks/evidence and stop conditions.",
         "Requires expected return format.",
         "Requires context compression at batch boundaries.",
         "Does not mark Approved."
@@ -158,7 +158,7 @@
       "expected_output": "The review flags Evidence Lifecycle / Evidence Budget as Major or Blocking, requires execution-policy revision, and does not approve runtime compilation.",
       "assertions": [
         "Includes Evidence Lifecycle / Evidence Budget as a review dimension.",
-        "Flags repeated full raw sensor outputs per batch.",
+        "Flags repeated full raw evidence check outputs per batch.",
         "Flags raw evidence volume exceeding controlled work size without justification.",
         "Requires summary and delta for intermediate evidence.",
         "Requires raw pointers instead of loading raw evidence as context.",
@@ -169,14 +169,14 @@
       ]
     },
     {
-      "id": "purpose-visible-outcome-cannot-be-claimed-from-internal-sensors-only",
+      "id": "purpose-visible-outcome-cannot-be-claimed-from-internal-evidence-checks-only",
       "prompt": "A goal exists to improve an observer-visible workflow. The plan verifies only internal checks and API smoke.",
-      "expected_output": "The review says internal checks are useful progress evidence but insufficient to claim the human purpose is achieved; it asks for the smallest purpose-boundary feedback or marks purpose feedback pending.",
+      "expected_output": "The review says internal checks are useful progress evidence but insufficient to claim the human purpose is achieved; it asks for the smallest purpose-limit feedback or marks user-purpose evidence pending.",
       "assertions": [
-        "Identifies the human purpose and beneficiary/observer boundary.",
+        "Identifies the human purpose and beneficiary/observer limit.",
         "Distinguishes internal progress evidence from purpose-achievement evidence.",
         "Does not require heavy end-to-end evidence by default.",
-        "Requires the smallest sufficient purpose-boundary or equivalent feedback before claiming purpose achieved.",
+        "Requires the smallest sufficient purpose-limit or equivalent feedback before claiming purpose achieved.",
         "Allows honest pending, partial, or unavailable purpose-feedback status instead of only blocking."
       ]
     },
@@ -186,68 +186,68 @@
       "expected_output": "The review accepts internal evidence as sufficient when the human purpose is internal-state correctness.",
       "assertions": [
         "Identifies the purpose as internal-state correctness.",
-        "Does not demand purpose-boundary workflow evidence.",
+        "Does not demand purpose-limit workflow evidence.",
         "Explains why internal feedback is sufficient for this purpose.",
         "Allows completion claim if approved internal checks pass."
       ]
     },
     {
-      "id": "non-achieved-terminal-report-cannot-be-target-achieved",
-      "prompt": "A target-achieving goal lists partial, diagnostic, blocked, and invalid as valid final statuses, then says one valid final status reached allows goal achieved: yes.",
-      "expected_output": "The review marks Target Achievement Predicate Fidelity as inadequate because non-achieved terminal reports are being treated as target-achieved states.",
+      "id": "report-when-not-done-cannot-count-as-done",
+      "prompt": "A done-making goal lists partial, diagnostic, blocked, and invalid as valid final statuses, then says one valid final status reached allows goal achieved: yes.",
+      "expected_output": "The review marks Target Achievement Done Rule Match as inadequate because reports when not done are being treated as done states.",
       "assertions": [
         "Identifies the what counts as done.",
         "Flags partial, diagnostic, blocked, unavailable, or invalid being treated as goal achieved.",
         "Requires a target-producing action or proof-of-impossibility path.",
-        "Allows honest non-achieved terminal reporting only as goal achieved: no.",
+        "Allows honest report when not doneing only as goal achieved: no.",
         "Does not let valid final status replace the what counts as done."
       ]
     },
     {
       "id": "target-contract-cannot-contain-alternate-report-statuses",
-      "prompt": "A goal's Target Achievement Contract includes a target predicate, then also lists valid final status values such as ready, partial, diagnostic, blocked, and invalid.",
-      "expected_output": "The review rejects the target contract because alternate report statuses are being placed inside the target-achievement structure instead of the non-achieved terminal report protocol.",
+      "prompt": "A goal's Target Achievement Contract includes a target done rule, then also lists valid final status values such as ready, partial, diagnostic, blocked, and invalid.",
+      "expected_output": "The review rejects the target contract because alternate report statuses are being placed inside the target-achievement structure instead of the report when not done protocol.",
       "assertions": [
         "Requires exactly one what counts as done.",
-        "Says non-achieved terminal reports are not target states.",
+        "Says reports when not done are not intended results.",
         "Flags valid final status values inside the target contract.",
-        "Requires non-achieved reports to remain goal achieved: no.",
-        "Keeps Target Achievement Predicate Fidelity separate from PFB and RSC."
+        "Requires report when not dones to remain goal achieved: no.",
+        "Keeps Target Achievement Done Rule Match separate from user-purpose evidence and result placement."
       ]
     },
     {
-      "id": "component-labelled-spine-is-not-valid-spine",
+      "id": "component-labelled-answer path-is-not-valid-answer path",
       "prompt": "Review an implementation plan whose Steps That Make The Result True says S1 implement ledger, S2 implement runner, S3 implement CLI, and Candidate Plan Tasks map component work to those labels. There is no actor-centered state transition from initial state to what counts as done.",
-      "expected_output": "The review marks Answer Path Check as inadequate because the plan renamed component inventory as a spine instead of modeling target-producing state transitions.",
+      "expected_output": "The review marks Answer Path Check as inadequate because the plan renamed component inventory as a answer path instead of modeling target-producing state transitions.",
       "assertions": [
         "Identifies S1/S2/S3 as component inventory rather than target-producing state transitions.",
         "Requires an actor-centered path from initial state to what counts as done.",
-        "Flags component evidence replacing spine transition evidence.",
-        "Does not approve merely because Candidate Plan Tasks have Spine node(s).",
+        "Flags component evidence replacing answer path transition evidence.",
+        "Does not approve merely because Candidate Plan Tasks have Required step(s).",
         "Requires execution-policy revision before runtime compilation."
       ]
     },
     {
-      "id": "local-action-cannot-claim-target-realization-without-rsc",
-      "prompt": "A goal changes a target state carried by multiple controlled-object surfaces. The plan changes one local artifact and then claims the target state is fully realized without a surface model or residual reconciliation.",
-      "expected_output": "The review marks Realization Surface Closure as missing or inadequate, treats local action as insufficient for target-state realization, and requires a surface model plus residual reconciliation before strongest positive wording.",
+      "id": "local-action-cannot-claim-result-without-placement",
+      "prompt": "A goal changes a intended result carried by multiple controlled-object surfaces. The plan changes one local artifact and then claims the intended result is fully realized without a place model or residual reconciliation.",
+      "expected_output": "The review marks Where The Result Must Show Up as missing or inadequate, treats local action as insufficient for intended-result realization, and requires a place model plus residual reconciliation before strongest positive wording.",
       "assertions": [
-        "Identifies the target state and controlled-object realization surfaces.",
-        "Distinguishes local action from global target-state realization.",
-        "Requires surface/action/residual/reconciliation structure.",
-        "Says strongest positive target-realization claims require RSC adequate.",
-        "Keeps RSC separate from Purpose Feedback Boundary."
+        "Identifies the intended result and controlled-object realization surfaces.",
+        "Distinguishes local action from global intended-result realization.",
+        "Requires place/action/residual/reconciliation structure.",
+        "Says strongest positive result claim requires result-placement adequate.",
+        "Keeps result placement separate from How We Know The User Purpose Was Met."
       ]
     },
     {
-      "id": "rsc-not-applicable-requires-justification",
-      "prompt": "A plan labels Realization Surface Closure as not applicable without explaining why the task has no target-state realization across controlled-object surfaces.",
-      "expected_output": "The review does not accept bare RSC not applicable wording; it requires justification or downgrades the RSC status.",
+      "id": "result-placement-not-applicable-requires-justification",
+      "prompt": "A plan labels Where The Result Must Show Up as not applicable without explaining why the task has no intended-result realization across controlled-object surfaces.",
+      "expected_output": "The review does not accept bare result placement not applicable wording; it requires justification or downgrades the result placement status.",
       "assertions": [
-        "Requires RSC not applicable with justification.",
-        "Does not treat an empty not-applicable label as adequate RSC.",
+        "Requires result placement not applicable with justification.",
+        "Does not treat an empty not-applicable label as adequate result placement.",
         "Allows justified not-applicable status for simple direct tasks.",
-        "Does not demand heavy surface discovery when no target state is being changed or realized."
+        "Does not demand heavy place discovery when no intended result is being changed or realized."
       ]
     }
   ]

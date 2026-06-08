@@ -36,7 +36,7 @@ Does this task mention complex concepts?
 The key routing question is:
 
 ```text
-Would the execution agent otherwise need to invent or revise control contracts, requirement semantics, solution structure, sensors, execution policy, or phase gates during runtime?
+Would the execution agent otherwise need to invent or revise goal contracts, requirement meaning, solution structure, evidence checks, execution policy, or phase checks during runtime?
 ```
 
 For evaluation tasks, also ask:
@@ -55,7 +55,7 @@ Route based on unresolved control decisions, not scary keywords.
 
 ## Core Rule
 
-Use the lightest workflow that keeps the agent from inventing control structure during execution.
+Use the lightest workflow that keeps the agent from inventing approved work chain during execution.
 
 A task should not be routed to the full pre-goal pipeline merely because it mentions:
 
@@ -79,9 +79,9 @@ Every routing response must include:
 1. `Routing decision`
 2. `Why`
 3. `Required gates`
-4. `Rubric gate` when the task asks for evaluation, audit, readiness, closure, quality, completeness, correctness, usability, or status classification
-5. `Output Contract gate` when output shape affects execution, acceptance, handoff, persistence, or downstream consumption
-6. `Design gate` when the task may require a solution model before goal writing
+4. `Rubric check` when the task asks for evaluation, audit, readiness, closure, quality, completeness, correctness, usability, or status classification
+5. `Output Contract check` when output shape affects execution, acceptance, handoff, persistence, or downstream consumption
+6. `Design check` when the task may require a solution model before goal writing
 7. `Recommended next step`
 8. `Rejected workflow, if any`
 
@@ -89,7 +89,7 @@ Do not create files. Do not run target execution. Do not write a goal contract. 
 
 Routing recommendations and handoff prompts are response-only. Do not write them into requirements, design, goal, plan, review, progress, or orchestration-status artifacts.
 
-## Evaluation Function Gate
+## Evaluation Function Check
 
 Before routing any task that asks Codex to evaluate, audit, assess, verify, check readiness, check closure, judge usability, judge completeness, classify status, or decide whether something is good/safe/stable/correct/covered/usable/ready/passed, check whether the evaluation rubric is explicit.
 
@@ -110,21 +110,21 @@ A rubric is explicit only when the task defines:
 
 Object lists are not rubrics. A complete checklist of items to inspect does not define the error function for judging those items.
 
-If the task is evaluative and the rubric is missing or only partially defined, keep the execution-complexity level unchanged and add `Rubric Gate: required` under `Required gates`.
+If the task is evaluative and the rubric is missing or only partially defined, keep the execution-complexity level unchanged and add `rubric check: required` under `Required gates`.
 
 Examples:
 
-- `Level 1` + `Required gates: Rubric Gate required` means short rubric analysis before inline goal.
-- `Level 2` + `Required gates: Rubric Gate required` means rubric analysis before bounded file/audit goal.
-- `Level 3` + `Required gates: Rubric Gate required` means the full requirements analysis phase must explicitly include rubric semantics.
+- `Level 1` + `Required gates: rubric check required` means short rubric analysis before inline goal.
+- `Level 2` + `Required gates: rubric check required` means rubric analysis before bounded file/audit goal.
+- `Level 3` + `Required gates: rubric check required` means the full requirements analysis phase must explicitly include rubric meaning.
 
 Do not route an unrubriced evaluation task directly to execution merely because execution scope is bounded.
 
-## Output Contract Gate
+## final-answer-format check
 
 Before routing tasks whose final result will be consumed for a decision, handoff, audit, record, downstream action, or machine consumption, check whether the output contract is explicit enough that runtime Codex will not invent the final shape.
 
-Output Contract Gate is explicit only when the task or existing artifacts define enough of the relevant:
+final-answer-format check is explicit only when the task or existing artifacts define enough of the relevant:
 
 - audience;
 - purpose;
@@ -136,36 +136,36 @@ Output Contract Gate is explicit only when the task or existing artifacts define
 - destination path;
 - acceptance condition.
 
-If output shape is missing or partial and the wrong shape would make the task unusable or change execution/acceptance, keep the execution-complexity level unchanged and add `Output Contract Gate: required` under `Required gates`.
+If output shape is missing or partial and the wrong shape would make the task unusable or change execution/acceptance, keep the execution-complexity level unchanged and add `final-answer-format check: required` under `Required gates`.
 
-Do not require this gate for simple tasks whose output is obviously a short chat summary or local confirmation. Do not turn output format into a routine question.
+Do not require this check for simple tasks whose output is obviously a short chat summary or local confirmation. Do not turn output format into a routine question.
 
 Examples:
 
-- `Level 1` + `Output Contract Gate: satisfied` can describe a simple local correction with a brief chat summary.
-- `Level 2` + `Output Contract Gate: required` can describe a bounded audit/report task whose evaluation scope is clear but whose decision-report shape is not defined.
-- `Level 3` + `Output Contract Gate: required` can describe full pre-goal work where downstream runtime must produce a structured artifact bundle or machine-readable handoff.
+- `Level 1` + `final-answer-format check: satisfied` can describe a simple local correction with a brief chat summary.
+- `Level 2` + `final-answer-format check: required` can describe a bounded audit/report task whose evaluation scope is clear but whose decision-report shape is not defined.
+- `Level 3` + `final-answer-format check: required` can describe full pre-goal work where downstream runtime must produce a structured artifact bundle or machine-readable handoff.
 
-## Design Gate
+## required design
 
-Before routing any task where the target semantics are known but the solution structure may be unclear, check whether a design model is explicit enough that runtime Codex will not invent objects, relationships, flows, interfaces, boundaries, or evidence models.
+Before routing any task where the target meaning are known but the solution structure may be unclear, check whether a design model is explicit enough that runtime Codex will not invent objects, relationships, flows, interfaces, boundaries, or evidence models.
 
-Design Gate is explicit only when the task or existing artifacts define the relevant:
+required design is explicit only when the task or existing artifacts define the relevant:
 
 - core objects, actors, roles, or responsibilities;
 - relationships among concepts or entities;
 - system, process, or organizational boundaries;
 - information flow, state flow, evidence flow, or decision flow;
 - interfaces, contracts, reports, procedures, events, or user interactions;
-- lifecycle, failure/exception model, and evidence/sensor model when relevant;
+- lifecycle, failure/exception model, and evidence/evidence check model when relevant;
 - design invariants versus tactical degrees of freedom.
 
-If solution structure is missing or partial, keep the execution-complexity level unchanged and add `Design Gate: required` under `Required gates`.
+If solution structure is missing or partial, keep the execution-complexity level unchanged and add `required design: required` under `Required gates`.
 
 Examples:
 
-- `Level 2` + `Design Gate: required` can describe a bounded audit/report task whose rubric is clear but report/evidence structure still needs a lightweight design.
-- `Level 3` + `Design Gate: required` describes complex work where requirement semantics are analyzed but the system/process model must be synthesized before goal and plan writing.
+- `Level 2` + `required design: required` can describe a bounded audit/report task whose rubric is clear but report/evidence structure still needs a lightweight design.
+- `Level 3` + `required design: required` describes complex work where requirement meaning are analyzed but the system/process model must be synthesized before goal and plan writing.
 
 Do not encode design in the level name. Use `Level N` plus `Required gates`.
 
@@ -176,18 +176,18 @@ Before routing to Level 3, check whether this is a bounded correction inside an 
 Downgrade to Level 1 or Level 2 when all are true:
 
 - The task does not introduce a new required capability.
-- Confirmed semantics and any required solution structure already exist in a requirements analysis, solution design, goal, plan, control review, prior approved decision, or explicit user instruction.
-- The task does not require changing structure-contract semantics, authorization semantics, external contract semantics, visibility semantics, or target setpoint.
+- Confirmed meaning and any required solution structure already exist in a requirements analysis, solution design, goal, plan, control review, prior approved decision, or explicit user instruction.
+- The task does not require changing structure-contract meaning, authorization meaning, external contract meaning, visibility meaning, or target setpoint.
 - The expected change can be described as a local correction to observer output, source fixtures, naming, checks, evidence artifacts, or one bounded workflow.
-- The agent would not need to invent new solution design, goals, sensors, execution policies, or phase gates during execution.
+- The agent would not need to invent new solution design, goals, evidence checks, execution policies, or phase checks during execution.
 
 Examples:
 
-- Correcting an observer label after the identity semantics are already analyzed.
+- Correcting an observer label after the identity meaning are already analyzed.
 - Adjusting local source fixtures to avoid misleading entity display.
-- Changing a displayed term when identifier semantics are already confirmed.
+- Changing a displayed term when identifier meaning are already confirmed.
 - Updating a stale evidence assertion to match an already confirmed requirement decision.
-- Tightening an access-boundary message without changing authorization semantics.
+- Tightening an access-boundary message without changing authorization meaning.
 
 These are not Level 3 merely because they mention authorization, identity mapping, oversight, checks, or evidence artifacts.
 
@@ -200,10 +200,10 @@ Use when the task is simple, local, low-risk, and has an obvious verification pa
 Signals:
 
 - one file or one small area
-- no new requirement semantics
+- no new requirement meaning
 - no authorization/visibility change
 - no structure/external contract change
-- no long-lived control artifact needed
+- no long-lived approved file needed
 - obvious verification command or inspection
 
 Recommended next step:
@@ -229,7 +229,7 @@ Signals:
 - one bounded objective
 - clear success condition
 - one or two verification surfaces
-- no unresolved requirement semantics
+- no unresolved requirement meaning
 - no need for a persistent goal file
 
 Recommended next step:
@@ -240,16 +240,16 @@ $writing-cybernetic-goals 为这个明确小任务写 inline /goal：<需求>
 
 ### Level 2: Bounded File Goal or Bounded Repair Goal
 
-Use when the task is multi-file or has moderate verification needs, but the control semantics are already fixed.
+Use when the task is multi-file or has moderate verification needs, but the control meaning are already fixed.
 
 Signals:
 
 - requirements are already clear
-- existing requirements analysis/solution design/goal/plan already fixes semantics and solution structure, or the user provides clear constraints
-- no unresolved requirement semantics
-- no new structure-contract, authorization, or external contract semantics
+- existing requirements analysis/solution design/goal/plan already fixes meaning and solution structure, or the user provides clear constraints
+- no unresolved requirement meaning
+- no new structure-contract, authorization, or external contract meaning
 - localized correction across observer output, source fixture, evidence channel, documentation, or one bounded workflow
-- wide read-only audit with fixed classification semantics, an explicit evaluation rubric, and a fixed report artifact
+- wide read-only audit with fixed classification meaning, an explicit evaluation rubric, and a fixed report artifact
 - moderate verification needs
 - a persistent small goal file may help, but a full pre-goal pipeline would be too heavy
 
@@ -267,7 +267,7 @@ $writing-cybernetic-goals 为这个有界修正创建小型文件 goal：<需求
 
 For Level 2 bounded file goals, the expected next step after goal creation is a direct `/goal` execution command against that small goal file. Do not recommend `$writing-cybernetic-execution-policies` by default unless the user explicitly asks for it or the task exposes unresolved control decisions.
 
-If an audit/evaluation/status-classification task names labels such as `已闭环`, `部分闭环`, `未闭环`, or `不可判定` but does not define the evidence rubric for those labels, keep the route at Level 2 and mark `Rubric Gate: required` before creating the bounded file goal.
+If an audit/evaluation/status-classification task names labels such as `已闭环`, `部分闭环`, `未闭环`, or `不可判定` but does not define the evidence rubric for those labels, keep the route at Level 2 and mark `rubric check: required` before creating the bounded file goal.
 
 If an existing feature has approved artifacts, reference them:
 
@@ -275,7 +275,7 @@ If an existing feature has approved artifacts, reference them:
 保持 <requirements analysis/design/goal/plan path> 中已确认语义和设计不变，只修正 <bounded issue>.
 ```
 
-### Level 2 With Rubric Gate
+### Level 2 With rubric check
 
 Use when execution complexity is Level 2 but the evaluation function is not yet defined.
 
@@ -283,7 +283,7 @@ Signals:
 
 - the task is an audit, evaluation, readiness check, closure check, usability judgment, completeness check, safety/stability assessment, or status classification;
 - object scope is clear enough for a bounded file goal;
-- requirement, structure-contract, authorization, or external-contract semantics are not being redesigned;
+- requirement, structure-contract, authorization, or external-contract meaning are not being redesigned;
 - labels such as complete/closed/ready/usable/pass/fail/partial/unknown are present but not operationally defined.
 
 Recommended next step:
@@ -300,19 +300,19 @@ $writing-cybernetic-goals 为这个 Level 2 有界任务创建小型文件 goal�
 
 ### Level 3: Full Pre-goal Pipeline
 
-Use when the execution agent would otherwise need to invent or revise the control structure.
+Use when the execution agent would otherwise need to invent or revise the approved work chain.
 
 Strong signals:
 
-- requirement semantics are unresolved
-- authorization or visibility semantics are unresolved
-- structure contracts, observer surfaces, and evidence channels must be coordinated and no approved control artifacts exist
-- old sensors may be stale and no sensor governance exists yet
+- requirement meaning are unresolved
+- authorization or visibility meaning are unresolved
+- structure contracts, observer surfaces, and evidence channels must be coordinated and no approved approved files exist
+- old evidence checks may be stale and no evidence check governance exists yet
 - solution structure is unresolved: objects, relationships, boundaries, flows, interfaces, or evidence model need design
-- execution requires multiple batches and phase gates not yet defined
+- execution requires multiple batches and phase checks not yet defined
 - the task would require creating or revising requirements analysis, solution design, goal, execution policy, or control review before safe execution
 - multiple subsystems are involved and the success criteria are not already frozen
-- evaluation rubric or sensor interpretation is unclear and the task is already complex enough to need full requirements analysis
+- evaluation rubric or evidence check interpretation is unclear and the task is already complex enough to need full requirements analysis
 
 Recommended next step:
 
@@ -326,9 +326,9 @@ After requirements analysis is complete and What the User Approved is Approved:
 $orchestrating-cybernetic-pregoal 根据 <requirements-path> 完成 pre-goal 编译，允许使用 subagents review。
 ```
 
-If `Design Gate: required`, do not recommend a standalone design step before orchestration for Level 3/4 work. The orchestrator must invoke or request `$designing-cybernetic-solutions` before goal writing.
+If `required design: required`, do not recommend a standalone design step before orchestration for Level 3/4 work. The orchestrator must invoke or request `$designing-cybernetic-solutions` before goal writing.
 
-If orchestration is unavailable, manually run the downstream sequence. In that manual fallback only, run solution design before goal writing when Design Gate is required:
+If orchestration is unavailable, manually run the downstream sequence. In that manual fallback only, run solution design before goal writing when required design is required:
 
 ```text
 $designing-cybernetic-solutions
@@ -338,9 +338,9 @@ $reviewing-cybernetic-control-structures
 $compiling-cybernetic-runtime-goals
 ```
 
-If Design Gate is not required or an existing design artifact is already valid, pass that state or artifact path into orchestration and skip redundant solution design.
+If required design is not required or an existing design artifact is already valid, pass that state or artifact path into orchestration and skip redundant solution design.
 
-If orchestration is unavailable and Design Gate is not required, manually run:
+If orchestration is unavailable and required design is not required, manually run:
 
 ```text
 $writing-cybernetic-goals
@@ -376,19 +376,19 @@ Score actual control uncertainty, not merely possible execution surface.
 
 | Dimension | Score |
 |---|---:|
-| New requirement semantics must be decided | +3 |
-| New authorization/visibility semantics must be decided | +3 |
-| New structure or transition semantics must be decided | +2 |
+| New requirement meaning must be decided | +3 |
+| New authorization/visibility meaning must be decided | +3 |
+| New structure or transition meaning must be decided | +2 |
 | Solution structure or design model must be decided | +3 |
 | Multiple subsystems need coordinated changes | +2 |
-| External contract semantics must change | +2 |
-| Existing sensors are likely stale and require governance | +2 |
+| External contract meaning must change | +2 |
+| Existing evidence checks are likely stale and require governance | +2 |
 | Requires multiple execution batches | +2 |
 | Requires multiple evidence channels | +1 |
 | Irreversible or live-state-impacting | +4 |
-| Existing requirements analysis/solution design/goal/plan/control review already fixes semantics and solution structure | -3 |
+| Existing requirements analysis/solution design/goal/plan/control review already fixes meaning and solution structure | -3 |
 | Task is a bounded correction inside an existing feature | -3 |
-| No structure/authorization/external-contract semantic change | -2 |
+| No structure/authorization/external-contract meaning change | -2 |
 | Goal and verification are already obvious | -1 |
 
 Guidance:
@@ -401,9 +401,9 @@ Guidance:
 
 The score is not binding. Use judgment. If the score and the downgrade pass disagree, explain why.
 
-Rubric clarity is orthogonal to the score. Missing evaluation rubric does not automatically mean Level 3; it means the selected level must list `Rubric Gate: required` unless the broader task already belongs in Level 3.
+Rubric clarity is orthogonal to the score. Missing evaluation rubric does not automatically mean Level 3; it means the selected level must list `rubric check: required` unless the broader task already belongs in Level 3.
 
-Design clarity is also orthogonal to the score. Missing solution structure means the selected level must list `Design Gate: required`; it does not create a new level suffix.
+Design clarity is also orthogonal to the score. Missing solution structure means the selected level must list `required design: required`; it does not create a new level suffix.
 
 ## Control-Decision Test
 
@@ -420,7 +420,7 @@ If the answer is only:
 - fixture cleanup
 - evidence-artifact text
 - obvious observer text
-- bounded sensor update
+- bounded evidence check update
 - local boundary-message presentation
 - stale assertion update
 
@@ -431,13 +431,13 @@ If the answer includes:
 - what the requirement means
 - who can see what
 - how visibility works
-- whether structure semantics change
-- what the target state is
+- whether structure meaning change
+- what the intended result is
 - what solution model, object relationships, boundaries, or information/state flow should be used
-- which sensors are authoritative
+- which evidence checks are authoritative
 - what observations count as good, bad, complete, partial, unknown, ready, safe, stable, usable, or passed
 - what execution policy is allowed
-- what phase gates are needed
+- what phase checks are needed
 
 then Level 3 may be appropriate.
 
@@ -453,20 +453,20 @@ core rules, gates, and downgrade pass above before using one.
 | Mistake | Fix |
 |---|---|
 | Routing by scary keywords | Route by unresolved control decisions |
-| Treating any authorization mention as Level 3 | Ask whether authorization semantics change |
-| Treating any structure mention as Level 3 | Ask whether structure semantics change |
-| Treating any evidence-artifact mention as Level 3 | Evidence artifacts alone are often Level 1/2 sensors |
+| Treating any authorization mention as Level 3 | Ask whether authorization meaning change |
+| Treating any structure mention as Level 3 | Ask whether structure meaning change |
+| Treating any evidence-artifact mention as Level 3 | Evidence artifacts alone are often Level 1/2 evidence checks |
 | Treating existing-feature fixes as new-feature work | Run the downgrade pass |
 | Recommending full pipeline for local display/fixture cleanup | Use Level 1/2 |
-| Ignoring approved requirements analysis/design/goal/plan artifacts | Downgrade when semantics and solution structure are already frozen |
+| Ignoring approved requirements analysis/design/goal/plan artifacts | Downgrade when meaning and solution structure are already frozen |
 | Listing five manual pre-goal skills when orchestrator exists | Prefer `$analyzing-cybernetic-requirements` then `$orchestrating-cybernetic-pregoal` |
-| Listing `$designing-cybernetic-solutions` as a separate Level 3/4 next step before orchestration | Keep Design Gate in Required gates and let `$orchestrating-cybernetic-pregoal` dispatch design before goal writing |
+| Listing `$designing-cybernetic-solutions` as a separate Level 3/4 next step before orchestration | Keep required design in Required gates and let `$orchestrating-cybernetic-pregoal` dispatch design before goal writing |
 | Letting small tasks use the full workflow because the user asked | Explain that the workflow is over-control and propose a lighter route |
 | Recommending execution policy after a Level 2 bounded file goal | Give the direct `/goal` path unless the user explicitly asks for policy or new control decisions appear |
 | Treating an object checklist as a completed rubric | Check the evaluation function before routing to execution |
 | Treating a requirement list as a completed design | Check whether objects, relationships, flows, boundaries, and evidence model are explicit |
-| Asking every simple task for output format | Use Output Contract Gate only when output shape affects execution, acceptance, handoff, persistence, or downstream consumption |
-| Adding special cases for words like "闭环" | Use the generic Evaluation Function Gate for all evaluative predicates |
+| Asking every simple task for output format | Use final-answer-format check only when output shape affects execution, acceptance, handoff, persistence, or downstream consumption |
+| Adding special cases for words like "闭环" | Use the generic Evaluation Function Check for all evaluative predicates |
 | Encoding gates in the routing level name | Keep `Routing decision: Level N` and list gates under `Required gates` |
 
 ## Validation Checklist
@@ -475,20 +475,20 @@ Before responding, verify:
 
 - [ ] The decision is based on unresolved control decisions, not scary keywords.
 - [ ] The downgrade pass was considered before Level 3.
-- [ ] Existing approved artifacts or confirmed semantics were considered.
-- [ ] The response distinguishes “concept sensitive” from “control structure unresolved.”
+- [ ] Existing approved artifacts or confirmed meaning were considered.
+- [ ] The response distinguishes “concept sensitive” from “approved work chain unresolved.”
 - [ ] The routing decision uses only Level 0/1/2/3/4, without suffixes.
 - [ ] Required gates are listed separately from the routing level.
-- [ ] Evaluation tasks include a rubric gate decision.
-- [ ] Output-sensitive tasks include an output contract gate decision, while simple tasks use safe defaults.
-- [ ] Tasks with unclear solution structure include a design gate decision.
+- [ ] Evaluation tasks include a rubric check decision.
+- [ ] Output-sensitive tasks include an output contract check decision, while simple tasks use safe defaults.
+- [ ] Tasks with unclear solution structure include a design check decision.
 - [ ] A complete object list is not mistaken for a complete evaluation rubric.
 - [ ] A requirement list is not mistaken for a complete solution design.
 - [ ] The recommended next step is the lightest safe workflow.
-- [ ] For Level 3/4, the response recommends `$analyzing-cybernetic-requirements`, then `$orchestrating-cybernetic-pregoal`; Design Gate remains explicit and design dispatch is owned by the orchestrator.
+- [ ] For Level 3/4, the response recommends `$analyzing-cybernetic-requirements`, then `$orchestrating-cybernetic-pregoal`; required design remains explicit and design dispatch is owned by the orchestrator.
 - [ ] For Level 0/1/2, the response does not recommend full pre-goal pipeline.
 - [ ] For Level 2 bounded file goals, the response does not recommend execution policy by default.
-- [ ] If Rubric Gate is required, the response recommends rubric analysis before execution.
-- [ ] If Output Contract Gate is required, the response routes output-contract definition through requirements analysis and solution design only when structure synthesis is needed.
-- [ ] If Design Gate is required for Level 3/4 full pre-goal work, the response says orchestration must invoke or request solution design before goal writing; direct solution design is still valid for Level 2 with Design Gate or manual fallback.
+- [ ] If rubric check is required, the response recommends rubric analysis before execution.
+- [ ] If final-answer-format check is required, the response routes output-contract definition through requirements analysis and solution design only when structure synthesis is needed.
+- [ ] If required design is required for Level 3/4 full pre-goal work, the response says orchestration must invoke or request solution design before goal writing; direct solution design is still valid for Level 2 with required design or manual fallback.
 - [ ] The response includes rejected workflow rationale.

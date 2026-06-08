@@ -10,7 +10,7 @@
         "The workflow creates or updates a goal contract file under docs/cybernetics/goals/.",
         "The workflow creates or updates an execution policy under docs/cybernetics/plans/.",
         "The workflow creates or updates a control review under docs/cybernetics/control-reviews/.",
-        "The workflow checks required Superpowers substrate status and does not silently emulate missing infrastructure.",
+        "The workflow checks required Superpowers workflow status and does not silently emulate missing infrastructure.",
         "The final /goal command references the requirements analysis, required design, goal, plan, and review files.",
         "The response does not start /goal execution.",
         "The workflow stops if review cannot converge within the maximum review cycles."
@@ -30,12 +30,12 @@
     },
     {
       "id": "distinguishes-review-and-runtime-subagent-authorization",
-      "prompt": "使用 $orchestrating-cybernetic-pregoal 编译最终 /goal。用户允许使用 subagents 做独立 review；execution policy 选择 Serial subagent-driven runtime topology。",
-      "expected_output": "The orchestrator treats the request authorization as pre-goal review-subagent authorization only, and treats runtime target-work subagents as authorized only by launching a final /goal that explicitly contains the approved subagent-driven topology.",
+      "prompt": "使用 $orchestrating-cybernetic-pregoal 编译最终 /goal。用户允许使用 subagents 做独立 review；execution policy 选择 Serial subagent-driven runtime work assignment。",
+      "expected_output": "The orchestrator treats the request authorization as pre-goal review-subagent authorization only, and treats runtime target-work subagents as authorized only by launching a final /goal that explicitly contains the approved subagent-driven work assignment.",
       "assertions": [
         "Distinguishes pre-goal review subagents from runtime target-work subagents.",
         "Does not treat review-subagent authorization as immediate runtime execution authorization.",
-        "Says runtime target-work subagents are authorized only when the final /goal carries the approved subagent-driven topology and the user launches that /goal.",
+        "Says runtime target-work subagents are authorized only when the final /goal carries the approved subagent-driven work assignment and the user launches that /goal.",
         "Requires parallel runtime subagents to have explicit human approval recorded in the execution policy and review.",
         "Does not start /goal execution."
       ]
@@ -54,7 +54,7 @@
       ]
     },
     {
-      "id": "orchestrator-blocks-without-human-setpoint-approval",
+      "id": "orchestrator-blocks-without-user-approval",
       "prompt": "Run pre-goal orchestration from a Complete requirements analysis that lacks What the User Approved.",
       "expected_output": "Blocks before solution design and asks for approval or revision of the compact control commitment.",
       "assertions": [
@@ -67,7 +67,7 @@
     },
     {
       "id": "explicit-current-message-approval-allows-orchestration",
-      "prompt": "Requirements brief is Complete and the user says: 批准这个 setpoint，进入 orchestration.",
+      "prompt": "Requirements brief is Complete and the user says: 批准这个 approved target，进入 orchestration.",
       "expected_output": "Allows orchestration because explicit approval exists and records What the User Approved: Approved before downstream stages.",
       "assertions": [
         "Records What the User Approved: Approved.",
@@ -85,7 +85,7 @@
         "The runtime goal contract references the approved control review path.",
         "The user-entered /goal points only to docs/cybernetics/runtime-goals/*.goal.md.",
         "The user-entered /goal does not say 'first write a plan'.",
-        "The user-entered /goal does not inline execution, debugging, completion-verification, topology, sensor-governance, HSA, PFB, RSC, TAP, or EHA prose.",
+        "The user-entered /goal does not inline execution, debugging, completion-verification, work assignment, evidence check-governance, What the User Approved, user-purpose evidence, result placement, what-counts-as-done, or work coverage and action limits prose.",
         "The runtime goal contract indexes the approved execution/debugging/completion-verification discipline.",
         "The pointer-only /goal tells Codex to stop if any referenced artifact is missing, not approved, or inconsistent."
       ]
@@ -96,7 +96,7 @@
       "expected_output": "The skill should create or update design when required, goal, plan, and control review paths using the same 2026-05-22-control-relationship slug and should not invent a different slug.",
       "assertions": [
         "The goal path is docs/cybernetics/goals/2026-05-22-control-relationship.md.",
-        "The design path is docs/cybernetics/designs/2026-05-22-control-relationship.md when Design Gate is required.",
+        "The design path is docs/cybernetics/designs/2026-05-22-control-relationship.md when required design is required.",
         "The plan path is docs/cybernetics/plans/2026-05-22-control-relationship.md.",
         "The review path is docs/cybernetics/control-reviews/2026-05-22-control-relationship.md.",
         "The response does not choose a different slug unless the user explicitly requested alternate output paths."
@@ -104,11 +104,11 @@
     },
     {
       "id": "review-nonconvergence-blocks",
-      "prompt": "使用 $orchestrating-cybernetic-pregoal 自动编译，requirements analysis contains What the User Approved: Approved，允许 subagents。review 两轮后仍然发现 plan 把 direct-observation semantics 改成 mediated-reporting。",
-      "expected_output": "The skill should block compilation, report the unresolved semantic conflict, and output the next allowed action rather than compiling a runtime /goal.",
+      "prompt": "使用 $orchestrating-cybernetic-pregoal 自动编译，requirements analysis contains What the User Approved: Approved，允许 subagents。review 两轮后仍然发现 plan 把 direct-observation meaning 改成 mediated-reporting。",
+      "expected_output": "The skill should block compilation, report the unresolved meaning conflict, and output the next allowed action rather than compiling a runtime /goal.",
       "assertions": [
         "The response states that review did not converge.",
-        "The response identifies the conflict between direct-observation semantics and mediated-reporting.",
+        "The response identifies the conflict between direct-observation meaning and mediated-reporting.",
         "The response does not emit a final runtime /goal command.",
         "The response points to the artifact sections that conflict.",
         "The response asks for the smallest human decision or revision needed.",
@@ -116,14 +116,14 @@
       ]
     },
     {
-      "id": "missing-required-superpowers-substrate-blocks",
+      "id": "missing-required-superpowers-workflow-blocks",
       "prompt": "使用 $orchestrating-cybernetic-pregoal 自动编译一个非平凡执行任务。$superpowers:writing-plans 不可用，但希望直接生成 approved plan 和 approved review。",
-      "expected_output": "The orchestrator blocks or reports missing planning infrastructure instead of emulating required Superpowers substrate or marking the control structure Approved.",
+      "expected_output": "The orchestrator blocks or reports missing planning infrastructure instead of emulating required Superpowers workflow or marking the approved work chain Approved.",
       "assertions": [
-        "Mentions $superpowers:writing-plans as required planning substrate for non-trivial execution policies.",
+        "Mentions $superpowers:writing-plans as required planning workflow for non-trivial execution policies.",
         "Stops or reports missing required planning infrastructure.",
         "Does not self-substitute with an ad hoc approved plan.",
-        "Does not mark the control structure Approved.",
+        "Does not mark the approved work chain Approved.",
         "Does not compile a final runtime /goal."
       ]
     },
@@ -152,8 +152,8 @@
       ]
     },
     {
-      "id": "inserts-design-stage-when-design-gate-required",
-      "prompt": "使用 $orchestrating-cybernetic-pregoal 根据 docs/cybernetics/requirements/2026-05-22-control-relationship.md 完成 pre-goal 编译，requirements analysis contains What the User Approved: Approved，允许使用 subagents review。requirements analysis 标记 Design Gate required，且 design artifact 不存在。",
+      "id": "inserts-design-stage-when-design-check-required",
+      "prompt": "使用 $orchestrating-cybernetic-pregoal 根据 docs/cybernetics/requirements/2026-05-22-control-relationship.md 完成 pre-goal 编译，requirements analysis contains What the User Approved: Approved，允许使用 subagents review。requirements analysis 标记 required design required，且 design artifact 不存在。",
       "expected_output": "The orchestrator runs or requests designing-cybernetic-solutions before goal writing, then reviews requirements analysis, design, goal, and plan.",
       "assertions": [
         "Derives design path docs/cybernetics/designs/2026-05-22-control-relationship.md.",
@@ -165,19 +165,19 @@
     },
     {
       "id": "orchestrator-cannot-skip-required-design",
-      "prompt": "Requirements analysis is Complete, contains What the User Approved: Approved, and says Design Gate: required, but no design artifact exists. Orchestrate pre-goal compilation.",
+      "prompt": "Requirements analysis is Complete, contains What the User Approved: Approved, and says required design: required, but no design artifact exists. Orchestrate pre-goal compilation.",
       "expected_output": "The orchestrator must stop before goal writing and request or invoke $designing-cybernetic-solutions.",
       "assertions": [
         "Does not create a goal contract.",
         "Does not create an execution policy.",
         "Does not synthesize solution design internally.",
-        "Reports Design Gate blocked or invokes $designing-cybernetic-solutions.",
+        "Reports required design blocked or invokes $designing-cybernetic-solutions.",
         "Records the next allowed action as RunDesign."
       ]
     },
     {
       "id": "orchestrator-blocks-when-design-skill-unavailable",
-      "prompt": "Requirements analysis is Complete, contains What the User Approved: Approved, and says Design Gate: required. $designing-cybernetic-solutions is unavailable. Orchestrate pre-goal compilation.",
+      "prompt": "Requirements analysis is Complete, contains What the User Approved: Approved, and says required design: required. $designing-cybernetic-solutions is unavailable. Orchestrate pre-goal compilation.",
       "expected_output": "The orchestrator must block and report the missing downstream design skill instead of synthesizing solution design internally.",
       "assertions": [
         "Does not synthesize solution design inside the orchestrator.",
@@ -202,14 +202,14 @@
     },
     {
       "id": "existing-design-artifact-propagates-downstream",
-      "prompt": "Requirements analysis with What the User Approved: Approved, an existing solution design artifact, goal, execution policy, and review are being orchestrated. Design Gate is already satisfied, but the design artifact exists.",
+      "prompt": "Requirements analysis with What the User Approved: Approved, an existing solution design artifact, goal, execution policy, and review are being orchestrated. required design is already satisfied, but the design artifact exists.",
       "expected_output": "The orchestrator must preserve and propagate the existing design artifact through goal, execution policy, review, and runtime compilation.",
       "assertions": [
         "Goal references the design.",
         "Execution policy references the design.",
         "Control review inputs include the design.",
         "Runtime compiler receives --design.",
-        "Does not drop the design because Design Gate is already satisfied."
+        "Does not drop the design because required design is already satisfied."
       ]
     },
     {
@@ -225,36 +225,36 @@
     },
     {
       "id": "orchestrator-returns-granularity-findings-to-policy-revision",
-      "prompt": "Control review flags execution granularity and sensor load as Major because the plan uses mechanical micro-batches and broad verification after every small edit. Orchestrate the next step.",
+      "prompt": "Control review flags execution granularity and evidence check load as Major because the plan uses mechanical micro-batches and broad verification after every small edit. Orchestrate the next step.",
       "expected_output": "The orchestrator must not tune batch granularity itself or compile runtime /goal; it returns to execution-policy revision and then review.",
       "assertions": [
         "Does not compile a runtime /goal.",
-        "Does not adjust batch granularity or sensor budget inside the orchestrator.",
+        "Does not adjust batch granularity or evidence check budget inside the orchestrator.",
         "Returns to $writing-cybernetic-execution-policies or execution-policy revision.",
         "Requires re-review before runtime compilation.",
-        "Treats execution granularity or sensor load Major/Blocking findings as blockers for runtime compilation."
+        "Treats execution granularity or evidence check load Major/Blocking findings as blockers for runtime compilation."
       ]
     },
     {
-      "id": "orchestrator-propagates-execution-topology-without-deciding-it",
-      "prompt": "Requirements contain What the User Approved: Approved. Execution policy selects Serial subagent-driven topology and control review approves it. Orchestrate runtime compilation.",
-      "expected_output": "The orchestrator verifies and propagates the selected execution topology to runtime compilation without choosing or rewriting topology itself.",
+      "id": "orchestrator-propagates-execution-work assignment-without-deciding-it",
+      "prompt": "Requirements contain What the User Approved: Approved. Execution policy selects Serial subagent-driven work assignment and control review approves it. Orchestrate runtime compilation.",
+      "expected_output": "The orchestrator verifies and propagates the selected execution work assignment to runtime compilation without choosing or rewriting work assignment itself.",
       "assertions": [
-        "Does not decide execution topology inside the orchestrator.",
-        "Requires the execution policy to contain selected execution topology.",
+        "Does not decide execution work assignment inside the orchestrator.",
+        "Requires the execution policy to contain selected execution work assignment.",
         "Propagates the execution policy path to runtime compilation.",
-        "Does not replace Serial subagent-driven topology with generic main-agent serial execution.",
-        "Blocks runtime compilation if selected execution topology is missing."
+        "Does not replace Serial subagent-driven work assignment with generic main-agent serial execution.",
+        "Blocks runtime compilation if selected execution work assignment is missing."
       ]
     },
     {
-      "id": "orchestrator-blocks-incomplete-subagent-topology",
-      "prompt": "Execution policy selects Serial subagent-driven topology but omits Context pack, Allowed actions, Return format, Integration gate, main-agent ownership, and agent workflow. Orchestrate the transition to control review or runtime compilation.",
-      "expected_output": "The orchestrator must block and return to execution-policy revision rather than letting an incomplete topology reach review/runtime compilation.",
+      "id": "orchestrator-blocks-incomplete-subagent-work assignment",
+      "prompt": "Execution policy selects Serial subagent-driven work assignment but omits Context pack, Allowed actions, Return format, Integration check, main-agent ownership, and agent workflow. Orchestrate the transition to control review or runtime compilation.",
+      "expected_output": "The orchestrator must block and return to execution-policy revision rather than letting an incomplete work assignment reach review/runtime compilation.",
       "assertions": [
-        "Does not choose or repair topology inside the orchestrator.",
-        "Reports incomplete Context Management / Execution Topology.",
-        "Requires Context pack, Allowed actions, Return format, and Integration gate for subagent-driven topology.",
+        "Does not choose or repair work assignment inside the orchestrator.",
+        "Reports incomplete Who Does The Work / Context Use.",
+        "Requires Context pack, Allowed actions, Return format, and Integration check for subagent-driven work assignment.",
         "Requires main-agent ownership.",
         "Returns to $writing-cybernetic-execution-policies or execution-policy revision.",
         "Does not compile a runtime /goal."
@@ -262,10 +262,10 @@
     },
     {
       "id": "orchestrator-blocks-level-3-main-only-without-justification",
-      "prompt": "Execution policy records Task level: Level 3 and Selected topology: Main-only, but Main-only context-load justification is missing or only says 'simpler'. Orchestrate the transition to review/runtime.",
-      "expected_output": "The orchestrator blocks and returns to execution-policy revision because Level 3 Main-only topology requires a meaningful context-load justification.",
+      "prompt": "Execution policy records Task level: Level 3 and Selected work assignment: Main-only, but Main-only context-load justification is missing or only says 'simpler'. Orchestrate the transition to review/runtime.",
+      "expected_output": "The orchestrator blocks and returns to execution-policy revision because Level 3 Main-only work assignment requires a meaningful context-load justification.",
       "assertions": [
-        "Does not decide or rewrite topology inside the orchestrator.",
+        "Does not decide or rewrite work assignment inside the orchestrator.",
         "Reports missing Main-only context-load justification.",
         "Returns to $writing-cybernetic-execution-policies or execution-policy revision.",
         "Does not compile a runtime /goal."
@@ -274,10 +274,10 @@
     {
       "id": "orchestrator-blocks-weak-context-pack",
       "prompt": "Execution policy selects Serial subagent-driven and has a delegation matrix, but Context pack only lists requirements, goal, plan and lacks Context Pack Requirements and Context Compression Rule. Orchestrate the transition to review/runtime.",
-      "expected_output": "The orchestrator blocks and returns to execution-policy revision because subagent topology lacks a bounded operating context and context compression structure.",
+      "expected_output": "The orchestrator blocks and returns to execution-policy revision because subagent work assignment lacks a bounded operating context and context compression structure.",
       "assertions": [
         "Reports incomplete Context Pack Requirements.",
-        "Requires relevant control excerpts, current batch objective, allowed artifacts/surfaces, forbidden changes, required sensors/evidence, stop conditions, and expected return format.",
+        "Requires relevant control excerpts, current batch objective, allowed artifacts/surfaces, forbidden changes, required evidence checks/evidence, stop conditions, and expected return format.",
         "Requires Context Compression Rule.",
         "Returns to $writing-cybernetic-execution-policies or execution-policy revision.",
         "Does not compile a runtime /goal."

@@ -15,81 +15,80 @@ Status: `Candidate`
 
 [What the human is trying to accomplish and why it matters.]
 
-## Confirmed Semantics
+## Confirmed Meaning
 
-[Requirement semantics from requirements analysis that this design must preserve.]
+[Requirement meaning from requirements analysis that this design must preserve.]
 
-## Design Substrate
+## Design Workflow
 
-- Design Gate: `Required`
+- required design: `Required`
 - `$superpowers:brainstorming` status: `Not required / Used / Blocked`
 - Reason: `[why brainstorming was or was not needed]`
 
 ## Answer Method Check
 
-Design must be skeleton-first. Use when HSA records an answering method or answer type.
+Design must start with the required answer path. Use when What the User Approved records how the question should be answered or what is not enough.
 
 | Element | Design |
 |---|---|
-| Approved answer method | [from HSA] |
-| Approved answer type | [from HSA] |
+| Approved answer method | [from What the User Approved] |
 | Required answer path | [design answer path] |
 | Required steps covered | [required answer-path steps and coverage status] |
-| What is not enough avoided | [yes/no + rationale; if no, stop and return to HSA revision] |
+| What is not enough avoided | [yes/no + rationale; if no, stop and return to What the User Approved revision] |
 
-## Target Skeleton Instance
+## Required Answer Path
 
-| Skeleton node | Required state / answer transition | Required evidence | Completion condition |
+| Required step | Required change or answer step | Required evidence | Completion condition |
 |---|---|---|---|
 | [S1] | [initial/intermediate state -> next state] | [evidence] | [condition] |
 
-## Support Model Mapping
+## What Supports Each Required Step
 
-Model elements exist to support skeleton nodes. Do not introduce components, actors, or mechanisms that are not mapped to a skeleton node or marked supporting-only.
+Design pieces exist to support required steps. Do not introduce components, actors, or mechanisms that are not mapped to a required step or marked supporting-only.
 
-| Skeleton node | Required support object/component/mechanism | Why needed | Evidence produced |
+| Required step | Required support object/component/mechanism | Why needed | Evidence produced |
 |---|---|---|---|
 | [S1] | [object/component/mechanism] | [reason] | [evidence] |
 
 ### Relationships
 
-[How support objects, actors, roles, or concepts relate to skeleton nodes.]
+[How support objects, actors, roles, or concepts relate to required steps.]
 
 ### Information / State Flow
 
-[How information, state, evidence, or decisions move through skeleton nodes.]
+[How information, state, evidence, or decisions move through required steps.]
 
-### Boundaries
+### Inside / Outside This Design
 
 Inside scope:
 
-- [included boundary]
+- [included item]
 
 Outside scope:
 
-- [excluded boundary]
+- [excluded item]
 
-### Alternative Skeletons / Support Models Considered
+### Alternative Answer Paths Or Support Models Considered
 
 | Option | Accepted / Rejected | Rationale |
 |---|---|---|
 | [option] | [status] | [reason] |
 
-### Design Invariants
+### Rules That Must Not Change
 
-- [invariant]
+- [rule]
 
 ## Detailed Design
 
 ### Components / Mechanisms
 
-| Component / Mechanism | Responsibility | Inputs | Outputs |
-|---|---|---|---|
-| [mechanism] | [responsibility] | [inputs] | [outputs] |
+| Component / Mechanism | Required answer step supported | Mainline or supporting-only | Responsibility | Inputs | Outputs | Evidence produced |
+|---|---|---|---|---|---|---|
+| [mechanism] | [required step] | [mainline/supporting-only] | [responsibility] | [inputs] | [outputs] | [evidence] |
 
-### Interfaces / Contracts
+### Interfaces / Agreements
 
-[External contracts, documents, events, forms, reports, procedures, or equivalent contracts.]
+[External agreements, documents, events, forms, reports, procedures, or equivalent dependencies.]
 
 ### State Model / Lifecycle
 
@@ -99,13 +98,13 @@ Outside scope:
 
 [How failure is surfaced, contained, retried, downgraded, or escalated.]
 
-### Evidence / Sensor Model
+### Evidence / Checks
 
 [What observations prove the design works and how weak/stale/unobservable evidence is handled.]
 
-### Output Contract Design
+### Final Answer Format Design
 
-Use when Output Contract Gate requires structure synthesis. Otherwise record `Not required; requirements or goal can use a safe simple output contract`.
+Use when final answer format requires structure synthesis. Otherwise record `Not required; requirements or goal can use a safe simple final answer format`.
 
 | Output element | Design |
 |---|---|
@@ -133,14 +132,14 @@ Use when Output Contract Gate requires structure synthesis. Otherwise record `No
 | Design element | Goal implication |
 |---|---|
 | [element] | [goal implication] |
-| Output Contract Design, if present | Goal must preserve the final output contract and forbid runtime substitution. |
+| Final Answer Format Design, if present | Goal must preserve the final answer format and forbid runtime substitution. |
 
 ## Design-to-Execution Mapping
 
 | Design element | Execution-policy implication |
 |---|---|
 | [element] | [execution implication] |
-| Output Contract Design, if present | Execution policy must collect and preserve the evidence/output material required by the output contract. |
+| Final Answer Format Design, if present | Execution policy must collect and preserve the evidence/output material required by the final answer format. |
 
 ## Open Design Questions
 
@@ -150,10 +149,10 @@ Use when Output Contract Gate requires structure synthesis. Otherwise record `No
 
 Review must check:
 
-- semantic fidelity to requirements analysis;
-- internal consistency of objects, relationships, flows, and boundaries;
-- evidence/sensor adequacy;
-- output-contract adequacy when Output Contract Gate required structure synthesis;
-- boundary correctness;
-- design invariants versus tactical flexibility;
+- meaning match to requirements analysis;
+- internal consistency of objects, relationships, flows, and inside/outside choices;
+- evidence/check adequacy;
+- final-answer-format adequacy when structure synthesis is required;
+- inside/outside correctness;
+- rules that must not change versus tactical flexibility;
 - suitability as source input for goal and execution policy.

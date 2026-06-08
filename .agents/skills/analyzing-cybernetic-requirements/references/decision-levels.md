@@ -10,7 +10,7 @@ Examples:
 - whether Concept X is an alias of Concept Y or an independent entity
 - whether Role A can observe all groups or only authorized groups
 - whether deferred/offline handling is inside scope
-- whether observer-visible identifier semantics are single-format or multi-format
+- whether observer-visible identifier meaning are single-format or multi-format
 - whether authorization scope is local, group-level, organization-level, or hybrid
 
 ## Level 2: Default Assumption
@@ -33,7 +33,7 @@ Examples:
 - exact timeout values
 - retry count
 - interface names
-- sensor artifact names
+- evidence check artifact names
 - structure index names
 - helper mechanism names
 - evidence artifact names

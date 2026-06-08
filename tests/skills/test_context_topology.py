@@ -7,7 +7,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 
-HSA_FIXTURE = """## What the User Approved
+USER_APPROVAL_FIXTURE = """## What the User Approved
 
 Status: `Approved`
 
@@ -17,13 +17,13 @@ Status: `Approved`
 | Input role binding | test fixture source material is approved background |
 | Primary object | context topology guard fixture |
 | Requested transformation | approved control chain to topology guard checks |
-| Non-goals | do not test HSA behavior in this fixture |
-| Purpose Feedback Boundary | covered by dedicated PFB tests |
-| Realization Surface Closure | covered by dedicated RSC tests |
+| Non-goals | do not test What the User Approved behavior in this fixture |
+| How We Know The User Purpose Was Met | covered by dedicated user-purpose evidence tests |
+| Where The Result Must Show Up | covered by dedicated result placement tests |
 | What counts as done | context-topology guard fixture is structurally ready |
 | Evidence needed to call it done | target-producing evidence is observed |
 | Non-achieved terminal report handling | report goal achieved: no |
-| Required answer path | context topology guard fixture spine |
+| Required answer path | context topology guard fixture required answer path |
 | Work covered in this run | context topology guard fixture horizon |
 | What the agent may do | local guard fixture checks |
 | Forbidden live / irreversible actions | none |
@@ -33,7 +33,7 @@ Status: `Approved`
 | Agent workflow preference | no preference |
 | Parallel execution authority | not applicable |
 | Parallelism cap | not specified |
-| Output Contract | guard output |
+| Final Answer Format | guard output |
 | Workflow fit | full pre-goal guard fixture |
 | Known assumptions | fixture-only assumptions |
 
@@ -49,14 +49,14 @@ class ContextTopologySkillTest(unittest.TestCase):
         self,
         delegation_substrate: str | None = None,
         *,
-        selected_delegation_substrate: str | None = "bounded-protocol",
+        selected_agent_workflow: str | None = "bounded-protocol",
         include_concurrency_policy: bool = True,
     ) -> str:
         substrate = delegation_substrate or "Approved bounded subagent delegation protocol for serial bounded work packages."
         selected_substrate_lines = []
-        if selected_delegation_substrate is not None:
+        if selected_agent_workflow is not None:
             selected_substrate_lines = [
-                f"Selected agent workflow: `{selected_delegation_substrate}`",
+                f"Selected agent workflow: `{selected_agent_workflow}`",
                 "",
             ]
         concurrency_lines = []
@@ -74,20 +74,20 @@ class ContextTopologySkillTest(unittest.TestCase):
                 "",
                 "- Package A",
                 "",
-                "Integration gate after each package:",
+                "Integration check after each package:",
                 "",
                 "- Main agent integrates Package A before launching any next package.",
                 "",
             ]
         return "\n".join(
             [
-                "Selected topology: `Serial subagent-driven`",
+                "Who does the work: `Serial subagent-driven`",
                 "",
                 "Task level: `Level 3`",
                 "",
                 *selected_substrate_lines,
                 *concurrency_lines,
-                "Topology rationale:",
+                "Work Assignment rationale:",
                 "",
                 "- Level 3 context load needs bounded delegation.",
                 "",
@@ -101,7 +101,7 @@ class ContextTopologySkillTest(unittest.TestCase):
                 "",
                 "Delegation matrix:",
                 "",
-                "| Work package | Executor | Context pack | Allowed actions | Return format | Integration gate |",
+                "| Work package | Executor | Context pack | Allowed actions | Return format | Integration check |",
                 "|---|---|---|---|---|---|",
                 "| Package A | serial subagent | requirements, goal, plan | inspect files | findings and evidence | main integrates result |",
                 "",
@@ -113,7 +113,7 @@ class ContextTopologySkillTest(unittest.TestCase):
                 "| Current batch objective | complete Package A bounded inspection |",
                 "| Allowed artifacts/surfaces | target files listed in package scope |",
                 "| Forbidden changes | control artifacts, scope, topology, unrelated files |",
-                "| Required sensors/evidence | command output and evidence references |",
+                "| Required evidence checks/evidence | command output and evidence references |",
                 "| Stop conditions | missing context, invariant conflict, unauthorized scope change |",
                 "| Expected return format | summary, files inspected, evidence, blockers, next integration note |",
                 "",
@@ -127,7 +127,7 @@ class ContextTopologySkillTest(unittest.TestCase):
                 "- Completed work packages: record packages integrated at the boundary.",
                 "- Subagent outputs integrated: record candidate outputs accepted into main progress state.",
                 "- Evidence produced: record evidence references and sensor interpretation.",
-                "- Deferred sensors and reasons: preserve policy-approved deferrals.",
+                "- Deferred evidence checks and reasons: preserve policy-approved deferrals.",
                 "- Unresolved blockers: record blockers requiring revision or human input.",
                 "- Deviations from policy: record deviations and whether execution must stop.",
                 "- Next allowed action: record the next policy-approved action.",
@@ -137,7 +137,7 @@ class ContextTopologySkillTest(unittest.TestCase):
     def complete_parallel_topology(
         self,
         *,
-        selected_delegation_substrate: str = "bounded-protocol",
+        selected_agent_workflow: str = "bounded-protocol",
         delegation_substrate: str | None = None,
         human_approval: str = "yes",
         dependency_independence: str = "yes",
@@ -162,14 +162,14 @@ class ContextTopologySkillTest(unittest.TestCase):
                 "",
                 "Conflict / lock model:",
                 "",
-                "| Surface / artifact / state | Lock owner | Conflict rule |",
+                "| Artifact / state / shared place | Lock owner | Conflict rule |",
                 "|---|---|---|",
                 "| area A files | Package A | exclusive lock during Wave 1 |",
                 "| area B files | Package B | exclusive lock during Wave 1 |",
                 "",
                 "Parallel wave matrix:",
                 "",
-                "| Wave | Spine frontier | Work packages | Independence proof | Shared surfaces / locks | Integration barrier |",
+                "| Wave | Required-step frontier | Work packages | Independence proof | Shared places / locks | Integration barrier |",
                 "|---|---|---|---|---|---|",
                 "| Wave 1 | S1 | Package A, Package B | areas are disjoint | exclusive per-area locks | main integrates both before next wave |",
                 "",
@@ -184,14 +184,14 @@ class ContextTopologySkillTest(unittest.TestCase):
             ]
         return "\n".join(
             [
-                "Selected topology: `Parallel subagent-driven`",
+                "Who does the work: `Parallel subagent-driven`",
                 "",
                 "Task level: `Level 3`",
                 "",
-                f"Selected agent workflow: `{selected_delegation_substrate}`",
+                f"Selected agent workflow: `{selected_agent_workflow}`",
                 "",
                 *concurrency_lines,
-                "Topology rationale:",
+                "Work Assignment rationale:",
                 "",
                 "- Independent packages can run in parallel without shared control artifacts.",
                 "",
@@ -205,7 +205,7 @@ class ContextTopologySkillTest(unittest.TestCase):
                 "",
                 "Delegation matrix:",
                 "",
-                "| Work package | Executor | Context pack | Allowed actions | Return format | Integration gate |",
+                "| Work package | Executor | Context pack | Allowed actions | Return format | Integration check |",
                 "|---|---|---|---|---|---|",
                 "| Package A | parallel subagent | requirements, goal, plan | inspect area A | findings and evidence | main integrates result |",
                 "| Package B | parallel subagent | requirements, goal, plan | inspect area B | findings and evidence | main integrates result |",
@@ -218,7 +218,7 @@ class ContextTopologySkillTest(unittest.TestCase):
                 "| Current batch objective | complete independent bounded inspections |",
                 "| Allowed artifacts/surfaces | target files listed in each package scope |",
                 "| Forbidden changes | control artifacts, scope, topology, unrelated files |",
-                "| Required sensors/evidence | command output and evidence references |",
+                "| Required evidence checks/evidence | command output and evidence references |",
                 "| Stop conditions | missing context, invariant conflict, unauthorized scope change |",
                 "| Expected return format | summary, files inspected, evidence, blockers, next integration note |",
                 "",
@@ -238,7 +238,7 @@ class ContextTopologySkillTest(unittest.TestCase):
                 "- Completed work packages: record packages integrated at the boundary.",
                 "- Subagent outputs integrated: record candidate outputs accepted into main progress state.",
                 "- Evidence produced: record evidence references and sensor interpretation.",
-                "- Deferred sensors and reasons: preserve policy-approved deferrals.",
+                "- Deferred evidence checks and reasons: preserve policy-approved deferrals.",
                 "- Unresolved blockers: record blockers requiring revision or human input.",
                 "- Deviations from policy: record deviations and whether execution must stop.",
                 "- Next allowed action: record the next policy-approved action.",
@@ -259,7 +259,7 @@ class ContextTopologySkillTest(unittest.TestCase):
         review = tmp / "review.md"
 
         requirements.write_text(
-            f"# Requirements\n\n## Requirements Analysis Status\n\nStatus: `Complete`\n\n{HSA_FIXTURE}\n",
+            f"# Requirements\n\n## Requirements Analysis Status\n\nStatus: `Complete`\n\n{USER_APPROVAL_FIXTURE}\n",
             encoding="utf-8",
         )
         goal.write_text(
@@ -273,11 +273,11 @@ class ContextTopologySkillTest(unittest.TestCase):
                     "",
                     "## Success Condition",
                     "",
-                    "Codex may report `goal achieved: yes` only when the single target-achieved predicate is satisfied.",
+                    "Codex may report `goal achieved: yes` only when the single what counts as done is satisfied.",
                     "",
-                    "- Required target-producing evidence is present.",
+                    "- Evidence needed to call it done is present.",
                     "",
-                    "## Purpose Feedback Contract",
+                    "## How We Know The User Purpose Was Met",
                     "",
                     "| Element | Requirement |",
                     "|---|---|",
@@ -285,40 +285,40 @@ class ContextTopologySkillTest(unittest.TestCase):
                     "| Purpose-realizing outcome observed | test operator can observe the approved outcome |",
                     "| Supporting Evidence | guard tests support structural readiness |",
                     "| Sufficient evidence level | internal |",
-                    "| Purpose feedback unavailable handling | report pending and smallest next observation |",
-                    "| Allowed completion wording | internal purpose feedback sufficient for this guard fixture |",
+                    "| If user-purpose evidence unavailable | report pending and smallest next observation |",
+                    "| Allowed completion wording | internal user-purpose evidence sufficient for this guard fixture |",
                     "",
-                    "## Realization Surface Contract",
+                    "## Where The Result Must Show Up",
                     "",
                     "| Element | Requirement |",
                     "|---|---|",
-                    "| Target state | context-topology guard fixture target state |",
-                    "| Required surfaces | context-topology fixture surface model |",
-                    "| Surface actions | act / inspect / preserve / exclude / discover |",
+                    "| Target state | context-topology guard fixture intended result |",
+                    "| Required result places | context-topology fixture surface model |",
+                    "| Place actions | act / inspect / preserve / exclude / discover |",
                     "| Residual reconciliation | account for old state, unknown surfaces, exclusions, preserved surfaces, and remaining mismatches |",
-                    "| RSC status wording | strongest target-realization claim requires RSC adequate |",
+                    "| Result-placement wording | strongest result claim claim requires result-placement adequate |",
                     "| Partial/unavailable handling | report partial, missing, unavailable, or not applicable with justification |",
-                    "| RSC / PFB boundary | RSC calibrates target-state and surface-closure claims while PFB calibrates human-purpose realization claims |",
+                    "| Distinction from user-purpose evidence | result-placement is distinct from How We Know The User Purpose Was Met |",
                     "",
-                    "## Target Achievement Contract",
+                    "## What Counts As Done",
                     "",
                     "| Element | Requirement |",
                     "|---|---|",
                     "| What counts as done | context-topology guard fixture is structurally ready |",
-                    "| Required target-producing evidence | target-producing evidence is observed |",
-                    "| Allowed achieved claim | only target-achieved predicate supports goal achieved: yes |",
-                    "| Steps that make the result true | context topology guard fixture spine |",
+                    "| Evidence needed to call it done | target-producing evidence is observed |",
+                    "| Allowed achieved claim | only what counts as done supports goal achieved: yes |",
+                    "| Steps that make the result true | context topology guard fixture required answer path |",
                     "",
                     "## Work Covered And Allowed Actions Contract",
                     "",
                     "| Element | Requirement |",
                     "|---|---|",
-                    "| Approved horizon | context topology guard fixture horizon |",
-                    "| Runtime-authorized actions | local guard fixture checks |",
+                    "| Work covered in this run | context topology guard fixture horizon |",
+                    "| What the agent may do | local guard fixture checks |",
                     "| Forbidden actions | none |",
                     "| Prepare-only / observe-only actions | none |",
                     "| Explicitly out-of-scope items | none |",
-                    "| Horizon completion rule | every horizon item is accounted for in this fixture |",
+                    "| Work coverage rule | every horizon item is accounted for in this fixture |",
                     "",
                 ]
             ),
@@ -340,21 +340,21 @@ class ContextTopologySkillTest(unittest.TestCase):
                     "",
                     "## Work Coverage And Action Limits Matrix",
                     "",
-                    "| Batch / surface | In approved horizon? | What the agent may do | Required runtime handling | Counts as achieved? |",
+                    "| Work item / place | In work covered in this run? | What the agent may do | Required runtime handling | Counts as achieved? |",
                     "|---|---|---|---|---|",
                     "| context topology guard fixture | yes | execute | run guard / compiler fixture checks | yes if fixture passes |",
                     "",
                     "## Steps That Make The Result True",
                     "",
-                    "| Spine node | Required state transition | Required evidence |",
+                    "| Required step | Required state transition | Required evidence |",
                     "|---|---|---|",
                     "| S1 | fixture input -> context topology guard-ready chain | guard fixture files exist |",
                     "",
-                    "## Target-Producing Action Strategy",
+                    "## Action That Can Make It Done",
                     "",
-                    "Target-producing action required:",
+                    "Action that can make it done:",
                     "",
-                    "- Run or observe the target-producing action before any achieved claim.",
+                    "- Run or observe the action that can make it done before any achieved claim.",
                     "",
                     "Proof of impossibility, if any:",
                     "",
@@ -362,17 +362,17 @@ class ContextTopologySkillTest(unittest.TestCase):
                     "",
                     "Non-achieved terminal report rule:",
                     "",
-                    "- A non-achieved report may be produced only after the action is attempted and fails, or impossibility is proven.",
+                    "- A report when not done may be produced only after the action is attempted and fails, or impossibility is proven.",
                     "",
-                    "## Realization Surface Closure Strategy",
+                    "## Where The Result Must Show Up",
                     "",
-                    "### Surface Model",
+                    "### Places The Result Appears",
                     "",
                     "| Surface | Role in target realization | Required action | Verification / reconciliation |",
                     "|---|---|---|---|",
-                    "| topology fixture surface | carries fixture target state | inspect | reconcile residuals in fixture scope |",
+                    "| topology fixture surface | carries fixture intended result | inspect | reconcile residuals in fixture scope |",
                     "",
-                    "### Surface Classes",
+                    "### Place Classes",
                     "",
                     "- Must act: none for topology fixture.",
                     "- Must inspect: topology fixture surface.",
@@ -382,9 +382,9 @@ class ContextTopologySkillTest(unittest.TestCase):
                     "",
                     "### Residual Reconciliation",
                     "",
-                    "- RSC fixture residuals are not the tested behavior in this file.",
+                    "- result-placement fixture residuals are not the tested behavior in this file.",
                     "",
-                    "## Context Management / Execution Topology",
+                    "## Who Does The Work / Context Use",
                     "",
                     topology_body,
                     "",
@@ -392,7 +392,7 @@ class ContextTopologySkillTest(unittest.TestCase):
                     "",
                     "### Batch 1: context topology guard fixture",
                     "",
-                    "Spine node(s):",
+                    "Required step(s):",
                     "",
                     "- S1",
                     "",
@@ -406,7 +406,7 @@ class ContextTopologySkillTest(unittest.TestCase):
                     "",
                     "- Fixture target-producing evidence is recorded.",
                     "",
-                    "Integration gate:",
+                    "Integration check:",
                     "",
                     "- Main agent accepts S1 evidence.",
                     "",
@@ -442,54 +442,54 @@ class ContextTopologySkillTest(unittest.TestCase):
                     "- Requirements analysis: `yes`",
                     "- Goal contract: `yes`",
                     "- Execution policy: `yes`",
-                    f"- Context management / execution topology: `{review_topology_independence}`",
-                    "- Purpose feedback adequacy: `yes`",
-                    "- Realization surface closure adequacy: `yes`",
-                    "- Target achievement predicate fidelity: `yes`",
+                    f"- Who does the work / context use: `{review_topology_independence}`",
+                    "- User purpose evidence check: `yes`",
+                    "- Result placement check: `yes`",
+                    "- What counts as done check: `yes`",
                     "- answer path check: `yes`",
-                    "- Work covered in this run and authority fidelity: `yes`",
-                    "- Subagent concurrency fidelity: `yes`",
+                    "- Work covered in this run and authority check: `yes`",
+                    "- Subagent concurrency check: `yes`",
                     "",
-                    "## Context Management / Execution Topology",
+                    "## Who Does The Work / Context Use",
                     "",
                     "Findings:",
-                    "- Reviewed selected topology, context pack requirements, agent workflow, context compression, and integration gates; no Blocking/Major findings.",
+                    "- Reviewed work assignment, context pack requirements, agent workflow, context compression, and integration gates; no Blocking/Major findings.",
                     "",
-                    "## Purpose Feedback Adequacy",
+                    "## User Purpose Evidence Check",
                     "",
                     "Classification:",
-                    "- Purpose-boundary evidence not required, justified",
+                    "- Purpose-limit evidence not required, justified",
                     "",
                     "Findings:",
                     "- This guard fixture exercises internal structural readiness; internal feedback is sufficient for the fixture purpose.",
                     "",
-                    "## Realization Surface Closure Adequacy",
+                    "## Result Placement Check",
                     "",
                     "Classification:",
-                    "- RSC adequate",
+                    "- result-placement adequate",
                     "",
                     "Findings:",
-                    "- Guard fixture includes RSC structure so topology tests isolate topology behavior.",
+                    "- Guard fixture includes result placement structure so topology tests isolate topology behavior.",
                     "",
-                    "## Target Achievement Predicate Fidelity",
+                    "## What Counts As Done Check",
                     "",
                     "Findings:",
-                    "- The single target-achieved predicate is separated from non-achieved terminal reports.",
+                    "- The single what counts as done is separated from report when not dones.",
                     "",
                     "## Answer Path Check",
                     "",
                     "Findings:",
-                    "- Work packages map to the fixture spine node.",
+                    "- Work packages map to the fixture required step.",
                     "",
                     "## Work Covered And Allowed Actions Check",
                     "",
                     "Findings:",
-                    "- Approved horizon and runtime authority are compact and fixture-bounded.",
+                    "- Work covered in this run and runtime authority are compact and fixture-bounded.",
                     "",
-                    "## Subagent Concurrency Fidelity",
+                    "## Subagent Concurrency Check",
                     "",
                     "Findings:",
-                    "- Subagent execution mode matches the selected topology and fixture agent workflow.",
+                    "- Subagent execution mode matches the work assignment and fixture agent workflow.",
                     "",
                 ]
             )
@@ -521,22 +521,22 @@ class ContextTopologySkillTest(unittest.TestCase):
             / ".agents/skills/writing-cybernetic-execution-policies/assets/execution-policy-template.md"
         ).read_text(encoding="utf-8")
         registry = (
-            ROOT / ".agents/skills/references/delegation-substrate-registry.json"
+            ROOT / ".agents/skills/references/delegation-workflow-registry.json"
         )
 
         for text in (skill, template):
-            self.assertIn("Context Management / Execution Topology", text)
+            self.assertIn("Who Does The Work / Context Use", text)
             self.assertIn("Main-only", text)
             self.assertIn("Serial subagent-driven", text)
             self.assertIn("Parallel subagent-driven", text)
             self.assertIn("Context pack", text)
             self.assertIn("Return format", text)
-            self.assertIn("Integration gate", text)
+            self.assertIn("Integration check", text)
             self.assertIn("Task level", text)
             self.assertIn("Context Pack Requirements", text)
             self.assertIn("Context Compression Rule", text)
             self.assertIn("Selected agent workflow", text)
-            self.assertIn("delegation-substrate-registry.json", text)
+            self.assertIn("delegation-workflow-registry.json", text)
 
         self.assertIn("main agent owns", template.casefold())
         self.assertIn("subagent owns", template.casefold())
@@ -548,7 +548,7 @@ class ContextTopologySkillTest(unittest.TestCase):
             ROOT / ".agents/skills/orchestrating-cybernetic-pregoal/scripts/orchestration_guard.py",
             ROOT / ".agents/skills/compiling-cybernetic-runtime-goals/scripts/control_chain_guard.py",
         ):
-            self.assertIn("delegation-substrate-registry.json", guard_path.read_text(encoding="utf-8"))
+            self.assertIn("delegation-workflow-registry.json", guard_path.read_text(encoding="utf-8"))
 
     def test_review_checks_context_topology(self):
         skill = (
@@ -561,8 +561,8 @@ class ContextTopologySkillTest(unittest.TestCase):
         ).read_text(encoding="utf-8")
 
         for text in (skill, template):
-            self.assertIn("Context Management / Execution Topology", text)
-            self.assertIn("selected topology", text.casefold())
+            self.assertIn("Who Does The Work / Context Use", text)
+            self.assertIn("work assignment", text.casefold())
             self.assertIn("context pack", text.casefold())
             self.assertIn("return format", text.casefold())
             self.assertIn("integration gate", text.casefold())
@@ -623,7 +623,7 @@ class ContextTopologySkillTest(unittest.TestCase):
         self.assertIn("Use this /goal:", result.stdout)
         self.assertIn("Execute the runtime goal contract at", result.stdout)
         self.assertNotIn("$superpowers:subagent-driven-development", result.stdout)
-        self.assertIn("Selected topology: `Serial subagent-driven`", contract_text)
+        self.assertIn("Who does the work: `Serial subagent-driven`", contract_text)
         self.assertIn("Selected agent workflow: `bounded-protocol`", contract_text)
         self.assertIn("bounded delegation protocol", contract_text)
         self.assertNotIn("Execute serially according to the approved batch rhythm", result.stdout)
@@ -635,7 +635,7 @@ class ContextTopologySkillTest(unittest.TestCase):
                 tmp,
                 self.complete_serial_topology(
                     "Implementation-plan same-session delegation uses `$superpowers:subagent-driven-development` discipline for independent bounded development tasks.",
-                    selected_delegation_substrate="superpowers-subagent-driven-development",
+                    selected_agent_workflow="superpowers-subagent-driven-development",
                 ),
             )
             runtime_contract = tmp / "runtime.goal.md"
@@ -678,7 +678,7 @@ class ContextTopologySkillTest(unittest.TestCase):
             requirements, goal, plan, review = self.write_artifact_chain(
                 tmp,
                 self.complete_parallel_topology(
-                    selected_delegation_substrate="superpowers-dispatching-parallel-agents",
+                    selected_agent_workflow="superpowers-dispatching-parallel-agents",
                     delegation_substrate="Approved parallel independent-domain delegation uses `$superpowers:dispatching-parallel-agents` under the plan wave, lock, and integration barriers.",
                 ),
             )
@@ -723,7 +723,7 @@ class ContextTopologySkillTest(unittest.TestCase):
                 tmp,
                 self.complete_serial_topology(
                     "Reference note: `$superpowers:subagent-driven-development` is an implementation-plan substrate, but this task uses the plan-local bounded delegation protocol.",
-                    selected_delegation_substrate="bounded-protocol",
+                    selected_agent_workflow="bounded-protocol",
                 ),
             )
             runtime_contract = tmp / "runtime.goal.md"
@@ -791,13 +791,13 @@ class ContextTopologySkillTest(unittest.TestCase):
         output = result.stdout + result.stderr
         self.assertNotEqual(result.returncode, 0)
         self.assertIn("NEXT: RunReview", output)
-        self.assertIn("Context Management / Execution Topology", output)
+        self.assertIn("Who Does The Work / Context Use", output)
 
     def test_control_chain_guard_rejects_incomplete_subagent_topology(self):
         with tempfile.TemporaryDirectory() as tmpdir:
             requirements, goal, plan, review = self.write_artifact_chain(
                 Path(tmpdir),
-                "Selected topology: `Serial subagent-driven`\n",
+                "Who does the work: `Serial subagent-driven`\n",
             )
 
             result = subprocess.run(
@@ -826,13 +826,13 @@ class ContextTopologySkillTest(unittest.TestCase):
         self.assertIn("NEXT: RunExecutionPolicy", output)
         self.assertIn("Context pack", output)
         self.assertIn("Return format", output)
-        self.assertIn("Integration gate", output)
+        self.assertIn("Integration check", output)
 
-    def test_guards_reject_missing_selected_delegation_substrate(self):
+    def test_guards_reject_missing_selected_agent_workflow(self):
         with tempfile.TemporaryDirectory() as tmpdir:
             requirements, goal, plan, review = self.write_artifact_chain(
                 Path(tmpdir),
-                self.complete_serial_topology(selected_delegation_substrate=None),
+                self.complete_serial_topology(selected_agent_workflow=None),
             )
 
             control_guard = subprocess.run(
@@ -881,11 +881,11 @@ class ContextTopologySkillTest(unittest.TestCase):
             self.assertNotEqual(result.returncode, 0)
             self.assertIn("Selected agent workflow", output)
 
-    def test_guards_reject_none_selected_delegation_substrate_for_subagent_topology(self):
+    def test_guards_reject_none_selected_agent_workflow_for_subagent_topology(self):
         with tempfile.TemporaryDirectory() as tmpdir:
             requirements, goal, plan, review = self.write_artifact_chain(
                 Path(tmpdir),
-                self.complete_serial_topology(selected_delegation_substrate="none"),
+                self.complete_serial_topology(selected_agent_workflow="none"),
             )
 
             control_guard = subprocess.run(
@@ -937,11 +937,11 @@ class ContextTopologySkillTest(unittest.TestCase):
     def test_guards_reject_level_3_main_only_without_context_load_justification(self):
         topology_body = "\n".join(
             [
-                "Selected topology: `Main-only`",
+                "Who does the work: `Main-only`",
                 "",
                 "Task level: `Level 3`",
                 "",
-                "Topology rationale:",
+                "Work Assignment rationale:",
                 "",
                 "- simpler",
                 "",
@@ -1006,11 +1006,11 @@ class ContextTopologySkillTest(unittest.TestCase):
     def test_guards_reject_missing_task_level(self):
         topology_body = "\n".join(
             [
-                "Selected topology: `Main-only`",
+                "Who does the work: `Main-only`",
                 "",
                 "Selected agent workflow: `none`",
                 "",
-                "Topology rationale:",
+                "Work Assignment rationale:",
                 "",
                 "- local bounded work",
                 "",
@@ -1028,7 +1028,7 @@ class ContextTopologySkillTest(unittest.TestCase):
                 "- Completed work packages: present.",
                 "- Subagent outputs integrated: present.",
                 "- Evidence produced: present.",
-                "- Deferred sensors and reasons: present.",
+                "- Deferred evidence checks and reasons: present.",
                 "- Unresolved blockers: present.",
                 "- Deviations from policy: present.",
                 "- Next allowed action: present.",
@@ -1211,19 +1211,19 @@ class ContextTopologySkillTest(unittest.TestCase):
             "Concurrency selection rationale",
             "Conflict / lock model",
             "Parallel wave matrix",
-            "Spine frontier",
+            "Required-step frontier",
             "Failure policy",
             "Main-agent integration rule",
         ):
             self.assertIn(expected, plan_template)
 
-        self.assertIn("Subagent Concurrency Fidelity", review_template)
-        self.assertIn("Subagent concurrency fidelity", review_template)
+        self.assertIn("Subagent Concurrency Check", review_template)
+        self.assertIn("Subagent concurrency check", review_template)
 
-    def test_parallel_wave_matrix_requires_spine_frontier(self):
+    def test_parallel_wave_matrix_requires_required_answer_path_frontier(self):
         old_wave_matrix = self.complete_parallel_topology().replace(
-            "| Wave | Spine frontier | Work packages | Independence proof | Shared surfaces / locks | Integration barrier |",
-            "| Wave | Work packages | Independence proof | Shared surfaces / locks | Integration barrier |",
+            "| Wave | Required-step frontier | Work packages | Independence proof | Shared places / locks | Integration barrier |",
+            "| Wave | Work packages | Independence proof | Shared places / locks | Integration barrier |",
         ).replace(
             "|---|---|---|---|---|---|",
             "|---|---|---|---|---|",
@@ -1258,7 +1258,7 @@ class ContextTopologySkillTest(unittest.TestCase):
         output = result.stdout + result.stderr
         self.assertNotEqual(result.returncode, 0)
         self.assertIn("NEXT: RunExecutionPolicy", output)
-        self.assertIn("Spine frontier", output)
+        self.assertIn("Required-step frontier", output)
 
     def test_max_safe_parallel_hsa_requires_serial_downgrade_rationale(self):
         with tempfile.TemporaryDirectory() as tmpdir:
@@ -1313,7 +1313,7 @@ class ContextTopologySkillTest(unittest.TestCase):
                 Path(tmpdir),
                 self.complete_serial_topology(
                     "Implementation-plan same-session delegation uses `$superpowers:subagent-driven-development` discipline for bounded work packages.",
-                    selected_delegation_substrate="superpowers-subagent-driven-development",
+                    selected_agent_workflow="superpowers-subagent-driven-development",
                     include_concurrency_policy=False,
                 ),
             )
@@ -1387,7 +1387,7 @@ class ContextTopologySkillTest(unittest.TestCase):
             requirements, goal, plan, review = self.write_artifact_chain(
                 Path(tmpdir),
                 self.complete_parallel_topology(
-                    selected_delegation_substrate="superpowers-subagent-driven-development",
+                    selected_agent_workflow="superpowers-subagent-driven-development",
                     delegation_substrate="Invalid fixture: SDD cannot dispatch multiple implementation subagents concurrently.",
                 ),
             )
@@ -1424,7 +1424,7 @@ class ContextTopologySkillTest(unittest.TestCase):
             requirements, goal, plan, review = self.write_artifact_chain(
                 Path(tmpdir),
                 self.complete_parallel_topology(
-                    selected_delegation_substrate="superpowers-dispatching-parallel-agents",
+                    selected_agent_workflow="superpowers-dispatching-parallel-agents",
                     delegation_substrate="Approved parallel independent-domain delegation uses `$superpowers:dispatching-parallel-agents` under the plan wave, lock, and integration barriers.",
                 ),
             )
@@ -1457,7 +1457,7 @@ class ContextTopologySkillTest(unittest.TestCase):
             requirements, goal, plan, _review = self.write_artifact_chain(
                 Path(tmpdir),
                 self.complete_parallel_topology(
-                    selected_delegation_substrate="superpowers-subagent-driven-development",
+                    selected_agent_workflow="superpowers-subagent-driven-development",
                     delegation_substrate="Invalid fixture: SDD cannot dispatch multiple implementation subagents concurrently.",
                 ),
             )
@@ -1494,7 +1494,7 @@ class ContextTopologySkillTest(unittest.TestCase):
             requirements, goal, plan, _review = self.write_artifact_chain(
                 Path(tmpdir),
                 self.complete_parallel_topology(
-                    selected_delegation_substrate="superpowers-dispatching-parallel-agents",
+                    selected_agent_workflow="superpowers-dispatching-parallel-agents",
                     delegation_substrate="Approved parallel independent-domain delegation uses `$superpowers:dispatching-parallel-agents` under the plan wave, lock, and integration barriers.",
                 ),
             )
@@ -1529,7 +1529,7 @@ class ContextTopologySkillTest(unittest.TestCase):
                 tmp,
                 self.complete_serial_topology(
                     "Implementation-plan same-session delegation uses `$superpowers:subagent-driven-development` discipline for bounded work packages.",
-                    selected_delegation_substrate="superpowers-subagent-driven-development",
+                    selected_agent_workflow="superpowers-subagent-driven-development",
                 ),
             )
             requirements.write_text(
@@ -1583,7 +1583,7 @@ class ContextTopologySkillTest(unittest.TestCase):
     def test_runtime_compiler_preserves_and_can_expect_subagent_execution_mode(self):
         topology = self.complete_serial_topology(
             "Implementation-plan same-session delegation uses `$superpowers:subagent-driven-development` discipline for bounded work packages.",
-            selected_delegation_substrate="superpowers-subagent-driven-development",
+            selected_agent_workflow="superpowers-subagent-driven-development",
         )
 
         with tempfile.TemporaryDirectory() as tmpdir:
@@ -1650,11 +1650,11 @@ class ContextTopologySkillTest(unittest.TestCase):
     def test_guards_reject_weak_context_pack_requirements(self):
         weak_topology = "\n".join(
             [
-                "Selected topology: `Serial subagent-driven`",
+                "Who does the work: `Serial subagent-driven`",
                 "",
                 "Task level: `Level 3`",
                 "",
-                "Topology rationale:",
+                "Work Assignment rationale:",
                 "",
                 "- Level 3 context load needs bounded delegation.",
                 "",
@@ -1668,7 +1668,7 @@ class ContextTopologySkillTest(unittest.TestCase):
                 "",
                 "Delegation matrix:",
                 "",
-                "| Work package | Executor | Context pack | Allowed actions | Return format | Integration gate |",
+                "| Work package | Executor | Context pack | Allowed actions | Return format | Integration check |",
                 "|---|---|---|---|---|---|",
                 "| Package A | serial subagent | requirements, goal, plan | inspect files | summary | review |",
                 "",
@@ -1682,7 +1682,7 @@ class ContextTopologySkillTest(unittest.TestCase):
                 "- Completed work packages: present.",
                 "- Subagent outputs integrated: present.",
                 "- Evidence produced: present.",
-                "- Deferred sensors and reasons: present.",
+                "- Deferred evidence checks and reasons: present.",
                 "- Unresolved blockers: present.",
                 "- Deviations from policy: present.",
                 "- Next allowed action: present.",
@@ -1742,7 +1742,7 @@ class ContextTopologySkillTest(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmpdir:
             requirements, goal, plan, _review = self.write_artifact_chain(
                 Path(tmpdir),
-                "Selected topology: `Serial subagent-driven`\n",
+                "Who does the work: `Serial subagent-driven`\n",
             )
 
             result = subprocess.run(
@@ -1771,7 +1771,7 @@ class ContextTopologySkillTest(unittest.TestCase):
         self.assertIn("NEXT: RunExecutionPolicy", output)
         self.assertIn("Context pack", output)
         self.assertIn("Return format", output)
-        self.assertIn("Integration gate", output)
+        self.assertIn("Integration check", output)
 
     def test_guards_accept_complete_subagent_topology_structure(self):
         with tempfile.TemporaryDirectory() as tmpdir:

@@ -4,9 +4,9 @@
     {
       "id": "does-not-downscope-for-stability",
       "prompt": "分析需求：Actor A 查询记录时必须实时向 Group B 直接观测，Group B 再向 Entity C 直接观测；这是需求，不要改成本地汇总。",
-      "expected_output": "Preserve direct-observation semantics and treat execution risks as planning concerns.",
+      "expected_output": "Preserve direct-observation meaning and treat execution risks as planning concerns.",
       "assertions": [
-        "Treats real-time direct observation as requirement semantics.",
+        "Treats real-time direct observation as requirement meaning.",
         "Does not recommend local summary as replacement.",
         "Records timeout/pagination/partial failure as planning concerns or design questions, not scope reductions."
       ]
@@ -18,7 +18,7 @@
       "assertions": [
         "Does not ask whether the whole observer surface should fail as a blocker.",
         "Records partial results with failed node marking as a default assumption.",
-        "Asks only high-level requirement semantic questions."
+        "Asks only high-level requirement meaning questions."
       ]
     },
     {
@@ -55,7 +55,7 @@
       "prompt": "分析这个评估任务的评价口径：从观察者路径逐项核对某组能力是否闭环，分类为已闭环、部分闭环、未闭环、不可判定。",
       "expected_output": "Ask concise rubric questions about status meanings, evidence strength, minimum evidence for the strongest positive status, external-dependency handling, and whether confidence/evidence levels are needed.",
       "assertions": [
-        "Treats 已闭环/部分闭环/未闭环/不可判定 as evaluation function semantics, not execution tactics.",
+        "Treats 已闭环/部分闭环/未闭环/不可判定 as evaluation function meaning, not execution tactics.",
         "Asks what evidence is required for 已闭环.",
         "Asks which evidence is strong versus weak.",
         "Asks how to classify missing external credentials, external-only dependencies, or unobservable third-party services.",
@@ -64,7 +64,7 @@
     },
     {
       "id": "complete-rubric-analysis-routes-to-bounded-goal",
-      "prompt": "Level 2 且 Required gates: Rubric Gate required 的评价口径需求分析已完成，brief 是 docs/cybernetics/requirements/2026-05-26-closure-rubric.md，已确认已闭环/部分闭环/未闭环/不可判定的状态定义和证据等级。",
+      "prompt": "Level 2 且 Required gates: rubric check required 的评价口径需求分析已完成，brief 是 docs/cybernetics/requirements/2026-05-26-closure-rubric.md，已确认已闭环/部分闭环/未闭环/不可判定的状态定义和证据等级。",
       "expected_output": "Mark rubric analysis complete and recommend writing-cybernetic-goals for a bounded audit goal, not orchestrating-cybernetic-pregoal.",
       "assertions": [
         "Outputs that rubric analysis is complete.",
@@ -75,39 +75,39 @@
       ]
     },
     {
-      "id": "design-gate-recorded-not-resolved",
+      "id": "design-check-recorded-not-resolved",
       "prompt": "分析一个控制关系需求：目标是让 Actor A 能跨 Group B 观测 Entity C 记录，但 Actor A、Group B、Entity C、identifier、授权边界和观察概念关系都还没有定。",
-      "expected_output": "Records Design Gate required without designing the full model inside requirements analysis. For full pre-goal work, routes to pre-goal orchestration and states that the orchestrator must invoke or request solution design before goal writing.",
+      "expected_output": "Records required design required without designing the full model inside requirements analysis. For full pre-goal work, routes to pre-goal orchestration and states that the orchestrator must invoke or request solution design before goal writing.",
       "assertions": [
-        "Marks Design Gate as required.",
+        "Marks required design as required.",
         "Lists missing solution-model questions as deferred solution design questions.",
         "Does not define final object structure, interfaces, state flow, or mechanism architecture.",
         "For Level 3/4 or full pre-goal work, recommends $orchestrating-cybernetic-pregoal after requirements analysis is complete.",
         "For Level 3/4 or full pre-goal work, does not output $designing-cybernetic-solutions as a standalone pre-orchestration command.",
-        "States that $orchestrating-cybernetic-pregoal must invoke or request $designing-cybernetic-solutions before goal writing when Design Gate is required."
+        "States that $orchestrating-cybernetic-pregoal must invoke or request $designing-cybernetic-solutions before goal writing when required design is required."
       ]
     },
     {
       "id": "complete-level-3-analysis-routes-to-orchestrator-not-manual-design",
-      "prompt": "Level 3 full pre-goal requirements analysis is complete. Requirements brief is docs/cybernetics/requirements/2026-05-31-complex-training.md. Required gates include Design Gate: required, there are no open blocking requirement questions, and What the User Approved: Approved.",
-      "expected_output": "Emit a pre-goal orchestration command, predicted runtime contract path, and pointer-only /goal shape using the concrete requirements path, not a standalone solution-design command before orchestration. Explain that the orchestrator owns design dispatch when Design Gate is required, but the Design Gate dispatch note must not replace the predicted pointer-only /goal.",
+      "prompt": "Level 3 full pre-goal requirements analysis is complete. Requirements brief is docs/cybernetics/requirements/2026-05-31-complex-training.md. Required gates include required design: required, there are no open blocking requirement questions, and What the User Approved: Approved.",
+      "expected_output": "Emit a pre-goal orchestration command, predicted runtime contract path, and pointer-only /goal shape using the concrete requirements path, not a standalone solution-design command before orchestration. Explain that the orchestrator owns design dispatch when required design is required, but the required design dispatch note must not replace the predicted pointer-only /goal.",
       "assertions": [
         "Outputs a command invoking $orchestrating-cybernetic-pregoal with docs/cybernetics/requirements/2026-05-31-complex-training.md.",
         "Requires What the User Approved: Approved before handoff.",
         "Outputs predicted downstream artifact paths that include docs/cybernetics/designs/2026-05-31-complex-training.md as the expected design path.",
-        "States that the Design Gate dispatch note does not replace the predicted pointer-only /goal.",
+        "States that the required design dispatch note does not replace the predicted pointer-only /goal.",
         "Does not output a standalone $designing-cybernetic-solutions command as a separate next step before orchestration.",
-        "States that the orchestrator must invoke or request $designing-cybernetic-solutions before goal writing because Design Gate is required.",
+        "States that the orchestrator must invoke or request $designing-cybernetic-solutions before goal writing because required design is required.",
         "Does not create a solution design inside requirements analysis.",
         "Does not recommend direct goal writing for this Level 3 full pre-goal workflow."
       ]
     },
     {
-      "id": "output-contract-gate-for-decision-report",
+      "id": "output-contract-check-for-decision-report",
       "prompt": "分析需求：核对一组能力是否已闭环，结果要给管理者决策使用，需要证据引用和未决项。",
-      "expected_output": "Identifies Output Contract Gate and records audience, purpose, medium, structure needs, evidence references, and acceptance condition without designing the full report schema.",
+      "expected_output": "Identifies final-answer-format check and records audience, purpose, medium, structure needs, evidence references, and acceptance condition without designing the full report schema.",
       "assertions": [
-        "Includes Output Contract Gate under Required Gates.",
+        "Includes final-answer-format check under Required Gates.",
         "Identifies audience and purpose.",
         "Records medium, detail level, evidence-reference needs, machine-readable needs, destination path, and acceptance condition when known or defaultable.",
         "Does not assume free-form chat is sufficient for a decision report.",
@@ -119,7 +119,7 @@
       "prompt": "分析需求：修正一个局部拼写错误并简单说明修改结果。",
       "expected_output": "Uses a safe default output contract and does not ask output-format questions because the output shape is obvious and low-risk.",
       "assertions": [
-        "Marks Output Contract Gate as not applicable or satisfied.",
+        "Marks final-answer-format check as not applicable or satisfied.",
         "Uses a simple chat summary or equivalent safe default.",
         "Does not ask the human to choose audience, medium, structure, or destination.",
         "Does not escalate to solution design for output structure."

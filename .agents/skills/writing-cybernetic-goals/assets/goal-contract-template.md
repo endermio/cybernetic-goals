@@ -12,74 +12,74 @@
 
 Codex may report `goal achieved: yes` only when:
 
-- the What counts as done in `Target Achievement Contract` is satisfied;
-- the Purpose Feedback Contract permits an achieved claim;
-- the Realization Surface Contract, when applicable, permits the corresponding target-realization claim.
+- the What counts as done in `What Counts As Done` is satisfied;
+- the How We Know The User Purpose Was Met permits an achieved claim;
+- the Where The Result Must Show Up, when applicable, permits the corresponding result claim.
 
-No partial, diagnostic, blocked, invalid, unavailable, fallback, or non-achieved report status may satisfy this success condition.
+No partial, diagnostic, blocked, invalid, unavailable, fallback, or report-when-not-done status may satisfy this success condition.
 
-## Purpose Feedback Contract
+## How We Know The User Purpose Was Met
 
 | Element | Requirement |
 |---|---|
 | Beneficiary / observer | [who can observe whether purpose is realized] |
 | Purpose-realizing outcome observed | [what observable change counts as purpose achievement] |
 | Supporting Evidence | [internal/integration checks that support progress or diagnosis] |
-| Sufficient evidence level | `internal / integration / purpose-boundary / operational` |
-| Purpose feedback unavailable handling | [honest status and smallest next observation] |
+| Sufficient evidence level | `internal / integration / purpose-limit / operational` |
+| If user-purpose evidence unavailable | [honest status and smallest next observation] |
 | Allowed completion wording | [achieved / partially observed / pending / unavailable / not required with justification] |
 
-Do not define success as internal sensor success unless the human purpose is internal-state correctness.
+Do not define success as internal evidence check success unless the human purpose is internal-state correctness.
 
-## Realization Surface Contract
+## Where The Result Must Show Up
 
-Use this section when the task changes or realizes target state across controlled-object surfaces.
+Use this section when the task changes or realizes intended result across controlled-object result places.
 
 | Element | Requirement |
 |---|---|
-| Target state | [state or semantic change that must be realized] |
-| Required surfaces | [surface model or classes that carry target-state realization] |
-| Surface actions | [act / inspect / preserve / exclude / discover] |
-| Residual reconciliation | [old state, unknown surfaces, exclusions, preserved surfaces, and remaining mismatches to account for] |
-| RSC status wording | strongest positive target-realization claim requires RSC adequate |
+| Intended result | [state or meaning change that must be realized] |
+| Required result places | [result place model or classes that carry intended-result realization] |
+| Place actions | [act / inspect / preserve / exclude / discover] |
+| Residual reconciliation | [old state, unknown result places, exclusions, preserved result places, and remaining mismatches to account for] |
+| Result-placement wording | strongest positive result claim requires result-placement adequate |
 | Partial/unavailable handling | partial, missing, unavailable, or not applicable with justification |
-| RSC / PFB boundary | RSC is distinct from Purpose Feedback Boundary; RSC calibrates target-state and surface-closure claims, while PFB calibrates human-purpose realization claims. |
+| Distinction from user-purpose evidence | result-placement is distinct from How We Know The User Purpose Was Met; result-placement evidence supports intended-result claims while user-purpose evidence supports purpose claims. |
 
-## Target Achievement Contract
+## What Counts As Done
 
 | Element | Requirement |
 |---|---|
-| What counts as done | [the only predicate that allows `goal achieved: yes`] |
-| Required target-producing evidence | [what must be observed, produced, run, or measured] |
-| Allowed achieved claim | [exact wording allowed only when the predicate is met] |
-| Steps that make the result true | [state-transition path or execution-policy spine that produces the predicate] |
+| What counts as done | [the only what counts as done that allows `goal achieved: yes`] |
+| Evidence needed to call it done | [what must be observed, produced, run, or measured] |
+| Allowed achieved claim | [exact wording allowed only when the what counts as done is met] |
+| Steps that make the result true | [state-transition path or execution-policy required answer path that produces the what counts as done] |
 
-Non-achieved terminal reports are not target states and must not be listed here.
+report when not done are not intended results and must not be listed here.
 
-Target Achievement Predicate Fidelity calibrates whether the achieved claim matches the approved predicate. PFB calibrates purpose feedback. RSC calibrates target-state surface closure.
+The achieved claim must match what counts as done. User-purpose evidence and result-placement evidence are separate checks.
 
 ## Work Covered And Allowed Actions Contract
 
 | Element | Requirement |
 |---|---|
-| Approved horizon | [complete execution scope approved for this goal; do not shrink it to the first safe segment] |
-| Runtime-authorized actions | [actions runtime may execute directly] |
+| Work covered in this run | [complete execution scope approved for this goal; do not shrink it to the first safe segment] |
+| What the agent may do | [actions runtime may execute directly] |
 | Forbidden actions | [live, remote, destructive, irreversible, or externally risky actions runtime must not execute] |
-| Prepare-only / observe-only actions | [actions in the approved horizon that runtime may only prepare, observe, document, or report not executed] |
-| Explicitly out-of-scope items | [items excluded from this goal by HSA, not merely unauthorized] |
-| Horizon completion rule | [how every horizon item is accounted for: executed / prepared-only / forbidden-not-executed / explicitly out-of-scope by HSA] |
+| Prepare-only / observe-only actions | [actions in the work covered in this run that runtime may only prepare, observe, document, or report not executed] |
+| Explicitly out-of-scope items | [items excluded from this goal by requirements approval, not merely unauthorized] |
+| Work coverage rule | [how every work covered in this run item is accounted for: executed / prepared-only / forbidden-not-executed / explicitly out-of-scope by requirements approval] |
 
-Authority limits change runtime handling, not the approved horizon. Do not move approved horizon items to future roadmap or handoff unless What the User Approved explicitly excludes them from this goal.
+Authority limits change runtime handling, not the work covered in this run. Do not move work covered in this run items to future roadmap or handoff unless What the User Approved explicitly excludes them from this goal.
 
 ## Source of Truth
 
 Read first:
 
 - [requirements analysis brief]
-- [solution design, if Design Gate is required or a design exists]
+- [solution design, if required design is required or a design exists]
 - [relevant docs]
 
-## Scope and Boundaries
+## Allowed And Forbidden Work
 
 Allowed:
 
@@ -89,18 +89,18 @@ Forbidden unless explicitly approved:
 
 - [forbidden areas]
 
-## Invariants
+## Rules That Must Not Change
 
 Do not regress:
 
-- [semantic invariant]
-- [security/permission invariant]
+- [meaning rule]
+- [security/permission rule]
 
-## Verification Surface
+## Verification Checks
 
 Supporting Evidence:
 
-- [internal checks, scripts, lint, API smoke, reports, or other sensors]
+- [internal checks, scripts, lint, API smoke, reports, or other evidence checks]
 
 Focused checks:
 
@@ -114,7 +114,7 @@ Artifact checks:
 
 - [evidence artifacts/logs/evaluation reports]
 
-## Final Output Contract
+## Final Answer Format
 
 Use this section when output shape affects execution, acceptance, handoff, persistence, or downstream consumption. For simple tasks, record the safe default briefly or mark `Not required; simple response is sufficient`.
 
@@ -134,7 +134,7 @@ Runtime must not substitute a different audience, purpose, medium, structure, de
 
 ## Evaluation Rubric / Error Function
 
-Use this section for audit, evaluation, readiness, closure, completeness, usability, safety, stability, coverage, correctness, or status-classification goals.
+Use this section for audit, evaluation, readiness, result placement, completeness, usability, safety, stability, coverage, correctness, or status-classification goals.
 
 | Rubric element | Confirmed meaning |
 |---|---|
@@ -154,13 +154,13 @@ For each checkpoint:
 3. Run focused verification.
 4. If verification fails, inspect evidence and repair.
 5. Update progress log.
-6. Run broader verification only at integration gates or final gate.
+6. Run broader verification only at integration gates or final check.
 
 ## Repair Policy
 
 - Use root-cause debugging for unclear failures.
-- Do not weaken semantic invariants to satisfy sensors.
-- Do not treat stale sensors as authoritative.
+- Do not weaken meaning rules that cannot change to satisfy evidence checks.
+- Do not treat stale evidence checks as authoritative.
 - Stop if a confirmed human decision must be changed.
 
 ## Progress Log
@@ -207,20 +207,20 @@ When complete, report:
 - goal achieved: yes/no
 - what counts as done met: yes/no
 - target-producing evidence
-- if no: non-achieved reason
+- if no: not done reason
 - if no: target-producing action attempted or proof of impossibility
 - if no: smallest next target-producing attempt
 - work covered in this run
-- horizon coverage: complete / partial / unavailable / explicitly bounded by HSA
+- work covered in this run coverage: complete / partial / unavailable / explicitly bounded by requirements approval
 - executed
 - prepared-only
 - forbidden-not-executed
-- explicitly out-of-scope by HSA
-- purpose feedback status: achieved / partially observed / pending / unavailable / not required with justification
+- explicitly out-of-scope by requirements approval
+- user purpose evidence status: achieved / partially observed / pending / unavailable / not required with justification
 - highest purpose-relevant evidence observed
-- RSC status: adequate / partial / missing / unavailable / not applicable with justification
-- highest target-realization evidence observed
-- residuals, unknown surfaces, and smallest next reconciliation
+- Result-placement status: adequate / partial / missing / unavailable / not applicable with justification
+- highest result claim evidence observed
+- residuals, unknown result places, and smallest next reconciliation
 - supporting internal/integration evidence
 - not yet observed
 - smallest next observation needed

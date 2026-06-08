@@ -8,29 +8,29 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 
-HSA_FIXTURE = """## What the User Approved
+USER_APPROVAL_FIXTURE = """## What the User Approved
 
 Status: `Approved`
 
 | Element | Commitment |
 |---|---|
-| Human purpose | keep realization surface guard fixtures focused on RSC behavior |
+| Human purpose | keep realization surface guard fixtures focused on result-placement behavior |
 | Input role binding | test fixture source material is approved background |
 | Primary object | realization surface guard fixture |
-| Requested transformation | approved control chain to RSC guard checks |
-| Non-goals | do not test HSA behavior in this fixture |
-| Purpose Feedback Boundary | covered by compact fixture |
-| Realization Surface Closure | dedicated test target |
-| What counts as done | target-producing evidence is observed |
-| Evidence needed to call it done | target-producing evidence is observed |
+| Requested transformation | approved control chain to result-placement guard checks |
+| Non-goals | do not test What the User Approved behavior in this fixture |
+| How We Know The User Purpose Was Met | covered by compact fixture |
+| Where The Result Must Show Up | dedicated test target |
+| What counts as done | evidence needed to call it done is observed |
+| Evidence needed to call it done | evidence needed to call it done is observed |
 | Non-achieved terminal report handling | report goal achieved: no |
-| Required answer path | RSC guard fixture spine |
-| Work covered in this run | RSC guard fixture horizon |
+| Required answer path | result-placement guard fixture required answer path |
+| Work covered in this run | result-placement guard fixture horizon |
 | What the agent may do | local guard fixture checks |
 | Forbidden live / irreversible actions | none |
 | Required handling for unauthorized actions | none |
 | Explicitly out-of-scope items | none |
-| Output Contract | guard output |
+| Final Answer Format | guard output |
 | Workflow fit | full pre-goal guard fixture |
 | Known assumptions | fixture-only assumptions |
 
@@ -62,7 +62,7 @@ class RealizationSurfaceClosureTest(unittest.TestCase):
         review = tmp / "review.md"
 
         requirements.write_text(
-            f"# Requirements\n\n## Requirements Analysis Status\n\nStatus: `Complete`\n\n{HSA_FIXTURE}\n",
+            f"# Requirements\n\n## Requirements Analysis Status\n\nStatus: `Complete`\n\n{USER_APPROVAL_FIXTURE}\n",
             encoding="utf-8",
         )
 
@@ -75,11 +75,11 @@ class RealizationSurfaceClosureTest(unittest.TestCase):
             "",
             "## Success Condition",
                     "",
-                    "Codex may report `goal achieved: yes` only when the single target-achieved predicate is satisfied.",
+                    "Codex may report `goal achieved: yes` only when the single what counts as done is satisfied.",
                     "",
-                    "- Required target-producing evidence is present.",
+                    "- Evidence needed to call it done is present.",
                     "",
-                    "## Purpose Feedback Contract",
+                    "## How We Know The User Purpose Was Met",
             "",
             "| Element | Requirement |",
             "|---|---|",
@@ -87,47 +87,47 @@ class RealizationSurfaceClosureTest(unittest.TestCase):
             "| Purpose-realizing outcome observed | operator can observe the intended result |",
             "| Supporting Evidence | internal checks support progress only |",
             "| Sufficient evidence level | purpose-boundary |",
-            "| Purpose feedback unavailable handling | report pending and next observation |",
-            "| Allowed completion wording | pending until purpose feedback is observed |",
+            "| If user-purpose evidence unavailable | report pending and next observation |",
+            "| Allowed completion wording | pending until user-purpose evidence is observed |",
             "",
         ]
         if include_goal_rsc:
             rsc_rows = [
                 "| Target state | target semantics are represented across realization surfaces |",
-                "| Required surfaces | surface model, action classification, residual reconciliation |",
+                "| Required result places | surface model, action classification, residual reconciliation |",
             ]
             if complete_goal_rsc_fields:
                 rsc_rows.extend(
                     [
-                        "| Surface actions | act / inspect / preserve / exclude / discover |",
+                        "| Place actions | act / inspect / preserve / exclude / discover |",
                         "| Residual reconciliation | account for old state, unknown surfaces, exclusions, preserved surfaces, and remaining mismatches |",
-                        "| RSC status wording | strongest target-realization claim requires RSC adequate |",
+                        "| Result-placement wording | strongest result claim claim requires result-placement adequate |",
                         "| Partial/unavailable handling | report partial, missing, unavailable, or not applicable with justification |",
-                        "| RSC / PFB boundary | RSC calibrates target-state and surface-closure claims while PFB calibrates human-purpose realization claims |",
+                        "| Distinction from user-purpose evidence | result-placement is distinct from How We Know The User Purpose Was Met |",
                     ]
                 )
-            goal_parts.extend(["## Realization Surface Contract", "", "| Element | Requirement |", "|---|---|", *rsc_rows, ""])
+            goal_parts.extend(["## Where The Result Must Show Up", "", "| Element | Requirement |", "|---|---|", *rsc_rows, ""])
         goal_parts.extend(
             [
-                "## Target Achievement Contract",
+                "## What Counts As Done",
                 "",
                 "| Element | Requirement |",
                 "|---|---|",
-                "| What counts as done | target-producing evidence is observed |",
-                    "| Required target-producing evidence | target-producing evidence is observed |",
-                "| Allowed achieved claim | only target-achieved predicate supports goal achieved: yes |",
-                "| Steps that make the result true | RSC guard fixture spine |",
+                "| What counts as done | evidence needed to call it done is observed |",
+                    "| Evidence needed to call it done | evidence needed to call it done is observed |",
+                "| Allowed achieved claim | only what counts as done supports goal achieved: yes |",
+                "| Steps that make the result true | result-placement guard fixture required answer path |",
                 "",
                 "## Work Covered And Allowed Actions Contract",
                 "",
                 "| Element | Requirement |",
                 "|---|---|",
-                "| Approved horizon | RSC guard fixture horizon |",
-                "| Runtime-authorized actions | local guard fixture checks |",
+                "| Work covered in this run | result-placement guard fixture horizon |",
+                "| What the agent may do | local guard fixture checks |",
                 "| Forbidden actions | none |",
                 "| Prepare-only / observe-only actions | none |",
                 "| Explicitly out-of-scope items | none |",
-                "| Horizon completion rule | every horizon item is accounted for in this fixture |",
+                "| Work coverage rule | every horizon item is accounted for in this fixture |",
                 "",
             ]
         )
@@ -147,21 +147,21 @@ class RealizationSurfaceClosureTest(unittest.TestCase):
             "",
             "## Work Coverage And Action Limits Matrix",
             "",
-            "| Batch / surface | In approved horizon? | What the agent may do | Required runtime handling | Counts as achieved? |",
+            "| Work item / place | In work covered in this run? | What the agent may do | Required runtime handling | Counts as achieved? |",
             "|---|---|---|---|---|",
-            "| RSC guard fixture | yes | execute | run guard / compiler fixture checks | yes if fixture passes |",
+            "| result-placement guard fixture | yes | execute | run guard / compiler fixture checks | yes if fixture passes |",
             "",
             "## Steps That Make The Result True",
             "",
-            "| Spine node | Required state transition | Required evidence |",
+            "| Required step | Required state transition | Required evidence |",
             "|---|---|---|",
-            "| S1 | fixture input -> RSC guard-ready chain | guard fixture files exist |",
+            "| S1 | fixture input -> result-placement guard-ready chain | guard fixture files exist |",
             "",
-            "## Target-Producing Action Strategy",
+            "## Action That Can Make It Done",
             "",
-            "Target-producing action required:",
+            "Action that can make it done:",
             "",
-            "- Run or observe the target-producing action before any achieved claim.",
+            "- Run or observe the action that can make it done before any achieved claim.",
             "",
             "Proof of impossibility, if any:",
             "",
@@ -169,34 +169,34 @@ class RealizationSurfaceClosureTest(unittest.TestCase):
             "",
             "Non-achieved terminal report rule:",
             "",
-            "- A non-achieved report may be produced only after the action is attempted and fails, or impossibility is proven.",
+            "- A report when not done may be produced only after the action is attempted and fails, or impossibility is proven.",
             "",
         ]
         if include_plan_rsc:
             if plan_rsc_not_applicable:
                 plan_parts.extend(
                     [
-                        "## Realization Surface Closure Strategy",
+                        "## Where The Result Must Show Up",
                         "",
-                        "- RSC status: `RSC not applicable with justification`",
-                        "- Why no target-state surface closure is required: this fixture only checks runtime chain structure.",
-                        "- Why no surface discovery / residual reconciliation is needed: no controlled-object target state is changed.",
-                        "- Allowed target-realization wording: do not claim target-state realization; report RSC not applicable with justification.",
+                        "- Result-placement status: `not applicable with justification`",
+                        "- Why no intended-result result placement is required: this fixture only checks runtime chain structure.",
+                        "- Why no place discovery / residual reconciliation is needed: no controlled-object intended result is changed.",
+                        "- Allowed result claim wording: do not claim intended-result realization; report not applicable with justification.",
                         "",
                     ]
                 )
             else:
                 plan_parts.extend(
                     [
-                        "## Realization Surface Closure Strategy",
+                        "## Where The Result Must Show Up",
                         "",
-                        "### Surface Model",
+                        "### Places The Result Appears",
                         "",
-                        "| Surface | Role in target realization | Required action | Verification / reconciliation |",
+                        "| Place | Role in target realization | Required action | Verification / reconciliation |",
                         "|---|---|---|---|",
                         "| controlled surfaces | carry target semantics | act / inspect | reconcile residual old state |",
                         "",
-                        "### Surface Classes",
+                        "### Place Classes",
                         "",
                         "- Must act: controlled surfaces that must change.",
                         "- Must inspect: supporting surfaces that may retain old state.",
@@ -212,15 +212,15 @@ class RealizationSurfaceClosureTest(unittest.TestCase):
                 )
         plan_parts.extend(
             [
-                "## Context Management / Execution Topology",
+                "## Who Does The Work / Context Use",
                 "",
                 "Task level: `Level 2`",
                 "",
-                "Selected topology: `Main-only`",
+                "Who does the work: `Main-only`",
                 "",
                 "Selected agent workflow: `none`",
                 "",
-                "Topology rationale:",
+                "Work Assignment rationale:",
                 "",
                 "- Bounded work fits main-only execution.",
                 "",
@@ -232,9 +232,9 @@ class RealizationSurfaceClosureTest(unittest.TestCase):
                 "",
                 "## Candidate Plan Tasks",
                 "",
-                "### Batch 1: RSC guard fixture",
+                "### Batch 1: result-placement guard fixture",
                 "",
-                "Spine node(s):",
+                "Required step(s):",
                 "",
                 "- S1",
                 "",
@@ -246,9 +246,9 @@ class RealizationSurfaceClosureTest(unittest.TestCase):
                 "",
                 "Transition evidence produced:",
                 "",
-                "- Fixture target-producing evidence is recorded.",
+                "- Fixture evidence needed to call it done is recorded.",
                 "",
-                "Integration gate:",
+                "Integration check:",
                 "",
                 "- Main agent accepts S1 evidence.",
                 "",
@@ -260,7 +260,7 @@ class RealizationSurfaceClosureTest(unittest.TestCase):
                 "",
                 "Goal:",
                 "",
-                "- Keep the RSC guard fixture structurally ready.",
+                "- Keep the result-placement guard fixture structurally ready.",
                 "",
             ]
         )
@@ -280,22 +280,22 @@ class RealizationSurfaceClosureTest(unittest.TestCase):
             "- Requirements analysis: `yes`",
             "- Goal contract: `yes`",
             "- Execution policy: `yes`",
-            "- Context management / execution topology: `yes`",
-            "- Purpose feedback adequacy: `yes`",
-            f"- Realization surface closure adequacy: `{review_independence_rsc}`",
-            "- Target achievement predicate fidelity: `yes`",
+            "- Who does the work / context use: `yes`",
+            "- User purpose evidence check: `yes`",
+            f"- Result placement check: `{review_independence_rsc}`",
+            "- What counts as done check: `yes`",
             "- answer path check: `yes`",
-            "- Work covered in this run and authority fidelity: `yes`",
+            "- Work covered in this run and authority check: `yes`",
             "",
-            "## Context Management / Execution Topology",
+            "## Who Does The Work / Context Use",
             "",
             "Findings:",
-            "- Reviewed selected topology and no Blocking/Major findings.",
+            "- Reviewed work assignment and no Blocking/Major findings.",
             "",
-            "## Purpose Feedback Adequacy",
+            "## User Purpose Evidence Check",
             "",
             "Classification:",
-            "- Internally verified, purpose feedback pending",
+            "- Internally verified, user purpose evidence pending",
             "",
             "Findings:",
             "- Internal checks are progress evidence; purpose achievement claim waits for purpose-boundary feedback.",
@@ -304,32 +304,32 @@ class RealizationSurfaceClosureTest(unittest.TestCase):
         if include_review_rsc:
             review_parts.extend(
                 [
-                    "## Realization Surface Closure Adequacy",
+                    "## Result Placement Check",
                     "",
                     "Classification:",
-                    "- RSC adequate",
+                    "- result-placement adequate",
                     "",
                     "Findings:",
-                    "- Surface model, residual reconciliation, and target-realization wording were reviewed.",
+                    "- Place model, old behavior check, and result claim wording were reviewed.",
                     "",
                 ]
             )
         review_parts.extend(
             [
-                "## Target Achievement Predicate Fidelity",
+                "## What Counts As Done Check",
                 "",
                 "Findings:",
-                "- The single target-achieved predicate is separated from non-achieved terminal reports.",
+                "- The single what counts as done is separated from report when not dones.",
                 "",
                 "## Answer Path Check",
                 "",
                 "Findings:",
-                "- Work packages map to the fixture spine node.",
+                "- Work packages map to the fixture required step.",
                 "",
                 "## Work Covered And Allowed Actions Check",
                 "",
                 "Findings:",
-                "- Approved horizon and runtime authority are compact and fixture-bounded.",
+                "- Work covered in this run and runtime authority are compact and fixture-bounded.",
                 "",
             ]
         )
@@ -359,37 +359,38 @@ class RealizationSurfaceClosureTest(unittest.TestCase):
         )
 
         for text in (skill, template):
-            self.assertIn("Realization Surface Closure", text)
-            self.assertIn("Target state", text)
-            self.assertIn("Realization surfaces", text)
-            self.assertIn("Required surface action", text)
-            self.assertIn("Residual reconciliation", text)
-            self.assertIn("RSC status", text)
-            self.assertIn("RSC is distinct from Purpose Feedback Boundary", text)
+            self.assertIn("Where The Result Must Show Up", text)
+            self.assertIn("Intended result", text)
+            self.assertIn("Required action", text)
+            self.assertIn("Old behavior check", text)
+            self.assertIn("Result-placement status", text)
+            self.assertIn("result-placement is distinct from How We Know The User Purpose Was Met", text)
+        self.assertIn("Required result places", skill)
+        self.assertIn("Places the result must appear", template)
 
         high_value_questions = skill.split("## Ask Only High-Value Human Questions", 1)[1].split(
-            "## Output Contract Gate", 1
+            "## Final Answer Format Gate", 1
         )[0]
-        self.assertIn("realization surface closure", high_value_questions)
-        self.assertIn("target state surface model", high_value_questions)
-        self.assertIn("required surface action", high_value_questions)
-        self.assertIn("residual reconciliation", high_value_questions)
-        self.assertIn("preserved/excluded surfaces", high_value_questions)
+        self.assertIn("where the result must show up", high_value_questions)
+        self.assertIn("intended result", high_value_questions)
+        self.assertIn("required result places", high_value_questions)
+        self.assertIn("required action", high_value_questions)
+        self.assertIn("old behavior check", high_value_questions)
 
     def test_goal_preserves_rsc_contract_and_completion_wording(self):
         skill = self.read(".agents/skills/writing-cybernetic-goals/SKILL.md")
         template = self.read(".agents/skills/writing-cybernetic-goals/assets/goal-contract-template.md")
 
         self.assertIn("always for compiled runtime goals", skill)
-        self.assertIn("RSC not applicable with justification", skill)
+        self.assertIn("not applicable with justification", skill)
         for text in (skill, template):
-            self.assertIn("Realization Surface Contract", text)
-            self.assertIn("Target state", text)
-            self.assertIn("Required surfaces", text)
-            self.assertIn("RSC status wording", text)
-            self.assertIn("strongest positive target-realization claim requires RSC adequate", text)
+            self.assertIn("Where The Result Must Show Up", text)
+            self.assertIn("Intended result", text)
+            self.assertIn("Required result places", text)
+            self.assertIn("Result-placement wording", text)
+            self.assertIn("strongest positive result claim requires result-placement adequate", text)
             self.assertIn("partial, missing, unavailable, or not applicable with justification", text)
-            self.assertIn("RSC is distinct from Purpose Feedback Boundary", text)
+            self.assertIn("result-placement is distinct from How We Know The User Purpose Was Met", text)
 
     def test_execution_policy_defines_rsc_strategy(self):
         skill = self.read(".agents/skills/writing-cybernetic-execution-policies/SKILL.md")
@@ -398,11 +399,11 @@ class RealizationSurfaceClosureTest(unittest.TestCase):
         )
 
         for text in (skill, template):
-            self.assertIn("Realization Surface Closure Strategy", text)
+            self.assertIn("Where The Result Must Show Up", text)
             self.assertIn("always include", text)
-            self.assertIn("RSC not applicable with justification", text)
-            self.assertIn("Surface Model", text)
-            self.assertIn("Surface Classes", text)
+            self.assertIn("not applicable with justification", text)
+            self.assertIn("Places The Result Appears", text)
+            self.assertIn("Place Classes", text)
             self.assertIn("Residual Reconciliation", text)
             self.assertIn("Must act", text)
             self.assertIn("Must inspect", text)
@@ -417,10 +418,10 @@ class RealizationSurfaceClosureTest(unittest.TestCase):
         progress_log = template.split("## Progress Log Rules", 1)[1]
 
         for required in (
-            "RSC status",
-            "surfaces acted on or inspected",
+            "Result-placement status",
+            "places acted on or inspected",
             "residuals and reconciliation",
-            "allowed target-realization wording",
+            "allowed result claim wording",
         ):
             self.assertIn(required, progress_log)
 
@@ -431,13 +432,13 @@ class RealizationSurfaceClosureTest(unittest.TestCase):
         )
 
         for text in (skill, template):
-            self.assertIn("Realization Surface Closure Adequacy", text)
-            self.assertIn("RSC adequate", text)
-            self.assertIn("RSC partial", text)
-            self.assertIn("RSC missing", text)
-            self.assertIn("RSC unavailable", text)
-            self.assertIn("RSC not applicable with justification", text)
-            self.assertIn("local action is being treated as global target-state realization", text)
+            self.assertIn("Result Placement Check", text)
+            self.assertIn("result-placement adequate", text)
+            self.assertIn("result-placement partial", text)
+            self.assertIn("result-placement missing", text)
+            self.assertIn("result-placement unavailable", text)
+            self.assertIn("not applicable with justification", text)
+            self.assertIn("local action is being treated as global intended-result realization", text)
 
     def test_runtime_compiler_calibrates_rsc_completion_claims(self):
         skill = self.read(".agents/skills/compiling-cybernetic-runtime-goals/SKILL.md")
@@ -449,14 +450,14 @@ class RealizationSurfaceClosureTest(unittest.TestCase):
         )
 
         for text in (skill, template, compiler):
-            self.assertIn("Realization Surface", text)
-            self.assertIn("realization surfaces covered, actions completed or justified, residuals reconciled", text)
+            self.assertIn("Where The Result Must Show Up", text)
+            self.assertIn("result places covered, actions completed or justified, old behavior checked", text)
         preconditions = skill.split("## Preconditions", 1)[1].split("## Runtime Goal Contract", 1)[0]
-        self.assertIn("goal includes a compact `Purpose Feedback Contract`", preconditions)
-        self.assertIn("control review records `Purpose feedback adequacy: yes`", preconditions)
-        self.assertIn("goal includes a compact `Realization Surface Contract`", preconditions)
-        self.assertIn("execution policy includes `Realization Surface Closure Strategy`", preconditions)
-        self.assertIn("control review records `Realization surface closure adequacy: yes`", preconditions)
+        self.assertIn("goal includes a compact `How We Know The User Purpose Was Met`", preconditions)
+        self.assertIn("control review records `User purpose evidence check: yes`", preconditions)
+        self.assertIn("goal includes a compact `Where The Result Must Show Up`", preconditions)
+        self.assertIn("execution policy includes `Where The Result Must Show Up`", preconditions)
+        self.assertIn("control review records `Result placement check: yes`", preconditions)
 
         with tempfile.TemporaryDirectory() as tmpdir:
             tmp = Path(tmpdir)
@@ -488,11 +489,11 @@ class RealizationSurfaceClosureTest(unittest.TestCase):
 
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
         self.assertIn("Use this /goal:", result.stdout)
-        self.assertNotIn("Realization Surface Closure", result.stdout)
-        self.assertIn("Realization Surface Contract", contract_text)
-        self.assertIn("Realization Surface Closure Strategy", contract_text)
-        self.assertIn("Realization Surface Closure Adequacy", contract_text)
-        self.assertIn("realization surfaces covered, actions completed or justified, residuals reconciled", contract_text)
+        self.assertNotIn("Where The Result Must Show Up", result.stdout)
+        self.assertIn("Where The Result Must Show Up", contract_text)
+        self.assertIn("Where The Result Must Show Up", contract_text)
+        self.assertIn("Result Placement Check", contract_text)
+        self.assertIn("result places covered, actions completed or justified, old behavior checked", contract_text)
 
     def test_control_chain_guard_rejects_goal_missing_rsc_contract(self):
         with tempfile.TemporaryDirectory() as tmpdir:
@@ -525,7 +526,7 @@ class RealizationSurfaceClosureTest(unittest.TestCase):
         output = result.stdout + result.stderr
         self.assertNotEqual(result.returncode, 0)
         self.assertIn("NEXT: RunGoalWriting", output)
-        self.assertIn("Realization Surface Contract", output)
+        self.assertIn("Where The Result Must Show Up", output)
 
     def test_control_chain_guard_rejects_goal_rsc_contract_missing_required_fields(self):
         with tempfile.TemporaryDirectory() as tmpdir:
@@ -558,9 +559,9 @@ class RealizationSurfaceClosureTest(unittest.TestCase):
         output = result.stdout + result.stderr
         self.assertNotEqual(result.returncode, 0)
         self.assertIn("NEXT: RunGoalWriting", output)
-        self.assertIn("goal Realization Surface Contract missing Surface actions", output)
-        self.assertIn("goal Realization Surface Contract missing Residual reconciliation", output)
-        self.assertIn("goal Realization Surface Contract missing RSC / PFB boundary", output)
+        self.assertIn("goal Where The Result Must Show Up missing Place actions", output)
+        self.assertIn("goal Where The Result Must Show Up missing Residual reconciliation", output)
+        self.assertIn("goal Where The Result Must Show Up missing Distinction from user-purpose evidence", output)
 
     def test_control_chain_guard_rejects_plan_missing_rsc_strategy(self):
         with tempfile.TemporaryDirectory() as tmpdir:
@@ -593,7 +594,7 @@ class RealizationSurfaceClosureTest(unittest.TestCase):
         output = result.stdout + result.stderr
         self.assertNotEqual(result.returncode, 0)
         self.assertIn("NEXT: RunExecutionPolicy", output)
-        self.assertIn("Realization Surface Closure Strategy", output)
+        self.assertIn("Where The Result Must Show Up", output)
 
     def test_control_chain_guard_accepts_rsc_not_applicable_plan_strategy(self):
         with tempfile.TemporaryDirectory() as tmpdir:
@@ -658,8 +659,8 @@ class RealizationSurfaceClosureTest(unittest.TestCase):
         output = result.stdout + result.stderr
         self.assertNotEqual(result.returncode, 0)
         self.assertIn("NEXT: RunReview", output)
-        self.assertIn("Realization Surface Closure Adequacy", output)
-        self.assertIn("Realization surface closure adequacy: yes", output)
+        self.assertIn("Result Placement Check", output)
+        self.assertIn("Result placement check: yes", output)
 
     def test_rsc_evals_cover_false_completion_and_not_applicable_justification(self):
         review_evals = json.loads(
@@ -672,18 +673,18 @@ class RealizationSurfaceClosureTest(unittest.TestCase):
         review_ids = {item["id"] for item in review_evals["evals"]}
         compiler_ids = {item["id"] for item in compiler_evals["evals"]}
 
-        self.assertIn("local-action-cannot-claim-target-realization-without-rsc", review_ids)
-        self.assertIn("rsc-not-applicable-requires-justification", review_ids)
-        self.assertIn("runtime-calibrates-realization-surface-closure-claims", compiler_ids)
+        self.assertIn("local-action-cannot-claim-result-without-placement", review_ids)
+        self.assertIn("result-placement-not-applicable-requires-justification", review_ids)
+        self.assertIn("runtime-calibrates-result-placement-claims", compiler_ids)
 
     def test_invariant_matrix_tracks_realization_surface_closure(self):
         matrix = self.read("docs/cybernetic-framework/invariant-artifact-consumer-matrix.md")
 
-        self.assertIn("INV-RSC-001", matrix)
-        self.assertIn("Realization Surface Closure", matrix)
-        self.assertIn("Realization Surface Closure Strategy", matrix)
-        self.assertIn("Realization Surface Closure Adequacy", matrix)
-        self.assertIn("execution policy RSC strategy", matrix)
+        self.assertIn("INV-result-placement-001", matrix)
+        self.assertIn("Where The Result Must Show Up", matrix)
+        self.assertIn("Where The Result Must Show Up", matrix)
+        self.assertIn("Result Placement Check", matrix)
+        self.assertIn("execution policy result-placement strategy", matrix)
         self.assertIn("tests/skills/test_realization_surface_closure.py", matrix)
 
 

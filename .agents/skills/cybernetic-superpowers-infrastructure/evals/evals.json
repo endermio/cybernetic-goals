@@ -16,7 +16,7 @@
         "Distinguishes pre-goal review subagent authorization from runtime target-work subagent authorization.",
         "States that unavailable required substrates cause a stop/report instead of self-substitution.",
         "States that merely mentioning a Superpowers skill or imitating generic behavior is not sufficient.",
-        "States that approval requires a final observer pass after the last substantive mutation to reviewed control artifacts.",
+        "States that approval requires a final observer pass after the last substantive mutation to reviewed approved files.",
         "Does not say every cybernetic skill must invoke every Superpowers skill."
       ]
     },

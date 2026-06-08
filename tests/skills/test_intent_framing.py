@@ -160,7 +160,7 @@ class IntentFramingSkillTest(unittest.TestCase):
         )
         folded = orchestrator.casefold()
 
-        self.assertIn("Workflow Fit Gate", orchestrator)
+        self.assertIn("Workflow Fit Check", orchestrator)
         self.assertIn(
             "A user request to use full pre-goal compilation is not sufficient by itself.",
             orchestrator,

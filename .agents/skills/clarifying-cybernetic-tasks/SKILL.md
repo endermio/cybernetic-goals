@@ -27,4 +27,4 @@ Compatibility terms:
 - "Clarification Status" means "Requirements Analysis Status".
 - "Confirmed Decisions From Human" means "Confirmed Requirement Decisions".
 
-The boundary is unchanged: this alias may analyze requirements, rubrics, safe defaults, blocking decisions, and gates, but it must not resolve solution design, write goals, write plans, review control structures, compile runtime `/goal`, or execute target work.
+The boundary is unchanged: this alias may analyze requirements, rubrics, safe defaults, blocking decisions, and gates, but it must not resolve solution design, write goals, write plans, review approved work chains, compile runtime `/goal`, or execute target work.

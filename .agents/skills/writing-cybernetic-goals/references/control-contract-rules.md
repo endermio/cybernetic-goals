@@ -2,13 +2,13 @@
 
 A goal contract is not a runtime command. It is a frozen statement of:
 
-- target state
+- intended result
 - constraints
-- sensors
+- evidence checks
 - stop conditions
 - evidence requirements
 
-When Design Gate is required, the goal contract is downstream of the solution design. It should preserve design invariants and boundary decisions without redoing the design or freezing tactical details as semantics.
+When required design is required, the goal contract is downstream of the solution design. It should preserve design invariants and boundary decisions without redoing the design or freezing tactical details as meaning.
 
 For complex controlled work, do not let the runtime `/goal` write its own policy. The goal contract must be paired with an approved execution policy and an approved control review before execution.
 

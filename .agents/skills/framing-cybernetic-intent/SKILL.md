@@ -23,7 +23,7 @@ human situation
 
 It is not a router, requirements analyzer, planner, reviewer, or executor.
 
-## Core Boundary
+## What This Skill Owns
 
 This skill owns input role binding and collaborative intent framing before
 workflow routing.
@@ -44,7 +44,7 @@ Owned framing:
 
 Routed elsewhere:
 
-- requirements semantics go to `$analyzing-cybernetic-requirements`;
+- requirements meaning go to `$analyzing-cybernetic-requirements`;
 - workflow fit goes to `$routing-cybernetic-workflows`;
 - solution design, goal contracts, execution policies, control reviews,
   progress logs, and runtime `/goal` commands belong to their downstream skills;
@@ -115,7 +115,7 @@ Do you want these findings verified, or turned into a repair/convergence task?
 ```
 
 ```text
-Does "capability boundary" mean current system state, or future technical
+Does "capability limit" mean current system state, or future technical
 implementation limit?
 ```
 
@@ -196,7 +196,7 @@ Default to no file write.
 
 Write an intent brief only when one of these is true:
 
-- the intent frame will affect long-lived control artifacts;
+- the intent frame will affect long-lived approved files;
 - the same unresolved intent is likely to recur;
 - the user asks to record the framing;
 - future routing or requirements analysis needs a stable record of the shared

@@ -11,7 +11,7 @@ CONTROL_GUARD = ROOT / ".agents/skills/compiling-cybernetic-runtime-goals/script
 JARGON_POLICY = ROOT / ".agents/skills/references/jargon-policy.yaml"
 
 
-HSA_APPROVED = """## What the User Approved
+USER_APPROVAL_APPROVED = """## What the User Approved
 
 Status: `Approved`
 
@@ -22,18 +22,18 @@ Status: `Approved`
 | Primary object | artifact hygiene fixture |
 | Requested transformation | approved chain to runtime guard check |
 | Non-goals | do not test semantic adequacy |
-| Purpose Feedback Boundary | purpose feedback remains separately calibrated |
-| Realization Surface Closure | RSC remains separately calibrated |
+| How We Know The User Purpose Was Met | user-purpose evidence remains separately calibrated |
+| Where The Result Must Show Up | result placement remains separately calibrated |
 | What counts as done | artifact hygiene target-producing evidence is observed |
 | Evidence needed to call it done | target-producing evidence is observed |
 | Non-achieved terminal report handling | report goal achieved: no |
-| Required answer path | artifact hygiene guard fixture spine |
+| Required answer path | artifact hygiene guard fixture required answer path |
 | Work covered in this run | artifact hygiene guard fixture horizon |
 | What the agent may do | local guard fixture checks |
 | Forbidden live / irreversible actions | none |
 | Required handling for unauthorized actions | none |
 | Explicitly out-of-scope items | none |
-| Output Contract | guard output |
+| Final Answer Format | guard output |
 | Workflow fit | full pre-goal guard fixture |
 | Known assumptions | fixture-only assumptions |
 
@@ -68,7 +68,7 @@ class ArtifactHygieneTest(unittest.TestCase):
                     "",
                     "Status: `Complete`",
                     "",
-                    HSA_APPROVED,
+                    USER_APPROVAL_APPROVED,
                     "",
                     "## Confirmed Requirement Decisions",
                     "",
@@ -90,54 +90,54 @@ class ArtifactHygieneTest(unittest.TestCase):
                     "",
                     "## Success Condition",
                     "",
-                    "Codex may report `goal achieved: yes` only when the single target-achieved predicate is satisfied.",
+                    "Codex may report `goal achieved: yes` only when the single what counts as done is satisfied.",
                     "",
-                    "- Required target-producing evidence is present.",
+                    "- Evidence needed to call it done is present.",
                     "",
-                    "## Purpose Feedback Contract",
+                    "## How We Know The User Purpose Was Met",
                     "",
                     "| Element | Requirement |",
                     "|---|---|",
                     "| Beneficiary / observer | operator |",
                     "| Purpose-realizing outcome observed | operator can observe the intended result |",
                     "| Supporting Evidence | internal checks support progress only |",
-                    "| Sufficient evidence level | purpose-boundary |",
-                    "| Purpose feedback unavailable handling | report pending and next observation |",
-                    "| Allowed completion wording | pending until purpose feedback is observed |",
+                    "| Sufficient evidence level | user-purpose |",
+                    "| If user-purpose evidence unavailable | report pending and next observation |",
+                    "| Allowed completion wording | pending until user-purpose evidence is observed |",
                     "",
-                    "## Realization Surface Contract",
+                    "## Where The Result Must Show Up",
                     "",
                     "| Element | Requirement |",
                     "|---|---|",
-                    "| Target state | target semantics are represented across realization surfaces |",
-                    "| Required surfaces | surface model, action classification, residual reconciliation |",
-                    "| Surface actions | act, inspect, preserve, exclude, or discover surfaces |",
-                    "| Residual reconciliation | account for old state, unknown surfaces, exclusions, preserved surfaces, and remaining mismatches |",
-                    "| RSC status wording | strongest target-realization claim requires RSC adequate |",
+                    "| Target state | target semantics are represented across result places |",
+                    "| Required result places | result place model, action classification, residual reconciliation |",
+                    "| Place actions | act, inspect, preserve, exclude, or discover result places |",
+                    "| Residual reconciliation | account for old state, unknown result places, exclusions, preserved result places, and remaining mismatches |",
+                    "| Result-placement wording | strongest result claim claim requires result-placement adequate |",
                     "| Partial/unavailable handling | report partial, missing, unavailable, or not applicable with justification |",
-                    "| RSC / PFB boundary | RSC calibrates target-state claims while PFB calibrates human-purpose claims |",
+                    "| Distinction from user-purpose evidence | result placement calibrates intended-result claims while user-purpose evidence calibrates human-purpose claims |",
                     "",
-                    "## Target Achievement Contract",
+                    "## What Counts As Done",
                     "",
                     "| Element | Requirement |",
                     "|---|---|",
                     "| What counts as done | artifact hygiene target-producing evidence is observed |",
-                    "| Required target-producing evidence | target-producing evidence is observed |",
-                    "| Allowed achieved claim | only target-achieved predicate supports goal achieved: yes |",
-                    "| Steps that make the result true | artifact hygiene guard fixture spine |",
+                    "| Evidence needed to call it done | target-producing evidence is observed |",
+                    "| Allowed achieved claim | only what counts as done supports goal achieved: yes |",
+                    "| Steps that make the result true | artifact hygiene guard fixture required answer path |",
                     "",
                     "## Work Covered And Allowed Actions Contract",
                     "",
                     "| Element | Requirement |",
                     "|---|---|",
-                    "| Approved horizon | artifact hygiene guard fixture horizon |",
-                    "| Runtime-authorized actions | local guard fixture checks |",
+                    "| work covered in this run | artifact hygiene guard fixture horizon |",
+                    "| What the agent may do | local guard fixture checks |",
                     "| Forbidden actions | none |",
                     "| Prepare-only / observe-only actions | none |",
                     "| Explicitly out-of-scope items | none |",
-                    "| Horizon completion rule | every horizon item is accounted for in this fixture |",
+                    "| Work coverage rule | every horizon item is accounted for in this fixture |",
                     "",
-                    "## Final Output Contract",
+                    "## Final Final Answer Format",
                     "",
                     "| Element | Requirement |",
                     "|---|---|",
@@ -174,21 +174,21 @@ class ArtifactHygieneTest(unittest.TestCase):
                     "",
                     "## Work Coverage And Action Limits Matrix",
                     "",
-                    "| Batch / surface | In approved horizon? | What the agent may do | Required runtime handling | Counts as achieved? |",
+                    "| Work item / place | In work covered in this run? | What the agent may do | Required runtime handling | Counts as achieved? |",
                     "|---|---|---|---|---|",
                     "| artifact hygiene guard fixture | yes | execute | run guard / compiler fixture checks | yes if fixture passes |",
                     "",
                     "## Steps That Make The Result True",
                     "",
-                    "| Spine node | Required state transition | Required evidence |",
+                    "| Required step | Required state transition | Required evidence |",
                     "|---|---|---|",
                     "| S1 | fixture input -> artifact hygiene guard-ready chain | guard fixture files exist |",
                     "",
-                    "## Target-Producing Action Strategy",
+                    "## Action That Can Make It Done",
                     "",
-                    "Target-producing action required:",
+                    "Action that can make it done:",
                     "",
-                    "- Run or observe the target-producing action before any achieved claim.",
+                    "- Run or observe the action that can make it done before any achieved claim.",
                     "",
                     "Proof of impossibility, if any:",
                     "",
@@ -196,24 +196,24 @@ class ArtifactHygieneTest(unittest.TestCase):
                     "",
                     "Non-achieved terminal report rule:",
                     "",
-                    "- A non-achieved report may be produced only after the action is attempted and fails, or impossibility is proven.",
+                    "- A report when not done may be produced only after the action is attempted and fails, or impossibility is proven.",
                     "",
-                    "## Realization Surface Closure Strategy",
+                    "## Where The Result Must Show Up",
                     "",
-                    "- RSC status: `RSC not applicable with justification`",
-                    "- Why no target-state surface closure is required: this fixture only checks artifact hygiene.",
-                    "- Why no surface discovery / residual reconciliation is needed: no controlled-object target state is changed.",
-                    "- Allowed target-realization wording: do not claim target-state realization.",
+                    "- Result-placement status: `not applicable with justification`",
+                    "- Why no intended-result result placement is required: this fixture only checks artifact hygiene.",
+                    "- Why no place discovery / residual reconciliation is needed: no controlled-object intended result is changed.",
+                    "- Allowed result claim wording: do not claim intended-result realization.",
                     "",
-                    "## Context Management / Execution Topology",
+                    "## Who Does The Work / Context Use",
                     "",
                     "Task level: `Level 2`",
                     "",
-                    "Selected topology: `Main-only`",
+                    "Who does the work: `Main-only`",
                     "",
                     "Selected agent workflow: `none`",
                     "",
-                    "Topology rationale:",
+                    "Work Assignment rationale:",
                     "",
                     "- Bounded work fits main-only execution.",
                     "",
@@ -227,7 +227,7 @@ class ArtifactHygieneTest(unittest.TestCase):
                     "",
                     "### Batch 1: artifact hygiene guard fixture",
                     "",
-                    "Spine node(s):",
+                    "Required step(s):",
                     "",
                     "- S1",
                     "",
@@ -241,7 +241,7 @@ class ArtifactHygieneTest(unittest.TestCase):
                     "",
                     "- Fixture target-producing evidence is recorded.",
                     "",
-                    "Integration gate:",
+                    "Integration check:",
                     "",
                     "- Main agent accepts S1 evidence.",
                     "",
@@ -277,47 +277,47 @@ class ArtifactHygieneTest(unittest.TestCase):
                     "- Human setpoint fidelity: `yes`",
                     "- Goal contract: `yes`",
                     "- Execution policy: `yes`",
-                    "- Context management / execution topology: `yes`",
-                    "- Purpose feedback adequacy: `yes`",
-                    "- Realization surface closure adequacy: `yes`",
-                    "- Target achievement predicate fidelity: `yes`",
+                    "- Who does the work / context use: `yes`",
+                    "- User purpose evidence check: `yes`",
+                    "- Result placement check: `yes`",
+                    "- What counts as done check: `yes`",
                     "- answer path check: `yes`",
-                    "- Work covered in this run and authority fidelity: `yes`",
+                    "- Work covered in this run and authority check: `yes`",
                     "",
-                    "## Human Setpoint Fidelity",
+                    "## What The User Approved Check",
                     "",
                     "Findings:",
                     "- Downstream artifacts preserve the approved setpoint.",
                     "",
-                    "## Context Management / Execution Topology",
+                    "## Who Does The Work / Context Use",
                     "",
                     "Findings:",
-                    "- Reviewed selected topology.",
+                    "- Reviewed work assignment.",
                     "",
-                    "## Purpose Feedback Adequacy",
+                    "## User Purpose Evidence Check",
                     "",
                     "Findings:",
                     "- Internal checks are progress evidence only.",
                     "",
-                    "## Realization Surface Closure Adequacy",
+                    "## Result Placement Check",
                     "",
                     "Findings:",
-                    "- RSC not applicable is justified for this fixture.",
+                    "- not applicable is justified for this fixture.",
                     "",
-                    "## Target Achievement Predicate Fidelity",
+                    "## What Counts As Done Check",
                     "",
                     "Findings:",
-                    "- The single target-achieved predicate is separated from non-achieved terminal reports.",
+                    "- The single what counts as done is separated from report when not dones.",
                     "",
                     "## Answer Path Check",
                     "",
                     "Findings:",
-                    "- Work packages map to the fixture spine node.",
+                    "- Work packages map to the fixture required step.",
                     "",
                     "## Work Covered And Allowed Actions Check",
                     "",
                     "Findings:",
-                    "- Approved horizon and runtime authority are compact and fixture-bounded.",
+                    "- work covered in this run and runtime authority are compact and fixture-bounded.",
                     "",
                     "## Final Observer Check",
                     "",
@@ -396,7 +396,7 @@ class ArtifactHygieneTest(unittest.TestCase):
                         "",
                         "## Findings",
                         "",
-                        *["- must not claim purpose achievement from internal sensors alone." for _ in range(12)],
+                        *["- must not claim purpose achievement from internal evidence checks alone." for _ in range(12)],
                     ]
                 ),
                 encoding="utf-8",
@@ -408,13 +408,13 @@ class ArtifactHygieneTest(unittest.TestCase):
             self.assertIn("WARN", result.stdout)
             self.assertIn("defensive clause density", result.stdout)
 
-    def test_hygiene_lint_skips_skill_templates(self):
+    def test_hygiene_lint_checks_skill_template_language_without_artifact_noise_checks(self):
         template = ROOT / ".agents/skills/analyzing-cybernetic-requirements/assets/requirements-analysis-template.md"
 
         result = self.run_lint(template)
 
         self.assertEqual(0, result.returncode, result.stdout + result.stderr)
-        self.assertIn("SKIP", result.stdout)
+        self.assertNotIn("SKIP", result.stdout)
 
     def test_jargon_policy_exists_for_user_visible_artifacts(self):
         policy = JARGON_POLICY.read_text(encoding="utf-8")
@@ -424,6 +424,21 @@ class ArtifactHygieneTest(unittest.TestCase):
         self.assertIn("How this should be answered", policy)
         self.assertIn("Target-achieved predicate", policy)
         self.assertIn("What counts as done", policy)
+        for term in (
+            "Answer type",
+            "Skeleton",
+            "Spine",
+            "Predicate",
+            "Fidelity",
+            "Boundary",
+            "Closure",
+            "Surface",
+            "Substrate",
+            "Topology",
+            "Setpoint",
+            "Invariant",
+        ):
+            self.assertIn(f'term: "{term}"', policy)
         self.assertIn("allowed_internal_paths", policy)
 
     def test_hygiene_lint_rejects_user_visible_jargon(self):
@@ -439,7 +454,7 @@ class ArtifactHygieneTest(unittest.TestCase):
                         "| Element | Commitment |",
                         "|---|---|",
                         "| Task skeleton family | coverage-ceiling-measurement |",
-                        "| Target-achieved predicate | candidate report complete |",
+                        "| Done predicate | candidate report complete |",
                         "",
                     ]
                 ),
@@ -464,10 +479,39 @@ class ArtifactHygieneTest(unittest.TestCase):
         self.assertIn("How this should be answered", requirements_template)
         self.assertIn("What is not enough", requirements_template)
         self.assertIn("Required answer path", requirements_template)
+        self.assertNotIn("Answer type", requirements_template)
         self.assertNotIn("Task skeleton family", requirements_template)
         self.assertNotIn("Not-sufficient substitute", requirements_template)
         self.assertIn("Approved answer method", design_template)
-        self.assertIn("Approved answer type", design_template)
+
+    def test_user_facing_templates_do_not_expose_internal_control_jargon(self):
+        template_paths = [
+            ROOT / ".agents/skills/analyzing-cybernetic-requirements/assets/requirements-analysis-template.md",
+            ROOT / ".agents/skills/designing-cybernetic-solutions/assets/solution-design-template.md",
+            ROOT / ".agents/skills/writing-cybernetic-goals/assets/goal-contract-template.md",
+            ROOT / ".agents/skills/writing-cybernetic-execution-policies/assets/execution-policy-template.md",
+            ROOT / ".agents/skills/reviewing-cybernetic-control-structures/assets/control-review-template.md",
+            ROOT / ".agents/skills/compiling-cybernetic-runtime-goals/assets/runtime-goal-template.txt",
+        ]
+
+        forbidden = (
+            "Answer type",
+            "Skeleton",
+            "Spine",
+            "Predicate",
+            "Fidelity",
+            "Boundary",
+            "Closure",
+            "Surface",
+            "Substrate",
+            "Topology",
+            "Setpoint",
+            "Invariant",
+        )
+        for path in template_paths:
+            text = path.read_text(encoding="utf-8")
+            for term in forbidden:
+                self.assertNotRegex(text, rf"\b{term}\b", f"{path} exposes {term}")
 
     def test_hygiene_lint_enforces_hard_size_budget_with_justification_escape(self):
         with tempfile.TemporaryDirectory() as tmpdir:

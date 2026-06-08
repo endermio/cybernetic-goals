@@ -23,7 +23,7 @@
 .agents/skills/designing-cybernetic-solutions/agents/openai.yaml
 .agents/skills/designing-cybernetic-solutions/assets/solution-design-template.md
 .agents/skills/designing-cybernetic-solutions/evals/evals.json
-.agents/skills/designing-cybernetic-solutions/references/design-gate.md
+.agents/skills/designing-cybernetic-solutions/references/design-check.md
 .agents/skills/framing-cybernetic-intent/SKILL.md
 .agents/skills/framing-cybernetic-intent/agents/openai.yaml
 .agents/skills/framing-cybernetic-intent/assets/intent-frame-template.md
@@ -41,7 +41,7 @@
 .agents/skills/recording-cybernetic-run-outcomes/SKILL.md
 .agents/skills/recording-cybernetic-run-outcomes/assets/run-outcome-template.md
 .agents/skills/recording-cybernetic-run-outcomes/evals/evals.json
-.agents/skills/references/delegation-substrate-registry.json
+.agents/skills/references/delegation-workflow-registry.json
 .agents/skills/references/jargon-policy.yaml
 .agents/skills/references/task-skeleton-registry.json
 .agents/skills/reviewing-cybernetic-control-structures/SKILL.md
@@ -60,7 +60,7 @@
 .agents/skills/writing-cybernetic-execution-policies/assets/execution-policy-template.md
 .agents/skills/writing-cybernetic-execution-policies/evals/evals.json
 .agents/skills/writing-cybernetic-execution-policies/references/batch-cadence.md
-.agents/skills/writing-cybernetic-execution-policies/references/sensor-governance.md
+.agents/skills/writing-cybernetic-execution-policies/references/evidence-check-governance.md
 .agents/skills/writing-cybernetic-goals/SKILL.md
 .agents/skills/writing-cybernetic-goals/agents/openai.yaml
 .agents/skills/writing-cybernetic-goals/assets/goal-contract-template.md

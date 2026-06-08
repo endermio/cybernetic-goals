@@ -58,10 +58,10 @@ def section_status(text: str, heading: str) -> str | None:
     return canonical_status(match.group(1)) if match else None
 
 
-def design_gate_required(text: str) -> bool:
+def design_check_required(text: str) -> bool:
     for line in text.splitlines():
         lowered = line.casefold()
-        if "design gate" not in lowered:
+        if "design check" not in lowered:
             continue
         if re.search(r"not\s+required|not\s+applicable|satisfied", lowered):
             continue
@@ -125,7 +125,7 @@ def main() -> int:
             "requirements path must look like docs/cybernetics/requirements/YYYY-MM-DD-slug.md"
         )
 
-    design_required = design_gate_required(text)
+    design_required = design_check_required(text)
     print("Response-only queue suggestions:")
     print()
     print("```text")
@@ -133,7 +133,7 @@ def main() -> int:
     print("```")
     print()
     if design_required:
-        print("Design dispatch: when `Design Gate: required`, `$orchestrating-cybernetic-pregoal` must invoke or request `$designing-cybernetic-solutions` before goal writing.")
+        print("Design dispatch: when `design check: required`, `$orchestrating-cybernetic-pregoal` must invoke or request `$designing-cybernetic-solutions` before goal writing.")
         print()
     print("Predicted downstream artifact paths:")
     print()

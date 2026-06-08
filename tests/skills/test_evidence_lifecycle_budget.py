@@ -54,7 +54,7 @@ class EvidenceLifecycleBudgetTest(unittest.TestCase):
 
         for text in (skill, template):
             self.assertIn("Evidence Lifecycle / Evidence Budget", text)
-            self.assertIn("repeated full raw sensor outputs", text)
+            self.assertIn("repeated full raw evidence check outputs", text)
             self.assertIn("summary", text)
             self.assertIn("delta", text)
             self.assertIn("reviewable", text)
@@ -89,7 +89,7 @@ class EvidenceLifecycleBudgetTest(unittest.TestCase):
 
         self.assertIn("INV-EVD-001", matrix)
         self.assertIn("Evidence Lifecycle / Evidence Budget", matrix)
-        self.assertIn("repeated full raw sensor outputs", matrix)
+        self.assertIn("repeated full raw evidence check outputs", matrix)
 
 
 if __name__ == "__main__":

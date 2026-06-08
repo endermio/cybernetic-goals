@@ -10,36 +10,36 @@ GUARD = ROOT / ".agents/skills/compiling-cybernetic-runtime-goals/scripts/contro
 COMPILER = ROOT / ".agents/skills/compiling-cybernetic-runtime-goals/scripts/compile_runtime_goal.py"
 
 
-HSA_APPROVED = """## What the User Approved
+USER_APPROVAL_APPROVED = """## What the User Approved
 
 Status: `Approved`
 
 | Element | Commitment |
 |---|---|
-| Human purpose | produce a target state through an actor-centered path |
+| Human purpose | produce a intended result through an actor-centered path |
 | Input role binding | fixture source material is approved background |
-| Primary object | target-producing spine fixture |
-| Requested transformation | approved target into spine-first execution policy |
+| Primary object | target-producing answer path fixture |
+| Requested transformation | approved target into required answer path-first execution policy |
 | Non-goals | do not count component-only work as goal progress |
-| Purpose Feedback Boundary | purpose feedback remains separately calibrated |
-| Realization Surface Closure | RSC remains separately calibrated |
-| What counts as done | all required spine transitions are satisfied |
-| Evidence needed to call it done | spine transition evidence exists |
-| Non-achieved terminal report handling | report goal achieved: no when spine transitions are unsatisfied |
-| Required answer path | S0 no durable state -> S1 durable state -> S2 observable target state |
-| Work covered in this run | target-producing spine fixture horizon |
+| How We Know The User Purpose Was Met | user-purpose evidence remains separately calibrated |
+| Where The Result Must Show Up | result placement remains separately calibrated |
+| What counts as done | all required required steps are satisfied |
+| Evidence needed to call it done | required step evidence exists |
+| Non-achieved terminal report handling | report goal achieved: no when required steps are unsatisfied |
+| Required answer path | S0 no durable state -> S1 durable state -> S2 observable intended result |
+| Work covered in this run | target-producing answer path fixture horizon |
 | What the agent may do | local guard fixture checks |
 | Forbidden live / irreversible actions | none |
 | Required handling for unauthorized actions | none |
 | Explicitly out-of-scope items | none |
-| Output Contract | guard output |
+| Final Answer Format | guard output |
 | Workflow fit | full pre-goal guard fixture |
 | Known assumptions | fixture-only assumptions |
 
 Approval record:
 
 - Approved by: `test fixture`
-- Approval phrase or source: `approved target-producing spine`
+- Approval phrase or source: `approved target-producing required answer path`
 """
 
 
@@ -51,12 +51,12 @@ class TargetProducingSpineTest(unittest.TestCase):
         self,
         tmp: Path,
         *,
-        include_goal_spine: bool = True,
-        include_plan_spine: bool = True,
-        include_candidate_spine_nodes: bool = True,
-        include_candidate_spine_transition_fields: bool = True,
-        include_review_spine: bool = True,
-        review_spine_independence: str = "yes",
+        include_goal_required_answer_path: bool = True,
+        include_plan_required_answer_path: bool = True,
+        include_candidate_required_answer_path_nodes: bool = True,
+        include_candidate_required_answer_path_transition_fields: bool = True,
+        include_review_required_answer_path: bool = True,
+        review_required_answer_path_independence: str = "yes",
     ) -> tuple[Path, Path, Path, Path]:
         requirements = tmp / "requirements.md"
         goal = tmp / "goal.md"
@@ -64,16 +64,16 @@ class TargetProducingSpineTest(unittest.TestCase):
         review = tmp / "review.md"
 
         requirements.write_text(
-            f"# Requirements\n\n## Requirements Analysis Status\n\nStatus: `Complete`\n\n{HSA_APPROVED}\n",
+            f"# Requirements\n\n## Requirements Analysis Status\n\nStatus: `Complete`\n\n{USER_APPROVAL_APPROVED}\n",
             encoding="utf-8",
         )
 
         target_rows = [
-            "| What counts as done | all required spine transitions are satisfied |",
-            "| Required target-producing evidence | spine transition evidence exists |",
-            "| Allowed achieved claim | goal achieved: yes only when all required spine transitions are satisfied |",
+            "| What counts as done | all required required steps are satisfied |",
+            "| Evidence needed to call it done | required step evidence exists |",
+            "| Allowed achieved claim | goal achieved: yes only when all required required steps are satisfied |",
         ]
-        if include_goal_spine:
+        if include_goal_required_answer_path:
             target_rows.append("| Steps that make the result true | S1 and S2 transitions in the execution policy Steps That Make The Result True |")
 
         goal.write_text(
@@ -87,9 +87,9 @@ class TargetProducingSpineTest(unittest.TestCase):
                     "",
                     "## Success Condition",
                     "",
-                    "Codex may report `goal achieved: yes` only when the single target-achieved predicate is satisfied.",
+                    "Codex may report `goal achieved: yes` only when the single what counts as done is satisfied.",
                     "",
-                    "## Purpose Feedback Contract",
+                    "## How We Know The User Purpose Was Met",
                     "",
                     "| Element | Requirement |",
                     "|---|---|",
@@ -97,22 +97,22 @@ class TargetProducingSpineTest(unittest.TestCase):
                     "| Purpose-realizing outcome observed | operator observes the target-producing path completed |",
                     "| Supporting Evidence | internal checks support progress only |",
                     "| Sufficient evidence level | purpose-boundary |",
-                    "| Purpose feedback unavailable handling | report pending and next observation |",
-                    "| Allowed completion wording | achieved only when spine transitions are satisfied |",
+                    "| If user-purpose evidence unavailable | report pending and next observation |",
+                    "| Allowed completion wording | achieved only when required steps are satisfied |",
                     "",
-                    "## Realization Surface Contract",
+                    "## Where The Result Must Show Up",
                     "",
                     "| Element | Requirement |",
                     "|---|---|",
-                    "| Target state | guard fixture target state |",
-                    "| Required surfaces | guard fixture surface model |",
-                    "| Surface actions | act / inspect / preserve / exclude / discover |",
+                    "| Target state | guard fixture intended result |",
+                    "| Required result places | guard fixture surface model |",
+                    "| Place actions | act / inspect / preserve / exclude / discover |",
                     "| Residual reconciliation | account for old state, unknown surfaces, exclusions, preserved surfaces, and remaining mismatches |",
-                    "| RSC status wording | strongest target-realization claim requires RSC adequate |",
-                    "| Partial/unavailable handling | report non-achieved terminal status without target-realization claim |",
-                    "| RSC / PFB boundary | RSC calibrates target-state and surface-closure claims while PFB calibrates human-purpose realization claims |",
+                    "| Result-placement wording | strongest result claim claim requires result-placement adequate |",
+                    "| Partial/unavailable handling | report not done terminal status without result claim claim |",
+                    "| Distinction from user-purpose evidence | result-placement is distinct from How We Know The User Purpose Was Met |",
                     "",
-                    "## Target Achievement Contract",
+                    "## What Counts As Done",
                     "",
                     "| Element | Requirement |",
                     "|---|---|",
@@ -122,12 +122,12 @@ class TargetProducingSpineTest(unittest.TestCase):
                     "",
                     "| Element | Requirement |",
                     "|---|---|",
-                    "| Approved horizon | target-producing spine fixture horizon |",
-                    "| Runtime-authorized actions | local guard fixture checks |",
+                    "| Work covered in this run | target-producing answer path fixture horizon |",
+                    "| What the agent may do | local guard fixture checks |",
                     "| Forbidden actions | none |",
                     "| Prepare-only / observe-only actions | none |",
                     "| Explicitly out-of-scope items | none |",
-                    "| Horizon completion rule | every horizon item is accounted for in this fixture |",
+                    "| Work coverage rule | every horizon item is accounted for in this fixture |",
                     "",
                 ]
             ),
@@ -148,55 +148,55 @@ class TargetProducingSpineTest(unittest.TestCase):
             "",
             "## Work Coverage And Action Limits Matrix",
             "",
-            "| Batch / surface | In approved horizon? | What the agent may do | Required runtime handling | Counts as achieved? |",
+            "| Work item / place | In work covered in this run? | What the agent may do | Required runtime handling | Counts as achieved? |",
             "|---|---|---|---|---|",
-            "| target-producing spine fixture | yes | execute | run guard / compiler fixture checks | yes if fixture passes |",
+            "| target-producing answer path fixture | yes | execute | run guard / compiler fixture checks | yes if fixture passes |",
             "",
         ]
-        if include_plan_spine:
+        if include_plan_required_answer_path:
             plan_parts.extend(
                 [
                     "## Steps That Make The Result True",
                     "",
-                    "| Spine node | Required state transition | Required evidence |",
+                    "| Required step | Required state transition | Required evidence |",
                     "|---|---|---|",
                     "| S1 | no durable state -> durable state exists | durable state id is recorded |",
-                    "| S2 | durable state exists -> observable target state | target observation references durable state id |",
+                    "| S2 | durable state exists -> observable intended result | target observation references durable state id |",
                     "",
                 ]
             )
         plan_parts.extend(
             [
-                "## Target-Producing Action Strategy",
+                "## Action That Can Make It Done",
                 "",
-                "Target-producing action required:",
+                "Action that can make it done:",
                 "",
-                "- Satisfy S1 and S2 spine transitions before any achieved claim.",
+                "- Satisfy S1 and S2 required steps before any achieved claim.",
                 "",
                 "Proof of impossibility, if any:",
                 "",
-                "- Record the condition proving a spine transition cannot be attempted.",
+                "- Record the condition proving a required step cannot be attempted.",
                 "",
                 "Non-achieved terminal report rule:",
                 "",
-                "- A non-achieved report may be produced only after the transition is attempted and fails, or impossibility is proven.",
+                "- A report when not done may be produced only after the transition is attempted and fails, or impossibility is proven.",
                 "",
-                "## Realization Surface Closure Strategy",
+                    "## Where The Result Must Show Up",
                 "",
-                "- RSC status: `RSC not applicable with justification`",
-                "- Why no target-state surface closure is required: this fixture only checks TPS structure.",
-                "- Why no surface discovery / residual reconciliation is needed: no controlled-object target state is changed.",
-                "- Allowed target-realization wording: do not claim target-state realization.",
+                "- Result-placement status: `not applicable with justification`",
+                "- Why no intended-result result placement is required: this fixture only checks TPS structure.",
+                "- Why no place discovery / residual reconciliation is needed: no controlled-object intended result is changed.",
+                "- Allowed result claim wording: do not claim intended-result realization.",
                 "",
-                "## Context Management / Execution Topology",
+                "## Who Does The Work / Context Use",
                 "",
                 "Task level: `Level 2`",
                 "",
-                "Selected topology: `Main-only`",
+                "Who does the work: `Main-only`",
                 "",
                 "Selected agent workflow: `none`",
                 "",
-                "Topology rationale:",
+                "Work Assignment rationale:",
                 "",
                 "- Bounded fixture fits main-only execution.",
                 "",
@@ -208,21 +208,21 @@ class TargetProducingSpineTest(unittest.TestCase):
                 "",
                 "## Candidate Plan Tasks",
                 "",
-                "### Batch 1: satisfy spine fixture",
+                "### Batch 1: satisfy answer path fixture",
                 "",
             ]
         )
-        if include_candidate_spine_nodes:
+        if include_candidate_required_answer_path_nodes:
             plan_parts.extend(
                 [
-                    "Spine node(s):",
+                    "Required step(s):",
                     "",
                     "- S1",
                     "- S2",
                     "",
                 ]
             )
-        if include_candidate_spine_transition_fields:
+        if include_candidate_required_answer_path_transition_fields:
             plan_parts.extend(
                 [
                     "Role: `mainline`",
@@ -233,9 +233,9 @@ class TargetProducingSpineTest(unittest.TestCase):
                     "",
                     "Transition evidence produced:",
                     "",
-                    "- Durable state and observable target state evidence.",
+                    "- Durable state and observable intended result evidence.",
                     "",
-                    "Integration gate:",
+                    "Integration check:",
                     "",
                     "- Main agent accepts S1/S2 evidence into progress state.",
                     "",
@@ -251,7 +251,7 @@ class TargetProducingSpineTest(unittest.TestCase):
             [
                 "Goal:",
                 "",
-                "- Drive the fixture through the approved target-producing spine.",
+                "- Drive the fixture through the approved target-producing required answer path.",
                 "",
                 "Batch-end gate:",
                 "",
@@ -278,44 +278,44 @@ class TargetProducingSpineTest(unittest.TestCase):
             "## Review Independence",
             "",
             "- Requirements analysis: `yes`",
-            "- Human setpoint fidelity: `yes`",
+            "- What the user approved check: `yes`",
             "- Goal contract: `yes`",
             "- Execution policy: `yes`",
-            "- Context management / execution topology: `yes`",
-            "- Purpose feedback adequacy: `yes`",
-            "- Realization surface closure adequacy: `yes`",
-            "- Target achievement predicate fidelity: `yes`",
-            f"- answer path check: `{review_spine_independence}`",
-            "- Work covered in this run and authority fidelity: `yes`",
+            "- Who does the work / context use: `yes`",
+            "- User purpose evidence check: `yes`",
+            "- Result placement check: `yes`",
+            "- What counts as done check: `yes`",
+            f"- answer path check: `{review_required_answer_path_independence}`",
+            "- Work covered in this run and authority check: `yes`",
             "",
-            "## Context Management / Execution Topology",
+            "## Who Does The Work / Context Use",
             "",
             "Findings:",
-            "- Reviewed selected topology.",
+            "- Reviewed work assignment.",
             "",
-            "## Purpose Feedback Adequacy",
+            "## User Purpose Evidence Check",
             "",
             "Findings:",
             "- Purpose feedback waits for purpose-boundary evidence.",
             "",
-            "## Realization Surface Closure Adequacy",
+                "## Result Placement Check",
             "",
             "Findings:",
-            "- RSC not applicable is justified for this fixture.",
+            "- not applicable is justified for this fixture.",
             "",
-            "## Target Achievement Predicate Fidelity",
+            "## What Counts As Done Check",
             "",
             "Findings:",
-            "- The single target-achieved predicate is separated from non-achieved terminal reports.",
+            "- The single what counts as done is separated from report when not dones.",
             "",
         ]
-        if include_review_spine:
+        if include_review_required_answer_path:
             review_parts.extend(
                 [
                     "## Answer Path Check",
                     "",
                     "Findings:",
-                    "- Work packages are mapped to S1/S2 spine transitions and supporting-only work cannot satisfy goal progress by itself.",
+                    "- Work packages are mapped to S1/S2 required steps and supporting-only work cannot satisfy goal progress by itself.",
                     "",
                 ]
             )
@@ -324,7 +324,7 @@ class TargetProducingSpineTest(unittest.TestCase):
                 "## Work Covered And Allowed Actions Check",
                 "",
                 "Findings:",
-                "- Approved horizon and runtime authority are compact and fixture-bounded.",
+                "- Work covered in this run and runtime authority are compact and fixture-bounded.",
                 "",
                 "## Final Observer Check",
                 "",
@@ -362,7 +362,7 @@ class TargetProducingSpineTest(unittest.TestCase):
             capture_output=True,
         )
 
-    def test_templates_include_target_producing_spine(self):
+    def test_templates_include_target_producing_required_answer_path(self):
         requirements = self.read(".agents/skills/analyzing-cybernetic-requirements/assets/requirements-analysis-template.md")
         goal = self.read(".agents/skills/writing-cybernetic-goals/assets/goal-contract-template.md")
         plan = self.read(".agents/skills/writing-cybernetic-execution-policies/assets/execution-policy-template.md")
@@ -371,11 +371,11 @@ class TargetProducingSpineTest(unittest.TestCase):
         self.assertIn("Required answer path", requirements)
         self.assertIn("Steps that make the result true", goal)
         self.assertIn("Steps That Make The Result True", plan)
-        self.assertIn("Spine node(s)", plan)
+        self.assertIn("Required step(s)", plan)
         self.assertIn("Answer Path Check", review)
         self.assertIn("answer path check", review)
 
-    def test_guard_accepts_complete_target_producing_spine_chain(self):
+    def test_guard_accepts_complete_target_producing_required_answer_path_chain(self):
         with tempfile.TemporaryDirectory() as tmpdir:
             requirements, goal, plan, review = self.write_chain(Path(tmpdir))
             result = self.guard(requirements, goal, plan, review)
@@ -383,9 +383,9 @@ class TargetProducingSpineTest(unittest.TestCase):
         self.assertEqual(0, result.returncode, result.stdout + result.stderr)
         self.assertIn("NEXT: CompileRuntimeGoal", result.stdout)
 
-    def test_guard_rejects_goal_missing_target_producing_spine_reference(self):
+    def test_guard_rejects_goal_missing_target_producing_required_answer_path_reference(self):
         with tempfile.TemporaryDirectory() as tmpdir:
-            requirements, goal, plan, review = self.write_chain(Path(tmpdir), include_goal_spine=False)
+            requirements, goal, plan, review = self.write_chain(Path(tmpdir), include_goal_required_answer_path=False)
             result = self.guard(requirements, goal, plan, review)
 
         output = result.stdout + result.stderr
@@ -393,9 +393,9 @@ class TargetProducingSpineTest(unittest.TestCase):
         self.assertIn("NEXT: RunGoalWriting", output)
         self.assertIn("Steps that make the result true", output)
 
-    def test_guard_rejects_plan_missing_target_producing_spine(self):
+    def test_guard_rejects_plan_missing_target_producing_required_answer_path(self):
         with tempfile.TemporaryDirectory() as tmpdir:
-            requirements, goal, plan, review = self.write_chain(Path(tmpdir), include_plan_spine=False)
+            requirements, goal, plan, review = self.write_chain(Path(tmpdir), include_plan_required_answer_path=False)
             result = self.guard(requirements, goal, plan, review)
 
         output = result.stdout + result.stderr
@@ -403,21 +403,21 @@ class TargetProducingSpineTest(unittest.TestCase):
         self.assertIn("NEXT: RunExecutionPolicy", output)
         self.assertIn("Steps That Make The Result True", output)
 
-    def test_guard_rejects_candidate_task_without_spine_nodes(self):
+    def test_guard_rejects_candidate_task_without_required_answer_path_nodes(self):
         with tempfile.TemporaryDirectory() as tmpdir:
-            requirements, goal, plan, review = self.write_chain(Path(tmpdir), include_candidate_spine_nodes=False)
+            requirements, goal, plan, review = self.write_chain(Path(tmpdir), include_candidate_required_answer_path_nodes=False)
             result = self.guard(requirements, goal, plan, review)
 
         output = result.stdout + result.stderr
         self.assertEqual(2, result.returncode, output)
         self.assertIn("NEXT: RunExecutionPolicy", output)
-        self.assertIn("Spine node(s)", output)
+        self.assertIn("Required step(s)", output)
 
-    def test_guard_rejects_candidate_task_with_only_spine_label(self):
+    def test_guard_rejects_candidate_task_with_only_required_answer_path_label(self):
         with tempfile.TemporaryDirectory() as tmpdir:
             requirements, goal, plan, review = self.write_chain(
                 Path(tmpdir),
-                include_candidate_spine_transition_fields=False,
+                include_candidate_required_answer_path_transition_fields=False,
             )
             result = self.guard(requirements, goal, plan, review)
 
@@ -428,12 +428,12 @@ class TargetProducingSpineTest(unittest.TestCase):
         self.assertIn("Transition evidence produced", output)
         self.assertIn("Counts as goal progress", output)
 
-    def test_guard_rejects_review_missing_spine_fidelity(self):
+    def test_guard_rejects_review_missing_required_answer_path_check(self):
         with tempfile.TemporaryDirectory() as tmpdir:
             requirements, goal, plan, review = self.write_chain(
                 Path(tmpdir),
-                include_review_spine=False,
-                review_spine_independence="no",
+                include_review_required_answer_path=False,
+                review_required_answer_path_independence="no",
             )
             result = self.guard(requirements, goal, plan, review)
 
@@ -443,7 +443,7 @@ class TargetProducingSpineTest(unittest.TestCase):
         self.assertIn("Answer Path Check", output)
         self.assertIn("answer path check: yes", output)
 
-    def test_runtime_contract_indexes_target_producing_spine(self):
+    def test_runtime_contract_indexes_target_producing_required_answer_path(self):
         compiler = self.read(".agents/skills/compiling-cybernetic-runtime-goals/scripts/compile_runtime_goal.py")
         template = self.read(".agents/skills/compiling-cybernetic-runtime-goals/assets/runtime-goal-template.txt")
         skill = self.read(".agents/skills/compiling-cybernetic-runtime-goals/SKILL.md")
@@ -481,13 +481,13 @@ class TargetProducingSpineTest(unittest.TestCase):
         self.assertIn("Steps That Make The Result True", contract_text)
         self.assertIn("Answer Path Check", contract_text)
 
-    def test_progress_log_rules_track_spine_node_status(self):
+    def test_progress_log_rules_track_required_answer_path_node_status(self):
         template = self.read(".agents/skills/writing-cybernetic-execution-policies/assets/execution-policy-template.md")
         progress_log = template.split("## Progress Log Rules", 1)[1]
 
         self.assertIn("required answer path step status", progress_log)
-        self.assertIn("spine transitions satisfied", progress_log)
-        self.assertIn("spine transitions failed / blocked / unobserved", progress_log)
+        self.assertIn("required steps satisfied", progress_log)
+        self.assertIn("required steps failed / blocked / unobserved", progress_log)
         self.assertIn("supporting-only work completed", progress_log)
         self.assertIn("supporting-only work not counted as goal progress", progress_log)
 

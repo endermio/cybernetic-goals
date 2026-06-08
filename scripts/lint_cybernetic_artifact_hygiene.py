@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
-"""Hygiene lint for generated cybernetic control artifacts.
+"""Hygiene lint for generated task-control artifacts.
 
-The lint checks objective artifact noise only. It does not decide whether PFB,
-RSC, setpoint, plan granularity, or review semantics are adequate.
+The lint checks objective artifact noise only. It does not decide whether
+user-purpose evidence, result placement, approved-target meaning, plan
+granularity, or review adequacy are correct.
 """
 from __future__ import annotations
 
@@ -247,13 +248,13 @@ def lint_paths(paths: list[Path]) -> tuple[list[Finding], list[Finding], list[Fi
     warns: list[Finding] = []
     skips: list[Finding] = []
     for path in paths:
-        if is_template_path(path):
-            skips.append(Finding(path, 1, "template file; generated-artifact hygiene lint skipped"))
-            continue
         try:
             text = path.read_text(encoding="utf-8")
         except FileNotFoundError:
             errors.append(Finding(path, 1, "missing file"))
+            continue
+        if is_template_path(path):
+            errors.extend(language_findings(path, text))
             continue
         errors.extend(hard_findings(path, text))
         warns.extend(warnings(path, text))

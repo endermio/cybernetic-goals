@@ -13,7 +13,7 @@ SCRIPT = (
 )
 
 
-HSA_APPROVED = """## What the User Approved
+USER_APPROVAL_APPROVED = """## What the User Approved
 
 Status: `Approved`
 
@@ -24,9 +24,9 @@ Status: `Approved`
 | Primary object | pre-goal handoff predictor |
 | Requested transformation | requirements path to handoff commands |
 | Non-goals | do not compile final runtime goal |
-| Purpose Feedback Boundary | final approval remains downstream |
-| Realization Surface Closure | not applicable to predictor fixture |
-| Output Contract | response-only handoff text |
+| How We Know The User Purpose Was Met | final approval remains downstream |
+| Where The Result Must Show Up | not applicable to predictor fixture |
+| Final Answer Format | response-only handoff text |
 | Workflow fit | full pre-goal orchestration |
 | Known assumptions | fixture-only |
 """
@@ -38,8 +38,8 @@ class PregoalHandoffPredictorTest(unittest.TestCase):
         tmp: Path,
         *,
         status: str = "Complete",
-        hsa: str = HSA_APPROVED,
-        design_gate: str = "required",
+        hsa: str = USER_APPROVAL_APPROVED,
+        design_check: str = "required",
         name: str = "2026-06-06-predictor.md",
     ) -> Path:
         req_dir = tmp / "docs/cybernetics/requirements"
@@ -56,11 +56,11 @@ class PregoalHandoffPredictorTest(unittest.TestCase):
                     "",
                     hsa,
                     "",
-                    "## Required Gates",
+                    "## Required Checks Before Moving On",
                     "",
-                    "| Gate | Status | Reason |",
+                    "| Check | Status | Reason |",
                     "|---|---|---|",
-                    f"| Design Gate | `{design_gate}` | fixture |",
+                    f"| design check | `{design_check}` | fixture |",
                     "",
                 ]
             ),
@@ -116,7 +116,7 @@ class PregoalHandoffPredictorTest(unittest.TestCase):
             requirements = Path(tmpdir) / "requirements.md"
             requirements.write_text(
                 "# Requirements\n\n## Requirements Analysis Status\n\nStatus: `Complete`\n\n"
-                + HSA_APPROVED,
+                + USER_APPROVAL_APPROVED,
                 encoding="utf-8",
             )
             result = self.run_script(requirements)
@@ -140,7 +140,7 @@ class PregoalHandoffPredictorTest(unittest.TestCase):
         self.assertIn(script_path, manifest)
         self.assertIn(test_path, manifest)
 
-    def test_design_gate_dispatch_note_does_not_replace_predicted_goal(self):
+    def test_design_check_dispatch_note_does_not_replace_predicted_goal(self):
         skill = (ROOT / ".agents/skills/analyzing-cybernetic-requirements/SKILL.md").read_text(
             encoding="utf-8"
         )
@@ -154,7 +154,7 @@ class PregoalHandoffPredictorTest(unittest.TestCase):
         }["complete-level-3-analysis-routes-to-orchestrator-not-manual-design"]
 
         self.assertIn(
-            "Design Gate dispatch note must not replace the predicted pointer-only `/goal`",
+            "design check dispatch note must not replace the predicted pointer-only `/goal`",
             skill,
         )
         self.assertIn("predicted runtime contract path", complete_level_3["expected_output"])

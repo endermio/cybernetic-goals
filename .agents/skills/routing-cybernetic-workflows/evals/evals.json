@@ -19,30 +19,30 @@
       "assertions": [
         "Classifies the task as Level 1 or Level 2.",
         "Does not recommend the full pre-goal pipeline.",
-        "Explains that existing control artifacts already fix the semantics.",
+        "Explains that existing approved files already fix the meaning.",
         "Explains that no new structure-contract, authorization, observation-flow, or entity-mapping decision is required.",
         "Recommends a bounded repair prompt or small file-based goal."
       ]
     },
     {
-      "id": "mentions-authorization-but-no-new-authorization-semantics",
+      "id": "mentions-authorization-but-no-new-authorization-meaning",
       "prompt": "使用 $routing-cybernetic-workflows 评估任务：已有授权模型不变，只修一个观察表面的授权提示文案和证据断言，让未授权状态显示明确提示。",
       "expected_output": "Do not route to full pipeline merely because permissions are mentioned.",
       "assertions": [
         "Classifies as Level 0, Level 1, or Level 2.",
         "Does not classify as Level 3 solely due to authorization wording.",
-        "Distinguishes authorization-related observer text from new authorization semantics.",
+        "Distinguishes authorization-related observer text from new authorization meaning.",
         "Recommends a lightweight workflow."
       ]
     },
     {
-      "id": "new-relationship-semantics-still-full-pipeline",
+      "id": "new-relationship-meaning-still-full-pipeline",
       "prompt": "使用 $routing-cybernetic-workflows 评估任务：我们还没有决定 Actor A、Group B、Entity C 和 identifier 的关系，也没决定记录是直接观测还是中介上报，现在要建立新的控制关系。",
-      "expected_output": "Route to Level 3 because requirement semantics and control structure are unresolved.",
+      "expected_output": "Route to Level 3 because requirement meaning and approved work chain are unresolved.",
       "assertions": [
         "Classifies as Level 3.",
-        "Mentions unresolved requirement semantics.",
-        "Mentions unresolved observation-flow semantics.",
+        "Mentions unresolved requirement meaning.",
+        "Mentions unresolved observation-flow meaning.",
         "Recommends $analyzing-cybernetic-requirements.",
         "Recommends $orchestrating-cybernetic-pregoal only after requirements analysis is complete and What the User Approved is Approved."
       ]
@@ -53,7 +53,7 @@
       "expected_output": "Route to Level 3 or Level 4 depending on risk; likely Level 3 unless live external state is involved.",
       "assertions": [
         "Classifies as Level 3 or Level 4.",
-        "Mentions unresolved authorization/visibility semantics.",
+        "Mentions unresolved authorization/visibility meaning.",
         "Mentions migration or compatibility uncertainty.",
         "Does not recommend direct execution.",
         "Recommends requirements analysis before goal execution."
@@ -76,18 +76,18 @@
       "expected_output": "Route to Level 0, 1, or 2; evidence artifacts alone should not force full pipeline.",
       "assertions": [
         "Does not classify as Level 3.",
-        "Explains that evidence artifacts are sensors, and the semantic decision is already fixed.",
+        "Explains that evidence artifacts are evidence checks, and the meaning decision is already fixed.",
         "Recommends a bounded repair prompt or lightweight goal.",
         "Does not recommend requirements analysis."
       ]
     },
     {
-      "id": "structure-mentioned-but-semantics-fixed",
+      "id": "structure-mentioned-but-meaning-fixed",
       "prompt": "使用 $routing-cybernetic-workflows 分析任务：已有 approved plan 明确了结构迁移。现在只需要修迁移记录里的索引名和对应证据断言，语义不变。",
-      "expected_output": "Route to Level 1 or Level 2, not Level 3, because structure is mentioned but structure semantics are already fixed.",
+      "expected_output": "Route to Level 1 or Level 2, not Level 3, because structure is mentioned but structure meaning are already fixed.",
       "assertions": [
         "Does not classify as Level 3 solely due to structure wording.",
-        "Mentions that approved plan already fixes structure semantics.",
+        "Mentions that approved plan already fixes structure meaning.",
         "Recommends bounded repair.",
         "Does not recommend full pre-goal pipeline."
       ]
@@ -95,12 +95,12 @@
     {
       "id": "existing-artifacts-lower-score",
       "prompt": "使用 $routing-cybernetic-workflows 分析任务：已有 requirements analysis、goal、plan、control review 都已 Approved。现在执行中发现某个观察表面字段名和已确认语义不一致，需要修正。",
-      "expected_output": "Route to Level 1 or Level 2 because the approved control artifacts lower the routing level.",
+      "expected_output": "Route to Level 1 or Level 2 because the approved approved files lower the routing level.",
       "assertions": [
         "Mentions existing approved artifacts.",
         "Classifies as Level 1 or Level 2.",
         "Does not route to full pre-goal pipeline.",
-        "Frames the task as a bounded correction inside existing control structure."
+        "Frames the task as a bounded correction inside existing approved work chain."
       ]
     },
     {
@@ -126,14 +126,14 @@
       ]
     },
     {
-      "id": "wide-user-closure-audit-needs-rubric-gate",
+      "id": "wide-user-closure-audit-needs-rubric-check",
       "prompt": "使用 $routing-cybernetic-workflows 分析任务：从观察者使用层面逐项核对某组能力是否闭环，分类为已闭环、部分闭环、未闭环、不可判定。可以读源材料、文档、检查结果、记录、预览状态和证据 artifacts，只输出评估报告，不执行修复，不改变结构契约、授权、外部契约或需求语义。",
-      "expected_output": "Classify as Level 2 with Required gates: Rubric Gate required, because execution complexity is bounded but the evaluation rubric for closure/completeness is not explicit. Recommend rubric analysis before creating the bounded audit goal.",
+      "expected_output": "Classify as Level 2 with Required gates: rubric check required, because execution complexity is bounded but the evaluation rubric for closure/completeness is not explicit. Recommend rubric analysis before creating the bounded audit goal.",
       "assertions": [
         "Classifies the task as Level 2.",
-        "Includes Required gates with Rubric Gate required.",
-        "Does not encode the Rubric Gate in the routing level name.",
-        "Explains that broad scope is not the same as unresolved control structure.",
+        "Includes Required gates with rubric check required.",
+        "Does not encode the rubric check in the routing level name.",
+        "Explains that broad scope is not the same as unresolved approved work chain.",
         "Explains that the evaluation function or rubric is not sufficiently defined.",
         "Recommends analyzing status definitions, evidence strength, and minimum evidence for the strongest positive status before creating the audit goal.",
         "Does not recommend the full pre-goal pipeline or execution policy by default."
@@ -142,7 +142,7 @@
     {
       "id": "wide-user-closure-audit-with-rubric-is-level-2",
       "prompt": "使用 $routing-cybernetic-workflows 分析任务：从观察者使用层面逐项核对某组能力是否闭环。rubric 已定义：已闭环必须有实际操作流证据或已运行 runtime check；部分闭环是有 work artifact、文档或未运行传感器但没有实际路径证据；未闭环是只有占位/计划或没有可用入口；不可判定是需要外部凭证、外部环境、真实第三方服务或当前环境无法观测。只输出评估报告，不执行修复。",
-      "expected_output": "Classify as Level 2 bounded file goal because scope is broad but semantics and evaluation rubric are explicit.",
+      "expected_output": "Classify as Level 2 bounded file goal because scope is broad but meaning and evaluation rubric are explicit.",
       "assertions": [
         "Classifies the task as Level 2.",
         "States that the evaluation rubric is explicit.",
@@ -152,40 +152,40 @@
       ]
     },
     {
-      "id": "new-feature-with-unclear-solution-structure-needs-design-gate",
+      "id": "new-feature-with-unclear-solution-structure-needs-design-check",
       "prompt": "使用 $routing-cybernetic-workflows 分析任务：需求语义已经确认，要建立新的控制关系，但还没有 solution design；Actor A、Group B、Entity C、identifier 关系、记录实时观测的信息流、观察表面中的概念边界都需要形成结构模型。",
-      "expected_output": "Classify as Level 3 and list Design Gate required. Recommend requirements analysis and then pre-goal orchestration; the orchestrator must invoke or request solution design before goal writing.",
+      "expected_output": "Classify as Level 3 and list required design required. Recommend requirements analysis and then pre-goal orchestration; the orchestrator must invoke or request solution design before goal writing.",
       "assertions": [
         "Classifies the task as Level 3.",
-        "Includes Required gates with Design Gate required.",
+        "Includes Required gates with required design required.",
         "Explains that the execution agent would otherwise need to invent the solution structure.",
         "Recommends $analyzing-cybernetic-requirements before pre-goal orchestration.",
         "Recommends $orchestrating-cybernetic-pregoal only after requirements analysis is complete and What the User Approved is Approved.",
         "Does not recommend $designing-cybernetic-solutions as a standalone manual step before orchestration for Level 3 full pre-goal work.",
-        "Explains that the orchestrator invokes or requests $designing-cybernetic-solutions when Design Gate is required.",
+        "Explains that the orchestrator invokes or requests $designing-cybernetic-solutions when required design is required.",
         "Keeps the routing decision as Level 3 without encoding a suffix such as Level 3D."
       ]
     },
     {
-      "id": "level-3-with-existing-design-does-not-require-design-gate",
+      "id": "level-3-with-existing-design-does-not-require-design-check",
       "prompt": "评估任务：已有完整 requirements analysis 和 solution design，接下来要执行一个跨多个执行表面和证据通道的复杂任务。设计对象、接口、状态流、证据模型都已明确。",
-      "expected_output": "Classify as Level 3 because execution is complex, but mark Design Gate as satisfied or not required rather than required.",
+      "expected_output": "Classify as Level 3 because execution is complex, but mark required design as satisfied or not required rather than required.",
       "assertions": [
         "Classifies the task as Level 3.",
-        "Does not mark Design Gate as required.",
+        "Does not mark required design as required.",
         "Explains that solution structure is already explicit.",
         "Recommends pre-goal pipeline without redoing solution design."
       ]
     },
     {
-      "id": "bounded-fix-with-existing-design-does-not-need-design-gate",
+      "id": "bounded-fix-with-existing-design-does-not-need-design-check",
       "prompt": "使用 $routing-cybernetic-workflows 分析任务：已有 requirements analysis、solution design、goal、plan 和 approved review。现在只修正一个观察表面把 Actor A/B 误显示为 Entity C 的问题，不改变结构契约、授权、观测语义或概念边界。",
-      "expected_output": "Classify as Level 1 or Level 2 with Design Gate satisfied or not applicable, not full pre-goal pipeline.",
+      "expected_output": "Classify as Level 1 or Level 2 with required design satisfied or not applicable, not full pre-goal pipeline.",
       "assertions": [
         "Classifies the task as Level 1 or Level 2.",
         "Does not classify as Level 3 solely because design-sensitive concepts are mentioned.",
-        "Lists Design Gate as satisfied or not applicable.",
-        "Explains that existing design/control artifacts already fix the solution structure.",
+        "Lists required design as satisfied or not applicable.",
+        "Explains that existing design/approved files already fix the solution structure.",
         "Recommends a bounded repair prompt or small file-based goal."
       ]
     }

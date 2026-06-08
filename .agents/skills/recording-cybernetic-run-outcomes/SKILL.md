@@ -10,7 +10,7 @@ description: 'Use when a cybernetic skill invocation, artifact creation, blocked
 Record local process evidence for the cybernetic skill group.
 
 This skill converts a completed local outcome into one or more metadata-only run
-events. It is an observability helper, not a task-control gate.
+events. It is an observability helper, not a task-control check.
 
 Primary output:
 
@@ -21,14 +21,14 @@ local JSONL event store
 Use `assets/run-outcome-template.md` when a human-readable summary is needed
 before event recording.
 
-## Core Boundary
+## What This Skill Owns
 
 This skill owns local metadata-only observability records for completed
 cybernetic outcomes.
 
 Owned recording:
 
-- inspect the current run outcome and existing control artifacts;
+- inspect the current run outcome and existing approved files;
 - classify the event type and optional failure-taxonomy codes;
 - write metadata-only local events through `scripts/record_run_event.py`;
 - validate local event files through `scripts/validate_run_events.py`;
@@ -41,7 +41,7 @@ Routed elsewhere or excluded:
   their normal repository workflows;
 - improvement candidates remain candidates until reviewed through the normal
   review/eval/release process;
-- ordinary cybernetic tasks can proceed without an observability gate.
+- ordinary cybernetic tasks can proceed without an observability check.
 
 Metadata-only mode excludes raw prompts, content summaries/excerpts, artifact
 bodies, code/log excerpts, credentials, customer data, real paths, and real
@@ -107,7 +107,7 @@ python3 scripts/record_run_event.py --event <event> --status <status> --skill <s
 python3 scripts/validate_run_events.py --taxonomy observability/taxonomies/failure-taxonomy.yaml <event-file>
 ```
 
-## Upload Boundary
+## Upload Limit
 
 This skill does not upload.
 
@@ -118,10 +118,10 @@ If the operator asks to upload or sync:
 - keep real upload disabled unless destination and token configuration are explicit;
 - never upload content summaries/excerpts or raw artifacts in metadata-only mode.
 
-## Improvement Candidate Boundary
+## Improvement Candidate Limit
 
 Reports, issues, eval candidates, and patch proposals generated from run events
-are candidates only. They do not modify the control law until reviewed through
+are candidates only. They do not modify the execution rule until reviewed through
 the repository's normal review/eval/release process.
 
 ## Output Format

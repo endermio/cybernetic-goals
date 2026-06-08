@@ -32,11 +32,11 @@ def section_body(text: str, heading: str) -> str | None:
 
 def selected_execution_topology(plan_path: str) -> str | None:
     plan = Path(plan_path).read_text(encoding="utf-8")
-    body = section_body(plan, "Context Management / Execution Topology")
+    body = section_body(plan, "Who Does The Work / Context Use")
     if body is None:
         return None
 
-    match = re.search(r"(?im)^\s*Selected topology\s*:\s*`?([^`\n]+?)`?\s*$", body)
+    match = re.search(r"(?im)^\s*Who does the work\s*:\s*`?([^`\n]+?)`?\s*$", body)
     if not match:
         return None
 
@@ -55,10 +55,10 @@ def selected_execution_topology(plan_path: str) -> str | None:
 
 def topology_section(plan_path: str) -> str:
     plan = Path(plan_path).read_text(encoding="utf-8")
-    return section_body(plan, "Context Management / Execution Topology") or ""
+    return section_body(plan, "Who Does The Work / Context Use") or ""
 
 
-def selected_delegation_substrate(plan_path: str) -> str | None:
+def selected_delegation_workflow(plan_path: str) -> str | None:
     body = topology_section(plan_path)
     match = re.search(r"(?im)^\s*Selected agent workflow\s*:\s*`?([^`\n]+?)`?\s*$", body)
     if not match:
@@ -164,24 +164,24 @@ def runtime_goal_contract(
 ) -> str:
     design_line = f"- Design: `{design}`" if design else "- Design: `not required`"
     design_required_line = (
-        f"- Design `{design}`: `Answer Method Check`, `Output Contract Design`, `Design-to-Goal Mapping`, `Design-to-Execution Mapping`."
+        f"- Design `{design}`: `Answer Method Check`, `Final Answer Format Design`, `Design-to-Goal Mapping`, `Design-to-Execution Mapping`."
         if design
         else "- Design: `not required`."
     )
-    topology = selected_execution_topology(plan) or "read from approved execution policy"
-    substrate = selected_delegation_substrate(plan) or "read from approved execution policy"
+    work_assignment = selected_execution_topology(plan) or "read from approved execution policy"
+    workflow = selected_delegation_workflow(plan) or "read from approved execution policy"
     subagent_mode = selected_subagent_execution_mode(plan) or "read from approved execution policy"
     max_concurrent = max_concurrent_subagents(plan) or "read from approved execution policy"
-    if substrate == "superpowers-subagent-driven-development":
-        substrate_line = (
+    if workflow == "superpowers-subagent-driven-development":
+        workflow_line = (
             "- Because the selected agent workflow is `superpowers-subagent-driven-development`, use `$superpowers:subagent-driven-development` only in `serial-single-active` mode for approved current-session implementation-plan work packages."
         )
-    elif substrate == "superpowers-dispatching-parallel-agents":
-        substrate_line = (
-            "- Because the selected agent workflow is `superpowers-dispatching-parallel-agents`, use `$superpowers:dispatching-parallel-agents` only for the approved independent work packages in the current wave, under the plan's spine frontier, lock, barrier, failure, and main-agent integration rules."
+    elif workflow == "superpowers-dispatching-parallel-agents":
+        workflow_line = (
+            "- Because the selected agent workflow is `superpowers-dispatching-parallel-agents`, use `$superpowers:dispatching-parallel-agents` only for the approved independent work packages in the current wave, under the plan's required-step frontier, lock, barrier, failure, and main-agent integration rules."
         )
     else:
-        substrate_line = "- Use only the selected agent workflow recorded in the approved execution policy."
+        workflow_line = "- Use only the selected agent workflow recorded in the approved execution policy."
 
     return "\n".join(
         [
@@ -197,29 +197,29 @@ def runtime_goal_contract(
             "",
             "## Runtime Execution Rule",
             "",
-            "Execute the approved execution policy under the approved control chain. Do not reinterpret what the user approved, how this should be answered, what counts as done, output contract, topology, checks, or control strategy.",
-            "Treat What the User Approved as the source for primary object, requested transformation, non-goals, how this should be answered, what is not enough, answer type, work covered in this run, what the agent may do, forbidden actions, purpose feedback, realization surface closure, what counts as done, output contract, workflow fit, and known assumptions.",
+            "Execute the approved execution policy under the approved control chain. Do not reinterpret what the user approved, how this should be answered, what counts as done, final answer format, work assignment, checks, or control strategy.",
+            "Treat What the User Approved as the source for primary object, requested transformation, non-goals, how this should be answered, what is not enough, work covered in this run, what the agent may do, forbidden actions, purpose feedback, where the result must show up, what counts as done, final answer format, workflow fit, and known assumptions.",
             "",
-            f"- Selected topology: `{topology}`",
-            f"- Selected agent workflow: `{substrate}`",
+            f"- Who does the work: `{work_assignment}`",
+            f"- Selected agent workflow: `{workflow}`",
             f"- Subagent execution mode: `{subagent_mode}`",
             f"- Max concurrent subagents: `{max_concurrent}`",
             "",
             "## Required Sections To Read",
             "",
-            f"- Requirements `{requirements}`: `What the User Approved`, `Purpose Feedback Boundary`, `Realization Surface Closure`, `Output Contract`.",
+            f"- Requirements `{requirements}`: `What the User Approved`, `How We Know The User Purpose Was Met`, `Where The Result Must Show Up`, `Final Answer Format`.",
             design_required_line,
-            f"- Goal `{goal}`: `Success Condition`, `Target Achievement Contract`, `Work Covered And Allowed Actions Contract`, `Purpose Feedback Contract`, `Realization Surface Contract`, `Final Output Contract`.",
-            f"- Execution policy `{plan}`: `Work Coverage And Action Limits Matrix`, `Steps That Make The Result True`, `Target-Producing Action Strategy`, `Candidate Plan Tasks`, `Context Management / Execution Topology`, `Subagent execution mode`, `Parallel wave matrix`, `Conflict / lock model`, `Failure policy`, `Phase Gates`, `Progress Log Rules`, `Purpose Feedback Strategy`, `Realization Surface Closure Strategy`, `Sensor / Evidence Governance`.",
-            f"- Control review `{review}`: `Design Answer Method Check`, `Work Covered And Allowed Actions Check`, `Subagent Concurrency Fidelity`, `Answer Path Check`, `Target Achievement Predicate Fidelity`, `Purpose Feedback Adequacy`, `Realization Surface Closure Adequacy`, `Context Management / Execution Topology`, `Final Observer Check`.",
+            f"- Goal `{goal}`: `Success Condition`, `What Counts As Done`, `Work Covered And Allowed Actions Contract`, `How We Know The User Purpose Was Met`, `Where The Result Must Show Up`, `Final Answer Format`.",
+            f"- Execution policy `{plan}`: `Work Coverage And Action Limits Matrix`, `Steps That Make The Result True`, `Action That Can Make It Done`, `Candidate Plan Tasks`, `Who Does The Work / Context Use`, `Subagent execution mode`, `Parallel wave matrix`, `Conflict / lock model`, `Failure policy`, `Phase Gates`, `Progress Log Rules`, `User Purpose Strategy`, `Where The Result Must Show Up`, `Check / Evidence Rules`.",
+            f"- Control review `{review}`: `Design Answer Method Check`, `Work Covered And Allowed Actions Check`, `Subagent Concurrency Check`, `Answer Path Check`, `What Counts As Done Check`, `User Purpose Evidence Check`, `Result Placement Check`, `Who Does The Work / Context Use`, `Final Observer Check`.",
             "",
             "## Runtime Discipline",
             "",
             "- Use `$superpowers:executing-plans` discipline against the approved execution policy.",
             "- Use `$superpowers:systematic-debugging` for unclear or repeated failures.",
             "- Use `$superpowers:verification-before-completion` before claiming completion.",
-            "- Follow the approved execution topology and agent workflow recorded in the execution policy.",
-            substrate_line,
+            "- Follow the approved work assignment and agent workflow recorded in the execution policy.",
+            workflow_line,
             "- If `Subagent execution mode` is `serial-single-active`, run exactly one execution subagent at a time and integrate before launching the next.",
             "- If `Subagent execution mode` is `parallel-max-safe`, launch only the current approved wave up to the approved cap, after dependencies are satisfied and conflict locks are disjoint; integrate at the approved barrier before launching the next wave.",
             "- Treat subagent work as governed by the execution policy's bounded delegation protocol and integration gates.",
@@ -229,20 +229,20 @@ def runtime_goal_contract(
             "",
             "- goal achieved: yes/no",
             "- what counts as done met: yes/no",
-            "- target-producing evidence",
+            "- evidence needed to call it done",
             "- required answer path coverage and step evidence",
-            "- answer method completion evidence when requirements/design define an answer type",
-            "- if no: non-achieved reason",
-            "- if no: target-producing action attempted or proof of impossibility",
-            "- if no: smallest next target-producing attempt",
+            "- answer method completion evidence when requirements/design define how this should be answered",
+            "- if no: not done reason",
+            "- if no: action that can make it done attempted or proof of impossibility",
+            "- if no: smallest next action that can make it done",
             "- work covered in this run",
-            "- horizon coverage: complete / partial / unavailable / explicitly bounded by HSA",
+            "- work coverage: complete / partial / unavailable / explicitly bounded by what the user approved",
             "- executed",
             "- prepared-only",
             "- forbidden-not-executed",
-            "- explicitly out-of-scope by HSA",
-            "- purpose feedback status and highest purpose-relevant evidence observed",
-            "- realization surfaces covered, actions completed or justified, residuals reconciled, and pending or unknown surfaces when RSC applies",
+            "- explicitly out-of-scope by what the user approved",
+            "- user purpose evidence status and highest purpose-relevant evidence observed",
+            "- result places covered, actions completed or justified, old behavior checked, and pending or unknown places when result-placement applies",
             "",
             "## Stop Rule",
             "",
@@ -261,7 +261,7 @@ def main() -> int:
     ap.add_argument("--plan", required=True)
     ap.add_argument("--review", required=True)
     ap.add_argument("--out")
-    ap.add_argument("--expect-topology", help="Optional compile-time assertion; validates the approved plan topology but does not override it.")
+    ap.add_argument("--expect-topology", help="Optional compile-time assertion; validates the approved plan work assignment but does not override it.")
     ap.add_argument("--expect-subagent-mode", help="Optional compile-time assertion; validates the approved plan subagent execution mode but does not override it.")
     ap.add_argument("--skip-guard", action="store_true", help="Internal validation only. Bypasses phase-gate checks and must not be used for official runtime goal compilation.")
     ap.add_argument("--i-understand-this-bypasses-phase-gates", action="store_true", help="Required with --skip-guard to make phase-gate bypass explicit.")

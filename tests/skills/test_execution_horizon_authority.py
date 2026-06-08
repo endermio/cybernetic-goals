@@ -10,7 +10,7 @@ GUARD = ROOT / ".agents/skills/compiling-cybernetic-runtime-goals/scripts/contro
 COMPILER = ROOT / ".agents/skills/compiling-cybernetic-runtime-goals/scripts/compile_runtime_goal.py"
 
 
-HSA_APPROVED = """## What the User Approved
+USER_APPROVAL_APPROVED = """## What the User Approved
 
 Status: `Approved`
 
@@ -21,18 +21,18 @@ Status: `Approved`
 | Primary object | horizon and authority fidelity fixture |
 | Requested transformation | approved full horizon into bounded runtime execution |
 | Non-goals | do not execute forbidden live actions |
-| Purpose Feedback Boundary | purpose feedback remains separately calibrated |
-| Realization Surface Closure | RSC remains separately calibrated |
-| What counts as done | approved horizon coverage is accounted for |
-| Evidence needed to call it done | horizon coverage matrix and authorized execution evidence exist |
-| Non-achieved terminal report handling | report goal achieved: no when approved horizon is only partially covered |
-| Required answer path | EHA guard fixture spine |
-| Work covered in this run | Batch 1 through Batch 8 are in the approved horizon |
+| How We Know The User Purpose Was Met | user-purpose evidence remains separately calibrated |
+| Where The Result Must Show Up | result-placement remains separately calibrated |
+| What counts as done | work covered in this run coverage is accounted for |
+| Evidence needed to call it done | work coverage matrix and authorized execution evidence exist |
+| Non-achieved terminal report handling | report goal achieved: no when work covered in this run is only partially covered |
+| Required answer path | work coverage and action limits guard fixture required answer path |
+| Work covered in this run | Batch 1 through Batch 8 are in the work covered in this run |
 | What the agent may do | local code, local tests, local smoke, ledgers, runbooks, and evidence packages may be executed |
 | Forbidden live / irreversible actions | remote deployment, production nginx cutover, service restart, and production artifact overwrite |
 | Required handling for unauthorized actions | prepare runbook / rollback / evidence checklist and report not executed |
 | Explicitly out-of-scope items | none |
-| Output Contract | guard output |
+| Final Answer Format | guard output |
 | Workflow fit | full pre-goal guard fixture |
 | Known assumptions | fixture-only assumptions |
 
@@ -63,7 +63,7 @@ class ExecutionHorizonAuthorityTest(unittest.TestCase):
         review = tmp / "review.md"
 
         requirements.write_text(
-            f"# Requirements\n\n## Requirements Analysis Status\n\nStatus: `Complete`\n\n{HSA_APPROVED}\n",
+            f"# Requirements\n\n## Requirements Analysis Status\n\nStatus: `Complete`\n\n{USER_APPROVAL_APPROVED}\n",
             encoding="utf-8",
         )
 
@@ -76,39 +76,39 @@ class ExecutionHorizonAuthorityTest(unittest.TestCase):
             "",
             "## Success Condition",
             "",
-            "Codex may report `goal achieved: yes` only when the single target-achieved predicate is satisfied.",
+            "Codex may report `goal achieved: yes` only when the single what counts as done is satisfied.",
             "",
-            "## Purpose Feedback Contract",
+            "## How We Know The User Purpose Was Met",
             "",
             "| Element | Requirement |",
             "|---|---|",
             "| Beneficiary / observer | operator |",
-            "| Purpose-realizing outcome observed | operator observes approved horizon coverage |",
+            "| Purpose-realizing outcome observed | operator observes work covered in this run coverage |",
             "| Supporting Evidence | internal checks support progress only |",
             "| Sufficient evidence level | purpose-boundary |",
-            "| Purpose feedback unavailable handling | report pending and next observation |",
-            "| Allowed completion wording | achieved only when approved horizon coverage is accounted for |",
+            "| If user-purpose evidence unavailable | report pending and next observation |",
+            "| Allowed completion wording | achieved only when work covered in this run coverage is accounted for |",
             "",
-            "## Realization Surface Contract",
+            "## Where The Result Must Show Up",
             "",
             "| Element | Requirement |",
             "|---|---|",
-            "| Target state | guard fixture target state |",
-            "| Required surfaces | guard fixture surface model |",
-            "| Surface actions | act / inspect / preserve / exclude / discover |",
+            "| Target state | guard fixture intended result |",
+            "| Required result places | guard fixture surface model |",
+            "| Place actions | act / inspect / preserve / exclude / discover |",
             "| Residual reconciliation | account for old state, unknown surfaces, exclusions, preserved surfaces, and remaining mismatches |",
-            "| RSC status wording | strongest target-realization claim requires RSC adequate |",
-            "| Partial/unavailable handling | report non-achieved terminal status without target-realization claim |",
-            "| RSC / PFB boundary | RSC calibrates target-state and surface-closure claims while PFB calibrates human-purpose realization claims |",
+            "| Result-placement wording | strongest result claim claim requires result-placement adequate |",
+            "| Partial/unavailable handling | report not done terminal status without result claim claim |",
+            "| Distinction from user-purpose evidence | result-placement is distinct from How We Know The User Purpose Was Met |",
             "",
-            "## Target Achievement Contract",
+            "## What Counts As Done",
             "",
             "| Element | Requirement |",
             "|---|---|",
-            "| What counts as done | approved horizon coverage is accounted for |",
-            "| Required target-producing evidence | horizon coverage matrix and authorized execution evidence exist |",
-            "| Allowed achieved claim | `goal achieved: yes` only when approved horizon coverage is accounted for |",
-            "| Steps that make the result true | EHA guard fixture spine |",
+            "| What counts as done | work covered in this run coverage is accounted for |",
+            "| Evidence needed to call it done | work coverage matrix and authorized execution evidence exist |",
+            "| Allowed achieved claim | `goal achieved: yes` only when work covered in this run coverage is accounted for |",
+            "| Steps that make the result true | work coverage and action limits guard fixture required answer path |",
             "",
         ]
         if include_goal_eha:
@@ -118,12 +118,12 @@ class ExecutionHorizonAuthorityTest(unittest.TestCase):
                     "",
                     "| Element | Requirement |",
                     "|---|---|",
-                    "| Approved horizon | Batch 1 through Batch 8 are in the approved horizon |",
-                    "| Runtime-authorized actions | local code, local tests, local smoke, ledgers, runbooks, and evidence packages |",
+                    "| Work covered in this run | Batch 1 through Batch 8 are in the work covered in this run |",
+                    "| What the agent may do | local code, local tests, local smoke, ledgers, runbooks, and evidence packages |",
                     "| Forbidden actions | remote deployment, production nginx cutover, service restart, production artifact overwrite |",
                     "| Prepare-only / observe-only actions | forbidden live actions must produce runbook / rollback / evidence checklist only |",
                     "| Explicitly out-of-scope items | none |",
-                    "| Horizon completion rule | every approved horizon item must be executed, prepared-only, forbidden-not-executed, or explicitly out of scope by HSA |",
+                    "| Work coverage rule | every work covered in this run item must be executed, prepared-only, forbidden-not-executed, or explicitly out of scope by What the User Approved |",
                     "",
                 ]
             )
@@ -147,9 +147,9 @@ class ExecutionHorizonAuthorityTest(unittest.TestCase):
                 [
                     "## Work Coverage And Action Limits Matrix",
                     "",
-                    "| Batch / surface | In approved horizon? | What the agent may do | Required runtime handling | Counts as achieved? |",
+                    "| Work item / place | In work covered in this run? | What the agent may do | Required runtime handling | Counts as achieved? |",
                     "|---|---|---|---|---|",
-                    "| Batch 1 local route parity | yes | execute | modify and test locally | yes if sensors pass |",
+                    "| Batch 1 local route parity | yes | execute | modify and test locally | yes if evidence checks pass |",
                     "| Batch 6 remote deployment | yes | forbidden-not-executed | prepare runbook and rollback checklist | no live claim |",
                 ]
             )
@@ -160,40 +160,40 @@ class ExecutionHorizonAuthorityTest(unittest.TestCase):
             [
                 "## Steps That Make The Result True",
                 "",
-                "| Spine node | Required state transition | Required evidence |",
+                "| Required step | Required state transition | Required evidence |",
                 "|---|---|---|",
-                "| S1 | approved horizon exists -> horizon coverage accounted | horizon coverage matrix has coverage rows |",
+                "| S1 | work covered in this run exists -> work coverage accounted | work coverage matrix has coverage rows |",
                 "",
-                "## Target-Producing Action Strategy",
+                "## Action That Can Make It Done",
                 "",
-                "Target-producing action required:",
+                "Action that can make it done:",
                 "",
-                "- Account for every approved horizon item by execution, prepare-only handling, forbidden-not-executed handling, or explicit HSA out-of-scope classification.",
+                "- Account for every work covered in this run item by execution, prepare-only handling, forbidden-not-executed handling, or explicit What the User Approved out-of-scope classification.",
                 "",
                 "Proof of impossibility, if any:",
                 "",
-                "- Record the condition proving a target-producing action cannot be attempted.",
+                "- Record the condition proving a action that can make it done cannot be attempted.",
                 "",
                 "Non-achieved terminal report rule:",
                 "",
-                "- A non-achieved terminal report may be produced only after horizon coverage is accounted for or impossibility is proven.",
+                "- A report when not done may be produced only after work coverage is accounted for or impossibility is proven.",
                 "",
-                "## Realization Surface Closure Strategy",
+                "## Where The Result Must Show Up",
                 "",
-                "- RSC status: `RSC not applicable with justification`",
-                "- Why no target-state surface closure is required: this fixture only checks EHA structure.",
-                "- Why no surface discovery / residual reconciliation is needed: no controlled-object target state is changed.",
-                "- Allowed target-realization wording: do not claim target-state realization.",
+                "- Result-placement status: `not applicable with justification`",
+                "- Why no intended-result result placement is required: this fixture only checks work coverage and action limits structure.",
+                "- Why no place discovery / residual reconciliation is needed: no controlled-object intended result is changed.",
+                "- Allowed result claim wording: do not claim intended-result realization.",
                 "",
-                "## Context Management / Execution Topology",
+                "## Who Does The Work / Context Use",
                 "",
                 "Task level: `Level 2`",
                 "",
-                "Selected topology: `Main-only`",
+                "Who does the work: `Main-only`",
                 "",
                 "Selected agent workflow: `none`",
                 "",
-                "Topology rationale:",
+                "Work Assignment rationale:",
                 "",
                 "- Bounded fixture fits main-only execution.",
                 "",
@@ -205,9 +205,9 @@ class ExecutionHorizonAuthorityTest(unittest.TestCase):
                 "",
                 "## Candidate Plan Tasks",
                 "",
-                "### Batch 1: EHA guard fixture",
+                "### Batch 1: work coverage and action limits guard fixture",
                 "",
-                "Spine node(s):",
+                "Required step(s):",
                 "",
                 "- S1",
                 "",
@@ -219,9 +219,9 @@ class ExecutionHorizonAuthorityTest(unittest.TestCase):
                 "",
                 "Transition evidence produced:",
                 "",
-                "- Fixture target-producing evidence is recorded.",
+                "- Fixture evidence needed to call it done is recorded.",
                 "",
-                "Integration gate:",
+                "Integration check:",
                 "",
                 "- Main agent accepts S1 evidence.",
                 "",
@@ -233,7 +233,7 @@ class ExecutionHorizonAuthorityTest(unittest.TestCase):
                 "",
                 "Goal:",
                 "",
-                "- Keep the EHA guard fixture structurally ready.",
+                "- Keep the work coverage and action limits guard fixture structurally ready.",
                 "",
             ]
         )
@@ -254,37 +254,37 @@ class ExecutionHorizonAuthorityTest(unittest.TestCase):
             "- Human setpoint fidelity: `yes`",
             "- Goal contract: `yes`",
             "- Execution policy: `yes`",
-            "- Context management / execution topology: `yes`",
-            "- Purpose feedback adequacy: `yes`",
-            "- Realization surface closure adequacy: `yes`",
-            "- Target achievement predicate fidelity: `yes`",
+            "- Who does the work / context use: `yes`",
+            "- User purpose evidence check: `yes`",
+            "- Result placement check: `yes`",
+            "- What counts as done check: `yes`",
             "- answer path check: `yes`",
-            f"- Work covered in this run and authority fidelity: `{review_eha_independence}`",
+            f"- Work covered in this run and authority check: `{review_eha_independence}`",
             "",
-            "## Context Management / Execution Topology",
+            "## Who Does The Work / Context Use",
             "",
             "Findings:",
-            "- Reviewed selected topology.",
+            "- Reviewed work assignment.",
             "",
-            "## Purpose Feedback Adequacy",
+            "## User Purpose Evidence Check",
             "",
             "Findings:",
             "- Purpose feedback waits for purpose-boundary evidence.",
             "",
-            "## Realization Surface Closure Adequacy",
+            "## Result Placement Check",
             "",
             "Findings:",
-            "- RSC not applicable is justified for this fixture.",
+            "- not applicable is justified for this fixture.",
             "",
-            "## Target Achievement Predicate Fidelity",
+            "## What Counts As Done Check",
             "",
             "Findings:",
-            "- The single target-achieved predicate is separated from non-achieved terminal reports.",
+            "- The single what counts as done is separated from report when not dones.",
             "",
             "## Answer Path Check",
             "",
             "Findings:",
-            "- Work packages map to the fixture spine node.",
+            "- Work packages map to the fixture required step.",
             "",
         ]
         if include_review_eha:
@@ -293,7 +293,7 @@ class ExecutionHorizonAuthorityTest(unittest.TestCase):
                     "## Work Covered And Allowed Actions Check",
                     "",
                     "Findings:",
-                    "- Approved horizon remains in scope while authority limits define execute / prepare-only / forbidden-not-executed handling.",
+                    "- Work covered in this run remains in scope while authority limits define execute / prepare-only / forbidden-not-executed handling.",
                     "",
                 ]
             )
@@ -351,16 +351,16 @@ class ExecutionHorizonAuthorityTest(unittest.TestCase):
             self.assertIn(required, requirements)
 
         self.assertIn("Work Covered And Allowed Actions Contract", goal)
-        self.assertIn("Approved horizon", goal)
-        self.assertIn("Runtime-authorized actions", goal)
-        self.assertIn("Horizon completion rule", goal)
+        self.assertIn("Work covered in this run", goal)
+        self.assertIn("What the agent may do", goal)
+        self.assertIn("Work coverage rule", goal)
 
         self.assertIn("Work Coverage And Action Limits Matrix", plan)
         self.assertIn("What the agent may do", plan)
         self.assertIn("Required runtime handling", plan)
 
         self.assertIn("Work Covered And Allowed Actions Check", review)
-        self.assertIn("Work covered in this run and authority fidelity", review)
+        self.assertIn("Work covered in this run and authority check", review)
 
     def test_guard_accepts_complete_horizon_authority_chain(self):
         with tempfile.TemporaryDirectory() as tmpdir:
@@ -403,7 +403,7 @@ class ExecutionHorizonAuthorityTest(unittest.TestCase):
         self.assertEqual(2, result.returncode, output)
         self.assertIn("NEXT: RunReview", output)
         self.assertIn("Work Covered And Allowed Actions Check", output)
-        self.assertIn("Work covered in this run and authority fidelity: yes", output)
+        self.assertIn("Work covered in this run and authority check: yes", output)
 
     def test_guard_rejects_future_roadmap_inside_approved_horizon_matrix(self):
         with tempfile.TemporaryDirectory() as tmpdir:
@@ -413,7 +413,7 @@ class ExecutionHorizonAuthorityTest(unittest.TestCase):
         output = result.stdout + result.stderr
         self.assertEqual(2, result.returncode, output)
         self.assertIn("NEXT: RunExecutionPolicy", output)
-        self.assertIn("future roadmap cannot replace approved horizon", output)
+        self.assertIn("future roadmap cannot replace work covered in this run", output)
 
     def test_runtime_contract_requires_horizon_coverage_report_fields(self):
         compiler = self.read(".agents/skills/compiling-cybernetic-runtime-goals/scripts/compile_runtime_goal.py")
@@ -421,11 +421,11 @@ class ExecutionHorizonAuthorityTest(unittest.TestCase):
         skill = self.read(".agents/skills/compiling-cybernetic-runtime-goals/SKILL.md")
 
         for text in (compiler, template, skill):
-            self.assertIn("horizon coverage", text)
+            self.assertIn("work coverage", text)
             self.assertIn("executed", text)
             self.assertIn("prepared-only", text)
             self.assertIn("forbidden-not-executed", text)
-            self.assertIn("explicitly out-of-scope by HSA", text)
+            self.assertIn("explicitly out-of-scope by what the user approved", text)
 
         with tempfile.TemporaryDirectory() as tmpdir:
             tmp = Path(tmpdir)
@@ -455,7 +455,7 @@ class ExecutionHorizonAuthorityTest(unittest.TestCase):
         self.assertEqual(0, result.returncode, result.stdout + result.stderr)
         self.assertIn("Work Coverage And Action Limits Matrix", contract_text)
         self.assertIn("Work Covered And Allowed Actions Check", contract_text)
-        self.assertIn("horizon coverage", contract_text)
+        self.assertIn("work coverage", contract_text)
         self.assertNotIn("future roadmap", contract_text.casefold())
 
 

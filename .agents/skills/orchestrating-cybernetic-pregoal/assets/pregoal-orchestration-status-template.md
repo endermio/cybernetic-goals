@@ -6,11 +6,11 @@ State: `RequirementsMissing` / `RequirementsComplete` / `DesignReady` / `GoalRea
 
 ## Artifact Chain
 
-| Stage | Required | Path | Status | Gate |
+| Stage | Required | Path | Status | Check |
 |---|---:|---|---|---|
 | Requirements | yes | `[path]` | `Complete / Incomplete / missing` | `passed / blocked` |
 | Design | `yes/no` | `[path or none]` | `Candidate / Reviewed / Approved / missing / not required` | `passed / blocked` |
-| Output Contract | `yes/no` | `[requirements/design/goal section or none]` | `present / missing / not required` | `passed / blocked` |
+| Final Answer Format | `yes/no` | `[requirements/design/goal section or none]` | `present / missing / not required` | `passed / blocked` |
 | Goal | yes | `[path or none]` | `present / missing` | `passed / blocked` |
 | Execution Policy | yes | `[path or none]` | `Candidate / Approved / missing` | `passed / blocked` |
 | Control Review | yes | `[path or none]` | `Approved / Needs Revision / Needs Independent Review / Dirty / Needs Re-review / missing` | `passed / blocked` |
@@ -20,10 +20,10 @@ State: `RequirementsMissing` / `RequirementsComplete` / `DesignReady` / `GoalRea
 
 `RunDesign` / `RunGoalWriting` / `RunExecutionPolicy` / `RunReview` / `RunRuntimeCompile` / `OutputRuntimeGoal` / `Blocked`
 
-## Execution Topology
+## Execution Work Assignment
 
-- Selected topology: `Main-only / Serial subagent-driven / Parallel subagent-driven / not selected`
-- Topology source: `[execution policy path]`
+- Who does the work: `Main-only / Serial subagent-driven / Parallel subagent-driven / not selected`
+- Work Assignment source: `[execution policy path]`
 - Orchestrator decision made: `no`
 
 ## Blocked Reason

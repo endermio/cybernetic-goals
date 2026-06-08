@@ -14,12 +14,12 @@ Status: `Approved` / `Blocked` / `Needs Independent Review`
 
 ## Control Summary
 
-- Setpoint:
+- What the user approved:
 - Solution model:
-- Semantic invariants:
+- Meaning invariants:
 - Tactical degrees of freedom:
-- Sensors:
-- Runtime boundary:
+- Evidence checks:
+- Runtime limit:
 
 ## Review Cycle Summary
 

@@ -2,25 +2,25 @@
   "skill_name": "writing-cybernetic-execution-policies",
   "evals": [
     {
-      "id": "contains-sensor-governance",
+      "id": "contains-evidence check-governance",
       "prompt": "根据 requirements analysis 和 goal 为复杂功能写 execution policy。",
-      "expected_output": "Plan includes sensor governance, batch cadence, dependency matrix, and no runtime execution.",
+      "expected_output": "Plan includes evidence check governance, batch cadence, dependency matrix, and no runtime execution.",
       "assertions": [
         "Includes Dependency Matrix.",
-        "Includes Sensor / Evidence Governance.",
+        "Includes Evidence check / Evidence Governance.",
         "Includes destructive intermediate-state policy.",
         "Does not execute target work.",
         "Marks plan as candidate, not approved."
       ]
     },
     {
-      "id": "requires-superpowers-planning-substrate",
+      "id": "requires-superpowers-planning-workflow",
       "prompt": "根据 requirements analysis 和 goal 为一个非平凡执行任务写 execution policy，但 $superpowers:writing-plans 不可用。",
-      "expected_output": "The skill stops or marks the policy blocked because the required planning substrate is unavailable, instead of drafting an approved ad hoc plan, and includes a response-only next step.",
+      "expected_output": "The skill stops or marks the policy blocked because the required planning workflow is unavailable, instead of drafting an approved ad hoc plan, and includes a response-only next step.",
       "assertions": [
-        "Mentions $superpowers:writing-plans as the required planning substrate for non-trivial execution policies.",
+        "Mentions $superpowers:writing-plans as the required planning workflow for non-trivial execution policies.",
         "States that merely mentioning $superpowers:writing-plans or imitating generic planning is not sufficient.",
-        "Stops or reports missing required planning infrastructure when the substrate is unavailable.",
+        "Stops or reports missing required planning infrastructure when the workflow is unavailable.",
         "Does not self-substitute with an unreviewed internal plan.",
         "Does not mark the execution policy Approved.",
         "Does not execute target work.",
@@ -47,7 +47,7 @@
         "Source Contracts includes the solution design path.",
         "Plan preserves confirmed design invariants.",
         "Plan distinguishes design invariants from tactical degrees of freedom.",
-        "Plan does not invent new controlled objects, relationships, information flow, or interface semantics not present in requirements analysis or design.",
+        "Plan does not invent new controlled objects, relationships, information flow, or interface meaning not present in requirements analysis or design.",
         "Does not execute target work."
       ]
     },
@@ -64,7 +64,7 @@
     },
     {
       "id": "level-3-policy-handoff-returns-to-orchestrator",
-      "prompt": "根据 requirements、solution design 和 goal 创建 execution policy。路由结果是 Level 3 full pre-goal pipeline，Control Review Gate required，$orchestrating-cybernetic-pregoal 可用。",
+      "prompt": "根据 requirements、solution design 和 goal 创建 execution policy。路由结果是 Level 3 full pre-goal pipeline，review check required，$orchestrating-cybernetic-pregoal 可用。",
       "expected_output": "Create a candidate execution policy, then in the response hand off back to $orchestrating-cybernetic-pregoal rather than directly recommending $reviewing-cybernetic-control-structures.",
       "assertions": [
         "Creates or references a docs/cybernetics/plans path.",
@@ -76,9 +76,9 @@
     {
       "id": "avoids-micro-batch-overcontrol",
       "prompt": "Create an execution policy for a complex controlled change. The tempting plan splits every tiny edit into its own batch and requires broad verification after each edit.",
-      "expected_output": "The execution policy groups work into coherent target-state slices, allows approved intermediate breakage inside batches, and uses batch-end verification rather than micro-step verification.",
+      "expected_output": "The execution policy groups work into coherent intended-result slices, allows approved intermediate breakage inside batches, and uses batch-end verification rather than micro-step verification.",
       "assertions": [
-        "Includes Execution Granularity and Sensor Budget.",
+        "Includes Execution Granularity and Evidence check Budget.",
         "Rejects mechanical micro-batches.",
         "Allows intermediate broken states inside approved batches.",
         "Requires each batch to end in an openable or meaningfully verifiable state.",
@@ -100,29 +100,29 @@
       ]
     },
     {
-      "id": "level-3-high-context-load-selects-subagent-topology",
+      "id": "level-3-high-context-load-selects-subagent-work assignment",
       "prompt": "Create an execution policy for a Level 3 controlled change with high context load across multiple independent work packages. The main agent would otherwise need to coordinate, investigate, execute, verify, and integrate all work.",
-      "expected_output": "The execution policy includes Context Management / Execution Topology, selects Serial subagent-driven by default unless main-only is justified, defines bounded context packs, return formats, and integration gates, and does not default to parallel without approval.",
+      "expected_output": "The execution policy includes Who Does The Work / Context Use, selects Serial subagent-driven by default unless main-only is justified, defines bounded context packs, return formats, and integration gates, and does not default to parallel without approval.",
       "assertions": [
-        "Includes Context Management / Execution Topology.",
+        "Includes Who Does The Work / Context Use.",
         "Selects Main-only, Serial subagent-driven, or Parallel subagent-driven explicitly.",
         "Records Selected agent workflow.",
         "Defaults Level 3 high-context work to Serial subagent-driven unless Main-only has a context-load justification.",
         "Defines Context pack for each delegated work package.",
-        "Defines Context Pack Requirements including relevant control excerpts, current batch objective, allowed artifacts/surfaces, forbidden changes, required sensors/evidence, stop conditions, and expected return format.",
+        "Defines Context Pack Requirements including relevant control excerpts, current batch objective, allowed artifacts/surfaces, forbidden changes, required evidence checks/evidence, stop conditions, and expected return format.",
         "Defines Return format for each delegated work package.",
-        "Defines Integration gate for each delegated work package.",
+        "Defines Integration check for each delegated work package.",
         "Defines a Context Compression Rule for batch boundaries.",
         "Does not select Parallel subagent-driven without explicit human approval and dependency independence."
       ]
     },
     {
       "id": "level-3-main-only-requires-context-load-justification",
-      "prompt": "Create an execution policy for a Level 3 controlled change, but choose Main-only topology because the work is tightly coupled and subagent delegation would add more integration risk than it removes.",
+      "prompt": "Create an execution policy for a Level 3 controlled change, but choose Main-only work assignment because the work is tightly coupled and subagent delegation would add more integration risk than it removes.",
       "expected_output": "The execution policy may choose Main-only only with an explicit Main-only context-load justification explaining why the main agent will not become an overloaded coordinator, worker, integrator, and verifier.",
       "assertions": [
         "Records Task level as Level 3.",
-        "Selects Main-only explicitly if that topology is used.",
+        "Selects Main-only explicitly if that work assignment is used.",
         "Records Selected agent workflow as none or another justified non-delegating value for Main-only.",
         "Includes Main-only context-load justification.",
         "Explains why bounded subagents are not needed or would be counterproductive.",
@@ -132,7 +132,7 @@
     },
     {
       "id": "execution-policy-prevents-repeated-full-raw-evidence",
-      "prompt": "Create an execution policy for a long controlled change whose sensor emits about 20k raw JSONL hits per scan. The tempting plan stores a full raw scan after baseline, every batch, and final verification.",
+      "prompt": "Create an execution policy for a long controlled change whose evidence check emits about 20k raw JSONL hits per scan. The tempting plan stores a full raw scan after baseline, every batch, and final verification.",
       "expected_output": "The execution policy includes Evidence Lifecycle / Evidence Budget, permits at most one full baseline and one final full scan unless justified, stores intermediate evidence as summary + delta with raw pointers, and keeps tracked evidence reviewable.",
       "assertions": [
         "Includes Evidence Lifecycle / Evidence Budget.",
@@ -140,7 +140,7 @@
         "Keeps at most one full baseline and one final full scan unless explicitly justified.",
         "Requires intermediate scans to store summary + delta instead of repeated full raw hits.",
         "Requires raw pointers or hashes when raw output exists.",
-        "Keeps full raw sensor output out of tracked review artifacts unless the goal explicitly requires it.",
+        "Keeps full raw evidence check output out of tracked review artifacts unless the goal explicitly requires it.",
         "Stops or revises the execution policy if evidence artifacts exceed the approved evidence budget."
       ]
     }

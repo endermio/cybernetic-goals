@@ -75,7 +75,7 @@
     },
     {
       "id": "persistent-intent-brief-only-when-justified",
-      "prompt": "This intent framing will guide several future control artifacts; record it before we proceed.",
+      "prompt": "This intent framing will guide several future approved files; record it before we proceed.",
       "expected_output": "The skill may write an intent brief because persistence is explicitly justified, while keeping it limited to shared understanding and optional handoff.",
       "assertions": [
         "Uses docs/cybernetics/intents/YYYY-MM-DD-<slug>.md when writing.",

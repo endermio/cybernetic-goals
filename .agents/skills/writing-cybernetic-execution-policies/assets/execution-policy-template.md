@@ -10,60 +10,60 @@ Status: `Candidate`
 - Solution design: `[path or not required]`
 - Goal contract: `[path]`
 
-## Superpowers Planning Substrate
+## Superpowers Planning Workflow
 
-- Required substrate: `$superpowers:writing-plans`
-- Substrate status: `Required / Used / Blocked / Not required`
+- Required workflow: `$superpowers:writing-plans`
+- Workflow status: `Required / Used / Blocked / Not required`
 - Planning status: `Candidate`
 
-Cybernetic constraints supplied to the substrate:
+Cybernetic constraints supplied to the workflow:
 
-- confirmed semantic invariants;
-- approved or candidate solution-design invariants;
+- rules that cannot change;
+- approved or candidate solution-design rules;
 - tactical degrees of freedom;
 - dependency matrix;
-- context management / execution topology;
+- who does the work / context use;
 - subagent execution mode and concurrency policy;
 - work coverage and action limits matrix;
-- realization surface closure strategy;
+- where the result must show up;
 - required answer path;
-- target-producing action strategy;
-- execution granularity and sensor budget;
+- action that can make it done strategy;
+- execution granularity and evidence check budget;
 - batch cadence;
 - destructive intermediate-state policy;
 - output material/evidence collection;
 - purpose feedback strategy;
 - evidence lifecycle / evidence budget;
-- sensor/evidence governance;
-- stale sensor retirement and rewrite policy.
+- evidence check/evidence governance;
+- stale evidence check retirement and rewrite policy.
 
-If the required substrate is unavailable for a non-trivial execution policy, this policy is blocked and must not be treated as an approved internal substitute.
+If the required workflow is unavailable for a non-trivial execution policy, this policy is blocked and must not be treated as an approved internal substitute.
 
-## Confirmed Semantic Invariants
+## Rules That Cannot Change
 
 These cannot be changed during runtime execution without stopping.
 
-- [semantic invariant]
+- [meaning rule]
 
 ## Tactical Degrees of Freedom
 
-These may change during execution if invariants are preserved.
+These may change during execution if rules that cannot change are preserved.
 
 - [execution detail]
 - [workstream organization detail]
-- [sensor fixture/detail]
+- [evidence check fixture/detail]
 
 ## Dependency Matrix
 
-| Workstream | Owns | Depends on | Can run in parallel with | Gate |
+| Workstream | Owns | Depends on | Can run in parallel with | Check |
 |---|---|---|---|---|
-| A | [area] | [dependency] | [parallel work] | [gate] |
+| A | [area] | [dependency] | [parallel work] | [check] |
 
-## Context Management / Execution Topology
+## Who Does The Work / Context Use
 
 Task level: `Level 0 / Level 1 / Level 2 / Level 3 / Level 4`
 
-Selected topology: `Main-only / Serial subagent-driven / Parallel subagent-driven`
+Who does the work: `Main-only / Serial subagent-driven / Parallel subagent-driven`
 
 Selected agent workflow: `bounded-protocol / superpowers-subagent-driven-development / superpowers-dispatching-parallel-agents / adapter-specific / none`
 
@@ -71,11 +71,11 @@ Subagent execution mode: `none / serial-single-active / parallel-max-safe`
 
 Max concurrent subagents: `1 / auto / N`
 
-Substrate compatibility:
+Agent workflow compatibility:
 
-Use `.agents/skills/references/delegation-substrate-registry.json` as the source of substrate capability boundaries.
+Use `.agents/skills/references/delegation-workflow-registry.json` as the source of workflow capability boundaries.
 
-| Selected agent workflow | Allowed topology | Allowed mode |
+| Selected agent workflow | Allowed work assignment | Allowed mode |
 |---|---|---|
 | `superpowers-subagent-driven-development` | `Serial subagent-driven` | `serial-single-active` |
 | `superpowers-dispatching-parallel-agents` | `Parallel subagent-driven` | `parallel-max-safe` |
@@ -85,7 +85,7 @@ Use `.agents/skills/references/delegation-substrate-registry.json` as the source
 
 Agent workflow compatibility rationale:
 
-- [required when HSA substrate preference is not used or when a requested substrate is incompatible with the selected topology/mode]
+- [required when What the User Approved workflow preference is not used or when a requested workflow is incompatible with the selected work assignment/mode]
 
 Concurrency selection rationale:
 
@@ -97,15 +97,15 @@ Concurrency frontier rule:
 
 Conflict / lock model:
 
-| Surface / artifact / state | Lock owner | Conflict rule |
+| Artifact / state / shared place | Lock owner | Conflict rule |
 |---|---|---|
-| [surface] | [main / work package / not shared] | [disjoint / exclusive lock / read-only / barrier required] |
+| [place] | [main / work package / not shared] | [disjoint / exclusive lock / read-only / barrier required] |
 
 Parallel wave matrix:
 
-| Wave | Spine frontier | Work packages | Independence proof | Shared surfaces / locks | Integration barrier |
+| Wave | Required-step frontier | Work packages | Independence proof | Shared places / locks | Integration barrier |
 |---|---|---|---|---|---|
-| [Wave 1] | [spine node(s) whose dependencies are satisfied] | [packages] | [why they can run together] | [locks or disjoint surfaces] | [main-agent barrier] |
+| [Wave 1] | [required step(s) whose dependencies are satisfied] | [packages] | [why they can run together] | [locks or disjoint places] | [main-agent barrier] |
 
 Failure policy:
 
@@ -115,9 +115,9 @@ Main-agent integration rule:
 
 - [when candidate outputs become accepted progress state]
 
-Topology rationale:
+Work Assignment rationale:
 
-- [why this topology fits the task level, context load, dependency matrix, and review constraints]
+- [why this work assignment fits the task level, context load, dependency matrix, and review constraints]
 
 Main-only context-load justification:
 
@@ -125,7 +125,7 @@ Main-only context-load justification:
 
 Main agent owns:
 
-- approved control artifacts
+- approved approved files
 - current batch state
 - dispatch
 - integration
@@ -140,7 +140,7 @@ Subagent owns:
 
 Delegation matrix:
 
-| Work package | Executor | Context pack | Allowed actions | Return format | Integration gate |
+| Work package | Executor | Context pack | Allowed actions | Return format | Integration check |
 |---|---|---|---|---|---|
 | [package] | `main / serial subagent / parallel subagent` | [artifact paths, files, constraints, stop conditions] | [bounded actions] | [required summary/evidence format] | [main-agent integration condition] |
 
@@ -152,15 +152,15 @@ Each delegated work package must define a bounded operating context, not just ar
 |---|---|
 | Relevant control excerpts | [requirements/design/goal/policy excerpts needed for this package] |
 | Current batch objective | [bounded objective for this package] |
-| Allowed artifacts/surfaces | [files, documents, commands, or surfaces this package may touch] |
-| Forbidden changes | [control artifacts, scope, topology, unrelated surfaces, or other forbidden changes] |
-| Required sensors/evidence | [checks, evidence references, or observations this package must return] |
+| Allowed artifacts/places | [files, documents, commands, or places this package may touch] |
+| Forbidden changes | [approved files, scope, work assignment, unrelated places, or other forbidden changes] |
+| Required evidence checks/evidence | [checks, evidence references, or observations this package must return] |
 | Stop conditions | [conditions that force the subagent to stop and report rather than continue] |
 | Expected return format | [summary/evidence/blocker format required for integration] |
 
 Subagent workflow:
 
-- [Record the approved bounded subagent delegation protocol for serial or parallel subagent-driven topology.]
+- [Record the approved bounded subagent delegation protocol for serial or parallel subagent-driven work assignment.]
 - [This must match Selected agent workflow.]
 - [Use `superpowers-subagent-driven-development` only for `Serial subagent-driven` + `serial-single-active` + `Max concurrent subagents: 1`.]
 - [Use `superpowers-dispatching-parallel-agents` only for `Parallel subagent-driven` + `parallel-max-safe` under the approved wave/lock/barrier/integration structure.]
@@ -178,132 +178,132 @@ Rules:
 - Use `Parallel subagent-driven` only when Human approval, Dependency independence, and Control-review approval are explicitly `yes` or `approved`; pair it with `Subagent execution mode: parallel-max-safe`.
 - Use `Serial subagent-driven` with `Subagent execution mode: serial-single-active` and `Max concurrent subagents: 1`.
 - The main agent must coordinate, integrate, maintain the progress log, and detect stop conditions.
-- A subagent must not modify control artifacts, widen scope, replace topology, or bypass the integration gate.
+- A subagent must not modify approved files, widen scope, replace work assignment, or bypass the integration check.
 - Do not treat `$superpowers:subagent-driven-development` as the generic agent workflow; it is serial-single-active only.
 - Do not use `$superpowers:subagent-driven-development` with `parallel-max-safe`; use `superpowers-dispatching-parallel-agents`, `bounded-protocol`, or `adapter-specific` for max-safe parallel execution.
 - `Selected agent workflow: none` is allowed only for `Main-only`.
-- If the selected topology becomes insufficient, stop and revise the execution policy; do not let runtime improvise a new topology.
+- If the selected work assignment becomes insufficient, stop and revise the execution policy; do not let runtime improvise a new work assignment.
 
 Context Compression Rule:
 
-At each batch boundary, update the progress log with:
+At each batch break, update the progress log with:
 
-- Active control summary: [current requirements, goal invariants, topology, and stop conditions]
+- Active control summary: [current requirements, goal rules that cannot change, work assignment, and stop conditions]
 - Completed work packages: [packages completed and integrated]
 - Subagent outputs integrated: [candidate outputs accepted into main progress state]
-- Evidence produced: [evidence references and sensor interpretation]
-- Deferred sensors and reasons: [policy-approved deferrals]
+- Evidence produced: [evidence references and evidence check interpretation]
+- Deferred evidence checks and reasons: [policy-approved deferrals]
 - Unresolved blockers: [blockers requiring revision or human input]
 - Deviations from policy: [deviations and whether execution must stop]
 - Next allowed action: [next policy-approved action]
 
 ## Work Coverage And Action Limits Matrix
 
-Use this section for full-route or multi-batch controlled work. Authority limits define runtime handling; they must not silently shrink the approved horizon.
+Use this section for full-route or multi-batch controlled work. Authority limits define runtime handling; they must not silently shrink the work covered in this run.
 
-| Batch / surface | In approved horizon? | What the agent may do | Required runtime handling | Counts as achieved? |
+| Work item / place | In work covered in this run? | What the agent may do | Required runtime handling | Counts as achieved? |
 |---|---|---|---|---|
-| [batch or surface] | `yes/no; if no, cite HSA out-of-scope item` | `execute / prepare-only / observe-only / forbidden-not-executed / explicitly out-of-scope by HSA` | [execute, prepare runbook, observe, report not executed, or exclude by HSA] | [yes/no and claim wording] |
+| [batch or place] | `yes/no; if no, cite What the User Approved out-of-scope item` | `execute / prepare-only / observe-only / forbidden-not-executed / explicitly out-of-scope by what the user approved` | [execute, prepare runbook, observe, report not executed, or exclude by What the User Approved] | [yes/no and claim wording] |
 
 Rules:
 
-- Every approved horizon item must be accounted for as executed, prepared-only, observe-only, forbidden-not-executed, or explicitly out-of-scope by HSA.
+- Every work covered in this run item must be accounted for as executed, prepared-only, observe-only, forbidden-not-executed, or explicitly out-of-scope by what the user approved.
 - What the agent may do limits change handling, not scope.
-- Do not move approved horizon items to future roadmap, handoff, or later goal because they are unauthorized for direct execution.
+- Do not move work covered in this run items to future roadmap, handoff, or later goal because they are unauthorized for direct execution.
 - Unauthorized live or irreversible actions must be reported as not executed, with required preparation evidence when applicable.
-- If the approved horizon itself is too broad, stop and return to requirements/HSA revision instead of narrowing it inside the execution policy.
+- If the work covered in this run itself is too broad, stop and return to requirements/What the User Approved revision instead of narrowing it inside the execution policy.
 
-## Realization Surface Closure Strategy
+## Where The Result Must Show Up
 
 For compiled runtime goals, always include this section.
 
-When the task changes or realizes target state across controlled-object surfaces, use the full structure below.
+When the task changes or realizes intended result across controlled-object places, use the full structure below.
 
-If RSC is not applicable, record this compact structure instead:
+If result placement is not applicable, record this compact structure instead:
 
-- RSC status: `RSC not applicable with justification`
-- Why no target-state surface closure is required: [reason]
-- Why no surface discovery / residual reconciliation is needed: [reason]
-- Allowed target-realization wording: [wording]
+- Result-placement status: `not applicable with justification`
+- Why no intended-result result placement is required: [reason]
+- Why no place discovery / residual reconciliation is needed: [reason]
+- Allowed result claim wording: [wording]
 
-### Surface Model
+### Places The Result Appears
 
-| Surface | Role in target realization | Required action | Verification / reconciliation |
+| Place | Role in result claim | Required action | Verification / reconciliation |
 |---|---|---|---|
-| [surface] | [state carrier / interface / evidence surface / decision point / policy surface / compatibility boundary] | [act / inspect / preserve / exclude / discover] | [how closure, residuals, or bounded status will be checked] |
+| [place] | [state carrier / interface / evidence place / decision point / policy place / compatibility point] | [act / inspect / preserve / exclude / discover] | [how result placement, residuals, or bounded status will be checked] |
 
-### Surface Classes
+### Place Classes
 
 Must act:
 
-- [surface]
+- [place]
 
 Must inspect:
 
-- [surface]
+- [place]
 
 Must preserve:
 
-- [surface and rationale]
+- [place and rationale]
 
 Explicitly out of scope:
 
-- [surface and reason]
+- [place and reason]
 
 Unknown or requires discovery:
 
-- [surface or discovery question]
+- [place or discovery question]
 
 ### Residual Reconciliation
 
 After action, reconcile:
 
 - old-state residuals;
-- unhandled surfaces;
+- unhandled places;
 - unexplained differences;
-- preserved or excluded surfaces and rationale;
-- surfaces requiring later observation;
-- allowed target-realization wording for RSC adequate, partial, missing, unavailable, or not applicable with justification.
+- preserved or excluded places and rationale;
+- places requiring later observation;
+- allowed result claim wording for result-placement adequate, partial, missing, unavailable, or not applicable with justification.
 
-Domain adapters own concrete surface discovery and verification methods. The core policy owns surface/action/residual/reconciliation structure.
+Domain adapters own concrete place discovery and verification methods. The core policy owns place/action/residual/reconciliation structure.
 
 ## Steps That Make The Result True
 
 For target-achieving implementation work, decompose by the state transitions that produce the target, not by component inventory.
 
-| Spine node | Required state transition | Required evidence |
+| Required step | Required state transition | Required evidence |
 |---|---|---|
 | [S1] | [initial/intermediate state -> next state] | [evidence that this transition is satisfied] |
 
 Rules:
 
-- Every mainline work package must map to at least one spine node.
+- Every mainline work package must map to at least one required step.
 - Supporting-only work must be marked as supporting-only and cannot satisfy goal progress by itself.
-- Do not defer the primary actor-centered path to future work while claiming substrate or component completion.
-- Component evidence supports the spine; it does not replace spine transition evidence.
+- Do not defer the primary actor-centered path to future work while claiming workflow or component completion.
+- Component evidence supports the required answer path; it does not replace required step evidence.
 
-## Target-Producing Action Strategy
+## Action That Can Make It Done
 
-Target-producing action required:
+Action that can make it done:
 
 - [the action, probe, experiment, change, or observation that must be attempted to satisfy the what counts as done]
 
 Proof of impossibility, if any:
 
-- [what would prove the target-producing action cannot be attempted in this environment]
+- [what would prove the action that can make it done cannot be attempted in this environment]
 
-Non-achieved terminal report rule:
+report when not done rule:
 
-- A non-achieved report may be produced only after the target-producing action is attempted and fails, or after impossibility is proven.
-- A non-achieved report cannot satisfy the what counts as done.
+- A report when not done may be produced only after the action that can make it done is attempted and fails, or after impossibility is proven.
+- A report when not done cannot satisfy the what counts as done.
 
-## Execution Granularity and Sensor Budget
+## Execution Granularity and Evidence check Budget
 
 ### Batch Granularity
 
-Each batch must represent a coherent target-state slice, not a mechanical micro-step.
+Each batch must represent a coherent intended-result slice, not a mechanical micro-step.
 
-| Batch | Coherent target-state slice | Why this is one batch | Too-small split avoided |
+| Batch | Coherent intended-result slice | Why this is one batch | Too-small split avoided |
 |---|---|---|---|
 | Batch 1 | [slice] | [reason] | [micro-split avoided] |
 
@@ -312,21 +312,21 @@ Rules:
 - Do not require every micro-step to be openable.
 - Intermediate states inside a batch may be broken when this policy explicitly allows it.
 - Each batch must end in an openable or meaningfully verifiable state.
-- If a batch cannot be verified meaningfully, merge it with the next batch or redefine the gate.
-- If a batch is too large to diagnose failures, split by dependency boundary or sensor boundary.
+- If a batch cannot be verified meaningfully, merge it with the next batch or redefine the check.
+- If a batch is too large to diagnose failures, split by dependency line or check line.
 
-### Sensor Budget
+### Evidence check Budget
 
-| Batch | Required strong sensors | Optional/weak sensors | Deferred sensors | Final-only sensors |
+| Batch | Required strong evidence checks | Optional/weak evidence checks | Deferred evidence checks | Final-only evidence checks |
 |---|---|---|---|---|
-| Batch 1 | [sensors] | [sensors] | [sensors] | [sensors] |
+| Batch 1 | [evidence checks] | [evidence checks] | [evidence checks] | [evidence checks] |
 
 Rules:
 
-- Use the smallest sensor set that can detect semantic or structural drift.
-- Do not run expensive broad checks at every batch unless they are the only reliable drift sensor.
-- Treat broad verification as integration-gate or completion-gate work by default.
-- If many sensors fail because they encode old semantics, preserve the target state and record stale-sensor retirement or rewrite.
+- Use the smallest evidence check set that can detect meaning or structural drift.
+- Do not run expensive broad checks at every batch unless they are the only reliable drift evidence check.
+- Treat broad verification as integration-check or completion-check work by default.
+- If many evidence checks fail because they encode old meaning, preserve the intended result and record stale-evidence check retirement or rewrite.
 
 ## Batch Cadence
 
@@ -342,7 +342,7 @@ Allowed inside a batch:
 
 Not allowed even inside a batch:
 
-- [semantic violation]
+- [meaning violation]
 - [security/permission violation]
 
 Batch-end requirements:
@@ -351,7 +351,7 @@ Batch-end requirements:
 
 ## Output Material / Evidence Collection
 
-Use when the goal `Final Output Contract` or design `Output Contract Design` requires structured output. Otherwise record `Not required; final output can be produced from ordinary progress and verification evidence`.
+Use when the goal `Final Answer Format` or design `Final Answer Format Design` requires structured output. Otherwise record `Not required; final output can be produced from ordinary progress and verification evidence`.
 
 | Required output material | Producing batch/checkpoint | Evidence reference location | Ready before final output? | Missing material blocks completion? |
 |---|---|---|---|---|
@@ -365,7 +365,7 @@ Blocking missing material:
 
 - [missing material that forces stop or revision]
 
-## Purpose Feedback Strategy
+## User Purpose Strategy
 
 ### Internal feedback
 
@@ -375,7 +375,7 @@ Blocking missing material:
 
 - [shows cross-component or cross-artifact behavior]
 
-### Purpose-boundary feedback
+### User-purpose feedback
 
 - [smallest feedback that observes the purpose-realizing outcome]
 
@@ -399,7 +399,7 @@ Blocking missing material:
 
 ## Evidence Lifecycle / Evidence Budget
 
-The evidence lifecycle must keep tracked evidence reviewable and prevent repeated full raw sensor output from outgrowing the controlled work.
+The evidence lifecycle must keep tracked evidence reviewable and prevent repeated full raw evidence check output from outgrowing the controlled work.
 
 | Evidence channel | Raw allowed? | Baseline policy | Per-batch retention | Delta required? | Summary required? | Max tracked size | Git policy | Raw pointer |
 |---|---|---|---|---|---|---|---|---|
@@ -409,49 +409,49 @@ Rules:
 
 - Keep at most one full baseline and one final full scan unless explicitly justified.
 - Intermediate scans should store summary + delta, not repeated full raw hits.
-- Full raw sensor output belongs in local cache, ignored artifacts, compressed retained-full artifacts, or external artifact storage unless the goal explicitly requires tracked raw output.
-- Tracked evidence must be reviewable without reading all raw sensor output.
-- Repeated full snapshots of the same sensor are forbidden unless this policy explains why delta is impossible.
+- Full raw evidence check output belongs in local cache, ignored artifacts, compressed retained-full artifacts, or external artifact storage unless the goal explicitly requires tracked raw output.
+- Tracked evidence must be reviewable without reading all raw evidence check output.
+- Repeated full snapshots of the same evidence check are forbidden unless this policy explains why delta is impossible.
 - Each batch must record evidence summary, delta, top offenders or representative samples, and raw pointer when raw output exists.
 - Evidence artifacts must not exceed the approved evidence budget without stopping or revising the execution policy.
 
 Evidence levels:
 
-- Level 0 transient raw: local sensor output, ignored by default, may be overwritten.
+- Level 0 transient raw: local evidence check output, ignored by default, may be overwritten.
 - Level 1 raw pointer: path, hash, command, timestamp, and retention location.
 - Level 2 reviewable summary/delta: tracked summary, delta, top offenders, representative samples, and manifest.
 - Level 3 retained full evidence: full baseline or final full scan only when explicitly justified.
 
-## Sensor / Evidence Governance
+## Evidence check / Evidence Governance
 
-Approved sensors, checks, and evidence channels are sensors, not objectives.
+Approved evidence checks, checks, and evidence channels are evidence checks, not objectives.
 
-Strong sensors to preserve:
+Strong evidence checks to preserve:
 
-- [sensor/check/evidence channel]
+- [check/evidence channel]
 
-Weak or stale sensors to inspect before obeying:
+Weak or stale evidence checks to inspect before obeying:
 
-- [sensor/check/evidence channel]
+- [check/evidence channel]
 
-Obsolete sensors that may be retired and rewritten:
+Obsolete evidence checks that may be retired and rewritten:
 
-- [sensor/check/evidence channel]
+- [check/evidence channel]
 
-Target-state evidence has priority over preserving brittle old sensors.
+Intended-result evidence has priority over preserving brittle old evidence checks.
 
-## Stale Sensor Retirement and Rewrite Policy
+## Stale Evidence check Retirement and Rewrite Policy
 
-A sensor, check, or evidence channel may be retired or rewritten when:
+A check or evidence channel may be retired or rewritten when:
 
-- it encodes old requirement semantics;
+- it encodes old requirement meaning;
 - it over-constrains execution details;
-- it conflicts with confirmed semantic invariants;
+- it conflicts with rules that cannot change;
 - it prevents correct structural change.
 
-Any retired/replaced sensor must be recorded in the progress log with reason and replacement evidence coverage.
+Any retired/replaced evidence check must be recorded in the progress log with reason and replacement evidence coverage.
 
-## Phase Gates
+## Phase Checks
 
 Before execution:
 
@@ -460,10 +460,10 @@ Before execution:
 Before moving to next batch:
 
 - current batch-end condition met;
-- required strong sensors for this batch have been interpreted;
-- deferred and final-only sensors remain deferred by policy, not by omission;
+- required strong evidence checks for this batch have been interpreted;
+- deferred and final-only evidence checks remain deferred by policy, not by omission;
 - progress log updated;
-- no confirmed semantic invariant violated.
+- no confirmed meaning rule violated.
 
 Before completion:
 
@@ -472,7 +472,7 @@ Before completion:
 
 ## Execution Rhythm
 
-- Execute according to the selected Context Management / Execution Topology.
+- Execute according to the selected Who Does The Work / Context Use.
 - For `Main-only`, keep all target work in the main agent only when the context-load rationale remains valid.
 - For `Serial subagent-driven`, only one execution subagent is active at a time.
 - For `Parallel subagent-driven`, dispatch only work packages in the current approved wave whose dependencies are satisfied and whose conflict locks are disjoint.
@@ -484,9 +484,9 @@ Stop if:
 
 - the plan conflicts with requirements analysis or goal;
 - the plan conflicts with required solution design;
-- confirmed semantics appear wrong or insufficient;
-- sensor governance is insufficient for a failing check;
-- the approved execution topology cannot be followed;
+- confirmed meaning appear wrong or insufficient;
+- evidence check governance is insufficient for a failing check;
+- the approved execution work assignment cannot be followed;
 - executing further requires a new human decision;
 - the approved batch cadence cannot be followed.
 
@@ -502,27 +502,27 @@ Each entry must include:
 - files changed
 - commands run
 - result
-- sensor interpretation
-- purpose feedback status
+- evidence check interpretation
+- user purpose evidence status
 - what counts as done met
 - target-producing evidence
 - required answer path step status
-- spine transitions satisfied
-- spine transitions failed / blocked / unobserved
+- required steps satisfied
+- required steps failed / blocked / unobserved
 - supporting-only work completed
 - supporting-only work not counted as goal progress
-- non-achieved reason
-- target-producing action attempted or proof of impossibility
-- smallest next target-producing attempt
-- RSC status
-- surfaces acted on or inspected
+- not done reason
+- action that can make it done attempted or proof of impossibility
+- smallest next action that can make it done
+- Result-placement status
+- places acted on or inspected
 - residuals and reconciliation
-- allowed target-realization wording
+- allowed result claim wording
 - highest purpose-relevant evidence observed
-- purpose feedback not yet observed
+- user purpose evidence not yet observed
 - smallest next observation needed
 - allowed completion wording
-- deferred/final-only sensors and reason
+- deferred/final-only evidence checks and reason
 - active control summary
 - completed work packages
 - subagent outputs integrated
@@ -542,7 +542,7 @@ Each entry must include:
 
 ### Batch 1: [Name]
 
-Spine node(s):
+Required step(s):
 
 - [S1 / supporting-only for S1]
 
@@ -550,13 +550,13 @@ Role: `mainline / supporting-only`
 
 State transition advanced:
 
-- [specific spine transition this task advances, or "none; supporting-only for Sx"]
+- [specific required step this task advances, or "none; supporting-only for Sx"]
 
 Transition evidence produced:
 
-- [evidence that this task produces for the spine transition, or supporting evidence only]
+- [evidence that this task produces for the required step, or supporting evidence only]
 
-Integration gate:
+Integration check:
 
 - [condition under which the main agent accepts this task output into progress state]
 
@@ -568,20 +568,20 @@ Why this is not merely component completion:
 
 Goal:
 
-- [target-state slice]
+- [intended-result slice]
 
 Allowed intermediate breakage:
 
 - [breakage]
 
-Batch-end gate:
+Batch-end check:
 
-- [gate]
+- [check]
 
-Batch sensors:
+Batch evidence checks:
 
-- Required strong sensors: [sensors]
-- Deferred/final-only sensors: [sensors]
+- Required strong evidence checks: [evidence checks]
+- Deferred/final-only evidence checks: [evidence checks]
 
 Steps:
 

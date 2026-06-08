@@ -19,12 +19,12 @@ Artifacts:
 - Control review: `...` (`Approved`)
 
 Control summary:
-- Setpoint: ...
+- Approved target: ...
 - Solution model: ...
 - Invariants: ...
 - Execution policy: ...
-- Sensors: ...
-- Runtime boundary: ...
+- Evidence checks: ...
+- Runtime limit: ...
 
 Runtime goal contract:
 
@@ -74,8 +74,8 @@ Before responding, verify:
 - [ ] This skill did not execute target work.
 - [ ] This skill did not start `/goal`.
 - [ ] Pre-goal review subagents were used only if explicitly authorized.
-- [ ] Required Superpowers substrate status was checked.
-- [ ] No required Superpowers substrate was silently emulated.
+- [ ] Required Superpowers workflow status was checked.
+- [ ] No required Superpowers workflow was silently emulated.
 - [ ] No required solution design synthesis was emulated inside the orchestrator.
 - [ ] Requirements analysis was complete before creating downstream artifacts.
 - [ ] Required solution design was created by `$designing-cybernetic-solutions` or explicitly provided before goal writing, otherwise blocked.
@@ -85,16 +85,16 @@ Before responding, verify:
 - [ ] Goal and execution policy preserved required solution design.
 - [ ] Execution policy preserved the goal contract.
 - [ ] Execution policy uses `$superpowers:writing-plans` for non-trivial execution policies or blocks.
-- [ ] Review checked the whole control structure, including design when required, not only the plan.
+- [ ] Review checked the whole approved work chain, including design when required, not only the plan.
 - [ ] Review does not mark self-review as `Approved`.
 - [ ] Any substantive post-review artifact mutation had final independent re-review before approval.
-- [ ] Lint PASS was not used as a substitute for semantic/control-policy re-review.
+- [ ] Lint PASS was not used as a substitute for meaning/control-policy re-review.
 - [ ] Review status is `Approved` before final runtime `/goal` is emitted.
 - [ ] If not approved, the response is blocked and asks for the smallest necessary decision.
 - [ ] If blocked, the response includes `Next allowed action` and a response-only next step.
 - [ ] Runtime goal contract references requirements analysis, required design, goal, plan, and review files.
 - [ ] User-entered `/goal` is pointer-only and length-bounded.
-- [ ] User-entered `/goal` does not inline HSA, PFB, RSC, TAP, EHA, topology, sensor governance, or review discipline prose.
+- [ ] User-entered `/goal` does not inline What the User Approved, user-purpose evidence, result placement, what-counts-as-done, work coverage and action limits, work assignment, evidence check governance, or review discipline prose.
 - [ ] Runtime goal contract includes the missing/not-approved/inconsistent artifact precondition.
 - [ ] Runtime goal contract includes executing, debugging, and completion-verification discipline.
 - [ ] User-entered `/goal` does not tell Codex to write or approve a new plan.
@@ -103,18 +103,18 @@ Before responding, verify:
 
 | Mistake | Fix |
 |---|---|
-| Treating this as an execution skill | Stop; this skill only compiles control artifacts |
+| Treating this as an execution skill | Stop; this skill only compiles approved files |
 | Spawning subagents without user authorization | Ask for authorization or run candidate-only mode |
 | Creating a final `/goal` from an incomplete requirements analysis | Stop and return to requirements analysis |
-| Skipping design when Design Gate is required | Run `$designing-cybernetic-solutions` before goal writing |
+| Skipping design when required design is required | Run `$designing-cybernetic-solutions` before goal writing |
 | Synthesizing solution design inside the orchestrator | Stop; invoke/request `$designing-cybernetic-solutions` or block |
-| Dropping an existing design artifact because Design Gate is satisfied | Propagate the design path downstream |
-| Reviewing only the plan | Review requirements analysis, design when required, goal, and runtime boundary |
+| Dropping an existing design artifact because required design is satisfied | Propagate the design path downstream |
+| Reviewing only the plan | Review requirements analysis, design when required, goal, and runtime limit |
 | Replacing missing `$superpowers:writing-plans` with an ad hoc approved plan | Stop and report missing planning infrastructure |
 | Marking Approved after fixing reviewer blockers without final re-review | Mark artifacts Dirty / Needs Re-review and run final independent re-review |
-| Treating lint PASS as proof that semantic reviewer blockers are resolved | Use lint only as a structural sensor; require final observer pass for substantive changes |
+| Treating lint PASS as proof that meaning reviewer blockers are resolved | Use lint only as a structural evidence check; require final observer pass for substantive changes |
 | Choosing a new slug for downstream artifacts | Use the requirements analysis brief's date/slug unless the user explicitly specified other paths |
-| Letting review revisions change confirmed semantics | Stop and ask the human |
+| Letting review revisions change confirmed meaning | Stop and ask the human |
 | Infinite review-revision loops | Stop after two cycles |
 | Marking self-review as Approved | Require subagent, external reviewer, or explicit human approval |
 | Starting `/goal` after compiling it | Output the command only |

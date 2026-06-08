@@ -11,7 +11,7 @@ CONTROL_CHAIN_GUARD = ROOT / ".agents/skills/compiling-cybernetic-runtime-goals/
 COMPILER = ROOT / ".agents/skills/compiling-cybernetic-runtime-goals/scripts/compile_runtime_goal.py"
 
 
-HSA_WITH_COVERAGE_SKELETON = """## What the User Approved
+USER_APPROVAL_WITH_COVERAGE_PATH = """## What the User Approved
 
 Status: `Approved`
 
@@ -22,15 +22,15 @@ Status: `Approved`
 | Primary object | full workflow ceiling measurement |
 | Requested transformation | full workflow scope and bottleneck inventory into a ceiling measurement |
 | Non-goals | do not validate only one full-workflow candidate path |
-| Purpose Feedback Boundary | purpose is realized only when the full workflow ceiling is answered |
-| Realization Surface Closure | measurement surfaces must cover the workflow evidence bundle |
+| How We Know The User Purpose Was Met | purpose is realized only when the full workflow ceiling is answered |
+| Where The Result Must Show Up | measurement result places must cover the workflow evidence bundle |
 | What counts as done | full workflow ceiling coverage skeleton is satisfied |
 | Evidence needed to call it done | scope inventory, removable-source inventory, coverage criterion, coverage matrix, full workflow run, and interpretation against coverage |
 | Non-achieved terminal report handling | report goal achieved: no when coverage skeleton is unsatisfied |
 | Required answer path | coverage inventory -> coverage criterion -> candidate coverage matrix -> same-workload run -> interpretation |
 | How this should be answered | list full workflow scope, identify major removable sources, define ceiling coverage, prove candidate coverage, run full workflow, and interpret against coverage |
 | What is not enough | full-workflow-run-validation |
-| Answer type | coverage-ceiling-measurement |
+| How this should be answered | coverage-ceiling-measurement |
 | Work covered in this run | full workflow ceiling measurement horizon |
 | What the agent may do | local measurement and report generation |
 | Forbidden live / irreversible actions | none |
@@ -40,7 +40,7 @@ Status: `Approved`
 | Agent workflow preference | no preference |
 | Parallel execution authority | not applicable |
 | Parallelism cap | not specified |
-| Output Contract | guard output |
+| Final Answer Format | guard output |
 | Workflow fit | full pre-goal orchestration required |
 | Known assumptions | fixture assumptions only |
 
@@ -66,9 +66,9 @@ def write_requirements(tmp: Path) -> Path:
                 "",
                 "| Gate | Status | Reason |",
                 "|---|---|---|",
-                "| Design Gate | required | coverage skeleton must be designed |",
+                "| required design | required | coverage skeleton must be designed |",
                 "",
-                HSA_WITH_COVERAGE_SKELETON,
+                USER_APPROVAL_WITH_COVERAGE_PATH,
                 "",
             ]
         ),
@@ -105,7 +105,7 @@ def write_design(tmp: Path, requirements: Path, *, skeleton: str, mandatory_node
                 "| Element | Design |",
                 "|---|---|",
                 "| Approved answer method | list full workflow scope, identify major removable sources, define ceiling coverage, prove candidate coverage, run full workflow, and interpret against coverage |",
-                "| Approved answer type | coverage-ceiling-measurement |",
+                "| Approved answer method | coverage-ceiling-measurement |",
                 f"| Required answer path | {skeleton} |",
                 f"| Required steps covered | {', '.join(mandatory_nodes)} |",
                 f"| What is not enough avoided | {substitution_avoided} |",
@@ -166,50 +166,50 @@ def write_runtime_chain(
                 "",
                 "## Success Condition",
                 "",
-                "Codex may report `goal achieved: yes` only when the single target-achieved predicate is satisfied.",
+                "Codex may report `goal achieved: yes` only when the single what counts as done is satisfied.",
                 "",
-                "## Purpose Feedback Contract",
+                "## How We Know The User Purpose Was Met",
                 "",
                 "| Element | Requirement |",
                 "|---|---|",
                 "| Beneficiary / observer | operator |",
                 "| Purpose-realizing outcome observed | operator observes the coverage-ceiling answer |",
                 "| Supporting Evidence | internal checks support progress only |",
-                "| Sufficient evidence level | purpose-boundary |",
-                "| Purpose feedback unavailable handling | report pending and next observation |",
+                "| Sufficient evidence level | user-purpose |",
+                "| If user-purpose evidence unavailable | report pending and next observation |",
                 "| Allowed completion wording | achieved only when the coverage skeleton is satisfied |",
                 "",
-                "## Realization Surface Contract",
+                "## Where The Result Must Show Up",
                 "",
                 "| Element | Requirement |",
                 "|---|---|",
                 "| Target state | measurement answer state |",
-                "| Required surfaces | scope inventory, source inventory, coverage criterion, coverage matrix, run, interpretation |",
-                "| Surface actions | act / inspect / preserve / exclude / discover |",
-                "| Residual reconciliation | account for old state, unknown surfaces, exclusions, preserved surfaces, and remaining mismatches |",
-                "| RSC status wording | strongest target-realization claim requires RSC adequate |",
-                "| Partial/unavailable handling | report goal achieved: no without target-realization claim |",
-                "| RSC / PFB boundary | RSC calibrates answer-surface closure while PFB calibrates human-purpose realization |",
+                "| Required result places | scope inventory, source inventory, coverage criterion, coverage matrix, run, interpretation |",
+                "| Place actions | act / inspect / preserve / exclude / discover |",
+                "| Residual reconciliation | account for old state, unknown result places, exclusions, preserved result places, and remaining mismatches |",
+                "| Result-placement wording | strongest result claim claim requires result-placement adequate |",
+                "| Partial/unavailable handling | report goal achieved: no without result claim claim |",
+                "| Distinction from user-purpose evidence | result placement calibrates answer-result place closure while user-purpose evidence calibrates human-purpose realization |",
                 "",
-                "## Target Achievement Contract",
+                "## What Counts As Done",
                 "",
                 "| Element | Requirement |",
                 "|---|---|",
-                "| What counts as done | coverage-ceiling skeleton is satisfied |",
-                "| Required target-producing evidence | scope inventory, source inventory, coverage criterion, coverage matrix, full workflow run, and interpretation evidence exist |",
-                "| Allowed achieved claim | goal achieved: yes only when coverage-ceiling skeleton is satisfied |",
+                "| What counts as done | coverage-ceiling answer path is satisfied |",
+                "| Evidence needed to call it done | scope inventory, source inventory, coverage criterion, coverage matrix, full workflow run, and interpretation evidence exist |",
+                "| Allowed achieved claim | goal achieved: yes only when coverage-ceiling answer path is satisfied |",
                 "| Steps that make the result true | coverage inventory -> criterion -> matrix -> same-workload run -> interpretation |",
                 "",
                 "## Work Covered And Allowed Actions Contract",
                 "",
                 "| Element | Requirement |",
                 "|---|---|",
-                "| Approved horizon | coverage-ceiling measurement horizon |",
-                "| Runtime-authorized actions | local measurement fixture actions |",
+                "| work covered in this run | coverage-ceiling measurement horizon |",
+                "| What the agent may do | local measurement fixture actions |",
                 "| Forbidden actions | none |",
                 "| Prepare-only / observe-only actions | none |",
                 "| Explicitly out-of-scope items | none |",
-                "| Horizon completion rule | every horizon item is accounted for in the fixture |",
+                "| Work coverage rule | every horizon item is accounted for in the fixture |",
                 "",
             ]
         ),
@@ -233,13 +233,13 @@ def write_runtime_chain(
                 "",
                 "## Work Coverage And Action Limits Matrix",
                 "",
-                "| Batch / surface | In approved horizon? | What the agent may do | Required runtime handling | Counts as achieved? |",
+                "| Work item / place | In work covered in this run? | What the agent may do | Required runtime handling | Counts as achieved? |",
                 "|---|---|---|---|---|",
-                "| coverage-ceiling fixture | yes | execute | run fixture checks | yes if skeleton evidence exists |",
+                "| coverage-ceiling fixture | yes | execute | run fixture checks | yes if required answer evidence exists |",
                 "",
                 "## Steps That Make The Result True",
                 "",
-                "| Spine node | Required state transition | Required evidence |",
+                "| Required step | Required state transition | Required evidence |",
                 "|---|---|---|",
                 "| S1 | no scope inventory -> full workflow scope inventory exists | scope inventory evidence |",
                 "| S2 | scope inventory -> removable source inventory exists | source inventory evidence |",
@@ -248,36 +248,36 @@ def write_runtime_chain(
                 "| S5 | matrix -> same-workload full workflow run completed | run evidence |",
                 "| S6 | run -> interpretation against coverage matrix exists | interpretation evidence |",
                 "",
-                "## Target-Producing Action Strategy",
+                "## Action That Can Make It Done",
                 "",
-                "Target-producing action required:",
+                "Action that can make it done:",
                 "",
                 "- Satisfy S1 through S6 before any achieved claim.",
                 "",
                 "Proof of impossibility, if any:",
                 "",
-                "- Record the condition proving a spine transition cannot be attempted.",
+                "- Record the condition proving a required step cannot be attempted.",
                 "",
                 "Non-achieved terminal report rule:",
                 "",
-                "- A non-achieved report may be produced only after the transition is attempted and fails, or impossibility is proven.",
+                "- A report when not done may be produced only after the transition is attempted and fails, or impossibility is proven.",
                 "",
-                "## Realization Surface Closure Strategy",
+                "## Where The Result Must Show Up",
                 "",
-                "- RSC status: `RSC not applicable with justification`",
-                "- Why no target-state surface closure is required: this fixture only checks skeleton structure.",
-                "- Why no surface discovery / residual reconciliation is needed: no target code state is changed.",
-                "- Allowed target-realization wording: do not claim target-state realization.",
+                "- Result-placement status: `not applicable with justification`",
+                "- Why no intended-result result placement is required: this fixture only checks required answer path structure.",
+                "- Why no place discovery / residual reconciliation is needed: no target code state is changed.",
+                "- Allowed result claim wording: do not claim intended-result realization.",
                 "",
-                "## Context Management / Execution Topology",
+                "## Who Does The Work / Context Use",
                 "",
                 "Task level: `Level 2`",
                 "",
-                "Selected topology: `Main-only`",
+                "Who does the work: `Main-only`",
                 "",
                 "Selected agent workflow: `none`",
                 "",
-                "Topology rationale:",
+                "Work Assignment rationale:",
                 "",
                 "- Bounded fixture fits main-only execution.",
                 "",
@@ -289,9 +289,9 @@ def write_runtime_chain(
                 "",
                 "## Candidate Plan Tasks",
                 "",
-                "### Batch 1: satisfy coverage-ceiling spine fixture",
+                "### Batch 1: satisfy coverage-ceiling answer path fixture",
                 "",
-                "Spine node(s):",
+                "Required step(s):",
                 "",
                 "- S1",
                 "- S2",
@@ -308,9 +308,9 @@ def write_runtime_chain(
                 "",
                 "Transition evidence produced:",
                 "",
-                "- Coverage-ceiling skeleton evidence is recorded.",
+                "- Coverage-ceiling required answer evidence is recorded.",
                 "",
-                "Integration gate:",
+                "Integration check:",
                 "",
                 "- Main agent accepts S1 through S6 evidence.",
                 "",
@@ -318,11 +318,11 @@ def write_runtime_chain(
                 "",
                 "Why this is not merely component completion:",
                 "",
-                "- It records coverage-ceiling transition evidence for the approved skeleton.",
+                "- It records coverage-ceiling transition evidence for the approved answer path.",
                 "",
                 "Goal:",
                 "",
-                "- Drive the fixture through the approved coverage-ceiling skeleton.",
+                "- Drive the fixture through the approved coverage-ceiling answer path.",
                 "",
                 "Batch-end gate:",
                 "",
@@ -344,13 +344,13 @@ def write_runtime_chain(
         "",
         "## Review Independence",
         "",
-        "- Context management / execution topology: `yes`",
+        "- Who does the work / context use: `yes`",
         f"- Design answer method check: `{review_design_skeleton_independence}`",
-        "- Purpose feedback adequacy: `yes`",
-        "- Realization surface closure adequacy: `yes`",
-        "- Target achievement predicate fidelity: `yes`",
+        "- User purpose evidence check: `yes`",
+        "- Result placement check: `yes`",
+        "- What counts as done check: `yes`",
         "- answer path check: `yes`",
-        "- Work covered in this run and authority fidelity: `yes`",
+        "- Work covered in this run and authority check: `yes`",
         "",
     ]
     if include_review_design_skeleton:
@@ -365,35 +365,35 @@ def write_runtime_chain(
         )
     review_parts.extend(
         [
-            "## Context Management / Execution Topology",
+            "## Who Does The Work / Context Use",
             "",
             "Findings:",
-            "- Reviewed selected topology.",
+            "- Reviewed work assignment.",
             "",
-            "## Purpose Feedback Adequacy",
-            "",
-            "Findings:",
-            "- Purpose feedback waits for purpose-boundary evidence.",
-            "",
-            "## Realization Surface Closure Adequacy",
+            "## User Purpose Evidence Check",
             "",
             "Findings:",
-            "- RSC not applicable is justified for this fixture.",
+            "- Purpose feedback waits for user-purpose evidence.",
             "",
-            "## Target Achievement Predicate Fidelity",
+            "## Result Placement Check",
             "",
             "Findings:",
-            "- The single target-achieved predicate is separated from non-achieved terminal reports.",
+            "- not applicable is justified for this fixture.",
+            "",
+            "## What Counts As Done Check",
+            "",
+            "Findings:",
+            "- The single what counts as done is separated from report when not dones.",
             "",
             "## Answer Path Check",
             "",
             "Findings:",
-            "- Work packages map to coverage-ceiling spine transitions.",
+            "- Work packages map to coverage-ceiling answer path transitions.",
             "",
             "## Work Covered And Allowed Actions Check",
             "",
             "Findings:",
-            "- Approved horizon and runtime authority are fixture-bounded.",
+            "- work covered in this run and runtime authority are fixture-bounded.",
             "",
             "## Final Observer Check",
             "",
@@ -425,8 +425,9 @@ class DesignSkeletonFidelityTest(unittest.TestCase):
             ROOT / ".agents/skills/reviewing-cybernetic-control-structures/assets/control-review-template.md"
         ).read_text(encoding="utf-8")
 
-        for expected in ("How this should be answered", "What is not enough", "Answer type"):
+        for expected in ("How this should be answered", "What is not enough", "Required answer path"):
             self.assertIn(expected, requirements_template)
+        self.assertNotIn("Answer type", requirements_template)
 
         for expected in (
             "Answer Method Check",
@@ -434,8 +435,15 @@ class DesignSkeletonFidelityTest(unittest.TestCase):
             "Required answer path",
             "Required steps covered",
             "What is not enough avoided",
+            "Required Answer Path",
+            "What Supports Each Required Step",
+            "Required answer step supported",
+            "Mainline or supporting-only",
+            "Evidence produced",
         ):
             self.assertIn(expected, design_template)
+        for forbidden in ("Approved answer type", "Target Skeleton Instance", "Skeleton node", "Support Model Mapping"):
+            self.assertNotIn(forbidden, design_template)
 
         self.assertIn("Design Answer Method Check", review_template)
 
@@ -446,12 +454,12 @@ class DesignSkeletonFidelityTest(unittest.TestCase):
         design_skill = design_skill_path.read_text(encoding="utf-8")
 
         skeleton_index = design_template.index("## Answer Method Check")
-        support_index = design_template.index("## Support Model Mapping")
+        support_index = design_template.index("## What Supports Each Required Step")
         self.assertLess(skeleton_index, support_index)
         self.assertNotIn("## Conceptual Design", design_template)
-        self.assertIn("Skeleton node", design_template)
+        self.assertIn("Required step", design_template)
         self.assertIn("Required support object/component/mechanism", design_template)
-        self.assertIn("Design must be skeleton-first", design_skill)
+        self.assertIn("required answer path first", design_skill)
         self.assertNotIn("solution model synthesis", design_skill.casefold())
 
     def test_task_skeleton_registry_drives_coverage_ceiling_guard(self):

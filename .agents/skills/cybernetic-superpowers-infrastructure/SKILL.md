@@ -9,7 +9,7 @@ description: 'Use when a cybernetic skill must choose required Superpowers subst
 
 This skill defines how cybernetic skills depend on Superpowers skills.
 
-Cybernetic skills compile control structures. Superpowers skills provide the behavior substrate for planning, independent review discipline, execution, debugging, and completion verification.
+Cybernetic skills compile approved work chains. Superpowers skills provide the behavior substrate for planning, independent review discipline, execution, debugging, and completion verification.
 
 Use `references/superpowers-infrastructure-policy.md`.
 
@@ -25,7 +25,7 @@ When a required substrate applies:
 - do not treat merely mentioning the substrate, citing it, or imitating generic behavior as sufficient;
 - if the substrate is unavailable, stop and report the missing infrastructure.
 
-Approval requires a final observer pass after the last substantive mutation to the reviewed control artifacts, including required solution design. An older review result must not be transferred to a changed control structure unless the change is deterministic-only and guard-covered.
+Approval requires a final observer pass after the last substantive mutation to the reviewed approved files, including required solution design. An older review result must not be transferred to a changed approved work chain unless the change is deterministic-only and guard-covered.
 
 Pre-goal review subagents require explicit authorization in the orchestration request. Runtime target-work subagents are authorized only when the final `/goal` explicitly contains the approved subagent-driven execution topology and the user launches that `/goal`; parallel runtime subagents still require explicit human approval recorded in the execution policy and control review.
 

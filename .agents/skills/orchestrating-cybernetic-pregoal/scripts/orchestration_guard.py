@@ -78,7 +78,7 @@ def blocked_next_action(errors: list[str]) -> str:
         or "subagent execution mode" in joined
         or "max concurrent subagents" in joined
         or "ordered work package sequence" in joined
-        or "integration gate after each package" in joined
+        or "integration check after each package" in joined
         or "parallel wave matrix" in joined
         or "conflict / lock model" in joined
         or "failure policy" in joined
@@ -87,8 +87,8 @@ def blocked_next_action(errors: list[str]) -> str:
         or "runtime delegation preference" in joined
         or "agent workflow preference" in joined
         or "main-agent integration rule" in joined
-        or "execution policy missing ## target-producing action strategy" in joined
-        or "execution policy target-producing action strategy missing" in joined
+        or "execution policy missing ## action that can make it done strategy" in joined
+        or "execution policy action that can make it done strategy missing" in joined
         or "execution policy missing ## steps that make the result true" in joined
         or "execution policy steps that make the result true" in joined
         or "execution policy missing ## candidate plan tasks" in joined
@@ -227,9 +227,9 @@ def section_has_meaningful_content(text: str | None, heading: str) -> bool:
 
 def output_contract_present_upstream(requirements: str | None = None, design: str | None = None, goal: str | None = None) -> bool:
     return (
-        section_has_meaningful_content(requirements, "Output Contract")
-        or section_has_meaningful_content(design, "Output Contract Design")
-        or section_has_meaningful_content(goal, "Final Output Contract")
+        section_has_meaningful_content(requirements, "Final Answer Format")
+        or section_has_meaningful_content(design, "Final Answer Format Design")
+        or section_has_meaningful_content(goal, "Final Final Answer Format")
     )
 
 
@@ -240,10 +240,10 @@ def output_contract_required(requirements: str | None, design: str | None, goal:
 def selected_execution_topology(plan: str | None) -> str | None:
     if not plan:
         return None
-    body = section_body(plan, "Context Management / Execution Topology")
+    body = section_body(plan, "Who Does The Work / Context Use")
     if body is None:
         return None
-    match = re.search(r"(?im)^\s*Selected topology\s*:\s*`?([^`\n]+?)`?\s*$", body)
+    match = re.search(r"(?im)^\s*Who does the work\s*:\s*`?([^`\n]+?)`?\s*$", body)
     if not match:
         return None
     value = match.group(1).strip().strip("`")
@@ -259,18 +259,18 @@ def selected_execution_topology(plan: str | None) -> str | None:
     return None
 
 
-def selected_delegation_substrate(plan: str | None) -> str | None:
-    body = section_body(plan or "", "Context Management / Execution Topology")
+def selected_agent_workflow(plan: str | None) -> str | None:
+    body = section_body(plan or "", "Who Does The Work / Context Use")
     if body is None:
         return None
     match = re.search(r"(?im)^\s*Selected agent workflow\s*:\s*`?([^`\n]+?)`?\s*$", body)
     if not match:
         return None
 
-    return normalize_delegation_substrate(match.group(1))
+    return normalize_agent_workflow(match.group(1))
 
 
-def normalize_delegation_substrate(value: str | None) -> str | None:
+def normalize_agent_workflow(value: str | None) -> str | None:
     if value is None:
         return None
     value = value.strip().strip("`").casefold()
@@ -291,12 +291,12 @@ def normalize_delegation_substrate(value: str | None) -> str | None:
     return None
 
 
-DELEGATION_SUBSTRATE_REGISTRY_PATH = Path(__file__).resolve().parents[2] / "references/delegation-substrate-registry.json"
+DELEGATION_WORKFLOW_REGISTRY_PATH = Path(__file__).resolve().parents[2] / "references/delegation-workflow-registry.json"
 
 
 def delegation_substrate_registry() -> dict[str, object]:
     try:
-        return json.loads(DELEGATION_SUBSTRATE_REGISTRY_PATH.read_text(encoding="utf-8"))
+        return json.loads(DELEGATION_WORKFLOW_REGISTRY_PATH.read_text(encoding="utf-8"))
     except (FileNotFoundError, json.JSONDecodeError):
         return {}
 
@@ -314,7 +314,7 @@ def registry_list_field(definition: dict[str, object], key: str) -> list[str]:
 
 
 def selected_subagent_execution_mode(plan: str | None) -> str | None:
-    body = section_body(plan or "", "Context Management / Execution Topology")
+    body = section_body(plan or "", "Who Does The Work / Context Use")
     if body is None:
         return None
     match = re.search(r"(?im)^\s*Subagent execution mode\s*:\s*`?([^`\n]+?)`?\s*$", body)
@@ -334,7 +334,7 @@ def selected_subagent_execution_mode(plan: str | None) -> str | None:
 
 
 def max_concurrent_subagents(plan: str | None) -> str | None:
-    body = section_body(plan or "", "Context Management / Execution Topology")
+    body = section_body(plan or "", "Who Does The Work / Context Use")
     if body is None:
         return None
     value = labeled_value(body, "Max concurrent subagents")
@@ -347,7 +347,7 @@ def max_concurrent_subagents(plan: str | None) -> str | None:
 
 
 def task_level(plan: str | None) -> int | None:
-    body = section_body(plan or "", "Context Management / Execution Topology")
+    body = section_body(plan or "", "Who Does The Work / Context Use")
     if body is None:
         return None
     match = re.search(r"(?im)^\s*Task level\s*:\s*`?Level\s*([0-4])`?\s*$", body)
@@ -443,7 +443,7 @@ def has_meaningful_delegation_matrix(body: str) -> bool:
         "context pack",
         "allowed actions",
         "return format",
-        "integration gate",
+        "integration check",
     ]
     if not all(column in lowered for column in required_columns):
         return False
@@ -488,7 +488,7 @@ CONTEXT_PACK_FIELDS = [
     "Current batch objective",
     "Allowed artifacts/surfaces",
     "Forbidden changes",
-    "Required sensors/evidence",
+    "Required evidence checks/evidence",
     "Stop conditions",
     "Expected return format",
 ]
@@ -498,7 +498,7 @@ CONTEXT_COMPRESSION_FIELDS = [
     "Completed work packages",
     "Subagent outputs integrated",
     "Evidence produced",
-    "Deferred sensors and reasons",
+    "Deferred evidence checks and reasons",
     "Unresolved blockers",
     "Deviations from policy",
     "Next allowed action",
@@ -515,18 +515,18 @@ def check_labeled_requirements(body: str, heading: str, labels: list[str], error
 
 
 def check_execution_topology(plan: str | None, errors: list[str]) -> None:
-    body = section_body(plan or "", "Context Management / Execution Topology")
+    body = section_body(plan or "", "Who Does The Work / Context Use")
     if body is None:
-        errors.append("execution policy missing ## Context Management / Execution Topology")
+        errors.append("execution policy missing ## Who Does The Work / Context Use")
         return
 
     topology = selected_execution_topology(plan)
     if topology is None:
-        errors.append("execution policy is required to define a selected Context Management / Execution Topology")
+        errors.append("execution policy is required to define a selected Who Does The Work / Context Use")
         return
 
-    if not labeled_block_has_content(body, "Topology rationale"):
-        errors.append("execution topology missing Topology rationale")
+    if not labeled_block_has_content(body, "Work Assignment rationale"):
+        errors.append("execution topology missing Work Assignment rationale")
     if not labeled_block_has_content(body, "Main agent owns"):
         errors.append("execution topology missing main-agent ownership")
 
@@ -538,9 +538,9 @@ def check_execution_topology(plan: str | None, errors: list[str]) -> None:
 
     if topology in {"Serial subagent-driven", "Parallel subagent-driven"}:
         if not has_meaningful_delegation_matrix(body):
-            errors.append("execution topology missing meaningful delegation matrix with Context pack, Allowed actions, Return format, and Integration gate")
+            errors.append("execution topology missing meaningful delegation matrix with Context pack, Allowed actions, Return format, and Integration check")
         check_labeled_requirements(body, "Context Pack Requirements", CONTEXT_PACK_FIELDS, errors)
-        substrate = selected_delegation_substrate(plan)
+        substrate = selected_agent_workflow(plan)
         if substrate is None:
             errors.append("subagent-driven topology missing valid Selected agent workflow")
         elif substrate == "none":
@@ -558,8 +558,8 @@ def check_execution_topology(plan: str | None, errors: list[str]) -> None:
                 errors.append("Serial subagent-driven topology requires Max concurrent subagents: 1")
             if not labeled_block_has_content(body, "Ordered work package sequence"):
                 errors.append("Serial subagent-driven topology missing Ordered work package sequence")
-            if not labeled_block_has_content(body, "Integration gate after each package"):
-                errors.append("Serial subagent-driven topology missing Integration gate after each package")
+            if not labeled_block_has_content(body, "Integration check after each package"):
+                errors.append("Serial subagent-driven topology missing Integration check after each package")
         elif topology == "Parallel subagent-driven":
             if mode != "parallel-max-safe":
                 errors.append("Parallel subagent-driven topology requires Subagent execution mode: parallel-max-safe")
@@ -573,10 +573,10 @@ def check_execution_topology(plan: str | None, errors: list[str]) -> None:
             ):
                 if not labeled_block_has_content(body, label):
                     errors.append(f"Parallel subagent-driven topology missing {label}")
-            if not has_table_with_data_row(body, ["Surface / artifact / state", "Lock owner", "Conflict rule"]):
+            if not has_table_with_data_row(body, ["Artifact / state / shared place", "Lock owner", "Conflict rule"]):
                 errors.append("Parallel subagent-driven topology missing meaningful Conflict / lock model")
-            if not has_table_with_data_row(body, ["Wave", "Spine frontier", "Work packages", "Independence proof", "Shared surfaces / locks", "Integration barrier"]):
-                errors.append("Parallel subagent-driven topology missing meaningful Parallel wave matrix with Spine frontier")
+            if not has_table_with_data_row(body, ["Wave", "Required-step frontier", "Work packages", "Independence proof", "Shared places / locks", "Integration barrier"]):
+                errors.append("Parallel subagent-driven topology missing meaningful Parallel wave matrix with Required-step frontier")
 
     if topology in {"Serial subagent-driven", "Parallel subagent-driven"} or level in {3, 4}:
         check_labeled_requirements(body, "Context Compression Rule", CONTEXT_COMPRESSION_FIELDS, errors)
@@ -621,17 +621,17 @@ def check_substrate_mode_compatibility(
 
 
 def check_plan_target_producing_strategy(plan: str | None, errors: list[str]) -> None:
-    body = section_body(plan or "", "Target-Producing Action Strategy")
+    body = section_body(plan or "", "Action That Can Make It Done")
     if body is None:
-        errors.append("execution policy missing ## Target-Producing Action Strategy")
+        errors.append("execution policy missing ## Action That Can Make It Done")
         return
     for label in (
-        "Target-producing action required",
+        "Action that can make it done",
         "Proof of impossibility, if any",
         "Non-achieved terminal report rule",
     ):
         if not labeled_or_table_field_has_content(body, label):
-            errors.append(f"execution policy Target-Producing Action Strategy missing {label}")
+            errors.append(f"execution policy Action That Can Make It Done missing {label}")
 
 
 def check_plan_target_producing_spine(plan: str | None, errors: list[str]) -> None:
@@ -639,9 +639,9 @@ def check_plan_target_producing_spine(plan: str | None, errors: list[str]) -> No
     if body is None:
         errors.append("execution policy missing ## Steps That Make The Result True")
         return
-    required_columns = ["Spine node", "Required state transition", "Required evidence"]
+    required_columns = ["Required step", "Required state transition", "Required evidence"]
     if not has_table_with_data_row(body, required_columns):
-        errors.append("execution policy Steps That Make The Result True has no meaningful spine transition rows")
+        errors.append("execution policy Steps That Make The Result True has no meaningful required step rows")
 
 
 def check_candidate_plan_tasks_spine_nodes(plan: str | None, errors: list[str]) -> None:
@@ -656,11 +656,11 @@ def check_candidate_plan_tasks_spine_nodes(plan: str | None, errors: list[str]) 
         return
 
     required_fields = [
-        "Spine node(s)",
+        "Required step(s)",
         "Role",
         "State transition advanced",
         "Transition evidence produced",
-        "Integration gate",
+        "Integration check",
         "Counts as goal progress",
         "Why this is not merely component completion",
     ]
@@ -680,8 +680,8 @@ def check_plan_horizon_authority(plan: str | None, errors: list[str]) -> None:
         errors.append("execution policy missing ## Work Coverage And Action Limits Matrix")
         return
     required_columns = [
-        "Batch / surface",
-        "In approved horizon?",
+        "Work item / place",
+        "In work covered in this run?",
         "What the agent may do",
         "Required runtime handling",
         "Counts as achieved?",
@@ -782,7 +782,7 @@ def check_max_safe_parallel_preference(requirements: str | None, plan: str | Non
     if topology == "Parallel subagent-driven":
         return
 
-    topology_body = section_body(plan, "Context Management / Execution Topology") or ""
+    topology_body = section_body(plan, "Who Does The Work / Context Use") or ""
     rationale = field_value(topology_body, "Concurrency selection rationale")
     if rationale is None or "safe frontier" not in rationale.casefold():
         errors.append(
@@ -795,7 +795,7 @@ def check_delegation_substrate_preference(requirements: str | None, plan: str | 
     if hsa is None:
         return
 
-    substrate_preference = normalize_delegation_substrate(field_value(hsa, "Agent workflow preference"))
+    substrate_preference = normalize_agent_workflow(field_value(hsa, "Agent workflow preference"))
     if substrate_preference in {None, "no preference"}:
         return
 
@@ -809,11 +809,11 @@ def check_delegation_substrate_preference(requirements: str | None, plan: str | 
     if plan is None:
         return
 
-    selected = selected_delegation_substrate(plan)
+    selected = selected_agent_workflow(plan)
     if selected == substrate_preference:
         return
 
-    topology_body = section_body(plan, "Context Management / Execution Topology") or ""
+    topology_body = section_body(plan, "Who Does The Work / Context Use") or ""
     rationale = (
         field_value(topology_body, "Agent workflow compatibility rationale")
         or field_value(topology_body, "Agent workflow compatibility rationale")
@@ -847,7 +847,7 @@ def check_design_ready(
         errors.append(f"design status must be Candidate, Reviewed, or Approved: {status!r}")
     require_reference(design, requirements_path, "design", errors)
     if output_contract_gate_required(requirements, design) and not output_contract_present_upstream(requirements, design):
-        errors.append("Output Contract Gate is required but no upstream output contract is present")
+        errors.append("Final Answer Format Gate is required but no upstream output contract is present")
     check_design_skeleton_fidelity(requirements, design, errors)
     if has_blocking_design_questions(design):
         errors.append("design has blocking open design questions")
@@ -882,18 +882,16 @@ def check_design_skeleton_fidelity(requirements: str | None, design: str | None,
 
     answering_method = field_value(hsa, "How this should be answered")
     not_sufficient = field_value(hsa, "What is not enough")
-    skeleton_family = field_value(hsa, "Answer type")
-    if not any((answering_method, not_sufficient, skeleton_family)):
+    if not any((answering_method, not_sufficient)):
         return
 
     body = section_body(design, "Answer Method Check")
     if body is None:
-        errors.append("design missing ## Answer Method Check for approved answer method / answer type")
+        errors.append("design missing ## Answer Method Check for approved answer method")
         return
 
     for label in (
         "Approved answer method",
-        "Approved answer type",
         "Required answer path",
         "Required steps covered",
         "What is not enough avoided",
@@ -901,32 +899,19 @@ def check_design_skeleton_fidelity(requirements: str | None, design: str | None,
         if not labeled_or_table_field_has_content(body, label):
             errors.append(f"design Answer Method Check missing {label}")
 
-    family = (skeleton_family or "").casefold()
     instantiated = (field_value(body, "Required answer path") or "").casefold()
     mandatory = (field_value(body, "Required steps covered") or "").casefold()
     avoided = (field_value(body, "What is not enough avoided") or "").casefold()
     substitute = (not_sufficient or "").casefold()
-
-    if family and family not in (field_value(body, "Approved answer type") or "").casefold():
-        errors.append("design Answer Method Check does not preserve approved answer type")
-
-    definition = task_skeleton_definition(family)
-    forbidden_substitutions = registry_string_list(definition, "forbidden_substitutions")
-    mandatory_nodes = registry_string_list(definition, "mandatory_nodes")
-
-    for forbidden in forbidden_substitutions:
-        forbidden_lower = forbidden.casefold()
-        if forbidden_lower in instantiated or (substitute and substitute == forbidden_lower and substitute in instantiated):
-            errors.append(
-                f"design Answer Method Check substitutes {forbidden} for {family}"
-            )
-            break
-    if family and forbidden_substitutions:
-        if avoided.startswith("no") or " no" in avoided[:12]:
-            errors.append("design Answer Method Check records forbidden substitution was not avoided")
-    for node in mandatory_nodes:
-        if node.casefold() not in mandatory:
-            errors.append(f"design Answer Method Check missing {family} mandatory node: {node}")
+    approved = (field_value(body, "Approved answer method") or "").casefold()
+    if answering_method and answering_method.casefold() not in approved:
+        errors.append("design Answer Method Check does not preserve approved answer method")
+    if substitute and substitute in instantiated:
+        errors.append(f"design Answer Method Check substitutes what is not enough: {not_sufficient}")
+    if substitute and (avoided.startswith("no") or " no" in avoided[:12]):
+        errors.append("design Answer Method Check records what is not enough was not avoided")
+    if answering_method and not mandatory:
+        errors.append("design Answer Method Check missing required steps coverage")
 
 
 def check_goal_ready(
@@ -943,8 +928,8 @@ def check_goal_ready(
         return
     require_reference(goal, requirements_path, "goal", errors)
     require_reference(goal, design_path, "goal", errors)
-    if output_contract_required(requirements, design, goal) and not section_has_meaningful_content(goal, "Final Output Contract"):
-        errors.append("Output contract is required by gate or upstream artifact, but goal lacks meaningful ## Final Output Contract")
+    if output_contract_required(requirements, design, goal) and not section_has_meaningful_content(goal, "Final Final Answer Format"):
+        errors.append("Output contract is required by gate or upstream artifact, but goal lacks meaningful ## Final Final Answer Format")
 
 
 def check_plan_ready(

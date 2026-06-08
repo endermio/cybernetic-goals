@@ -9,7 +9,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[2]
 
 
-HSA_SECTION_APPROVED = """## What the User Approved
+USER_APPROVAL_SECTION_APPROVED = """## What the User Approved
 
 Status: `Approved`
 
@@ -22,18 +22,18 @@ Approval applies only to this compact control commitment.
 | Primary object | human-approved setpoint guard fixture |
 | Requested transformation | requirements brief to approved pre-goal chain |
 | Non-goals | do not reinterpret the setpoint downstream |
-| Purpose Feedback Boundary | purpose feedback remains separately calibrated |
-| Realization Surface Closure | target-state surfaces remain separately calibrated |
-| What counts as done | approved HSA guard target is observed |
+| How We Know The User Purpose Was Met | user-purpose evidence remains separately calibrated |
+| Where The Result Must Show Up | intended-result surfaces remain separately calibrated |
+| What counts as done | approved What the User Approved guard target is observed |
 | Evidence needed to call it done | target-producing evidence is observed |
 | Non-achieved terminal report handling | report goal achieved: no |
-| Required answer path | HSA guard fixture spine |
-| Work covered in this run | HSA guard fixture horizon |
+| Required answer path | What the User Approved guard fixture required answer path |
+| Work covered in this run | What the User Approved guard fixture horizon |
 | What the agent may do | local guard fixture checks |
 | Forbidden live / irreversible actions | none |
 | Required handling for unauthorized actions | none |
 | Explicitly out-of-scope items | none |
-| Output Contract | final runtime command preserves approved artifacts |
+| Final Answer Format | final runtime command preserves approved artifacts |
 | Workflow fit | full pre-goal orchestration is required for this fixture |
 | Known assumptions | test fixture assumptions only |
 
@@ -49,7 +49,7 @@ class HumanSetpointApprovalTest(unittest.TestCase):
     def read(self, path: str) -> str:
         return (ROOT / path).read_text(encoding="utf-8")
 
-    def write_requirements(self, tmp: Path, *, hsa: str | None = HSA_SECTION_APPROVED) -> Path:
+    def write_requirements(self, tmp: Path, *, hsa: str | None = USER_APPROVAL_SECTION_APPROVED) -> Path:
         requirements = tmp / "requirements.md"
         parts = [
             "# Requirements",
@@ -68,7 +68,7 @@ class HumanSetpointApprovalTest(unittest.TestCase):
         requirements.write_text("\n".join(parts), encoding="utf-8")
         return requirements
 
-    def write_control_chain(self, tmp: Path, *, hsa: str | None = HSA_SECTION_APPROVED):
+    def write_control_chain(self, tmp: Path, *, hsa: str | None = USER_APPROVAL_SECTION_APPROVED):
         requirements = self.write_requirements(tmp, hsa=hsa)
         goal = tmp / "goal.md"
         plan = tmp / "plan.md"
@@ -85,11 +85,11 @@ class HumanSetpointApprovalTest(unittest.TestCase):
                     "",
                     "## Success Condition",
                     "",
-                    "Codex may report `goal achieved: yes` only when the single target-achieved predicate is satisfied.",
+                    "Codex may report `goal achieved: yes` only when the single what counts as done is satisfied.",
                     "",
-                    "- Required target-producing evidence is present.",
+                    "- Evidence needed to call it done is present.",
                     "",
-                    "## Purpose Feedback Contract",
+                    "## How We Know The User Purpose Was Met",
                     "",
                     "| Element | Requirement |",
                     "|---|---|",
@@ -97,42 +97,42 @@ class HumanSetpointApprovalTest(unittest.TestCase):
                     "| Purpose-realizing outcome observed | operator can observe the intended result |",
                     "| Supporting Evidence | internal checks support progress only |",
                     "| Sufficient evidence level | purpose-boundary |",
-                    "| Purpose feedback unavailable handling | report pending and next observation |",
-                    "| Allowed completion wording | pending until purpose feedback is observed |",
+                    "| If user-purpose evidence unavailable | report pending and next observation |",
+                    "| Allowed completion wording | pending until user-purpose evidence is observed |",
                     "",
-                    "## Realization Surface Contract",
+                    "## Where The Result Must Show Up",
                     "",
                     "| Element | Requirement |",
                     "|---|---|",
                     "| Target state | target semantics are represented across realization surfaces |",
-                    "| Required surfaces | surface model, action classification, residual reconciliation |",
-                    "| Surface actions | act / inspect / preserve / exclude / discover |",
+                    "| Required result places | surface model, action classification, residual reconciliation |",
+                    "| Place actions | act / inspect / preserve / exclude / discover |",
                     "| Residual reconciliation | account for old state, unknown surfaces, exclusions, preserved surfaces, and remaining mismatches |",
-                    "| RSC status wording | strongest target-realization claim requires RSC adequate |",
+                    "| Result-placement wording | strongest result claim claim requires result-placement adequate |",
                     "| Partial/unavailable handling | report partial, missing, unavailable, or not applicable with justification |",
-                    "| RSC / PFB boundary | RSC calibrates target-state and surface-closure claims while PFB calibrates human-purpose realization claims |",
+                    "| Distinction from user-purpose evidence | result-placement is distinct from How We Know The User Purpose Was Met |",
                     "",
-                    "## Target Achievement Contract",
+                    "## What Counts As Done",
                     "",
                     "| Element | Requirement |",
                     "|---|---|",
-                    "| What counts as done | approved HSA guard target is observed |",
-                    "| Required target-producing evidence | target-producing evidence is observed |",
-                    "| Allowed achieved claim | only target-achieved predicate supports goal achieved: yes |",
-                    "| Steps that make the result true | HSA guard fixture spine |",
+                    "| What counts as done | approved What the User Approved guard target is observed |",
+                    "| Evidence needed to call it done | target-producing evidence is observed |",
+                    "| Allowed achieved claim | only what counts as done supports goal achieved: yes |",
+                    "| Steps that make the result true | What the User Approved guard fixture required answer path |",
                     "",
                     "## Work Covered And Allowed Actions Contract",
                     "",
                     "| Element | Requirement |",
                     "|---|---|",
-                    "| Approved horizon | HSA guard fixture horizon |",
-                    "| Runtime-authorized actions | local guard fixture checks |",
+                    "| Work covered in this run | What the User Approved guard fixture horizon |",
+                    "| What the agent may do | local guard fixture checks |",
                     "| Forbidden actions | none |",
                     "| Prepare-only / observe-only actions | none |",
                     "| Explicitly out-of-scope items | none |",
-                    "| Horizon completion rule | every horizon item is accounted for in this fixture |",
+                    "| Work coverage rule | every horizon item is accounted for in this fixture |",
                     "",
-                    "## Final Output Contract",
+                    "## Final Final Answer Format",
                     "",
                     "| Element | Requirement |",
                     "|---|---|",
@@ -167,21 +167,21 @@ class HumanSetpointApprovalTest(unittest.TestCase):
                     "",
                     "## Work Coverage And Action Limits Matrix",
                     "",
-                    "| Batch / surface | In approved horizon? | What the agent may do | Required runtime handling | Counts as achieved? |",
+                    "| Work item / place | In work covered in this run? | What the agent may do | Required runtime handling | Counts as achieved? |",
                     "|---|---|---|---|---|",
-                    "| HSA guard fixture | yes | execute | run guard / compiler fixture checks | yes if fixture passes |",
+                    "| What the User Approved guard fixture | yes | execute | run guard / compiler fixture checks | yes if fixture passes |",
                     "",
                     "## Steps That Make The Result True",
                     "",
-                    "| Spine node | Required state transition | Required evidence |",
+                    "| Required step | Required state transition | Required evidence |",
                     "|---|---|---|",
-                    "| S1 | fixture input -> HSA guard-ready chain | guard fixture files exist |",
+                    "| S1 | fixture input -> What the User Approved guard-ready chain | guard fixture files exist |",
                     "",
-                    "## Target-Producing Action Strategy",
+                    "## Action That Can Make It Done",
                     "",
-                    "Target-producing action required:",
+                    "Action that can make it done:",
                     "",
-                    "- Run or observe the target-producing action before any achieved claim.",
+                    "- Run or observe the action that can make it done before any achieved claim.",
                     "",
                     "Proof of impossibility, if any:",
                     "",
@@ -189,24 +189,24 @@ class HumanSetpointApprovalTest(unittest.TestCase):
                     "",
                     "Non-achieved terminal report rule:",
                     "",
-                    "- A non-achieved report may be produced only after the action is attempted and fails, or impossibility is proven.",
+                    "- A report when not done may be produced only after the action is attempted and fails, or impossibility is proven.",
                     "",
-                    "## Realization Surface Closure Strategy",
+                    "## Where The Result Must Show Up",
                     "",
-                    "- RSC status: `RSC not applicable with justification`",
-                    "- Why no target-state surface closure is required: this fixture only checks HSA structure.",
-                    "- Why no surface discovery / residual reconciliation is needed: no controlled-object target state is changed.",
-                    "- Allowed target-realization wording: do not claim target-state realization.",
+                    "- Result-placement status: `not applicable with justification`",
+                    "- Why no intended-result result placement is required: this fixture only checks What the User Approved structure.",
+                    "- Why no place discovery / residual reconciliation is needed: no controlled-object intended result is changed.",
+                    "- Allowed result claim wording: do not claim intended-result realization.",
                     "",
-                    "## Context Management / Execution Topology",
+                    "## Who Does The Work / Context Use",
                     "",
                     "Task level: `Level 2`",
                     "",
-                    "Selected topology: `Main-only`",
+                    "Who does the work: `Main-only`",
                     "",
                     "Selected agent workflow: `none`",
                     "",
-                    "Topology rationale:",
+                    "Work Assignment rationale:",
                     "",
                     "- Bounded work fits main-only execution.",
                     "",
@@ -218,9 +218,9 @@ class HumanSetpointApprovalTest(unittest.TestCase):
                     "",
                     "## Candidate Plan Tasks",
                     "",
-                    "### Batch 1: HSA guard fixture",
+                    "### Batch 1: What the User Approved guard fixture",
                     "",
-                    "Spine node(s):",
+                    "Required step(s):",
                     "",
                     "- S1",
                     "",
@@ -234,7 +234,7 @@ class HumanSetpointApprovalTest(unittest.TestCase):
                     "",
                     "- Fixture target-producing evidence is recorded.",
                     "",
-                    "Integration gate:",
+                    "Integration check:",
                     "",
                     "- Main agent accepts S1 evidence.",
                     "",
@@ -246,7 +246,7 @@ class HumanSetpointApprovalTest(unittest.TestCase):
                     "",
                     "Goal:",
                     "",
-                    "- Keep the HSA guard fixture structurally ready.",
+                    "- Keep the What the User Approved guard fixture structurally ready.",
                     "",
                 ]
             ),
@@ -270,53 +270,53 @@ class HumanSetpointApprovalTest(unittest.TestCase):
                     "- Human setpoint fidelity: `yes`",
                     "- Goal contract: `yes`",
                     "- Execution policy: `yes`",
-                    "- Context management / execution topology: `yes`",
-                    "- Purpose feedback adequacy: `yes`",
-                    "- Realization surface closure adequacy: `yes`",
-                    "- Target achievement predicate fidelity: `yes`",
+                    "- Who does the work / context use: `yes`",
+                    "- User purpose evidence check: `yes`",
+                    "- Result placement check: `yes`",
+                    "- What counts as done check: `yes`",
                     "- answer path check: `yes`",
-                    "- Work covered in this run and authority fidelity: `yes`",
+                    "- Work covered in this run and authority check: `yes`",
                     "",
-                    "## Human Setpoint Fidelity",
+                    "## What the User Approved Check",
                     "",
                     "Findings:",
                     "- Downstream artifacts preserve the approved compact control commitment.",
                     "",
-                    "## Context Management / Execution Topology",
+                    "## Who Does The Work / Context Use",
                     "",
                     "Findings:",
-                    "- Reviewed selected topology and no Blocking/Major findings.",
+                    "- Reviewed work assignment and no Blocking/Major findings.",
                     "",
-                    "## Purpose Feedback Adequacy",
+                    "## User Purpose Evidence Check",
                     "",
                     "Classification:",
-                    "- Internally verified, purpose feedback pending",
+                    "- Internally verified, user purpose evidence pending",
                     "",
                     "Findings:",
                     "- Internal checks are progress evidence; purpose achievement waits for purpose-boundary feedback.",
                     "",
-                    "## Realization Surface Closure Adequacy",
+                    "## Result Placement Check",
                     "",
                     "Classification:",
-                    "- RSC not applicable with justification",
+                    "- not applicable with justification",
                     "",
                     "Findings:",
-                    "- RSC not applicable is justified for this fixture.",
+                    "- not applicable is justified for this fixture.",
                     "",
-                    "## Target Achievement Predicate Fidelity",
+                    "## What Counts As Done Check",
                     "",
                     "Findings:",
-                    "- The single target-achieved predicate is separated from non-achieved terminal reports.",
+                    "- The single what counts as done is separated from report when not dones.",
                     "",
                     "## Answer Path Check",
                     "",
                     "Findings:",
-                    "- Work packages map to the fixture spine node.",
+                    "- Work packages map to the fixture required step.",
                     "",
                     "## Work Covered And Allowed Actions Check",
                     "",
                     "Findings:",
-                    "- Approved horizon and runtime authority are compact and fixture-bounded.",
+                    "- Work covered in this run and runtime authority are compact and fixture-bounded.",
                     "",
                     "## Final Observer Check",
                     "",
@@ -441,7 +441,7 @@ class HumanSetpointApprovalTest(unittest.TestCase):
             ".agents/skills/reviewing-cybernetic-control-structures/assets/control-review-template.md"
         )
         for text in (review_skill, review_template):
-            self.assertIn("Human Setpoint Fidelity", text)
+            self.assertIn("What The User Approved Check", text)
             self.assertIn("approved compact control commitment", text)
 
     def test_runtime_compiler_preserves_approved_setpoint(self):
@@ -460,11 +460,11 @@ class HumanSetpointApprovalTest(unittest.TestCase):
     def test_invariant_matrix_tracks_human_setpoint_approval(self):
         matrix = self.read("docs/cybernetic-framework/invariant-artifact-consumer-matrix.md")
 
-        self.assertIn("INV-HSA-001", matrix)
+        self.assertIn("INV-What the User Approved-001", matrix)
         self.assertIn("What the User Approved", matrix)
         self.assertIn("orchestration_guard.py", matrix)
         self.assertIn("control_chain_guard.py", matrix)
-        self.assertIn("Human Setpoint Fidelity", matrix)
+        self.assertIn("What the User Approved Check", matrix)
         self.assertIn("tests/skills/test_human_setpoint_approval.py", matrix)
 
     def test_orchestrator_evals_do_not_bypass_hsa(self):
@@ -481,12 +481,12 @@ class HumanSetpointApprovalTest(unittest.TestCase):
             "review-nonconvergence-blocks",
             "no-independent-review-no-approval",
             "post-review-revision-requires-final-observer",
-            "inserts-design-stage-when-design-gate-required",
+            "inserts-design-stage-when-design-check-required",
             "orchestrator-cannot-skip-required-design",
             "orchestrator-blocks-when-design-skill-unavailable",
             "existing-design-artifact-propagates-downstream",
             "orchestrator-cannot-compile-before-review",
-            "orchestrator-propagates-execution-topology-without-deciding-it",
+            "orchestrator-propagates-execution-work assignment-without-deciding-it",
         ]
         for eval_id in hsa_required_ids:
             self.assertIn(eval_id, eval_by_id)
@@ -517,7 +517,7 @@ class HumanSetpointApprovalTest(unittest.TestCase):
         skill = self.read(".agents/skills/writing-cybernetic-goals/SKILL.md")
         frontmatter = skill.split("---", 2)[1]
 
-        self.assertIn("control contract must be written", frontmatter)
+        self.assertIn("goal contract must be written", frontmatter)
         self.assertIn("Level 3/4 full pre-goal orchestration", frontmatter)
         self.assertIn("What the User Approved", frontmatter)
 
