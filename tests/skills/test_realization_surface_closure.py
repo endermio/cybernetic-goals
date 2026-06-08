@@ -372,18 +372,8 @@ class RealizationSurfaceClosureTest(unittest.TestCase):
         )
 
         for text in (skill, template, compiler):
-            self.assertIn(
-                "Do not claim target-state realization from local action alone when Realization Surface Closure is required.",
-                text,
-            )
-            self.assertIn(
-                "Strongest positive target-realization claims require RSC adequate.",
-                text,
-            )
-            self.assertIn(
-                "surfaces covered, required surface actions completed or justified, residuals reconciled, pending or unknown surfaces, and smallest next reconciliation",
-                text,
-            )
+            self.assertIn("Realization Surface", text)
+            self.assertIn("realization surfaces covered, actions completed or justified, residuals reconciled", text)
         preconditions = skill.split("## Preconditions", 1)[1].split("## Runtime Goal Contract", 1)[0]
         self.assertIn("goal includes a compact `Purpose Feedback Contract`", preconditions)
         self.assertIn("control review records `Purpose feedback adequacy: yes`", preconditions)
@@ -394,6 +384,7 @@ class RealizationSurfaceClosureTest(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmpdir:
             tmp = Path(tmpdir)
             requirements, goal, plan, review = self.write_guard_artifacts(tmp)
+            runtime_contract = tmp / "runtime.goal.md"
             result = subprocess.run(
                 [
                     sys.executable,
@@ -409,18 +400,22 @@ class RealizationSurfaceClosureTest(unittest.TestCase):
                     str(plan),
                     "--review",
                     str(review),
+                    "--out",
+                    str(runtime_contract),
                 ],
                 cwd=ROOT,
                 text=True,
                 capture_output=True,
             )
+            contract_text = runtime_contract.read_text(encoding="utf-8")
 
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
-        self.assertIn("target-state realization", result.stdout)
-        self.assertIn("RSC adequate", result.stdout)
-        self.assertIn("surfaces covered", result.stdout)
-        self.assertIn("required surface actions completed or justified", result.stdout)
-        self.assertIn("smallest next reconciliation", result.stdout)
+        self.assertIn("Use this /goal:", result.stdout)
+        self.assertNotIn("Realization Surface Closure", result.stdout)
+        self.assertIn("Realization Surface Contract", contract_text)
+        self.assertIn("Realization Surface Closure Strategy", contract_text)
+        self.assertIn("Realization Surface Closure Adequacy", contract_text)
+        self.assertIn("realization surfaces covered, actions completed or justified, residuals reconciled", contract_text)
 
     def test_control_chain_guard_rejects_goal_missing_rsc_contract(self):
         with tempfile.TemporaryDirectory() as tmpdir:

@@ -427,6 +427,7 @@ class ContextTopologySkillTest(unittest.TestCase):
                 tmp,
                 self.complete_serial_topology(),
             )
+            runtime_contract = tmp / "runtime.goal.md"
 
             result = subprocess.run(
                 [
@@ -445,19 +446,22 @@ class ContextTopologySkillTest(unittest.TestCase):
                     str(review),
                     "--skip-guard",
                     "--i-understand-this-bypasses-phase-gates",
+                    "--out",
+                    str(runtime_contract),
                 ],
                 cwd=ROOT,
                 text=True,
                 capture_output=True,
             )
+            contract_text = runtime_contract.read_text(encoding="utf-8")
 
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
-        self.assertIn("approved execution topology", result.stdout)
-        self.assertIn("approved bounded subagent delegation protocol", result.stdout)
+        self.assertIn("Use this /goal:", result.stdout)
+        self.assertIn("Execute the runtime goal contract at", result.stdout)
         self.assertNotIn("$superpowers:subagent-driven-development", result.stdout)
-        self.assertIn("only one execution subagent active at a time", result.stdout)
-        self.assertIn("main agent coordinates", result.stdout)
-        self.assertIn("Subagent outputs are candidate results until the main agent integrates them", result.stdout)
+        self.assertIn("Selected topology: `Serial subagent-driven`", contract_text)
+        self.assertIn("Selected delegation substrate: `bounded-protocol`", contract_text)
+        self.assertIn("bounded delegation protocol", contract_text)
         self.assertNotIn("Execute serially according to the approved batch rhythm", result.stdout)
 
     def test_runtime_compiler_uses_superpowers_subagent_workflow_when_plan_selects_it(self):
@@ -470,6 +474,7 @@ class ContextTopologySkillTest(unittest.TestCase):
                     selected_delegation_substrate="superpowers-subagent-driven-development",
                 ),
             )
+            runtime_contract = tmp / "runtime.goal.md"
 
             result = subprocess.run(
                 [
@@ -488,15 +493,19 @@ class ContextTopologySkillTest(unittest.TestCase):
                     str(review),
                     "--skip-guard",
                     "--i-understand-this-bypasses-phase-gates",
+                    "--out",
+                    str(runtime_contract),
                 ],
                 cwd=ROOT,
                 text=True,
                 capture_output=True,
             )
+            contract_text = runtime_contract.read_text(encoding="utf-8")
 
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
-        self.assertIn("$superpowers:subagent-driven-development", result.stdout)
-        self.assertIn("only when the approved plan's work packages match that workflow", result.stdout)
+        self.assertNotIn("$superpowers:subagent-driven-development", result.stdout)
+        self.assertIn("Selected delegation substrate: `superpowers-subagent-driven-development`", contract_text)
+        self.assertIn("$superpowers:subagent-driven-development", contract_text)
 
     def test_runtime_compiler_does_not_infer_superpowers_substrate_from_notes(self):
         with tempfile.TemporaryDirectory() as tmpdir:
@@ -508,6 +517,7 @@ class ContextTopologySkillTest(unittest.TestCase):
                     selected_delegation_substrate="bounded-protocol",
                 ),
             )
+            runtime_contract = tmp / "runtime.goal.md"
 
             result = subprocess.run(
                 [
@@ -526,15 +536,19 @@ class ContextTopologySkillTest(unittest.TestCase):
                     str(review),
                     "--skip-guard",
                     "--i-understand-this-bypasses-phase-gates",
+                    "--out",
+                    str(runtime_contract),
                 ],
                 cwd=ROOT,
                 text=True,
                 capture_output=True,
             )
+            contract_text = runtime_contract.read_text(encoding="utf-8")
 
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
         self.assertNotIn("$superpowers:subagent-driven-development", result.stdout)
-        self.assertIn("approved bounded subagent delegation protocol", result.stdout)
+        self.assertIn("Selected delegation substrate: `bounded-protocol`", contract_text)
+        self.assertNotIn("Selected delegation substrate: `superpowers-subagent-driven-development`", contract_text)
 
     def test_control_chain_guard_requires_review_of_context_topology(self):
         with tempfile.TemporaryDirectory() as tmpdir:

@@ -406,7 +406,9 @@ class TargetAchievementPredicateFidelityTest(unittest.TestCase):
             self.assertNotIn("fallback reason", text)
 
         with tempfile.TemporaryDirectory() as tmpdir:
-            requirements, goal, plan, review = self.write_chain(Path(tmpdir))
+            tmp = Path(tmpdir)
+            requirements, goal, plan, review = self.write_chain(tmp)
+            runtime_contract = tmp / "runtime.goal.md"
             result = subprocess.run(
                 [
                     sys.executable,
@@ -419,16 +421,82 @@ class TargetAchievementPredicateFidelityTest(unittest.TestCase):
                     str(plan),
                     "--review",
                     str(review),
+                    "--out",
+                    str(runtime_contract),
+                ],
+                cwd=ROOT,
+                text=True,
+                capture_output=True,
+            )
+            contract_text = runtime_contract.read_text(encoding="utf-8")
+
+        self.assertEqual(0, result.returncode, result.stdout + result.stderr)
+        self.assertIn("Use this /goal:", result.stdout)
+        self.assertNotIn("single target-achieved predicate met: yes/no", result.stdout)
+        self.assertIn("single target-achieved predicate met: yes/no", contract_text)
+        self.assertIn("non-achieved reason", contract_text)
+        self.assertNotIn("fallback reason", result.stdout)
+
+    def test_runtime_compiler_emits_short_pointer_to_runtime_contract(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            tmp = Path(tmpdir)
+            requirements, goal, plan, review = self.write_chain(tmp)
+            runtime_contract = tmp / "docs/cybernetics/runtime-goals/fixture.goal.md"
+            runtime_contract.parent.mkdir(parents=True, exist_ok=True)
+            result = subprocess.run(
+                [
+                    sys.executable,
+                    str(COMPILER),
+                    "--requirements",
+                    str(requirements),
+                    "--goal",
+                    str(goal),
+                    "--plan",
+                    str(plan),
+                    "--review",
+                    str(review),
+                    "--out",
+                    str(runtime_contract),
                 ],
                 cwd=ROOT,
                 text=True,
                 capture_output=True,
             )
 
+            contract_text = runtime_contract.read_text(encoding="utf-8") if runtime_contract.exists() else ""
+
         self.assertEqual(0, result.returncode, result.stdout + result.stderr)
-        self.assertIn("single target-achieved predicate met: yes/no", result.stdout)
-        self.assertIn("non-achieved reason", result.stdout)
-        self.assertNotIn("fallback reason", result.stdout)
+        self.assertIn("Runtime goal contract written:", result.stdout)
+        self.assertIn("Use this /goal:", result.stdout)
+
+        pointer = next(line for line in result.stdout.splitlines() if line.startswith("/goal "))
+        self.assertLessEqual(len(pointer), 800, pointer)
+        self.assertIn("Execute the runtime goal contract at", pointer)
+        self.assertIn("docs/cybernetics/runtime-goals/fixture.goal.md", pointer)
+        self.assertNotIn("Purpose Feedback Boundary", pointer)
+        self.assertNotIn("Realization Surface Closure", pointer)
+        self.assertNotIn("single target-achieved predicate met", pointer)
+        self.assertNotIn("subagent outputs are candidate results", pointer.casefold())
+
+        self.assertIn("## Approved Control Chain", contract_text)
+        self.assertIn(str(requirements), contract_text)
+        self.assertIn(str(goal), contract_text)
+        self.assertIn(str(plan), contract_text)
+        self.assertIn(str(review), contract_text)
+        self.assertIn("## Required Sections To Read", contract_text)
+        self.assertIn("Human Setpoint Approval", contract_text)
+        self.assertIn("Target Achievement Contract", contract_text)
+        self.assertIn("Purpose Feedback Contract", contract_text)
+        self.assertIn("Realization Surface Contract", contract_text)
+        self.assertIn("Target-Producing Action Strategy", contract_text)
+        self.assertIn("Context Management / Execution Topology", contract_text)
+        self.assertIn("Target Achievement Predicate Fidelity", contract_text)
+        self.assertIn("Purpose Feedback Adequacy", contract_text)
+        self.assertIn("Realization Surface Closure Adequacy", contract_text)
+        self.assertIn("Final Observer Check", contract_text)
+        self.assertIn("goal achieved: yes/no", contract_text)
+        self.assertIn("single target-achieved predicate met: yes/no", contract_text)
+        self.assertIn("smallest next target-producing attempt", contract_text)
 
     def test_matrix_and_evals_track_tap_invariant(self):
         matrix = self.read("docs/cybernetic-framework/invariant-artifact-consumer-matrix.md")

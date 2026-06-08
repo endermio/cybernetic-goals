@@ -1,1 +1,46 @@
-/goal Execute the approved execution policy in {plan} under the control contract in {goal}, the confirmed requirements in {requirements}, and the solution design in {design}. Use the approved control review in {review} as the phase-gate record. Follow the Final Output Contract section in {goal}; do not substitute a different audience, purpose, medium, structure, detail level, destination, or machine-readable shape. Execute only against the human-approved setpoint in {requirements}; do not reinterpret the human purpose, primary object, requested transformation, non-goals, Purpose Feedback Boundary, Realization Surface Closure, Single target-achieved predicate, output contract, or workflow fit. Do not reinterpret requirements, rewrite the solution design, rewrite the control strategy, replace approved sensors, or start unreviewed work. Use `$superpowers:executing-plans` discipline against the approved plan. Use `$superpowers:systematic-debugging` for unclear or repeated failures. Use `$superpowers:verification-before-completion` before claiming completion. Report completion status according to the highest purpose-relevant evidence actually observed. Do not claim the human purpose is achieved from internal sensors alone unless the approved goal says internal evidence is sufficient. If purpose feedback is missing, report what is verified, what is not yet observed, and the smallest next observation needed. Do not claim target-state realization from local action alone when Realization Surface Closure is required. Strongest positive target-realization claims require RSC adequate. Report surfaces covered, required surface actions completed or justified, residuals reconciled, pending or unknown surfaces, and smallest next reconciliation when RSC is partial, missing, unavailable, or not applicable with justification. Calibrate goal-achieved claims to the single target-achieved predicate in the approved goal. Non-achieved terminal reports may explain why the target was not achieved, but they are never alternate goals, target-achieved states, or success states. Final reports must include goal achieved: yes/no, single target-achieved predicate met: yes/no, target-producing evidence, if no: non-achieved reason, if no: target-producing action attempted or proof of impossibility, and if no: smallest next target-producing attempt. If runtime cannot load these skills, follow the equivalent discipline already written in the approved plan and control review. Use the approved execution topology defined in {plan}; when the topology delegates work, use only the approved bounded subagent delegation protocol recorded in {plan}. Use `$superpowers:subagent-driven-development` only if {plan} records `Selected delegation substrate: superpowers-subagent-driven-development` for work packages that fit that implementation-plan, current-session workflow. The main agent coordinates, integrates, maintains the progress log, and detects stop conditions when work is delegated. Subagent outputs are candidate results until the main agent integrates them against the approved control artifacts, progress log, evidence requirements, and stop conditions. Follow the approved batch rhythm. Intermediate states inside a batch may be broken if the approved plan allows it, but each batch must end in the approved openable/verifiable state. Treat approved sensors, checks, and evidence channels as sensors, not objectives; if an evidence channel conflicts with confirmed requirements or solution-design invariants, stop or follow the approved sensor-governance rule. If any referenced artifact is missing, not approved, or internally inconsistent, stop and report the smallest required human decision. If the requirements analysis, design, goal, plan, or review conflict or become insufficient, stop and report the smallest required human decision.
+# Runtime Goal Contract
+
+## Approved Control Chain
+
+- Requirements: `{requirements}`
+- Design: `{design_or_not_required}`
+- Goal: `{goal}`
+- Execution policy: `{plan}`
+- Control review: `{review}`
+
+## Runtime Execution Rule
+
+Execute the approved execution policy under the approved control chain. Do not reinterpret the approved setpoint, target-achieved predicate, output contract, topology, sensors, or control strategy.
+Treat the human-approved setpoint as the source for primary object, requested transformation, non-goals, purpose feedback, realization surface closure, single target-achieved predicate, output contract, workflow fit, and known assumptions.
+
+## Required Sections To Read
+
+- Requirements `{requirements}`: `Human Setpoint Approval`, `Purpose Feedback Boundary`, `Realization Surface Closure`, `Output Contract`.
+- Goal `{goal}`: `Success Condition`, `Target Achievement Contract`, `Purpose Feedback Contract`, `Realization Surface Contract`, `Final Output Contract`.
+- Execution policy `{plan}`: `Target-Producing Action Strategy`, `Context Management / Execution Topology`, `Phase Gates`, `Progress Log Rules`, `Purpose Feedback Strategy`, `Realization Surface Closure Strategy`, `Sensor / Evidence Governance`.
+- Control review `{review}`: `Target Achievement Predicate Fidelity`, `Purpose Feedback Adequacy`, `Realization Surface Closure Adequacy`, `Context Management / Execution Topology`, `Final Observer Check`.
+
+## Runtime Discipline
+
+- Use `$superpowers:executing-plans` discipline against the approved execution policy.
+- Use `$superpowers:systematic-debugging` for unclear or repeated failures.
+- Use `$superpowers:verification-before-completion` before claiming completion.
+- Follow the approved execution topology and delegation substrate recorded in the execution policy.
+- If the selected delegation substrate is `superpowers-subagent-driven-development`, use `$superpowers:subagent-driven-development` only for approved matching work packages.
+- Treat subagent work as governed by the execution policy's bounded delegation protocol and integration gates.
+- Treat approved sensors, checks, and evidence channels as sensors, not objectives.
+
+## Final Report Required Fields
+
+- goal achieved: yes/no
+- single target-achieved predicate met: yes/no
+- target-producing evidence
+- if no: non-achieved reason
+- if no: target-producing action attempted or proof of impossibility
+- if no: smallest next target-producing attempt
+- purpose feedback status and highest purpose-relevant evidence observed
+- realization surfaces covered, actions completed or justified, residuals reconciled, and pending or unknown surfaces when RSC applies
+
+## Stop Rule
+
+If any referenced artifact is missing, not approved, internally inconsistent, or insufficient for runtime execution, stop and report the smallest required human decision.

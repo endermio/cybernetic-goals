@@ -362,15 +362,8 @@ class PurposeFeedbackBoundaryTest(unittest.TestCase):
         )
 
         for text in (skill, template, compiler):
-            self.assertIn(
-                "Report completion status according to the highest purpose-relevant evidence actually observed.",
-                text,
-            )
-            self.assertIn(
-                "Do not claim the human purpose is achieved from internal sensors alone",
-                text,
-            )
-            self.assertIn("smallest next observation needed", text)
+            self.assertIn("Purpose Feedback", text)
+            self.assertIn("purpose feedback status and highest purpose-relevant evidence observed", text)
 
         with tempfile.TemporaryDirectory() as tmpdir:
             tmp = Path(tmpdir)
@@ -385,6 +378,7 @@ class PurposeFeedbackBoundaryTest(unittest.TestCase):
             goal.write_text("## Source Contracts\n\n- Requirements analysis: `requirements.md`\n", encoding="utf-8")
             plan.write_text("## Context Management / Execution Topology\n\nSelected topology: `Main-only`\n", encoding="utf-8")
             review.write_text("## Review Status\n\nStatus: `Approved`\n", encoding="utf-8")
+            runtime_contract = tmp / "runtime.goal.md"
 
             result = subprocess.run(
                 [
@@ -403,15 +397,22 @@ class PurposeFeedbackBoundaryTest(unittest.TestCase):
                     str(review),
                     "--skip-guard",
                     "--i-understand-this-bypasses-phase-gates",
+                    "--out",
+                    str(runtime_contract),
                 ],
                 cwd=ROOT,
                 text=True,
                 capture_output=True,
             )
+            contract_text = runtime_contract.read_text(encoding="utf-8")
 
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
-        self.assertIn("highest purpose-relevant evidence actually observed", result.stdout)
-        self.assertIn("smallest next observation needed", result.stdout)
+        self.assertIn("Use this /goal:", result.stdout)
+        self.assertIn("Execute the runtime goal contract at", result.stdout)
+        self.assertNotIn("highest purpose-relevant evidence actually observed", result.stdout)
+        self.assertIn("Purpose Feedback Contract", contract_text)
+        self.assertIn("Purpose Feedback Adequacy", contract_text)
+        self.assertIn("purpose feedback status and highest purpose-relevant evidence observed", contract_text)
 
     def test_control_chain_guard_rejects_goal_missing_purpose_feedback_contract(self):
         with tempfile.TemporaryDirectory() as tmpdir:

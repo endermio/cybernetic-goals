@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Compile a final runtime /goal command from approved control artifacts."""
+"""Compile a pointer-only runtime /goal and a runtime goal contract artifact."""
 from __future__ import annotations
 
 import argparse
@@ -28,20 +28,6 @@ def section_body(text: str, heading: str) -> str | None:
                 break
         return text[start:end]
     return None
-
-
-def final_output_contract_clause(goal_path: str) -> str:
-    goal = Path(goal_path).read_text(encoding="utf-8")
-    body = section_body(goal, "Final Output Contract")
-    if body is None:
-        return ""
-    if not body.strip():
-        return ""
-
-    return (
-        f"Follow the Final Output Contract section in {goal_path}. "
-        "Do not substitute a different audience, purpose, medium, structure, detail level, destination, or machine-readable shape. "
-    )
 
 
 def selected_execution_topology(plan_path: str) -> str | None:
@@ -92,45 +78,96 @@ def selected_delegation_substrate(plan_path: str) -> str | None:
     return None
 
 
-def conditional_subagent_workflow_clause(plan_path: str) -> str:
-    if selected_delegation_substrate(plan_path) != "superpowers-subagent-driven-development":
-        return ""
+def derive_runtime_goal_path(requirements_path: str) -> Path:
+    path = Path(requirements_path)
+    stem = path.stem
+    parts = list(path.parts)
+    if "requirements" in parts:
+        parts[parts.index("requirements")] = "runtime-goals"
+        return Path(*parts).with_name(f"{stem}.goal.md")
+    return path.with_name(f"{stem}.goal.md")
+
+
+def pointer_command(runtime_contract_path: Path) -> str:
     return (
-        "The approved plan records `Selected delegation substrate: superpowers-subagent-driven-development`; use `$superpowers:subagent-driven-development` only when the approved plan's work packages match that workflow. "
+        f"/goal Execute the runtime goal contract at {runtime_contract_path}. "
+        "Read it first and follow it exactly. "
+        "If any referenced artifact is missing, not approved, or inconsistent, "
+        "stop and report the smallest required human decision."
     )
 
 
-def execution_topology_clause(plan_path: str) -> str:
-    topology = selected_execution_topology(plan_path)
-    base = f"Use the approved execution topology defined in {plan_path}. "
+def runtime_goal_contract(
+    *,
+    requirements: str,
+    design: str | None,
+    goal: str,
+    plan: str,
+    review: str,
+) -> str:
+    design_line = f"- Design: `{design}`" if design else "- Design: `not required`"
+    topology = selected_execution_topology(plan) or "read from approved execution policy"
+    substrate = selected_delegation_substrate(plan) or "read from approved execution policy"
+    substrate_line = (
+        "- If the selected delegation substrate is `superpowers-subagent-driven-development`, use `$superpowers:subagent-driven-development` only for approved matching work packages."
+        if substrate == "superpowers-subagent-driven-development"
+        else "- Use only the selected delegation substrate recorded in the approved execution policy."
+    )
 
-    if topology == "Serial subagent-driven":
-        return (
-            base +
-            "Because the approved topology is Serial subagent-driven, use the approved bounded subagent delegation protocol defined in the plan with only one execution subagent active at a time. "
-            f"{conditional_subagent_workflow_clause(plan_path)}"
-            "The main agent coordinates, integrates, maintains the progress log, and detects stop conditions; it must not personally absorb delegated bounded work packages. "
-            "Subagents may execute only the bounded work packages, context packs, allowed actions, return formats, and integration gates defined in the approved plan. "
-            "Subagent outputs are candidate results until the main agent integrates them against the approved control artifacts, progress log, evidence requirements, and stop conditions. "
-        )
-
-    if topology == "Parallel subagent-driven":
-        return (
-            base +
-            "Because the approved topology is Parallel subagent-driven, use the approved bounded subagent delegation protocol defined in the plan and spawn subagents only for work packages explicitly marked independent by the dependency matrix and approved control review. "
-            f"{conditional_subagent_workflow_clause(plan_path)}"
-            "The main agent coordinates, integrates, maintains the progress log, and detects stop conditions; it must not personally absorb delegated bounded work packages. "
-            "Subagents may execute only the bounded work packages, context packs, allowed actions, return formats, and integration gates defined in the approved plan. "
-            "Subagent outputs are candidate results until the main agent integrates them against the approved control artifacts, progress log, evidence requirements, and stop conditions. "
-        )
-
-    if topology == "Main-only":
-        return (
-            base +
-            "Because the approved topology is Main-only, do not dispatch target-work subagents unless the execution policy is revised and reviewed. "
-        )
-
-    return base
+    return "\n".join(
+        [
+            "# Runtime Goal Contract",
+            "",
+            "## Approved Control Chain",
+            "",
+            f"- Requirements: `{requirements}`",
+            design_line,
+            f"- Goal: `{goal}`",
+            f"- Execution policy: `{plan}`",
+            f"- Control review: `{review}`",
+            "",
+            "## Runtime Execution Rule",
+            "",
+            "Execute the approved execution policy under the approved control chain. Do not reinterpret the approved setpoint, target-achieved predicate, output contract, topology, sensors, or control strategy.",
+            "Treat the human-approved setpoint as the source for primary object, requested transformation, non-goals, purpose feedback, realization surface closure, single target-achieved predicate, output contract, workflow fit, and known assumptions.",
+            "",
+            f"- Selected topology: `{topology}`",
+            f"- Selected delegation substrate: `{substrate}`",
+            "",
+            "## Required Sections To Read",
+            "",
+            f"- Requirements `{requirements}`: `Human Setpoint Approval`, `Purpose Feedback Boundary`, `Realization Surface Closure`, `Output Contract`.",
+            f"- Goal `{goal}`: `Success Condition`, `Target Achievement Contract`, `Purpose Feedback Contract`, `Realization Surface Contract`, `Final Output Contract`.",
+            f"- Execution policy `{plan}`: `Target-Producing Action Strategy`, `Context Management / Execution Topology`, `Phase Gates`, `Progress Log Rules`, `Purpose Feedback Strategy`, `Realization Surface Closure Strategy`, `Sensor / Evidence Governance`.",
+            f"- Control review `{review}`: `Target Achievement Predicate Fidelity`, `Purpose Feedback Adequacy`, `Realization Surface Closure Adequacy`, `Context Management / Execution Topology`, `Final Observer Check`.",
+            "",
+            "## Runtime Discipline",
+            "",
+            "- Use `$superpowers:executing-plans` discipline against the approved execution policy.",
+            "- Use `$superpowers:systematic-debugging` for unclear or repeated failures.",
+            "- Use `$superpowers:verification-before-completion` before claiming completion.",
+            "- Follow the approved execution topology and delegation substrate recorded in the execution policy.",
+            substrate_line,
+            "- Treat subagent work as governed by the execution policy's bounded delegation protocol and integration gates.",
+            "- Treat approved sensors, checks, and evidence channels as sensors, not objectives.",
+            "",
+            "## Final Report Required Fields",
+            "",
+            "- goal achieved: yes/no",
+            "- single target-achieved predicate met: yes/no",
+            "- target-producing evidence",
+            "- if no: non-achieved reason",
+            "- if no: target-producing action attempted or proof of impossibility",
+            "- if no: smallest next target-producing attempt",
+            "- purpose feedback status and highest purpose-relevant evidence observed",
+            "- realization surfaces covered, actions completed or justified, residuals reconciled, and pending or unknown surfaces when RSC applies",
+            "",
+            "## Stop Rule",
+            "",
+            "If any referenced artifact is missing, not approved, internally inconsistent, or insufficient for runtime execution, stop and report the smallest required human decision.",
+            "",
+        ]
+    )
 
 
 def main() -> int:
@@ -163,67 +200,22 @@ def main() -> int:
             sys.stderr.write(result.stderr)
             return result.returncode
 
-    design_boundary = "rewrite the solution design, " if args.design else ""
-    design_sensor_clause = " or solution-design invariants" if args.design else ""
-    conflict_clause = "design, " if args.design else ""
-    if args.design:
-        context_clause = (
-            f"under the control contract in {args.goal}, "
-            f"the confirmed requirements in {args.requirements}, "
-            f"and the solution design in {args.design}. "
-        )
-    else:
-        context_clause = (
-            f"under the control contract in {args.goal} "
-            f"and the confirmed requirements in {args.requirements}. "
-        )
+    out_path = Path(args.out) if args.out else derive_runtime_goal_path(args.requirements)
+    contract = runtime_goal_contract(
+        requirements=args.requirements,
+        design=args.design,
+        goal=args.goal,
+        plan=args.plan,
+        review=args.review,
+    )
+    out_path.parent.mkdir(parents=True, exist_ok=True)
+    out_path.write_text(contract, encoding="utf-8")
 
-    output_contract_clause = final_output_contract_clause(args.goal)
-    topology_clause = execution_topology_clause(args.plan)
-    purpose_feedback_clause = (
-        "Report completion status according to the highest purpose-relevant evidence actually observed. "
-        "Do not claim the human purpose is achieved from internal sensors alone unless the approved goal says internal evidence is sufficient. "
-        "If purpose feedback is missing, report what is verified, what is not yet observed, and the smallest next observation needed. "
-    )
-    realization_surface_clause = (
-        "Do not claim target-state realization from local action alone when Realization Surface Closure is required. "
-        "Strongest positive target-realization claims require RSC adequate. "
-        "Report surfaces covered, required surface actions completed or justified, residuals reconciled, pending or unknown surfaces, and smallest next reconciliation when RSC is partial, missing, unavailable, or not applicable with justification. "
-    )
-    target_achievement_clause = (
-        "Calibrate goal-achieved claims to the single target-achieved predicate in the approved goal. "
-        "Non-achieved terminal reports may explain why the target was not achieved, but they are never alternate goals, target-achieved states, or success states. "
-        "Final reports must include goal achieved: yes/no, single target-achieved predicate met: yes/no, target-producing evidence, if no: non-achieved reason, if no: target-producing action attempted or proof of impossibility, and if no: smallest next target-producing attempt. "
-    )
-    human_setpoint_clause = (
-        f"Execute only against the human-approved setpoint in {args.requirements}. "
-        "Do not reinterpret the human purpose, primary object, requested transformation, non-goals, Purpose Feedback Boundary, Realization Surface Closure, Single target-achieved predicate, output contract, or workflow fit. "
-    )
-
-    command = (
-        f"/goal Execute the approved execution policy in {args.plan} "
-        f"{context_clause}"
-        f"Use the approved control review in {args.review} as the phase-gate record. "
-        f"{output_contract_clause}"
-        f"{human_setpoint_clause}"
-        f"Do not reinterpret requirements, {design_boundary}rewrite the control strategy, replace approved sensors, or start unreviewed work. "
-        "Use `$superpowers:executing-plans` discipline against the approved plan. "
-        "Use `$superpowers:systematic-debugging` for unclear or repeated failures. "
-        "Use `$superpowers:verification-before-completion` before claiming completion. "
-        f"{purpose_feedback_clause}"
-        f"{realization_surface_clause}"
-        f"{target_achievement_clause}"
-        "If runtime cannot load these skills, follow the equivalent discipline already written in the approved plan and control review. "
-        f"{topology_clause}"
-        "Follow the approved batch rhythm. "
-        "Intermediate states inside a batch may be broken if the approved plan allows it, but each batch must end in the approved openable/verifiable state. "
-        f"Treat approved sensors, checks, and evidence channels as sensors, not objectives; if an evidence channel conflicts with confirmed requirements{design_sensor_clause}, stop or follow the approved sensor-governance rule. "
-        "If any referenced artifact is missing, not approved, or internally inconsistent, stop and report the smallest required human decision. "
-        f"If the requirements analysis, {conflict_clause}goal, plan, or review conflict or become insufficient, stop and report the smallest required human decision."
-    )
-
-    if args.out:
-        Path(args.out).write_text(command + "\n", encoding="utf-8")
+    command = pointer_command(out_path)
+    print("Runtime goal contract written:")
+    print(out_path)
+    print()
+    print("Use this /goal:")
     print(command)
     return 0
 

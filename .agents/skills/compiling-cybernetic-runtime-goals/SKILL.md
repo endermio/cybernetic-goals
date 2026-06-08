@@ -1,13 +1,13 @@
 ---
 name: compiling-cybernetic-runtime-goals
-description: 'Use when requirements, any required design, goal contract, execution policy, and approved control review exist, and the final runtime /goal command must be checked or emitted before execution.'
+description: 'Use when requirements, any required design, goal contract, execution policy, and approved control review exist, and a runtime goal contract plus short /goal pointer must be checked or emitted before execution.'
 ---
 
 # Compiling Cybernetic Runtime Goals
 
 ## Overview
 
-Produce the final executable `/goal` command from approved control artifacts.
+Produce a runtime goal contract artifact and a short executable `/goal` pointer from approved control artifacts.
 
 Inputs:
 
@@ -18,7 +18,7 @@ Inputs:
 - execution policy / plan
 - control review with status Approved
 
-This skill is a thin compiler. It must not rewrite the control structure.
+This skill is a thin compiler. It must not rewrite the control structure or inline control discipline into the user-entered `/goal`.
 
 Use `scripts/control_chain_guard.py` and `scripts/compile_runtime_goal.py` when available.
 
@@ -26,28 +26,9 @@ Use `scripts/control_chain_guard.py` and `scripts/compile_runtime_goal.py` when 
 
 Follow `$cybernetic-superpowers-infrastructure`.
 
-This skill does not invoke runtime execution. It compiles runtime discipline into the final `/goal` command.
+This skill does not invoke runtime execution.
 
-The final command must instruct runtime Codex to:
-
-- use `$superpowers:executing-plans` discipline against the approved plan;
-- use the approved execution topology defined in the execution policy;
-- use the approved bounded subagent delegation protocol when the approved topology selects serial or parallel subagent-driven execution;
-- use `$superpowers:subagent-driven-development` only when the approved plan records `Selected delegation substrate: superpowers-subagent-driven-development` for work packages that fit that implementation-plan, current-session workflow;
-- treat subagent outputs as candidate results until main-agent integration against approved artifacts, progress log, evidence requirements, and stop conditions;
-- execute only against the human-approved setpoint in the requirements analysis; do not reinterpret the human purpose, primary object, requested transformation, non-goals, Purpose Feedback Boundary, Realization Surface Closure, Single target-achieved predicate, output contract, or workflow fit;
-- use `$superpowers:systematic-debugging` for unclear or repeated failures;
-- use `$superpowers:verification-before-completion` before claiming completion;
-- Report completion status according to the highest purpose-relevant evidence actually observed.
-- Do not claim the human purpose is achieved from internal sensors alone unless the approved goal says internal evidence is sufficient.
-- If purpose feedback is missing, report what is verified, what is not yet observed, and the smallest next observation needed.
-- Do not claim target-state realization from local action alone when Realization Surface Closure is required.
-- Strongest positive target-realization claims require RSC adequate.
-- Report surfaces covered, required surface actions completed or justified, residuals reconciled, pending or unknown surfaces, and smallest next reconciliation when RSC is partial, missing, unavailable, or not applicable with justification.
-- Calibrate goal-achieved claims to the single target-achieved predicate in the approved goal.
-- Non-achieved terminal reports may explain why the target was not achieved, but they are never alternate goals, target-achieved states, or success states.
-- Final reports must include goal achieved: yes/no, single target-achieved predicate met: yes/no, target-producing evidence, if no: non-achieved reason, if no: target-producing action attempted or proof of impossibility, and if no: smallest next target-producing attempt.
-- if runtime cannot load these skills, follow the equivalent discipline already written in the approved plan and control review.
+The user-entered `/goal` must be pointer-only and length-bounded. It points to a runtime goal contract artifact, and the contract indexes the approved control chain and required sections to read. Do not inline HSA, PFB, RSC, TAP, topology, sensor governance, review discipline, or subagent protocol prose into the `/goal` hot path.
 
 ## Preconditions
 
@@ -84,40 +65,16 @@ Do not output `/goal` unless:
 
 ## Runtime Goal Contract
 
-The final `/goal` must:
+The contract artifact must be an index-style control contract, not a long copied prompt. It must include:
 
-- reference the concrete requirements path;
-- reference the concrete design path when Design Gate was required or a design exists;
-- reference the concrete goal path;
-- reference the concrete execution policy path;
-- reference the concrete control review path;
-- carry the final output contract from the goal when one is present or required;
-- execute only against the human-approved setpoint in the requirements analysis;
-- forbid reinterpreting the human purpose, primary object, requested transformation, non-goals, Purpose Feedback Boundary, Realization Surface Closure, Single target-achieved predicate, output contract, or workflow fit;
-- forbid reinterpreting requirements;
-- forbid rewriting the control strategy;
-- forbid rewriting the solution design;
-- forbid replacing the final output audience, purpose, medium, structure, detail level, destination, or machine-readable shape;
-- forbid replacing approved sensors without using approved sensor-governance rules;
-- use the approved execution topology defined in the execution policy;
-- use `$superpowers:executing-plans` discipline against the approved execution policy;
-- use the approved bounded subagent delegation protocol when the approved execution topology selects serial or parallel subagent-driven execution;
-- use `$superpowers:subagent-driven-development` only when the approved execution policy records `Selected delegation substrate: superpowers-subagent-driven-development` for work packages that fit that implementation-plan, current-session workflow;
-- state that subagent outputs remain candidate results until main-agent integration;
-- use `$superpowers:systematic-debugging` for unclear or repeated failures;
-- use `$superpowers:verification-before-completion` before claiming completion;
-- Report completion status according to the highest purpose-relevant evidence actually observed.
-- Do not claim the human purpose is achieved from internal sensors alone unless the approved goal says internal evidence is sufficient.
-- If purpose feedback is missing, report what is verified, what is not yet observed, and the smallest next observation needed.
-- Do not claim target-state realization from local action alone when Realization Surface Closure is required.
-- Strongest positive target-realization claims require RSC adequate.
-- Report surfaces covered, required surface actions completed or justified, residuals reconciled, pending or unknown surfaces, and smallest next reconciliation when RSC is partial, missing, unavailable, or not applicable with justification.
-- Calibrate goal-achieved claims to the single target-achieved predicate in the approved goal.
-- Non-achieved terminal reports may explain why the target was not achieved, but they are never alternate goals, target-achieved states, or success states.
-- Final reports must include goal achieved: yes/no, single target-achieved predicate met: yes/no, target-producing evidence, if no: non-achieved reason, if no: target-producing action attempted or proof of impossibility, and if no: smallest next target-producing attempt.
-- follow equivalent discipline already written in the approved plan and control review if runtime cannot load those skills;
-- stop if any referenced artifact is missing, not approved, or internally inconsistent;
-- stop if artifacts conflict or become insufficient.
+- approved control chain paths for requirements, design when present, goal, execution policy, and control review;
+- a runtime execution rule that forbids reinterpreting the approved setpoint, target-achieved predicate, output contract, topology, sensors, or control strategy;
+- a human-approved setpoint rule that treats primary object, requested transformation, non-goals, purpose feedback, realization surface closure, single target-achieved predicate, output contract, workflow fit, and known assumptions as source-owned by requirements;
+- required sections to read, including `Human Setpoint Approval`, `Target Achievement Contract`, `Purpose Feedback Contract`, `Realization Surface Contract`, `Target-Producing Action Strategy`, `Context Management / Execution Topology`, `Target Achievement Predicate Fidelity`, `Purpose Feedback Adequacy`, `Realization Surface Closure Adequacy`, and `Final Observer Check`;
+- final report fields: `goal achieved: yes/no`, `single target-achieved predicate met: yes/no`, target-producing evidence, non-achieved reason when no, target-producing action attempted or proof of impossibility when no, smallest next target-producing attempt when no, purpose feedback status and highest purpose-relevant evidence observed, and realization surfaces covered, actions completed or justified, residuals reconciled, and pending or unknown surfaces when RSC applies;
+- a stop rule for missing, unapproved, inconsistent, or insufficient referenced artifacts.
+
+The final `/goal` command must only point to this runtime goal contract and tell runtime Codex to read it first.
 
 ## Scripted Compilation
 
@@ -129,7 +86,8 @@ python3 .agents/skills/compiling-cybernetic-runtime-goals/scripts/compile_runtim
   --design docs/cybernetics/designs/YYYY-MM-DD-feature.md \
   --goal docs/cybernetics/goals/YYYY-MM-DD-feature.md \
   --plan docs/cybernetics/plans/YYYY-MM-DD-feature.md \
-  --review docs/cybernetics/control-reviews/YYYY-MM-DD-feature.md
+  --review docs/cybernetics/control-reviews/YYYY-MM-DD-feature.md \
+  --out docs/cybernetics/runtime-goals/YYYY-MM-DD-feature.goal.md
 ```
 
 Do not use `--skip-guard` for official runtime `/goal` compilation. It is only for internal validation and requires the explicit `--i-understand-this-bypasses-phase-gates` acknowledgement.
@@ -138,13 +96,16 @@ Do not use `--skip-guard` for official runtime `/goal` compilation. It is only f
 
 These output formats are response-only. Do not write `$skill ...` commands, runtime `/goal` prompts, or conversational next-step prompts into requirements, design, goal, plan, or review artifacts.
 
-### Approved runtime command
+### Approved runtime contract and command
 
 ```markdown
-Runtime /goal is ready:
+Runtime goal contract written:
+`docs/cybernetics/runtime-goals/YYYY-MM-DD-feature.goal.md`
+
+Use this /goal:
 
 ```text
-/goal Execute the approved execution policy in ...
+/goal Execute the runtime goal contract at docs/cybernetics/runtime-goals/YYYY-MM-DD-feature.goal.md. Read it first and follow it exactly. If any referenced artifact is missing, not approved, or inconsistent, stop and report the smallest required human decision.
 ```
 
 Preflight:
@@ -154,7 +115,7 @@ Preflight:
 - Solution design: present or not required
 - Execution policy: present
 - Control review: Approved
-- Final output contract: present when required
+- Runtime command: pointer-only and length-bounded
 ```
 
 ### Blocked runtime compilation
@@ -187,16 +148,15 @@ Do not create or modify target-work artifacts.
 - [ ] Control review records `Context management / execution topology: yes` in Review Independence.
 - [ ] Control review includes meaningful `Context Management / Execution Topology` findings.
 - [ ] Final Observer Check is present and allows approval.
-- [ ] The final `/goal` references all approved files.
-- [ ] The final `/goal` carries the goal's Final Output Contract when present or required.
-- [ ] The final `/goal` preserves the approved execution topology.
-- [ ] The final `/goal` preserves the human-approved setpoint, including primary object, requested transformation, non-goals, Purpose Feedback Boundary, Realization Surface Closure, Single target-achieved predicate, output contract, and workflow fit.
-- [ ] The final `/goal` treats subagent outputs as candidate results until main-agent integration.
+- [ ] Runtime goal contract references all approved files.
+- [ ] Runtime goal contract indexes the goal's Final Output Contract when present or required.
+- [ ] Runtime goal contract preserves the approved execution topology through the plan section index.
+- [ ] Runtime goal contract preserves the human-approved setpoint through the requirements section index.
+- [ ] Runtime goal contract includes final report fields for PFB, RSC, and TAP claim calibration.
+- [ ] The user-entered `/goal` is pointer-only and length-bounded.
+- [ ] The user-entered `/goal` does not inline HSA, PFB, RSC, TAP, topology, sensor-governance, review, or subagent protocol prose.
 - [ ] The final `/goal` does not ask runtime Codex to write a new plan.
 - [ ] The final `/goal` does not ask runtime Codex to create or revise solution design.
-- [ ] The final `/goal` includes executing, debugging, and completion-verification discipline.
-- [ ] The final `/goal` calibrates completion claims to the highest purpose-relevant evidence actually observed.
-- [ ] The final `/goal` calibrates target-realization claims to Realization Surface Closure status.
-- [ ] The final `/goal` calibrates goal-achieved claims to Target Achievement Predicate Fidelity.
+- [ ] Runtime goal contract includes executing, debugging, and completion-verification discipline.
 - [ ] If guard or preconditions fail, the response includes a response-only next step and no final `/goal`.
 - [ ] The skill did not execute target work.

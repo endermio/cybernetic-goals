@@ -55,51 +55,67 @@
     {
       "id": "compiles-runtime-goal",
       "prompt": "requirements analysis Complete with Human Setpoint Approval: Approved, goal exists, execution policy status Candidate, control review Approved, Final Observer Check allows approval；编译最终 /goal。",
-      "expected_output": "Outputs a final /goal referencing requirements analysis, goal, plan, and review paths.",
+      "expected_output": "Writes a runtime goal contract that references requirements analysis, goal, plan, and review paths, then outputs a short pointer-only /goal to that contract.",
       "assertions": [
-        "References all four artifact paths.",
-        "Preserves the human-approved setpoint.",
+        "Runtime goal contract references all four artifact paths.",
+        "Pointer /goal references the runtime goal contract path.",
+        "Pointer /goal is short and does not inline HSA, PFB, RSC, TAP, topology, sensor, review, or subagent protocol prose.",
+        "Runtime goal contract indexes Human Setpoint Approval.",
         "Requires Final Observer Check to allow approval.",
-        "Forbids reinterpretation of requirements.",
-        "Forbids rewriting control strategy.",
-        "Mentions approved sensors, checks, and evidence channels as sensors, not objectives.",
-        "Mentions $superpowers:executing-plans, $superpowers:systematic-debugging, and $superpowers:verification-before-completion runtime discipline.",
-        "Says to follow equivalent approved artifact discipline if runtime cannot load those skills.",
-        "Stops if any referenced artifact is missing, not approved, or internally inconsistent."
+        "Runtime goal contract forbids reinterpretation of approved setpoint, target-achieved predicate, output contract, topology, sensors, or control strategy.",
+        "Runtime goal contract mentions approved sensors, checks, and evidence channels as sensors, not objectives.",
+        "Runtime goal contract mentions $superpowers:executing-plans, $superpowers:systematic-debugging, and $superpowers:verification-before-completion discipline.",
+        "Runtime goal contract stops if any referenced artifact is missing, not approved, inconsistent, or insufficient."
+      ]
+    },
+    {
+      "id": "runtime-command-is-pointer-only",
+      "prompt": "requirements analysis Complete with Human Setpoint Approval: Approved, goal exists, execution policy status Candidate, control review Approved, Final Observer Check allows approval；编译最终 runtime command。",
+      "expected_output": "Outputs a short /goal that points to docs/cybernetics/runtime-goals/*.goal.md and writes the full runtime goal contract there.",
+      "assertions": [
+        "The user-entered /goal references a runtime goal contract path.",
+        "The user-entered /goal is length-bounded.",
+        "The user-entered /goal does not contain Purpose Feedback Boundary, Realization Surface Closure, single target-achieved predicate final-report fields, or subagent protocol prose.",
+        "The runtime goal contract contains Approved Control Chain.",
+        "The runtime goal contract contains Required Sections To Read.",
+        "The runtime goal contract contains Final Report Required Fields."
       ]
     },
     {
       "id": "runtime-calibrates-purpose-feedback-claims",
       "prompt": "requirements analysis Complete, goal exists, execution policy includes Purpose Feedback Strategy, control review Approved and says purpose feedback pending is allowed. Compile runtime /goal.",
-      "expected_output": "The final /goal tells runtime to report completion according to the highest purpose-relevant evidence actually observed and not claim human purpose achieved from internal sensors alone unless approved as sufficient.",
+      "expected_output": "The runtime goal contract indexes purpose-feedback sections and requires final reporting of purpose feedback status and highest purpose-relevant evidence observed.",
       "assertions": [
-        "Includes completion status calibrated to the highest purpose-relevant evidence actually observed.",
-        "Forbids claiming human purpose achieved from internal sensors alone unless the approved goal says internal evidence is sufficient.",
-        "If purpose feedback is missing, requires reporting what is verified, what is not yet observed, and the smallest next observation needed.",
-        "Does not turn missing purpose feedback into a generic execution blocker."
+        "Runtime goal contract indexes Purpose Feedback Contract.",
+        "Runtime goal contract indexes Purpose Feedback Adequacy.",
+        "Runtime goal contract includes final reporting of purpose feedback status and highest purpose-relevant evidence observed.",
+        "Pointer /goal does not inline purpose-feedback discipline prose."
       ]
     },
     {
       "id": "runtime-calibrates-realization-surface-closure-claims",
       "prompt": "requirements analysis Complete, goal includes Realization Surface Contract, execution policy includes Realization Surface Closure Strategy, control review Approved and says RSC partial or missing status is allowed only with calibrated wording. Compile runtime /goal.",
-      "expected_output": "The final /goal forbids claiming target-state realization from local action alone, requires RSC adequate for strongest positive target-realization claims, and reports surfaces covered, required surface actions completed or justified, residuals reconciled, pending or unknown surfaces, and smallest next reconciliation.",
+      "expected_output": "The runtime goal contract indexes RSC sections and requires final reporting of surfaces covered, actions completed or justified, residuals reconciled, and pending or unknown surfaces when RSC applies.",
       "assertions": [
-        "Forbids claiming target-state realization from local action alone when RSC is required.",
-        "Says strongest positive target-realization claims require RSC adequate.",
-        "Requires reporting surfaces covered, required surface actions completed or justified, residuals reconciled, pending or unknown surfaces, and smallest next reconciliation.",
-        "Keeps RSC completion wording distinct from purpose feedback wording."
+        "Runtime goal contract indexes Realization Surface Contract.",
+        "Runtime goal contract indexes Realization Surface Closure Strategy.",
+        "Runtime goal contract indexes Realization Surface Closure Adequacy.",
+        "Runtime goal contract includes final reporting of surfaces covered, actions completed or justified, residuals reconciled, and pending or unknown surfaces when RSC applies.",
+        "Pointer /goal does not inline RSC discipline prose."
       ]
     },
     {
       "id": "runtime-calibrates-target-achievement-predicate-claims",
       "prompt": "requirements analysis Complete, goal includes Target Achievement Contract, execution policy includes Target-Producing Action Strategy, and review Approved says non-achieved terminal reports are goal achieved: no. Compile runtime /goal.",
-      "expected_output": "The final /goal calibrates achieved claims to the single target-achieved predicate and requires final reporting of goal achieved yes/no, predicate met yes/no, target-producing evidence, non-achieved reason, target-producing action attempted or proof of impossibility, and smallest next target-producing attempt.",
+      "expected_output": "The runtime goal contract indexes target-achievement sections and requires final reporting of goal achieved yes/no, predicate met yes/no, target-producing evidence, non-achieved reason, target-producing action attempted or proof of impossibility, and smallest next target-producing attempt.",
       "assertions": [
-        "Calibrates goal-achieved claims to the single target-achieved predicate.",
-        "Says non-achieved terminal reports are not alternate goals, target-achieved states, or success states.",
-        "Requires goal achieved: yes/no in the final report.",
-        "Requires single target-achieved predicate met: yes/no.",
-        "Requires target-producing evidence, non-achieved reason, target-producing action attempted or proof of impossibility, and smallest next target-producing attempt."
+        "Runtime goal contract indexes Target Achievement Contract.",
+        "Runtime goal contract indexes Target-Producing Action Strategy.",
+        "Runtime goal contract indexes Target Achievement Predicate Fidelity.",
+        "Runtime goal contract requires goal achieved: yes/no in the final report.",
+        "Runtime goal contract requires single target-achieved predicate met: yes/no.",
+        "Runtime goal contract requires target-producing evidence, non-achieved reason, target-producing action attempted or proof of impossibility, and smallest next target-producing attempt.",
+        "Pointer /goal does not inline target-achievement final-report fields."
       ]
     },
     {
@@ -130,12 +146,13 @@
     {
       "id": "compiles-runtime-goal-with-design",
       "prompt": "requirements analysis Complete, solution design exists, goal references design, execution policy references design, control review Approved and references design；编译最终 /goal。",
-      "expected_output": "Outputs a final /goal referencing requirements analysis, design, goal, plan, and review paths.",
+      "expected_output": "Writes a runtime goal contract referencing requirements analysis, design, goal, plan, and review paths, then outputs a short pointer-only /goal to that contract.",
       "assertions": [
-        "References the solution design path.",
-        "Forbids rewriting the solution design.",
-        "References requirements analysis, goal, plan, and review paths.",
-        "Uses executing, debugging, and completion verification discipline.",
+        "Runtime goal contract references the solution design path.",
+        "Runtime goal contract forbids reinterpreting approved control strategy.",
+        "Runtime goal contract references requirements analysis, goal, plan, and review paths.",
+        "Runtime goal contract uses executing, debugging, and completion verification discipline.",
+        "Pointer /goal references the runtime goal contract path.",
         "Stops if artifacts conflict or become insufficient."
       ]
     },
@@ -154,14 +171,12 @@
     {
       "id": "preserves-approved-subagent-topology",
       "prompt": "requirements analysis Complete, goal exists, execution policy status Candidate and selects Serial subagent-driven topology, control review Approved and Final Observer Check allows approval；编译最终 /goal。",
-      "expected_output": "Outputs a final /goal that preserves the approved execution topology, uses the approved bounded subagent delegation protocol, keeps only one execution subagent active at a time for serial topology, and makes the main agent coordinate and integrate rather than absorb delegated work.",
+      "expected_output": "Writes a runtime goal contract that records the approved serial subagent-driven topology and selected delegation substrate, then emits a short pointer-only /goal.",
       "assertions": [
-        "References the approved execution topology from the execution policy.",
-        "Mentions the approved bounded subagent delegation protocol when serial subagent-driven topology is selected.",
+        "Runtime goal contract records the selected topology from the execution policy.",
+        "Runtime goal contract records the selected delegation substrate.",
+        "Pointer /goal does not inline subagent protocol prose.",
         "Does not require $superpowers:subagent-driven-development unless the approved execution policy records Selected delegation substrate: superpowers-subagent-driven-development for compatible implementation-plan work packages.",
-        "Requires only one execution subagent active at a time for serial topology.",
-        "Says the main agent coordinates, integrates, maintains progress log, and detects stop conditions.",
-        "States that subagent outputs are candidate results until main-agent integration against approved artifacts, progress log, evidence requirements, and stop conditions.",
         "Does not replace the approved topology with generic serial main-agent execution.",
         "Stops if runtime would need to invent or replace execution topology."
       ]
@@ -184,13 +199,12 @@
     {
       "id": "uses-subagent-driven-development-only-when-selected",
       "prompt": "requirements analysis Complete, goal exists, execution policy status Candidate and selects Serial subagent-driven topology with Selected delegation substrate: bounded-protocol and an approved bounded delegation protocol. control review Approved and Final Observer Check allows approval；编译最终 /goal。",
-      "expected_output": "Outputs a final /goal that preserves serial subagent-driven topology and uses the approved bounded delegation protocol without adding $superpowers:subagent-driven-development.",
+      "expected_output": "Writes a runtime goal contract that records serial subagent-driven topology and bounded-protocol substrate without adding $superpowers:subagent-driven-development, then emits a short pointer-only /goal.",
       "assertions": [
-        "References the approved execution topology from the execution policy.",
-        "Uses the approved bounded subagent delegation protocol recorded in the plan.",
+        "Runtime goal contract records the approved execution topology from the execution policy.",
+        "Runtime goal contract records the selected bounded-protocol substrate.",
         "Does not add $superpowers:subagent-driven-development when the plan does not record Selected delegation substrate: superpowers-subagent-driven-development.",
-        "Keeps the main agent responsible for coordination, integration, progress log, and stop-condition detection.",
-        "States that subagent outputs are candidate results until main-agent integration."
+        "Pointer /goal does not inline subagent protocol prose."
       ]
     },
     {
