@@ -396,6 +396,26 @@ class ContextTopologySkillTest(unittest.TestCase):
                     "",
                     "- S1",
                     "",
+                    "Role: `mainline`",
+                    "",
+                    "State transition advanced:",
+                    "",
+                    "- S1 fixture transition is satisfied.",
+                    "",
+                    "Transition evidence produced:",
+                    "",
+                    "- Fixture target-producing evidence is recorded.",
+                    "",
+                    "Integration gate:",
+                    "",
+                    "- Main agent accepts S1 evidence.",
+                    "",
+                    "Counts as goal progress: `yes`",
+                    "",
+                    "Why this is not merely component completion:",
+                    "",
+                    "- It records transition evidence for the fixture path.",
+                    "",
                     "Goal:",
                     "",
                     "- Keep the context topology guard fixture structurally ready.",
@@ -500,6 +520,9 @@ class ContextTopologySkillTest(unittest.TestCase):
             ROOT
             / ".agents/skills/writing-cybernetic-execution-policies/assets/execution-policy-template.md"
         ).read_text(encoding="utf-8")
+        registry = (
+            ROOT / ".agents/skills/references/delegation-substrate-registry.json"
+        )
 
         for text in (skill, template):
             self.assertIn("Context Management / Execution Topology", text)
@@ -513,9 +536,19 @@ class ContextTopologySkillTest(unittest.TestCase):
             self.assertIn("Context Pack Requirements", text)
             self.assertIn("Context Compression Rule", text)
             self.assertIn("Selected delegation substrate", text)
+            self.assertIn("delegation-substrate-registry.json", text)
 
         self.assertIn("main agent owns", template.casefold())
         self.assertIn("subagent owns", template.casefold())
+        self.assertTrue(registry.exists())
+        registry_text = registry.read_text(encoding="utf-8")
+        self.assertIn("superpowers-subagent-driven-development", registry_text)
+        self.assertIn("superpowers-dispatching-parallel-agents", registry_text)
+        for guard_path in (
+            ROOT / ".agents/skills/orchestrating-cybernetic-pregoal/scripts/orchestration_guard.py",
+            ROOT / ".agents/skills/compiling-cybernetic-runtime-goals/scripts/control_chain_guard.py",
+        ):
+            self.assertIn("delegation-substrate-registry.json", guard_path.read_text(encoding="utf-8"))
 
     def test_review_checks_context_topology(self):
         skill = (

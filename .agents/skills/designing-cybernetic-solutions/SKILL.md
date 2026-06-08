@@ -1,21 +1,21 @@
 ---
 name: designing-cybernetic-solutions
-description: 'Use when requirements analysis exists but the solution model is not explicit enough for goal writing or execution policy, especially unclear objects, roles, boundaries, flows, interfaces, lifecycle, failure model, or evidence model.'
+description: 'Use when requirements analysis exists but the task skeleton, support model, boundaries, flows, interfaces, lifecycle, failure model, evidence model, or output structure is not explicit enough for goal writing or execution policy.'
 ---
 
 # Designing Cybernetic Solutions
 
 ## Overview
 
-Create a solution model from confirmed requirements.
+Instantiate the approved task skeleton from confirmed requirements, then derive the support model needed for goal writing and execution policy.
 
 This skill resolves the `Design Gate` by turning:
 
 ```text
-requirements analysis -> controllable solution model -> goal-ready design artifact
+requirements analysis -> task skeleton instance -> support model mapping -> goal-ready design artifact
 ```
 
-The design expresses the controllable structure needed for later control artifacts. It must stay in the core cybernetic vocabulary and avoid importing adapter-specific terms.
+The design expresses the task-answering skeleton and the controllable support structure needed for later control artifacts. It must stay in the core cybernetic vocabulary and avoid importing adapter-specific terms.
 
 Output:
 
@@ -27,7 +27,7 @@ Use `assets/solution-design-template.md`.
 
 ## Core Boundary
 
-This skill owns solution model synthesis after requirement semantics are formed.
+This skill owns task skeleton instantiation and support model mapping after requirement semantics are formed.
 
 Owned design:
 
@@ -47,7 +47,7 @@ Routed elsewhere:
 - runtime `/goal` compilation goes to `$compiling-cybernetic-runtime-goals`;
 - target work starts only after an approved runtime `/goal`.
 
-Keep the core solution model neutral. Adapter-specific terms appear only when
+Keep the core support model neutral. Adapter-specific terms appear only when
 they are part of the confirmed domain.
 
 ## Required Input
@@ -82,7 +82,7 @@ Do not require brainstorming for a small Design Gate where the requirements anal
 
 ## Design Gate
 
-Design Gate is required when the goal is clear but the solution model is not.
+Design Gate is required when the goal is clear but the task skeleton or support model is not.
 
 Typical signals:
 
@@ -126,6 +126,8 @@ Do not leave runtime execution to invent the final output shape. Do not define o
 
 ## Task Skeleton Fidelity
 
+Design must be skeleton-first. The first design-owned product is the task skeleton instance; support objects, mechanisms, relationships, flows, and evidence model are derived from that skeleton.
+
 For Level 3/4 or full pre-goal work, the design must preserve the approved answering method from Human Setpoint Approval.
 
 When HSA records `Answering method`, `Not-sufficient substitute`, or `Task skeleton family`, the design must include `## Task Skeleton Fidelity` and record:
@@ -137,6 +139,8 @@ When HSA records `Answering method`, `Not-sufficient substitute`, or `Task skele
 - whether the not-sufficient substitute was avoided.
 
 The design must not replace the approved answering method with a weaker skeleton because it is easier to execute or verify. If the approved skeleton family is insufficient, infeasible, or unsuitable, stop and return to `$analyzing-cybernetic-requirements` for HSA revision instead of substituting another skeleton.
+
+Use `.agents/skills/references/task-skeleton-registry.json` for skeleton-family mandatory nodes, forbidden substitutions, minimum evidence, and review red flags. If the HSA task skeleton family is missing from the registry, record the gap and return to HSA or design-maintenance work rather than inventing an unreviewed family.
 
 For `coverage-ceiling-measurement`, the design must instantiate a coverage skeleton with these mandatory nodes:
 
@@ -158,14 +162,15 @@ The design artifact must include:
 3. Human Purpose
 4. Confirmed Semantics
 5. Design Substrate
-6. Conceptual Design
-7. Task Skeleton Fidelity, when HSA records an answering method or task skeleton family
-8. Detailed Design
-9. Output Contract Design, when Output Contract Gate requires structure synthesis
-10. Design-to-Goal Mapping
-11. Design-to-Execution Mapping
-12. Open Design Questions
-13. Design Review Requirements
+6. Task Skeleton Fidelity, when HSA records an answering method or task skeleton family
+7. Target Skeleton Instance
+8. Support Model Mapping
+9. Detailed Design
+10. Output Contract Design, when Output Contract Gate requires structure synthesis
+11. Design-to-Goal Mapping
+12. Design-to-Execution Mapping
+13. Open Design Questions
+14. Design Review Requirements
 
 ## Design Status
 
@@ -187,14 +192,15 @@ Open design questions that affect requirement semantics, controlled relationship
 4. Inspect the routing context from the user request, router output, and requirements gates.
 5. Inspect only enough context to avoid generic design.
 6. Identify whether `$superpowers:brainstorming` is required, used, blocked, or not required.
-7. Build the conceptual model: core objects/actors/roles, relationships, flows, boundaries, alternatives, invariants.
-8. If HSA records an answering method or task skeleton family, instantiate that skeleton and record Task Skeleton Fidelity.
-9. Build the detailed model: mechanisms, interfaces/contracts, state/lifecycle, failure model, evidence/sensor model, compatibility/integration, decisions.
-10. If Output Contract Gate requires structure synthesis, design the output structure and evidence-reference rules.
-11. Separate design invariants from tactical degrees of freedom.
-12. Map design elements to goal implications and execution-policy implications.
-13. If material design questions remain, record them and stop without marking Approved.
-14. Do not create goal, plan, review, runtime `/goal`, or target-work files.
+7. If HSA records an answering method or task skeleton family, instantiate that skeleton and record Task Skeleton Fidelity before deriving any model.
+8. Build the target skeleton instance: skeleton nodes, answer/state transitions, required evidence, and completion conditions.
+9. Derive the support model mapping from skeleton nodes: support objects, mechanisms, relationships, flows, boundaries, alternatives, and invariants.
+10. Build the detailed model from the support mapping: mechanisms, interfaces/contracts, state/lifecycle, failure model, evidence/sensor model, compatibility/integration, decisions.
+11. If Output Contract Gate requires structure synthesis, design the output structure and evidence-reference rules.
+12. Separate design invariants from tactical degrees of freedom.
+13. Map skeleton and support model elements to goal implications and execution-policy implications.
+14. If material design questions remain, record them and stop without marking Approved.
+15. Do not create goal, plan, review, runtime `/goal`, or target-work files.
 
 ## Response-Only Handoff Rule
 
@@ -220,8 +226,8 @@ Created or updated solution design:
 `docs/cybernetics/designs/YYYY-MM-DD-slug.md`
 
 Design summary:
-- Core model: ...
-- Key flows: ...
+- Task skeleton: ...
+- Support model: ...
 - Output contract, if designed: ...
 - Boundaries: ...
 - Evidence model: ...
@@ -263,8 +269,9 @@ Do not write the goal contract until this design decision is resolved or the hum
 - [ ] If HSA records Answering method, Not-sufficient substitute, or Task skeleton family, the design includes Task Skeleton Fidelity and does not substitute a weaker skeleton.
 - [ ] The design path uses the requirements analysis date/slug.
 - [ ] The design stays within core cybernetic vocabulary unless an explicit adapter supplies additional terms.
-- [ ] Conceptual design and detailed design are both present.
-- [ ] Core objects/actors/roles, relationships, flows, and boundaries are explicit.
+- [ ] Task skeleton instance appears before support model mapping.
+- [ ] Support objects/components/mechanisms map to skeleton nodes or are marked supporting-only.
+- [ ] Relationships, flows, and boundaries are explicit as support for skeleton nodes.
 - [ ] Interfaces/contracts, lifecycle/state, failure model, and evidence/sensor model are explicit when relevant.
 - [ ] Output structure, evidence-reference rules, and acceptance condition are explicit when Output Contract Gate requires structure synthesis.
 - [ ] Alternatives and design decisions are recorded where there were plausible options.

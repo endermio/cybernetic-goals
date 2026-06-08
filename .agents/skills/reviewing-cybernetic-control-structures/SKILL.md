@@ -85,6 +85,18 @@ Deterministic-only changes include:
 
 The author of a post-review revision must not be the sole approver of that revision.
 
+## Gate Cascade Rule
+
+Record gate verdicts before detailed findings:
+
+1. Design Skeleton Gate
+2. Target-Producing Spine Gate
+3. Execution Horizon / Authority Gate
+4. TAP / PFB / RSC Gate
+5. Topology / Subagent Gate
+
+If Design Skeleton Gate is `FAIL`, the review cannot be `Approved`; route back to design or HSA according to the failing skeleton contract. If another required gate is `FAIL`, route to the earliest failing artifact before evaluating downstream polish.
+
 ## Review Dimensions
 
 ### 1. Requirement Traceability
@@ -267,7 +279,7 @@ Flag as Major or Blocking when:
 
 - implementation decomposes by components without a target-producing spine;
 - no mainline work package owns the actor-centered path from initial state to target-achieved predicate;
-- candidate tasks lack `Spine node(s)` mapping;
+- candidate tasks lack `Spine node(s)`, `Role`, state-transition, transition-evidence, integration-gate, or goal-progress fields;
 - supporting-only work is allowed to satisfy goal progress by itself;
 - final integration path, primary use path, or spine transition evidence is deferred to future work while achieved claims remain possible;
 - component, module, or substrate evidence replaces spine transition evidence;

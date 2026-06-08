@@ -54,6 +54,7 @@ class TargetProducingSpineTest(unittest.TestCase):
         include_goal_spine: bool = True,
         include_plan_spine: bool = True,
         include_candidate_spine_nodes: bool = True,
+        include_candidate_spine_transition_fields: bool = True,
         include_review_spine: bool = True,
         review_spine_independence: str = "yes",
     ) -> tuple[Path, Path, Path, Path]:
@@ -218,6 +219,31 @@ class TargetProducingSpineTest(unittest.TestCase):
                     "",
                     "- S1",
                     "- S2",
+                    "",
+                ]
+            )
+        if include_candidate_spine_transition_fields:
+            plan_parts.extend(
+                [
+                    "Role: `mainline`",
+                    "",
+                    "State transition advanced:",
+                    "",
+                    "- S1 and S2 become satisfied for the actor-centered target path.",
+                    "",
+                    "Transition evidence produced:",
+                    "",
+                    "- Durable state and observable target state evidence.",
+                    "",
+                    "Integration gate:",
+                    "",
+                    "- Main agent accepts S1/S2 evidence into progress state.",
+                    "",
+                    "Counts as goal progress: `yes`",
+                    "",
+                    "Why this is not merely component completion:",
+                    "",
+                    "- The task satisfies actor-centered transitions rather than only creating a component.",
                     "",
                 ]
             )
@@ -386,6 +412,21 @@ class TargetProducingSpineTest(unittest.TestCase):
         self.assertEqual(2, result.returncode, output)
         self.assertIn("NEXT: RunExecutionPolicy", output)
         self.assertIn("Spine node(s)", output)
+
+    def test_guard_rejects_candidate_task_with_only_spine_label(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            requirements, goal, plan, review = self.write_chain(
+                Path(tmpdir),
+                include_candidate_spine_transition_fields=False,
+            )
+            result = self.guard(requirements, goal, plan, review)
+
+        output = result.stdout + result.stderr
+        self.assertEqual(2, result.returncode, output)
+        self.assertIn("NEXT: RunExecutionPolicy", output)
+        self.assertIn("State transition advanced", output)
+        self.assertIn("Transition evidence produced", output)
+        self.assertIn("Counts as goal progress", output)
 
     def test_guard_rejects_review_missing_spine_fidelity(self):
         with tempfile.TemporaryDirectory() as tmpdir:

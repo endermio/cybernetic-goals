@@ -73,6 +73,8 @@ Max concurrent subagents: `1 / auto / N`
 
 Substrate compatibility:
 
+Use `.agents/skills/references/delegation-substrate-registry.json` as the source of substrate capability boundaries.
+
 | Selected delegation substrate | Allowed topology | Allowed mode |
 |---|---|---|
 | `superpowers-subagent-driven-development` | `Serial subagent-driven` | `serial-single-active` |
@@ -543,6 +545,26 @@ Each entry must include:
 Spine node(s):
 
 - [S1 / supporting-only for S1]
+
+Role: `mainline / supporting-only`
+
+State transition advanced:
+
+- [specific spine transition this task advances, or "none; supporting-only for Sx"]
+
+Transition evidence produced:
+
+- [evidence that this task produces for the spine transition, or supporting evidence only]
+
+Integration gate:
+
+- [condition under which the main agent accepts this task output into progress state]
+
+Counts as goal progress: `yes/no`
+
+Why this is not merely component completion:
+
+- [explain why this task advances an actor-centered transition; for supporting-only, state that it cannot satisfy goal progress]
 
 Goal:
 

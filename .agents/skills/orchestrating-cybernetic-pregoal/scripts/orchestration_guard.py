@@ -83,6 +83,15 @@ def blocked_next_action(errors: list[str]) -> str:
         or "runtime delegation preference" in joined
         or "delegation substrate preference" in joined
         or "main-agent integration rule" in joined
+        or "execution policy missing ## target-producing action strategy" in joined
+        or "execution policy target-producing action strategy missing" in joined
+        or "execution policy missing ## target-producing spine" in joined
+        or "execution policy target-producing spine" in joined
+        or "execution policy missing ## candidate plan tasks" in joined
+        or "execution policy candidate plan task missing" in joined
+        or "candidate plan tasks has no candidate tasks" in joined
+        or "execution policy missing ## horizon and authority coverage matrix" in joined
+        or "execution policy horizon and authority coverage matrix" in joined
     ):
         return "RunExecutionPolicy"
     if (
@@ -276,6 +285,28 @@ def normalize_delegation_substrate(value: str | None) -> str | None:
     if value in {"no preference", "not specified", "unspecified", "not applicable", "n/a"}:
         return "no preference"
     return None
+
+
+DELEGATION_SUBSTRATE_REGISTRY_PATH = Path(__file__).resolve().parents[2] / "references/delegation-substrate-registry.json"
+
+
+def delegation_substrate_registry() -> dict[str, object]:
+    try:
+        return json.loads(DELEGATION_SUBSTRATE_REGISTRY_PATH.read_text(encoding="utf-8"))
+    except (FileNotFoundError, json.JSONDecodeError):
+        return {}
+
+
+def delegation_substrate_definition(substrate: str | None) -> dict[str, object]:
+    value = delegation_substrate_registry().get(substrate or "", {})
+    return value if isinstance(value, dict) else {}
+
+
+def registry_list_field(definition: dict[str, object], key: str) -> list[str]:
+    value = definition.get(key, [])
+    if not isinstance(value, list):
+        return []
+    return [item for item in value if isinstance(item, str)]
 
 
 def selected_subagent_execution_mode(plan: str | None) -> str | None:
@@ -559,6 +590,18 @@ def check_substrate_mode_compatibility(
     max_concurrent: str | None,
     errors: list[str],
 ) -> None:
+    definition = delegation_substrate_definition(substrate)
+    if definition:
+        allowed_topology = registry_list_field(definition, "allowed_topology")
+        allowed_mode = registry_list_field(definition, "allowed_mode")
+        max_rule = str(definition.get("max_concurrent", "")).strip()
+        if allowed_topology and topology not in allowed_topology:
+            errors.append(f"Selected delegation substrate {substrate} is not compatible with topology {topology}")
+        if allowed_mode and mode not in allowed_mode:
+            errors.append(f"Selected delegation substrate {substrate} is not compatible with Subagent execution mode: {mode}")
+        if max_rule == "1" and max_concurrent != "1":
+            errors.append(f"Selected delegation substrate {substrate} requires Max concurrent subagents: 1")
+
     if substrate == "superpowers-subagent-driven-development":
         if topology != "Serial subagent-driven" or mode != "serial-single-active" or max_concurrent != "1":
             errors.append(
@@ -571,6 +614,76 @@ def check_substrate_mode_compatibility(
             )
     if mode == "parallel-max-safe" and substrate == "superpowers-subagent-driven-development":
         errors.append("parallel-max-safe cannot use Selected delegation substrate: superpowers-subagent-driven-development")
+
+
+def check_plan_target_producing_strategy(plan: str | None, errors: list[str]) -> None:
+    body = section_body(plan or "", "Target-Producing Action Strategy")
+    if body is None:
+        errors.append("execution policy missing ## Target-Producing Action Strategy")
+        return
+    for label in (
+        "Target-producing action required",
+        "Proof of impossibility, if any",
+        "Non-achieved terminal report rule",
+    ):
+        if not labeled_or_table_field_has_content(body, label):
+            errors.append(f"execution policy Target-Producing Action Strategy missing {label}")
+
+
+def check_plan_target_producing_spine(plan: str | None, errors: list[str]) -> None:
+    body = section_body(plan or "", "Target-Producing Spine")
+    if body is None:
+        errors.append("execution policy missing ## Target-Producing Spine")
+        return
+    required_columns = ["Spine node", "Required state transition", "Required evidence"]
+    if not has_table_with_data_row(body, required_columns):
+        errors.append("execution policy Target-Producing Spine has no meaningful spine transition rows")
+
+
+def check_candidate_plan_tasks_spine_nodes(plan: str | None, errors: list[str]) -> None:
+    body = section_body(plan or "", "Candidate Plan Tasks")
+    if body is None:
+        errors.append("execution policy missing ## Candidate Plan Tasks")
+        return
+
+    task_matches = list(re.finditer(r"(?m)^###\s+(.+?)\s*$", body))
+    if not task_matches:
+        errors.append("execution policy Candidate Plan Tasks has no candidate tasks")
+        return
+
+    required_fields = [
+        "Spine node(s)",
+        "Role",
+        "State transition advanced",
+        "Transition evidence produced",
+        "Integration gate",
+        "Counts as goal progress",
+        "Why this is not merely component completion",
+    ]
+    for index, match in enumerate(task_matches):
+        start = match.end()
+        end = task_matches[index + 1].start() if index + 1 < len(task_matches) else len(body)
+        task_body = body[start:end]
+        task_name = match.group(1).strip()
+        for field in required_fields:
+            if not labeled_or_table_field_has_content(task_body, field):
+                errors.append(f"execution policy Candidate Plan Task missing {field}: {task_name}")
+
+
+def check_plan_horizon_authority(plan: str | None, errors: list[str]) -> None:
+    body = section_body(plan or "", "Horizon and Authority Coverage Matrix")
+    if body is None:
+        errors.append("execution policy missing ## Horizon and Authority Coverage Matrix")
+        return
+    required_columns = [
+        "Batch / surface",
+        "In approved horizon?",
+        "Runtime authority",
+        "Required runtime handling",
+        "Counts as achieved?",
+    ]
+    if not has_table_with_data_row(body, required_columns):
+        errors.append("execution policy Horizon and Authority Coverage Matrix has no meaningful coverage rows")
 
 
 def has_blocking_design_questions(design: str) -> bool:
@@ -736,14 +849,26 @@ def check_design_ready(
         errors.append("design has blocking open design questions")
 
 
-COVERAGE_CEILING_REQUIRED_NODES = (
-    "full workflow scope inventory",
-    "major removable source",
-    "ceiling coverage criterion",
-    "candidate coverage matrix",
-    "same-workload full workflow run",
-    "interpretation against coverage matrix",
-)
+TASK_SKELETON_REGISTRY_PATH = Path(__file__).resolve().parents[2] / "references/task-skeleton-registry.json"
+
+
+def task_skeleton_registry() -> dict[str, object]:
+    try:
+        return json.loads(TASK_SKELETON_REGISTRY_PATH.read_text(encoding="utf-8"))
+    except (FileNotFoundError, json.JSONDecodeError):
+        return {}
+
+
+def task_skeleton_definition(family: str) -> dict[str, object]:
+    value = task_skeleton_registry().get(family, {})
+    return value if isinstance(value, dict) else {}
+
+
+def registry_string_list(definition: dict[str, object], key: str) -> list[str]:
+    value = definition.get(key, [])
+    if not isinstance(value, list):
+        return []
+    return [item for item in value if isinstance(item, str)]
 
 
 def check_design_skeleton_fidelity(requirements: str | None, design: str | None, errors: list[str]) -> None:
@@ -781,16 +906,23 @@ def check_design_skeleton_fidelity(requirements: str | None, design: str | None,
     if family and family not in (field_value(body, "Approved skeleton family") or "").casefold():
         errors.append("design Task Skeleton Fidelity does not preserve approved skeleton family")
 
-    if family == "coverage-ceiling-measurement":
-        if "full-workflow-run-validation" in instantiated or (substitute and substitute in instantiated):
+    definition = task_skeleton_definition(family)
+    forbidden_substitutions = registry_string_list(definition, "forbidden_substitutions")
+    mandatory_nodes = registry_string_list(definition, "mandatory_nodes")
+
+    for forbidden in forbidden_substitutions:
+        forbidden_lower = forbidden.casefold()
+        if forbidden_lower in instantiated or (substitute and substitute == forbidden_lower and substitute in instantiated):
             errors.append(
-                "design Task Skeleton Fidelity substitutes full-workflow-run-validation for coverage-ceiling-measurement"
+                f"design Task Skeleton Fidelity substitutes {forbidden} for {family}"
             )
+            break
+    if family and forbidden_substitutions:
         if avoided.startswith("no") or " no" in avoided[:12]:
             errors.append("design Task Skeleton Fidelity records forbidden substitution was not avoided")
-        for node in COVERAGE_CEILING_REQUIRED_NODES:
-            if node not in mandatory:
-                errors.append(f"design Task Skeleton Fidelity missing coverage-ceiling mandatory node: {node}")
+    for node in mandatory_nodes:
+        if node.casefold() not in mandatory:
+            errors.append(f"design Task Skeleton Fidelity missing {family} mandatory node: {node}")
 
 
 def check_goal_ready(
@@ -832,6 +964,10 @@ def check_plan_ready(
     check_execution_topology(plan, errors)
     check_max_safe_parallel_preference(requirements, plan, errors)
     check_delegation_substrate_preference(requirements, plan, errors)
+    check_plan_target_producing_strategy(plan, errors)
+    check_plan_target_producing_spine(plan, errors)
+    check_candidate_plan_tasks_spine_nodes(plan, errors)
+    check_plan_horizon_authority(plan, errors)
 
 
 def check_review_ready(

@@ -300,6 +300,26 @@ def write_runtime_chain(
                 "- S5",
                 "- S6",
                 "",
+                "Role: `mainline`",
+                "",
+                "State transition advanced:",
+                "",
+                "- S1 through S6 coverage-ceiling transitions are satisfied.",
+                "",
+                "Transition evidence produced:",
+                "",
+                "- Coverage-ceiling skeleton evidence is recorded.",
+                "",
+                "Integration gate:",
+                "",
+                "- Main agent accepts S1 through S6 evidence.",
+                "",
+                "Counts as goal progress: `yes`",
+                "",
+                "Why this is not merely component completion:",
+                "",
+                "- It records coverage-ceiling transition evidence for the approved skeleton.",
+                "",
                 "Goal:",
                 "",
                 "- Drive the fixture through the approved coverage-ceiling skeleton.",
@@ -418,6 +438,35 @@ class DesignSkeletonFidelityTest(unittest.TestCase):
             self.assertIn(expected, design_template)
 
         self.assertIn("Design Skeleton Fidelity", review_template)
+
+    def test_design_template_is_skeleton_first_not_model_first(self):
+        design_template_path = ROOT / ".agents/skills/designing-cybernetic-solutions/assets/solution-design-template.md"
+        design_skill_path = ROOT / ".agents/skills/designing-cybernetic-solutions/SKILL.md"
+        design_template = design_template_path.read_text(encoding="utf-8")
+        design_skill = design_skill_path.read_text(encoding="utf-8")
+
+        skeleton_index = design_template.index("## Task Skeleton Fidelity")
+        support_index = design_template.index("## Support Model Mapping")
+        self.assertLess(skeleton_index, support_index)
+        self.assertNotIn("## Conceptual Design", design_template)
+        self.assertIn("Skeleton node", design_template)
+        self.assertIn("Required support object/component/mechanism", design_template)
+        self.assertIn("Design must be skeleton-first", design_skill)
+        self.assertNotIn("solution model synthesis", design_skill.casefold())
+
+    def test_task_skeleton_registry_drives_coverage_ceiling_guard(self):
+        registry = ROOT / ".agents/skills/references/task-skeleton-registry.json"
+        self.assertTrue(registry.exists())
+        registry_text = registry.read_text(encoding="utf-8")
+        orchestration_guard = ORCHESTRATION_GUARD.read_text(encoding="utf-8")
+        control_guard = CONTROL_CHAIN_GUARD.read_text(encoding="utf-8")
+
+        self.assertIn("coverage-ceiling-measurement", registry_text)
+        self.assertIn("full-workflow-run-validation", registry_text)
+        self.assertIn("task-skeleton-registry.json", orchestration_guard)
+        self.assertIn("task-skeleton-registry.json", control_guard)
+        self.assertNotIn("COVERAGE_CEILING_REQUIRED_NODES", orchestration_guard)
+        self.assertNotIn("COVERAGE_CEILING_REQUIRED_NODES", control_guard)
 
     def test_orchestration_guard_rejects_run_validation_substitution_before_goal(self):
         with tempfile.TemporaryDirectory() as tmpdir:

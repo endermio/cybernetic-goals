@@ -1,0 +1,48 @@
+{
+  "superpowers-subagent-driven-development": {
+    "allowed_topology": ["Serial subagent-driven"],
+    "allowed_mode": ["serial-single-active"],
+    "max_concurrent": "1",
+    "required_controls": [
+      "ordered work package sequence",
+      "integration gate after each package"
+    ]
+  },
+  "superpowers-dispatching-parallel-agents": {
+    "allowed_topology": ["Parallel subagent-driven"],
+    "allowed_mode": ["parallel-max-safe"],
+    "max_concurrent": "auto or N",
+    "required_controls": [
+      "spine frontier",
+      "parallel wave matrix",
+      "conflict / lock model",
+      "failure policy",
+      "main-agent integration rule"
+    ]
+  },
+  "bounded-protocol": {
+    "allowed_topology": ["Serial subagent-driven", "Parallel subagent-driven"],
+    "allowed_mode": ["serial-single-active", "parallel-max-safe"],
+    "max_concurrent": "1 / auto / N",
+    "required_controls": [
+      "cybernetic execution policy owns safety"
+    ]
+  },
+  "adapter-specific": {
+    "allowed_topology": ["Serial subagent-driven", "Parallel subagent-driven"],
+    "allowed_mode": ["serial-single-active", "parallel-max-safe"],
+    "max_concurrent": "registry-defined",
+    "required_controls": [
+      "adapter compatibility rationale",
+      "cybernetic execution policy owns safety"
+    ]
+  },
+  "none": {
+    "allowed_topology": ["Main-only"],
+    "allowed_mode": ["none"],
+    "max_concurrent": "0",
+    "required_controls": [
+      "main-only context-load rationale when Level 3/4"
+    ]
+  }
+}

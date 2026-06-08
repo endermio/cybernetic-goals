@@ -25,21 +25,39 @@ Status: `Candidate`
 - `$superpowers:brainstorming` status: `Not required / Used / Blocked`
 - Reason: `[why brainstorming was or was not needed]`
 
-## Conceptual Design
+## Task Skeleton Fidelity
 
-### Core Objects / Actors / Roles
+Design must be skeleton-first. Use when HSA records an answering method or task skeleton family.
 
-| Concept | Meaning | Notes |
-|---|---|---|
-| [concept] | [meaning] | [notes] |
+| Element | Design |
+|---|---|
+| Approved answering method | [from HSA] |
+| Approved skeleton family | [from HSA] |
+| Instantiated skeleton | [design skeleton] |
+| Mandatory nodes coverage | [required skeleton nodes and coverage status] |
+| Forbidden substitution avoided | [yes/no + rationale; if no, stop and return to HSA revision] |
+
+## Target Skeleton Instance
+
+| Skeleton node | Required state / answer transition | Required evidence | Completion condition |
+|---|---|---|---|
+| [S1] | [initial/intermediate state -> next state] | [evidence] | [condition] |
+
+## Support Model Mapping
+
+Model elements exist to support skeleton nodes. Do not introduce components, actors, or mechanisms that are not mapped to a skeleton node or marked supporting-only.
+
+| Skeleton node | Required support object/component/mechanism | Why needed | Evidence produced |
+|---|---|---|---|
+| [S1] | [object/component/mechanism] | [reason] | [evidence] |
 
 ### Relationships
 
-[How objects, actors, roles, or concepts relate.]
+[How support objects, actors, roles, or concepts relate to skeleton nodes.]
 
 ### Information / State Flow
 
-[How information, state, evidence, or decisions move.]
+[How information, state, evidence, or decisions move through skeleton nodes.]
 
 ### Boundaries
 
@@ -51,27 +69,15 @@ Outside scope:
 
 - [excluded boundary]
 
-### Alternative Concepts Considered
+### Alternative Skeletons / Support Models Considered
 
 | Option | Accepted / Rejected | Rationale |
 |---|---|---|
 | [option] | [status] | [reason] |
 
-### Conceptual Invariants
+### Design Invariants
 
 - [invariant]
-
-## Task Skeleton Fidelity
-
-Use when HSA records an answering method or task skeleton family.
-
-| Element | Design |
-|---|---|
-| Approved answering method | [from HSA] |
-| Approved skeleton family | [from HSA] |
-| Instantiated skeleton | [design skeleton] |
-| Mandatory nodes coverage | [required skeleton nodes and coverage status] |
-| Forbidden substitution avoided | [yes/no + rationale; if no, stop and return to HSA revision] |
 
 ## Detailed Design
 

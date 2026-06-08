@@ -104,6 +104,8 @@ The execution policy must choose one approved topology:
 
 The execution policy must record `Task level`, `Selected delegation substrate`, `Subagent execution mode`, and `Max concurrent subagents` next to the selected topology.
 
+Use `.agents/skills/references/delegation-substrate-registry.json` as the source of substrate capability boundaries.
+
 Allowed `Selected delegation substrate` values:
 
 - `bounded-protocol`
@@ -232,6 +234,8 @@ The execution policy must define:
 - Required evidence: evidence that the transition is satisfied.
 
 Every mainline work package must map to at least one spine node. Supporting-only work may exist, but it must be marked `supporting-only` and cannot satisfy goal progress by itself.
+
+Each `Candidate Plan Task` must record `Spine node(s)`, `Role`, `State transition advanced`, `Transition evidence produced`, `Integration gate`, `Counts as goal progress`, and `Why this is not merely component completion`.
 
 ## Target-Producing Action Strategy
 
@@ -435,7 +439,7 @@ Response-only next step:
 - [ ] The plan includes Realization Surface Closure Strategy for compiled runtime goals, with either full surface/action/residual structure or `RSC not applicable with justification`.
 - [ ] The plan includes Horizon and Authority Coverage Matrix for full-route or multi-batch work.
 - [ ] The plan includes Target-Producing Spine.
-- [ ] Each Candidate Plan Task maps to `Spine node(s)` or is explicitly supporting-only.
+- [ ] Each Candidate Plan Task records `Spine node(s)`, `Role`, `State transition advanced`, `Transition evidence produced`, `Integration gate`, `Counts as goal progress`, and why it is not merely component completion.
 - [ ] The plan includes Target-Producing Action Strategy.
 - [ ] The plan selects `Main-only`, `Serial subagent-driven`, or `Parallel subagent-driven`.
 - [ ] The plan records `Selected delegation substrate`.

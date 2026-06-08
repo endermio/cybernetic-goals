@@ -39,6 +39,19 @@ Notes:
 
 - [independence note]
 
+## Gate Verdicts
+
+- Design Skeleton Gate: `PASS / FAIL / Not applicable`
+- Target-Producing Spine Gate: `PASS / FAIL / Not applicable`
+- Execution Horizon / Authority Gate: `PASS / FAIL / Not applicable`
+- TAP / PFB / RSC Gate: `PASS / FAIL / Not applicable`
+- Topology / Subagent Gate: `PASS / FAIL / Not applicable`
+
+Gate rule:
+
+- If Design Skeleton Gate is `FAIL`, Review Status cannot be `Approved`.
+- If any required gate is `FAIL`, record `Needs Revision` or `Rejected` and route to the earliest failing artifact.
+
 ## Final Observer Check
 
 - Last independent review completed at: `[time or review pass label]`
