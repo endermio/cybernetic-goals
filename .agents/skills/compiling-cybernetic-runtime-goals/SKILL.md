@@ -94,6 +94,8 @@ python3 .agents/skills/compiling-cybernetic-runtime-goals/scripts/compile_runtim
   --out docs/cybernetics/runtime-goals/YYYY-MM-DD-feature.goal.md
 ```
 
+The `--out` path must end with `.goal.md`; the output file is a runtime goal contract, not a copyable command transcript.
+
 Do not use `--skip-guard` for official runtime `/goal` compilation. It is only for internal validation and requires the explicit `--i-understand-this-bypasses-phase-gates` acknowledgement.
 
 ## Output Format

@@ -84,12 +84,16 @@ class PregoalHandoffPredictorTest(unittest.TestCase):
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
         self.assertIn("$orchestrating-cybernetic-pregoal", result.stdout)
         self.assertIn(str(requirements), result.stdout)
-        self.assertIn("/goal Execute the approved execution policy", result.stdout)
+        self.assertIn("Predicted runtime contract path:", result.stdout)
+        self.assertIn("/goal Execute the runtime goal contract at", result.stdout)
+        self.assertNotIn("/goal Execute the approved execution policy", result.stdout)
+        self.assertIn("docs/cybernetics/runtime-goals/2026-06-06-predictor.goal.md", result.stdout)
         self.assertIn("docs/cybernetics/goals/2026-06-06-predictor.md", result.stdout)
         self.assertIn("docs/cybernetics/plans/2026-06-06-predictor.md", result.stdout)
         self.assertIn("docs/cybernetics/control-reviews/2026-06-06-predictor.md", result.stdout)
         self.assertIn("docs/cybernetics/designs/2026-06-06-predictor.md", result.stdout)
-        self.assertIn("If any referenced artifact is missing, not approved, or internally inconsistent", result.stdout)
+        self.assertIn("If any referenced artifact is missing, not approved, or inconsistent", result.stdout)
+        self.assertIn("compile_runtime_goal.py", result.stdout)
         self.assertIn("Predicted", result.stdout)
 
     def test_blocks_when_human_setpoint_is_not_approved(self):
@@ -132,7 +136,7 @@ class PregoalHandoffPredictorTest(unittest.TestCase):
         test_path = "tests/skills/test_pregoal_handoff_predictor.py"
 
         self.assertIn(script_path, skill)
-        self.assertIn("Use the script output instead of hand-writing the predicted `/goal`", skill)
+        self.assertIn("Use the script output instead of hand-writing predicted runtime commands", skill)
         self.assertIn(script_path, manifest)
         self.assertIn(test_path, manifest)
 
@@ -150,12 +154,12 @@ class PregoalHandoffPredictorTest(unittest.TestCase):
         }["complete-level-3-analysis-routes-to-orchestrator-not-manual-design"]
 
         self.assertIn(
-            "Design Gate dispatch note must not replace the predicted `/goal`",
+            "Design Gate dispatch note must not replace the predicted pointer-only `/goal`",
             skill,
         )
-        self.assertIn("predicted queue-friendly /goal", complete_level_3["expected_output"])
+        self.assertIn("predicted runtime contract path", complete_level_3["expected_output"])
         self.assertTrue(
-            any("predicted /goal" in assertion for assertion in complete_level_3["assertions"])
+            any("pointer-only /goal" in assertion for assertion in complete_level_3["assertions"])
         )
 
 

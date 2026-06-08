@@ -88,6 +88,10 @@ def derive_runtime_goal_path(requirements_path: str) -> Path:
     return path.with_name(f"{stem}.goal.md")
 
 
+def validate_runtime_contract_path(path: Path) -> bool:
+    return path.name.endswith(".goal.md")
+
+
 def pointer_command(runtime_contract_path: Path) -> str:
     return (
         f"/goal Execute the runtime goal contract at {runtime_contract_path}. "
@@ -170,7 +174,7 @@ def runtime_goal_contract(
             "",
             "## Stop Rule",
             "",
-            "If any referenced artifact is missing, not approved, internally inconsistent, or insufficient for runtime execution, stop and report the smallest required human decision.",
+            "If any referenced artifact is missing, not approved, inconsistent, or insufficient for runtime execution, stop and report the smallest required human decision.",
             "",
         ]
     )
@@ -207,6 +211,12 @@ def main() -> int:
             return result.returncode
 
     out_path = Path(args.out) if args.out else derive_runtime_goal_path(args.requirements)
+    if not validate_runtime_contract_path(out_path):
+        print(
+            f"Runtime goal contract output path must end with .goal.md: {out_path}",
+            file=sys.stderr,
+        )
+        return 2
     contract = runtime_goal_contract(
         requirements=args.requirements,
         design=args.design,

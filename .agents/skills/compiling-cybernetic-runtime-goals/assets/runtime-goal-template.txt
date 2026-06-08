@@ -49,4 +49,4 @@ Treat the human-approved setpoint as the source for primary object, requested tr
 
 ## Stop Rule
 
-If any referenced artifact is missing, not approved, internally inconsistent, or insufficient for runtime execution, stop and report the smallest required human decision.
+If any referenced artifact is missing, not approved, inconsistent, or insufficient for runtime execution, stop and report the smallest required human decision.

@@ -79,15 +79,15 @@
     {
       "id": "runtime-goal-does-not-write-plan",
       "prompt": "使用 $orchestrating-cybernetic-pregoal 编译最终 /goal。已有 complete requirements analysis with Human Setpoint Approval: Approved、goal、approved plan、approved review。",
-      "expected_output": "The final /goal should execute approved artifacts only and must not instruct Codex to write or approve its own plan inside runtime.",
+      "expected_output": "The final response should emit a runtime goal contract artifact plus a short pointer-only /goal. The runtime contract should index approved artifacts, and the user-entered /goal must not instruct Codex to write or approve its own plan inside runtime.",
       "assertions": [
-        "The final /goal references the approved plan path.",
-        "The final /goal references the approved control review path.",
-        "The final /goal does not say 'first write a plan'.",
-        "The final /goal does not allow runtime reinterpretation of requirements.",
-        "The final /goal mentions $superpowers:executing-plans, $superpowers:systematic-debugging, and $superpowers:verification-before-completion discipline.",
-        "The final /goal tells Codex to stop if artifacts conflict or become insufficient.",
-        "The final /goal tells Codex to stop if any referenced artifact is missing, not approved, or internally inconsistent."
+        "The runtime goal contract references the approved plan path.",
+        "The runtime goal contract references the approved control review path.",
+        "The user-entered /goal points only to docs/cybernetics/runtime-goals/*.goal.md.",
+        "The user-entered /goal does not say 'first write a plan'.",
+        "The user-entered /goal does not inline execution, debugging, completion-verification, topology, sensor-governance, HSA, PFB, RSC, TAP, or EHA prose.",
+        "The runtime goal contract indexes the approved execution/debugging/completion-verification discipline.",
+        "The pointer-only /goal tells Codex to stop if any referenced artifact is missing, not approved, or inconsistent."
       ]
     },
     {

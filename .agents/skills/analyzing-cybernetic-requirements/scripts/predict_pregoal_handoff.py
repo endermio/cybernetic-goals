@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """Emit queue-friendly pre-goal handoff text from a requirements artifact.
 
-This script predicts the orchestration command and a non-final runtime /goal
-skeleton. It does not compile the final runtime goal and does not approve
+This script predicts the orchestration command and the runtime goal contract
+path. It does not compile the final runtime goal and does not approve
 downstream artifacts.
 """
 from __future__ import annotations
@@ -87,6 +87,7 @@ def derive_paths(requirements: Path) -> dict[str, str] | None:
         "goal": f"{prefix}/goals/{slug}",
         "plan": f"{prefix}/plans/{slug}",
         "review": f"{prefix}/control-reviews/{slug}",
+        "runtime_contract": f"{prefix}/runtime-goals/{Path(slug).stem}.goal.md",
     }
 
 
@@ -125,10 +126,6 @@ def main() -> int:
         )
 
     design_required = design_gate_required(text)
-    design_clause = ""
-    if design_required:
-        design_clause = f", and the solution design in {paths['design']}"
-
     print("Response-only queue suggestions:")
     print()
     print("```text")
@@ -138,20 +135,37 @@ def main() -> int:
     if design_required:
         print("Design dispatch: when `Design Gate: required`, `$orchestrating-cybernetic-pregoal` must invoke or request `$designing-cybernetic-solutions` before goal writing.")
         print()
-    print("Response-only predicted runtime command:")
+    print("Predicted downstream artifact paths:")
+    print()
+    print("```text")
+    print(f"Requirements: {paths['requirements']}")
+    if design_required:
+        print(f"Design: {paths['design']}")
+    else:
+        print("Design: not required")
+    print(f"Goal: {paths['goal']}")
+    print(f"Execution policy: {paths['plan']}")
+    print(f"Control review: {paths['review']}")
+    print("```")
+    print()
+    print("Predicted runtime contract path:")
+    print()
+    print("```text")
+    print(paths["runtime_contract"])
+    print("```")
+    print()
+    print("Predicted pointer-only runtime command shape:")
     print()
     print("```text")
     print(
-        f"/goal Execute the approved execution policy in {paths['plan']} "
-        f"under the control contract in {paths['goal']}, "
-        f"the confirmed requirements in {paths['requirements']}{design_clause}. "
-        f"Use the approved control review in {paths['review']} as the phase-gate record. "
-        "Do not reinterpret requirements, rewrite the solution design, rewrite the control strategy, replace approved sensors, or start unreviewed work. "
-        "If any referenced artifact is missing, not approved, or internally inconsistent, stop and report the smallest required human decision."
+        f"/goal Execute the runtime goal contract at {paths['runtime_contract']}. "
+        "Read it first and follow it exactly. "
+        "If any referenced artifact is missing, not approved, or inconsistent, "
+        "stop and report the smallest required human decision."
     )
     print("```")
     print()
-    print("Predicted only: this is not the final approved runtime command.")
+    print("Predicted only: compile_runtime_goal.py must generate the final runtime contract and pointer command after approved downstream artifacts exist.")
     return 0
 
 

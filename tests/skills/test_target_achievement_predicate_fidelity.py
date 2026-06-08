@@ -465,6 +465,35 @@ class TargetAchievementPredicateFidelityTest(unittest.TestCase):
         self.assertIn("non-achieved reason", contract_text)
         self.assertNotIn("fallback reason", result.stdout)
 
+    def test_runtime_compiler_rejects_misleading_out_path_suffix(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            tmp = Path(tmpdir)
+            requirements, goal, plan, review = self.write_chain(tmp)
+            misleading_out = tmp / "runtime-command.txt"
+            result = subprocess.run(
+                [
+                    sys.executable,
+                    str(COMPILER),
+                    "--requirements",
+                    str(requirements),
+                    "--goal",
+                    str(goal),
+                    "--plan",
+                    str(plan),
+                    "--review",
+                    str(review),
+                    "--out",
+                    str(misleading_out),
+                ],
+                cwd=ROOT,
+                text=True,
+                capture_output=True,
+            )
+
+        self.assertEqual(2, result.returncode, result.stdout + result.stderr)
+        self.assertIn(".goal.md", result.stderr)
+        self.assertFalse(misleading_out.exists())
+
     def test_runtime_compiler_emits_short_pointer_to_runtime_contract(self):
         with tempfile.TemporaryDirectory() as tmpdir:
             tmp = Path(tmpdir)

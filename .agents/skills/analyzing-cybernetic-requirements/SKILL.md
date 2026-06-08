@@ -285,7 +285,7 @@ Human Setpoint Approval is Pending. Please approve or revise the compact control
 For Level 3/4 or full pre-goal work, when `Human Setpoint Approval: Approved` is recorded and the requirements path is deterministic, output:
 
 1. A pre-goal orchestration command using the concrete requirements path.
-2. A predicted queue-friendly `/goal` command using the expected artifact paths for the same date/slug.
+2. The predicted runtime goal contract path and pointer-only `/goal` shape using the expected artifact paths for the same date/slug.
 
 When available, generate both with:
 
@@ -294,11 +294,11 @@ python3 .agents/skills/analyzing-cybernetic-requirements/scripts/predict_pregoal
   --requirements docs/cybernetics/requirements/YYYY-MM-DD-<slug>.md
 ```
 
-Use the script output instead of hand-writing the predicted `/goal`. The script checks `Requirements Analysis Status: Complete`, `Human Setpoint Approval: Approved`, deterministic path shape, Design Gate, and same-slug artifact paths.
+Use the script output instead of hand-writing predicted runtime commands. The script checks `Requirements Analysis Status: Complete`, `Human Setpoint Approval: Approved`, deterministic path shape, Design Gate, and same-slug artifact paths.
 
-If `Design Gate: required`, still output the predicted queue-friendly `/goal`. State that `$orchestrating-cybernetic-pregoal` must invoke or request `$designing-cybernetic-solutions` before goal writing, and make the predicted `/goal` reference the expected solution design path. Design Gate dispatch note must not replace the predicted `/goal`. Do not output `$designing-cybernetic-solutions` as a standalone command before orchestration for Level 3/4 or full pre-goal work.
+If `Design Gate: required`, still output the predicted runtime contract path and pointer-only `/goal` shape. State that `$orchestrating-cybernetic-pregoal` must invoke or request `$designing-cybernetic-solutions` before goal writing, and make the predicted downstream artifact paths include the expected solution design path. Design Gate dispatch note must not replace the predicted pointer-only `/goal`. Do not output `$designing-cybernetic-solutions` as a standalone command before orchestration for Level 3/4 or full pre-goal work.
 
-The predicted `/goal` is not the final approved runtime command. Label it as predicted or queue-friendly, and make it depend on artifacts that the pre-goal orchestrator must create and approve.
+The predicted pointer-only `/goal` is not the final approved runtime command. Label it as predicted or queue-friendly, and make it point to the runtime goal contract that the pre-goal compiler must create after downstream artifacts are approved.
 
 Derive expected paths from:
 
@@ -313,12 +313,13 @@ docs/cybernetics/designs/YYYY-MM-DD-<slug>.md
 docs/cybernetics/goals/YYYY-MM-DD-<slug>.md
 docs/cybernetics/plans/YYYY-MM-DD-<slug>.md
 docs/cybernetics/control-reviews/YYYY-MM-DD-<slug>.md
+docs/cybernetics/runtime-goals/YYYY-MM-DD-<slug>.goal.md
 ```
 
-The predicted `/goal` command must include this precondition:
+The predicted pointer-only `/goal` shape must include this precondition:
 
 ```text
-If any referenced artifact is missing, not approved, or internally inconsistent, stop and report the smallest required human decision.
+If any referenced artifact is missing, not approved, or inconsistent, stop and report the smallest required human decision.
 ```
 
 Predicted commands and handoff prompts are response-only. Do not write them into the requirements analysis artifact.

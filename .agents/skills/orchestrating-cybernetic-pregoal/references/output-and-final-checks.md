@@ -26,10 +26,14 @@ Control summary:
 - Sensors: ...
 - Runtime boundary: ...
 
-Response-only runtime `/goal` command:
+Runtime goal contract:
+
+`docs/cybernetics/runtime-goals/YYYY-MM-DD-slug.goal.md`
+
+User-entered short `/goal` pointer:
 
 ```text
-/goal Execute the approved execution policy in ...
+/goal Execute the runtime goal contract at docs/cybernetics/runtime-goals/YYYY-MM-DD-slug.goal.md. Read it first and follow it exactly. If any referenced artifact is missing, not approved, or inconsistent, stop and report the smallest required human decision.
 ```
 
 Do not start the goal until you are ready for runtime execution.
@@ -88,10 +92,12 @@ Before responding, verify:
 - [ ] Review status is `Approved` before final runtime `/goal` is emitted.
 - [ ] If not approved, the response is blocked and asks for the smallest necessary decision.
 - [ ] If blocked, the response includes `Next allowed action` and a response-only next step.
-- [ ] Runtime `/goal` references requirements analysis, required design, goal, plan, and review files.
-- [ ] Runtime `/goal` includes the missing/not-approved/inconsistent artifact precondition.
-- [ ] Runtime `/goal` includes executing, debugging, and completion-verification discipline.
-- [ ] Runtime `/goal` does not tell Codex to write or approve a new plan.
+- [ ] Runtime goal contract references requirements analysis, required design, goal, plan, and review files.
+- [ ] User-entered `/goal` is pointer-only and length-bounded.
+- [ ] User-entered `/goal` does not inline HSA, PFB, RSC, TAP, EHA, topology, sensor governance, or review discipline prose.
+- [ ] Runtime goal contract includes the missing/not-approved/inconsistent artifact precondition.
+- [ ] Runtime goal contract includes executing, debugging, and completion-verification discipline.
+- [ ] User-entered `/goal` does not tell Codex to write or approve a new plan.
 
 ## Common Mistakes
 
