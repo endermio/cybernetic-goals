@@ -570,6 +570,10 @@ TARGET_CONTRACT_FORBIDDEN_TERMS = (
     "fallback report handling",
     "valid non-achieved report statuses",
     "non-achieved report statuses",
+    "non-achieved terminal report",
+    "non-achieved terminal reports",
+    "non-achieved terminal report status",
+    "non-achieved terminal report statuses",
     "valid final status",
 )
 
@@ -600,6 +604,10 @@ def check_goal_target_achievement(goal: str, errors: list[str]) -> None:
         if not labeled_or_table_field_has_content(body, field):
             errors.append(f"goal Target Achievement Contract missing {field}")
 
+    predicate_count = target_achieved_predicate_field_count(body)
+    if predicate_count != 1:
+        errors.append("goal Target Achievement Contract must contain exactly one target-achieved predicate")
+
     for line in body.splitlines():
         lowered = line.casefold()
         if is_prohibition_line(line):
@@ -620,6 +628,23 @@ def check_goal_target_achievement(goal: str, errors: list[str]) -> None:
         for term in NON_ACHIEVED_SUCCESS_TERMS:
             if re.search(rf"\b{re.escape(term)}\b", lowered):
                 errors.append(f"goal Success Condition contains non-achieved terminal report term: {term}")
+
+
+def target_achieved_predicate_field_count(text: str) -> int:
+    count = 0
+    for line in text.splitlines():
+        stripped = line.strip()
+        if not stripped or is_prohibition_line(stripped):
+            continue
+        if "|" in stripped:
+            cells = [cell.strip().casefold() for cell in stripped.strip("|").split("|")]
+            if cells and "target-achieved predicate" in cells[0]:
+                count += 1
+            continue
+        label = stripped.split(":", 1)[0].strip("-* ").casefold()
+        if "target-achieved predicate" in label:
+            count += 1
+    return count
 
 
 def check_plan_target_producing_strategy(plan: str, errors: list[str]) -> None:
@@ -723,6 +748,7 @@ def suggest_next_action(errors: list[str]) -> str:
         or "goal realization surface contract missing" in joined
         or "goal missing ## target achievement contract" in joined
         or "goal target achievement contract missing" in joined
+        or "goal target achievement contract must contain exactly one target-achieved predicate" in joined
         or "goal success condition contains non-achieved terminal report term" in joined
         or "goal target achievement contract contains non-achieved or fallback term" in joined
     ):

@@ -67,7 +67,7 @@ Execution complexity may be recorded as execution risk, planning concern, eviden
 
 Ask the human a question only if all are true:
 
-1. The answer materially changes requirement semantics, evaluation rubric, output contract, purpose feedback boundary, beneficiary/observer, sufficient evidence level, feedback-unavailable handling, realization surface closure, target state surface model, required surface action, residual reconciliation, preserved/excluded surfaces, visibility boundary, authorization model, external contract semantics, observer-visible behavior, downstream consumption, acceptance condition, or control boundaries.
+1. The answer materially changes any Human Setpoint Approval compact control commitment field, including purpose feedback boundary, beneficiary/observer, sufficient evidence level, feedback-unavailable handling, realization surface closure, target state surface model, required surface action, residual reconciliation, preserved/excluded surfaces, or target-achievement predicate; or changes requirement semantics, evaluation rubric, output contract, visibility boundary, authorization model, external contract semantics, observer-visible behavior, downstream consumption, acceptance condition, or control boundaries.
 2. There are at least two plausible business choices.
 3. The correct answer cannot be safely inferred from the user request, existing source artifacts, or common requirement conventions.
 4. A wrong default would be costly to reverse or would cause serious misalignment.

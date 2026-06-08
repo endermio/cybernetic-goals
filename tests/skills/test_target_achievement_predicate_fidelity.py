@@ -299,6 +299,11 @@ class TargetAchievementPredicateFidelityTest(unittest.TestCase):
         ):
             self.assertNotIn(removed, combined)
 
+        success_condition = self.read(
+            ".agents/skills/writing-cybernetic-goals/assets/goal-contract-template.md"
+        ).split("## Success Condition", 1)[1].split("## Purpose Feedback Contract", 1)[0]
+        self.assertNotIn("Supporting Evidence", success_condition)
+
     def test_guard_rejects_success_condition_with_non_achieved_status(self):
         with tempfile.TemporaryDirectory() as tmpdir:
             requirements, goal, plan, review = self.write_chain(
@@ -332,6 +337,37 @@ class TargetAchievementPredicateFidelityTest(unittest.TestCase):
         self.assertIn("NEXT: RunGoalWriting", output)
         self.assertIn("Target Achievement Contract", output)
         self.assertIn("non-achieved or fallback term", output)
+
+    def test_guard_rejects_target_contract_with_non_achieved_terminal_report_statuses(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            requirements, goal, plan, review = self.write_chain(
+                Path(tmpdir),
+                target_contract_extra=[
+                    "| Non-achieved terminal report statuses | partial / blocked |",
+                ],
+            )
+            result = self.guard(requirements, goal, plan, review)
+
+        output = result.stdout + result.stderr
+        self.assertEqual(2, result.returncode, output)
+        self.assertIn("NEXT: RunGoalWriting", output)
+        self.assertIn("Target Achievement Contract", output)
+        self.assertIn("non-achieved or fallback term", output)
+
+    def test_guard_rejects_multiple_target_achieved_predicates(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            requirements, goal, plan, review = self.write_chain(
+                Path(tmpdir),
+                target_contract_extra=[
+                    "| Alternative target-achieved predicate | a lower-cost report exists |",
+                ],
+            )
+            result = self.guard(requirements, goal, plan, review)
+
+        output = result.stdout + result.stderr
+        self.assertEqual(2, result.returncode, output)
+        self.assertIn("NEXT: RunGoalWriting", output)
+        self.assertIn("exactly one target-achieved predicate", output)
 
     def test_guard_rejects_plan_missing_target_producing_action_strategy(self):
         with tempfile.TemporaryDirectory() as tmpdir:

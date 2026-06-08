@@ -10,14 +10,12 @@
 
 ## Success Condition
 
-Codex may report `goal achieved: yes` only when the Single target-achieved predicate in `Target Achievement Contract` is satisfied.
+Codex may report `goal achieved: yes` only when:
 
-Codex may stop successfully only when:
+- the Single target-achieved predicate in `Target Achievement Contract` is satisfied;
+- the Purpose Feedback Contract permits an achieved claim;
+- the Realization Surface Contract, when applicable, permits the corresponding target-realization claim.
 
-- Purpose-realizing outcome observed: [observable purpose achievement]
-- Supporting Evidence: [verification evidence that supports the outcome]
-
-Do not define success as internal sensor success unless the human purpose is internal-state correctness.
 No partial, diagnostic, blocked, invalid, unavailable, fallback, or non-achieved report status may satisfy this success condition.
 
 ## Purpose Feedback Contract
@@ -30,6 +28,8 @@ No partial, diagnostic, blocked, invalid, unavailable, fallback, or non-achieved
 | Sufficient evidence level | `internal / integration / purpose-boundary / operational` |
 | Purpose feedback unavailable handling | [honest status and smallest next observation] |
 | Allowed completion wording | [achieved / partially observed / pending / unavailable / not required with justification] |
+
+Do not define success as internal sensor success unless the human purpose is internal-state correctness.
 
 ## Realization Surface Contract
 

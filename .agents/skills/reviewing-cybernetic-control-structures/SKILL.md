@@ -233,7 +233,7 @@ Flag as Major or Blocking when:
 - the plan can terminate with `goal achieved: yes` without satisfying the single target-achieved predicate;
 - "valid final status" is used without separating `goal achieved: yes` from `goal achieved: no`.
 
-### 11. Execution Granularity / Sensor Load
+### 12. Execution Granularity / Sensor Load
 
 Flag as Major or Blocking when:
 
@@ -248,7 +248,7 @@ Flag as Major or Blocking when:
 
 Use `Major` when execution-policy revision can repair the control law. Use `Blocking` when the granularity or sensor load would prevent runtime completion or let sensors override confirmed semantics.
 
-### 12. Context Management / Execution Topology
+### 13. Context Management / Execution Topology
 
 Flag as Major or Blocking when:
 
@@ -265,7 +265,7 @@ Flag as Major or Blocking when:
 
 Use `Major` when execution-policy revision can repair topology. Use `Blocking` when context overload would likely make runtime lose requirements, design invariants, output contract, stop conditions, or approval boundaries.
 
-### 13. Batch Rhythm
+### 14. Batch Rhythm
 
 Flag:
 
@@ -274,11 +274,11 @@ Flag:
 - no batch-end openability requirement;
 - no destructive intermediate-state policy.
 
-### 14. Semantic vs Tactical Boundary
+### 15. Semantic vs Tactical Boundary
 
 Semantic invariants must be frozen. Tactical execution details must remain adjustable.
 
-### 15. Runtime Suitability
+### 16. Runtime Suitability
 
 The runtime `/goal` must be able to execute the approved artifacts without inventing new control structures. Any required runtime discipline, including approved execution topology, bounded subagent delegation protocol, and conditionally selected Superpowers substrate, must be precompiled into the approved plan, review, or final `/goal`.
 
@@ -291,7 +291,7 @@ target-realization claims require RSC adequate.
 
 Runtime target-achievement claims must be calibrated to the single target-achieved predicate. Non-achieved terminal reports may stop execution honestly, but they do not support `goal achieved: yes`.
 
-### 16. Review Independence
+### 17. Review Independence
 
 The review must record:
 
@@ -300,7 +300,7 @@ The review must record:
 - whether approval is allowed;
 - why approval is blocked when independent review is missing.
 
-### 17. Final Observer Check
+### 18. Final Observer Check
 
 The review must record whether any substantive artifact changed after the latest independent review pass and whether a final independent observer confirmed no Blocking or Major findings after that change.
 

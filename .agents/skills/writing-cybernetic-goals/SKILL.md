@@ -346,7 +346,7 @@ If the user explicitly requests a small inline `/goal` and the task is low-risk,
 - [ ] The goal includes Realization Surface Contract for compiled runtime goals; direct bounded goals include it when requirements define Realization Surface Closure or target-state realization spans surfaces.
 - [ ] The goal includes Target Achievement Contract for compiled runtime goals.
 - [ ] For Level 3/4 or full pre-goal work, Human Setpoint Approval is Approved before the goal is written.
-- [ ] Success Condition is Purpose-realizing outcome observed, not internal sensor success unless the human purpose is internal-state correctness.
+- [ ] Success Condition allows `goal achieved: yes` only when the single target-achieved predicate is satisfied and PFB/RSC permit the matching achieved claims.
 - [ ] Any strongest positive target-realization claim requires RSC adequate; partial, missing, unavailable, or not applicable with justification receives calibrated wording.
 - [ ] Sensors are named but not treated as the objective.
 - [ ] Evaluation tasks define an explicit rubric before any executable goal is emitted.
