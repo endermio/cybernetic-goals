@@ -16,8 +16,8 @@ Cybernetic skills compile solution designs and control structures: requirements 
 | Control structure review | Independent subagent review discipline | Required for `Approved` unless explicit human approval exists | This is review discipline, not the full execution workflow from `$superpowers:subagent-driven-development`. |
 | Runtime execution | `$superpowers:executing-plans` discipline | Required | Execute the approved plan; do not create or approve a new plan at runtime. |
 | Runtime target-work delegation | Approved bounded subagent delegation protocol | Required when execution policy selects serial or parallel subagent-driven topology | Main agent coordinates and integrates; delegated work packages stay bounded by the approved execution policy. |
-| Runtime serial implementation-plan delegation | `$superpowers:subagent-driven-development` discipline | Conditional | Use only when the approved execution policy records `Selected delegation substrate: superpowers-subagent-driven-development`, `Subagent execution mode: serial-single-active`, and `Max concurrent subagents: 1`. |
-| Runtime parallel independent-domain delegation | `$superpowers:dispatching-parallel-agents` discipline | Conditional | Use only when the approved execution policy records `Selected delegation substrate: superpowers-dispatching-parallel-agents`, `Subagent execution mode: parallel-max-safe`, and approved wave/lock/barrier/integration rules. |
+| Runtime serial implementation-plan delegation | `$superpowers:subagent-driven-development` discipline | Conditional | Use only when the approved execution policy records `Selected agent workflow: superpowers-subagent-driven-development`, `Subagent execution mode: serial-single-active`, and `Max concurrent subagents: 1`. |
+| Runtime parallel independent-domain delegation | `$superpowers:dispatching-parallel-agents` discipline | Conditional | Use only when the approved execution policy records `Selected agent workflow: superpowers-dispatching-parallel-agents`, `Subagent execution mode: parallel-max-safe`, and approved wave/lock/barrier/integration rules. |
 | Runtime debugging | `$superpowers:systematic-debugging` | Required for unclear or repeated failures | Investigate before changing behavior. |
 | Completion claim | `$superpowers:verification-before-completion` | Required | Completion requires fresh verification evidence. |
 
@@ -33,7 +33,7 @@ Do not silently replace:
 - independent subagent review with self-review;
 - `$superpowers:executing-plans` with runtime replanning;
 - an approved bounded subagent delegation protocol with ad hoc context delegation when subagent-driven topology is selected;
-- `$superpowers:subagent-driven-development` with generic subagent delegation, with parallel execution, or without `Selected delegation substrate: superpowers-subagent-driven-development`;
+- `$superpowers:subagent-driven-development` with generic subagent delegation, with parallel execution, or without `Selected agent workflow: superpowers-subagent-driven-development`;
 - `$superpowers:dispatching-parallel-agents` as a substitute for `$superpowers:subagent-driven-development`'s implementer/spec-review/code-quality review loop;
 - `$superpowers:systematic-debugging` with speculative fixes;
 - `$superpowers:verification-before-completion` with confidence statements.
@@ -74,8 +74,8 @@ Compiled runtime `/goal` commands must instruct Codex to use:
 
 - `$superpowers:executing-plans` discipline for execution against the approved plan;
 - the approved bounded subagent delegation protocol when the approved execution policy selects serial or parallel subagent-driven topology;
-- `$superpowers:subagent-driven-development` only when the approved execution policy records `Selected delegation substrate: superpowers-subagent-driven-development`, `Subagent execution mode: serial-single-active`, and `Max concurrent subagents: 1`;
-- `$superpowers:dispatching-parallel-agents` only when the approved execution policy records `Selected delegation substrate: superpowers-dispatching-parallel-agents` and `Subagent execution mode: parallel-max-safe`;
+- `$superpowers:subagent-driven-development` only when the approved execution policy records `Selected agent workflow: superpowers-subagent-driven-development`, `Subagent execution mode: serial-single-active`, and `Max concurrent subagents: 1`;
+- `$superpowers:dispatching-parallel-agents` only when the approved execution policy records `Selected agent workflow: superpowers-dispatching-parallel-agents` and `Subagent execution mode: parallel-max-safe`;
 - `$superpowers:systematic-debugging` for unclear or repeated failures;
 - `$superpowers:verification-before-completion` before claiming completion.
 

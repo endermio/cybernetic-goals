@@ -17,11 +17,11 @@
     },
     {
       "id": "requires-human-setpoint-approval",
-      "prompt": "requirements analysis Complete, goal exists, execution policy exists, control review Approved, but requirements lacks Human Setpoint Approval. Compile final /goal.",
-      "expected_output": "Refuse to compile runtime /goal and return to requirements analysis for Human Setpoint Approval.",
+      "prompt": "requirements analysis Complete, goal exists, execution policy exists, control review Approved, but requirements lacks What the User Approved. Compile final /goal.",
+      "expected_output": "Refuse to compile runtime /goal and return to requirements analysis for What the User Approved.",
       "assertions": [
         "Does not output final /goal.",
-        "Requires Human Setpoint Approval: Approved.",
+        "Requires What the User Approved: Approved.",
         "Does not treat Requirements Analysis Status: Complete as approval.",
         "Routes back to requirements analysis or orchestration with the guard failure.",
         "Does not ask the user to review downstream execution artifacts as a substitute."
@@ -54,15 +54,15 @@
     },
     {
       "id": "compiles-runtime-goal",
-      "prompt": "requirements analysis Complete with Human Setpoint Approval: Approved, goal exists, execution policy status Candidate, control review Approved, Final Observer Check allows approval；编译最终 /goal。",
+      "prompt": "requirements analysis Complete with What the User Approved: Approved, goal exists, execution policy status Candidate, control review Approved, Final Observer Check allows approval；编译最终 /goal。",
       "expected_output": "Writes a runtime goal contract that references requirements analysis, goal, plan, and review paths, then outputs a short pointer-only /goal to that contract.",
       "assertions": [
         "Runtime goal contract references all four artifact paths.",
         "Pointer /goal references the runtime goal contract path.",
         "Pointer /goal is short and does not inline HSA, PFB, RSC, TAP, topology, sensor, review, or subagent protocol prose.",
-        "Runtime goal contract indexes Human Setpoint Approval.",
+        "Runtime goal contract indexes What the User Approved.",
         "Requires Final Observer Check to allow approval.",
-        "Runtime goal contract forbids reinterpretation of approved setpoint, target-achieved predicate, output contract, topology, sensors, or control strategy.",
+        "Runtime goal contract forbids reinterpretation of what the user approved, what counts as done, output contract, topology, sensors, or control strategy.",
         "Runtime goal contract mentions approved sensors, checks, and evidence channels as sensors, not objectives.",
         "Runtime goal contract mentions $superpowers:executing-plans, $superpowers:systematic-debugging, and $superpowers:verification-before-completion discipline.",
         "Runtime goal contract stops if any referenced artifact is missing, not approved, inconsistent, or insufficient."
@@ -70,12 +70,12 @@
     },
     {
       "id": "runtime-command-is-pointer-only",
-      "prompt": "requirements analysis Complete with Human Setpoint Approval: Approved, goal exists, execution policy status Candidate, control review Approved, Final Observer Check allows approval；编译最终 runtime command。",
+      "prompt": "requirements analysis Complete with What the User Approved: Approved, goal exists, execution policy status Candidate, control review Approved, Final Observer Check allows approval；编译最终 runtime command。",
       "expected_output": "Outputs a short /goal that points to docs/cybernetics/runtime-goals/*.goal.md and writes the full runtime goal contract there.",
       "assertions": [
         "The user-entered /goal references a runtime goal contract path.",
         "The user-entered /goal is length-bounded.",
-        "The user-entered /goal does not contain Purpose Feedback Boundary, Realization Surface Closure, single target-achieved predicate final-report fields, or subagent protocol prose.",
+        "The user-entered /goal does not contain Purpose Feedback Boundary, Realization Surface Closure, what counts as done final-report fields, or subagent protocol prose.",
         "The runtime goal contract contains Approved Control Chain.",
         "The runtime goal contract contains Required Sections To Read.",
         "The runtime goal contract contains Final Report Required Fields."
@@ -113,7 +113,7 @@
         "Runtime goal contract indexes Target-Producing Action Strategy.",
         "Runtime goal contract indexes Target Achievement Predicate Fidelity.",
         "Runtime goal contract requires goal achieved: yes/no in the final report.",
-        "Runtime goal contract requires single target-achieved predicate met: yes/no.",
+        "Runtime goal contract requires what counts as done met: yes/no.",
         "Runtime goal contract requires target-producing evidence, non-achieved reason, target-producing action attempted or proof of impossibility, and smallest next target-producing attempt.",
         "Pointer /goal does not inline target-achievement final-report fields."
       ]
@@ -171,10 +171,10 @@
     {
       "id": "preserves-approved-subagent-topology",
       "prompt": "requirements analysis Complete, goal exists, execution policy status Candidate and selects Serial subagent-driven topology, control review Approved and Final Observer Check allows approval；编译最终 /goal。",
-      "expected_output": "Writes a runtime goal contract that records the approved serial subagent-driven topology and selected delegation substrate, then emits a short pointer-only /goal.",
+      "expected_output": "Writes a runtime goal contract that records the approved serial subagent-driven topology and selected agent workflow, then emits a short pointer-only /goal.",
       "assertions": [
         "Runtime goal contract records the selected topology from the execution policy.",
-        "Runtime goal contract records the selected delegation substrate.",
+        "Runtime goal contract records the selected agent workflow.",
         "Pointer /goal does not inline subagent protocol prose.",
         "Does not require $superpowers:subagent-driven-development unless the approved execution policy records a compatible serial SDD substrate.",
         "Does not require $superpowers:dispatching-parallel-agents unless the approved execution policy records a compatible parallel dispatch substrate.",
@@ -184,7 +184,7 @@
     },
     {
       "id": "guard-rejects-incomplete-subagent-topology",
-      "prompt": "requirements analysis Complete, goal exists, execution policy status Candidate and only says Selected topology: Serial subagent-driven, but lacks Context pack, Allowed actions, Return format, Integration gate, main-agent ownership, and delegation substrate. control review says Approved. Compile runtime /goal.",
+      "prompt": "requirements analysis Complete, goal exists, execution policy status Candidate and only says Selected topology: Serial subagent-driven, but lacks Context pack, Allowed actions, Return format, Integration gate, main-agent ownership, and agent workflow. control review says Approved. Compile runtime /goal.",
       "expected_output": "Refuse to compile runtime /goal because the execution topology section is structurally incomplete, and route back to execution-policy revision.",
       "assertions": [
         "Does not output final /goal.",
@@ -193,13 +193,13 @@
         "Requires Context Pack Requirements for subagent-driven topology.",
         "Requires Context Compression Rule when subagent-driven topology is selected.",
         "Requires main-agent ownership.",
-        "Requires an approved bounded subagent delegation substrate for subagent-driven topology.",
+        "Requires an approved bounded subagent agent workflow for subagent-driven topology.",
         "Includes a response-only next step to revise the execution policy."
       ]
     },
     {
       "id": "uses-selected-superpowers-substrate-only-when-compatible",
-      "prompt": "requirements analysis Complete, goal exists, execution policy status Candidate and selects Serial subagent-driven topology with Selected delegation substrate: bounded-protocol and an approved bounded delegation protocol. control review Approved and Final Observer Check allows approval；编译最终 /goal。",
+      "prompt": "requirements analysis Complete, goal exists, execution policy status Candidate and selects Serial subagent-driven topology with Selected agent workflow: bounded-protocol and an approved bounded delegation protocol. control review Approved and Final Observer Check allows approval；编译最终 /goal。",
       "expected_output": "Writes a runtime goal contract that records serial subagent-driven topology and bounded-protocol substrate without adding $superpowers:subagent-driven-development, then emits a short pointer-only /goal.",
       "assertions": [
         "Runtime goal contract records the approved execution topology from the execution policy.",

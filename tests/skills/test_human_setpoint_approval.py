@@ -9,7 +9,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[2]
 
 
-HSA_SECTION_APPROVED = """## Human Setpoint Approval
+HSA_SECTION_APPROVED = """## What the User Approved
 
 Status: `Approved`
 
@@ -24,12 +24,12 @@ Approval applies only to this compact control commitment.
 | Non-goals | do not reinterpret the setpoint downstream |
 | Purpose Feedback Boundary | purpose feedback remains separately calibrated |
 | Realization Surface Closure | target-state surfaces remain separately calibrated |
-| Single target-achieved predicate | approved HSA guard target is observed |
-| Target-producing evidence required | target-producing evidence is observed |
+| What counts as done | approved HSA guard target is observed |
+| Evidence needed to call it done | target-producing evidence is observed |
 | Non-achieved terminal report handling | report goal achieved: no |
-| Target-producing path | HSA guard fixture spine |
-| Execution horizon | HSA guard fixture horizon |
-| Runtime authority | local guard fixture checks |
+| Required answer path | HSA guard fixture spine |
+| Work covered in this run | HSA guard fixture horizon |
+| What the agent may do | local guard fixture checks |
 | Forbidden live / irreversible actions | none |
 | Required handling for unauthorized actions | none |
 | Explicitly out-of-scope items | none |
@@ -116,12 +116,12 @@ class HumanSetpointApprovalTest(unittest.TestCase):
                     "",
                     "| Element | Requirement |",
                     "|---|---|",
-                    "| Single target-achieved predicate | approved HSA guard target is observed |",
+                    "| What counts as done | approved HSA guard target is observed |",
                     "| Required target-producing evidence | target-producing evidence is observed |",
                     "| Allowed achieved claim | only target-achieved predicate supports goal achieved: yes |",
-                    "| Target-producing spine | HSA guard fixture spine |",
+                    "| Steps that make the result true | HSA guard fixture spine |",
                     "",
-                    "## Execution Horizon and Authority Contract",
+                    "## Work Covered And Allowed Actions Contract",
                     "",
                     "| Element | Requirement |",
                     "|---|---|",
@@ -165,13 +165,13 @@ class HumanSetpointApprovalTest(unittest.TestCase):
                     f"- Requirements analysis: `{requirements}`",
                     f"- Goal contract: `{goal}`",
                     "",
-                    "## Horizon and Authority Coverage Matrix",
+                    "## Work Coverage And Action Limits Matrix",
                     "",
-                    "| Batch / surface | In approved horizon? | Runtime authority | Required runtime handling | Counts as achieved? |",
+                    "| Batch / surface | In approved horizon? | What the agent may do | Required runtime handling | Counts as achieved? |",
                     "|---|---|---|---|---|",
                     "| HSA guard fixture | yes | execute | run guard / compiler fixture checks | yes if fixture passes |",
                     "",
-                    "## Target-Producing Spine",
+                    "## Steps That Make The Result True",
                     "",
                     "| Spine node | Required state transition | Required evidence |",
                     "|---|---|---|",
@@ -204,7 +204,7 @@ class HumanSetpointApprovalTest(unittest.TestCase):
                     "",
                     "Selected topology: `Main-only`",
                     "",
-                    "Selected delegation substrate: `none`",
+                    "Selected agent workflow: `none`",
                     "",
                     "Topology rationale:",
                     "",
@@ -274,8 +274,8 @@ class HumanSetpointApprovalTest(unittest.TestCase):
                     "- Purpose feedback adequacy: `yes`",
                     "- Realization surface closure adequacy: `yes`",
                     "- Target achievement predicate fidelity: `yes`",
-                    "- Target-producing spine fidelity: `yes`",
-                    "- Execution horizon and authority fidelity: `yes`",
+                    "- answer path check: `yes`",
+                    "- Work covered in this run and authority fidelity: `yes`",
                     "",
                     "## Human Setpoint Fidelity",
                     "",
@@ -308,12 +308,12 @@ class HumanSetpointApprovalTest(unittest.TestCase):
                     "Findings:",
                     "- The single target-achieved predicate is separated from non-achieved terminal reports.",
                     "",
-                    "## Target-Producing Spine Fidelity",
+                    "## Answer Path Check",
                     "",
                     "Findings:",
                     "- Work packages map to the fixture spine node.",
                     "",
-                    "## Execution Horizon and Authority Fidelity",
+                    "## Work Covered And Allowed Actions Check",
                     "",
                     "Findings:",
                     "- Approved horizon and runtime authority are compact and fixture-bounded.",
@@ -343,7 +343,7 @@ class HumanSetpointApprovalTest(unittest.TestCase):
         )
 
         for text in (skill, template):
-            self.assertIn("Human Setpoint Approval", text)
+            self.assertIn("What the User Approved", text)
             self.assertIn("Human purpose", text)
             self.assertIn("Input role binding", text)
             self.assertIn("Primary object", text)
@@ -373,7 +373,7 @@ class HumanSetpointApprovalTest(unittest.TestCase):
         output = result.stdout + result.stderr
         self.assertNotEqual(result.returncode, 0)
         self.assertIn("NEXT: ReturnToRequirementsAnalysis", output)
-        self.assertIn("Human Setpoint Approval", output)
+        self.assertIn("What the User Approved", output)
 
     def test_control_chain_guard_rejects_missing_human_setpoint_approval(self):
         with tempfile.TemporaryDirectory() as tmpdir:
@@ -399,7 +399,7 @@ class HumanSetpointApprovalTest(unittest.TestCase):
         output = result.stdout + result.stderr
         self.assertNotEqual(result.returncode, 0)
         self.assertIn("NEXT: ReturnToRequirementsAnalysis", output)
-        self.assertIn("Human Setpoint Approval", output)
+        self.assertIn("What the User Approved", output)
 
     def test_control_chain_guard_accepts_approved_human_setpoint(self):
         with tempfile.TemporaryDirectory() as tmpdir:
@@ -434,7 +434,7 @@ class HumanSetpointApprovalTest(unittest.TestCase):
             ".agents/skills/reviewing-cybernetic-control-structures/assets/control-review-template.md",
         ):
             text = self.read(path)
-            self.assertIn("Human Setpoint Approval", text)
+            self.assertIn("What the User Approved", text)
 
         review_skill = self.read(".agents/skills/reviewing-cybernetic-control-structures/SKILL.md")
         review_template = self.read(
@@ -452,7 +452,7 @@ class HumanSetpointApprovalTest(unittest.TestCase):
         )
 
         for text in (skill, compiler, template):
-            self.assertIn("human-approved setpoint", text)
+            self.assertIn("What the User Approved", text)
             self.assertIn("primary object", text)
             self.assertIn("requested transformation", text)
             self.assertIn("workflow fit", text)
@@ -461,7 +461,7 @@ class HumanSetpointApprovalTest(unittest.TestCase):
         matrix = self.read("docs/cybernetic-framework/invariant-artifact-consumer-matrix.md")
 
         self.assertIn("INV-HSA-001", matrix)
-        self.assertIn("Human Setpoint Approval", matrix)
+        self.assertIn("What the User Approved", matrix)
         self.assertIn("orchestration_guard.py", matrix)
         self.assertIn("control_chain_guard.py", matrix)
         self.assertIn("Human Setpoint Fidelity", matrix)
@@ -490,7 +490,7 @@ class HumanSetpointApprovalTest(unittest.TestCase):
         ]
         for eval_id in hsa_required_ids:
             self.assertIn(eval_id, eval_by_id)
-            self.assertIn("Human Setpoint Approval: Approved", eval_by_id[eval_id]["prompt"])
+            self.assertIn("What the User Approved: Approved", eval_by_id[eval_id]["prompt"])
 
     def test_orchestrator_candidate_mode_does_not_request_artifact_by_artifact_approval(self):
         skill = self.read(".agents/skills/orchestrating-cybernetic-pregoal/SKILL.md")
@@ -498,11 +498,11 @@ class HumanSetpointApprovalTest(unittest.TestCase):
         self.assertNotIn("manually approve the artifacts", skill)
         self.assertNotIn("approves the artifacts", skill)
         self.assertIn("explicit control-review approval of the review findings", skill)
-        self.assertIn("Do not ask for artifact-by-artifact review as a substitute for Human Setpoint Approval", skill)
+        self.assertIn("Do not ask for artifact-by-artifact review as a substitute for What the User Approved", skill)
 
     def test_current_message_approval_must_be_recorded_before_downstream_guards(self):
         required_phrase = (
-            "update the requirements analysis `Human Setpoint Approval` section first"
+            "update the requirements analysis `What the User Approved` section first"
         )
         for path in (
             ".agents/skills/analyzing-cybernetic-requirements/SKILL.md",
@@ -519,7 +519,7 @@ class HumanSetpointApprovalTest(unittest.TestCase):
 
         self.assertIn("control contract must be written", frontmatter)
         self.assertIn("Level 3/4 full pre-goal orchestration", frontmatter)
-        self.assertIn("Human Setpoint Approval", frontmatter)
+        self.assertIn("What the User Approved", frontmatter)
 
 
 if __name__ == "__main__":

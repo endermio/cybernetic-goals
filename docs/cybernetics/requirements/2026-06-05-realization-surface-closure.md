@@ -4,7 +4,7 @@
 
 Status: `Complete`
 
-## Human Setpoint Approval
+## What the User Approved
 
 Status: `Approved`
 

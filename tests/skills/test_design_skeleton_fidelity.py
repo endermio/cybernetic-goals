@@ -11,7 +11,7 @@ CONTROL_CHAIN_GUARD = ROOT / ".agents/skills/compiling-cybernetic-runtime-goals/
 COMPILER = ROOT / ".agents/skills/compiling-cybernetic-runtime-goals/scripts/compile_runtime_goal.py"
 
 
-HSA_WITH_COVERAGE_SKELETON = """## Human Setpoint Approval
+HSA_WITH_COVERAGE_SKELETON = """## What the User Approved
 
 Status: `Approved`
 
@@ -24,20 +24,20 @@ Status: `Approved`
 | Non-goals | do not validate only one full-workflow candidate path |
 | Purpose Feedback Boundary | purpose is realized only when the full workflow ceiling is answered |
 | Realization Surface Closure | measurement surfaces must cover the workflow evidence bundle |
-| Single target-achieved predicate | full workflow ceiling coverage skeleton is satisfied |
-| Target-producing evidence required | scope inventory, removable-source inventory, coverage criterion, coverage matrix, full workflow run, and interpretation against coverage |
+| What counts as done | full workflow ceiling coverage skeleton is satisfied |
+| Evidence needed to call it done | scope inventory, removable-source inventory, coverage criterion, coverage matrix, full workflow run, and interpretation against coverage |
 | Non-achieved terminal report handling | report goal achieved: no when coverage skeleton is unsatisfied |
-| Target-producing path | coverage inventory -> coverage criterion -> candidate coverage matrix -> same-workload run -> interpretation |
-| Answering method | list full workflow scope, identify major removable sources, define ceiling coverage, prove candidate coverage, run full workflow, and interpret against coverage |
-| Not-sufficient substitute | full-workflow-run-validation |
-| Task skeleton family | coverage-ceiling-measurement |
-| Execution horizon | full workflow ceiling measurement horizon |
-| Runtime authority | local measurement and report generation |
+| Required answer path | coverage inventory -> coverage criterion -> candidate coverage matrix -> same-workload run -> interpretation |
+| How this should be answered | list full workflow scope, identify major removable sources, define ceiling coverage, prove candidate coverage, run full workflow, and interpret against coverage |
+| What is not enough | full-workflow-run-validation |
+| Answer type | coverage-ceiling-measurement |
+| Work covered in this run | full workflow ceiling measurement horizon |
+| What the agent may do | local measurement and report generation |
 | Forbidden live / irreversible actions | none |
 | Required handling for unauthorized actions | none |
 | Explicitly out-of-scope items | none |
-| Runtime delegation preference | no preference |
-| Delegation substrate preference | no preference |
+| Agent delegation preference | no preference |
+| Agent workflow preference | no preference |
 | Parallel execution authority | not applicable |
 | Parallelism cap | not specified |
 | Output Contract | guard output |
@@ -100,15 +100,15 @@ def write_design(tmp: Path, requirements: Path, *, skeleton: str, mandatory_node
                 "",
                 "Preserve the approved answering method.",
                 "",
-                "## Task Skeleton Fidelity",
+                "## Answer Method Check",
                 "",
                 "| Element | Design |",
                 "|---|---|",
-                "| Approved answering method | list full workflow scope, identify major removable sources, define ceiling coverage, prove candidate coverage, run full workflow, and interpret against coverage |",
-                "| Approved skeleton family | coverage-ceiling-measurement |",
-                f"| Instantiated skeleton | {skeleton} |",
-                f"| Mandatory nodes coverage | {', '.join(mandatory_nodes)} |",
-                f"| Forbidden substitution avoided | {substitution_avoided} |",
+                "| Approved answer method | list full workflow scope, identify major removable sources, define ceiling coverage, prove candidate coverage, run full workflow, and interpret against coverage |",
+                "| Approved answer type | coverage-ceiling-measurement |",
+                f"| Required answer path | {skeleton} |",
+                f"| Required steps covered | {', '.join(mandatory_nodes)} |",
+                f"| What is not enough avoided | {substitution_avoided} |",
                 "",
                 "## Conceptual Design",
                 "",
@@ -195,12 +195,12 @@ def write_runtime_chain(
                 "",
                 "| Element | Requirement |",
                 "|---|---|",
-                "| Single target-achieved predicate | coverage-ceiling skeleton is satisfied |",
+                "| What counts as done | coverage-ceiling skeleton is satisfied |",
                 "| Required target-producing evidence | scope inventory, source inventory, coverage criterion, coverage matrix, full workflow run, and interpretation evidence exist |",
                 "| Allowed achieved claim | goal achieved: yes only when coverage-ceiling skeleton is satisfied |",
-                "| Target-producing spine | coverage inventory -> criterion -> matrix -> same-workload run -> interpretation |",
+                "| Steps that make the result true | coverage inventory -> criterion -> matrix -> same-workload run -> interpretation |",
                 "",
-                "## Execution Horizon and Authority Contract",
+                "## Work Covered And Allowed Actions Contract",
                 "",
                 "| Element | Requirement |",
                 "|---|---|",
@@ -231,13 +231,13 @@ def write_runtime_chain(
                 f"- Solution design: `{design}`",
                 f"- Goal contract: `{goal}`",
                 "",
-                "## Horizon and Authority Coverage Matrix",
+                "## Work Coverage And Action Limits Matrix",
                 "",
-                "| Batch / surface | In approved horizon? | Runtime authority | Required runtime handling | Counts as achieved? |",
+                "| Batch / surface | In approved horizon? | What the agent may do | Required runtime handling | Counts as achieved? |",
                 "|---|---|---|---|---|",
                 "| coverage-ceiling fixture | yes | execute | run fixture checks | yes if skeleton evidence exists |",
                 "",
-                "## Target-Producing Spine",
+                "## Steps That Make The Result True",
                 "",
                 "| Spine node | Required state transition | Required evidence |",
                 "|---|---|---|",
@@ -275,7 +275,7 @@ def write_runtime_chain(
                 "",
                 "Selected topology: `Main-only`",
                 "",
-                "Selected delegation substrate: `none`",
+                "Selected agent workflow: `none`",
                 "",
                 "Topology rationale:",
                 "",
@@ -345,18 +345,18 @@ def write_runtime_chain(
         "## Review Independence",
         "",
         "- Context management / execution topology: `yes`",
-        f"- Design skeleton fidelity: `{review_design_skeleton_independence}`",
+        f"- Design answer method check: `{review_design_skeleton_independence}`",
         "- Purpose feedback adequacy: `yes`",
         "- Realization surface closure adequacy: `yes`",
         "- Target achievement predicate fidelity: `yes`",
-        "- Target-producing spine fidelity: `yes`",
-        "- Execution horizon and authority fidelity: `yes`",
+        "- answer path check: `yes`",
+        "- Work covered in this run and authority fidelity: `yes`",
         "",
     ]
     if include_review_design_skeleton:
         review_parts.extend(
             [
-                "## Design Skeleton Fidelity",
+                "## Design Answer Method Check",
                 "",
                 "Findings:",
                 "- The design preserves coverage-ceiling-measurement and does not substitute full-workflow-run-validation.",
@@ -385,12 +385,12 @@ def write_runtime_chain(
             "Findings:",
             "- The single target-achieved predicate is separated from non-achieved terminal reports.",
             "",
-            "## Target-Producing Spine Fidelity",
+            "## Answer Path Check",
             "",
             "Findings:",
             "- Work packages map to coverage-ceiling spine transitions.",
             "",
-            "## Execution Horizon and Authority Fidelity",
+            "## Work Covered And Allowed Actions Check",
             "",
             "Findings:",
             "- Approved horizon and runtime authority are fixture-bounded.",
@@ -425,19 +425,19 @@ class DesignSkeletonFidelityTest(unittest.TestCase):
             ROOT / ".agents/skills/reviewing-cybernetic-control-structures/assets/control-review-template.md"
         ).read_text(encoding="utf-8")
 
-        for expected in ("Answering method", "Not-sufficient substitute", "Task skeleton family"):
+        for expected in ("How this should be answered", "What is not enough", "Answer type"):
             self.assertIn(expected, requirements_template)
 
         for expected in (
-            "Task Skeleton Fidelity",
-            "Approved answering method",
-            "Instantiated skeleton",
-            "Mandatory nodes coverage",
-            "Forbidden substitution avoided",
+            "Answer Method Check",
+            "Approved answer method",
+            "Required answer path",
+            "Required steps covered",
+            "What is not enough avoided",
         ):
             self.assertIn(expected, design_template)
 
-        self.assertIn("Design Skeleton Fidelity", review_template)
+        self.assertIn("Design Answer Method Check", review_template)
 
     def test_design_template_is_skeleton_first_not_model_first(self):
         design_template_path = ROOT / ".agents/skills/designing-cybernetic-solutions/assets/solution-design-template.md"
@@ -445,7 +445,7 @@ class DesignSkeletonFidelityTest(unittest.TestCase):
         design_template = design_template_path.read_text(encoding="utf-8")
         design_skill = design_skill_path.read_text(encoding="utf-8")
 
-        skeleton_index = design_template.index("## Task Skeleton Fidelity")
+        skeleton_index = design_template.index("## Answer Method Check")
         support_index = design_template.index("## Support Model Mapping")
         self.assertLess(skeleton_index, support_index)
         self.assertNotIn("## Conceptual Design", design_template)
@@ -499,7 +499,7 @@ class DesignSkeletonFidelityTest(unittest.TestCase):
         output = result.stdout + result.stderr
         self.assertNotEqual(result.returncode, 0)
         self.assertIn("NEXT: RunDesign", output)
-        self.assertIn("Task Skeleton Fidelity", output)
+        self.assertIn("Answer Method Check", output)
         self.assertIn("full-workflow-run-validation", output)
 
     def test_orchestration_guard_accepts_coverage_ceiling_skeleton_before_goal(self):
@@ -569,8 +569,8 @@ class DesignSkeletonFidelityTest(unittest.TestCase):
         output = result.stdout + result.stderr
         self.assertEqual(2, result.returncode, output)
         self.assertIn("NEXT: RunReview", output)
-        self.assertIn("Design Skeleton Fidelity", output)
-        self.assertIn("Design skeleton fidelity: yes", output)
+        self.assertIn("Design Answer Method Check", output)
+        self.assertIn("Design answer method check: yes", output)
 
     def test_runtime_contract_indexes_design_skeleton_fidelity(self):
         with tempfile.TemporaryDirectory() as tmpdir:
@@ -602,6 +602,6 @@ class DesignSkeletonFidelityTest(unittest.TestCase):
 
         self.assertEqual(0, result.returncode, result.stdout + result.stderr)
         self.assertIn("Use this /goal:", result.stdout)
-        self.assertIn("Task Skeleton Fidelity", contract_text)
-        self.assertIn("Design Skeleton Fidelity", contract_text)
-        self.assertIn("skeleton completion evidence", contract_text)
+        self.assertIn("Answer Method Check", contract_text)
+        self.assertIn("Design Answer Method Check", contract_text)
+        self.assertIn("answer method completion evidence", contract_text)

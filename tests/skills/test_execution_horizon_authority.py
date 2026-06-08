@@ -10,25 +10,25 @@ GUARD = ROOT / ".agents/skills/compiling-cybernetic-runtime-goals/scripts/contro
 COMPILER = ROOT / ".agents/skills/compiling-cybernetic-runtime-goals/scripts/compile_runtime_goal.py"
 
 
-HSA_APPROVED = """## Human Setpoint Approval
+HSA_APPROVED = """## What the User Approved
 
 Status: `Approved`
 
 | Element | Commitment |
 |---|---|
-| Human purpose | complete the approved execution horizon without shrinking it to the first safe segment |
+| Human purpose | complete the work covered in this run without shrinking it to the first safe segment |
 | Input role binding | fixture source material is approved background |
 | Primary object | horizon and authority fidelity fixture |
 | Requested transformation | approved full horizon into bounded runtime execution |
 | Non-goals | do not execute forbidden live actions |
 | Purpose Feedback Boundary | purpose feedback remains separately calibrated |
 | Realization Surface Closure | RSC remains separately calibrated |
-| Single target-achieved predicate | approved horizon coverage is accounted for |
-| Target-producing evidence required | horizon coverage matrix and authorized execution evidence exist |
+| What counts as done | approved horizon coverage is accounted for |
+| Evidence needed to call it done | horizon coverage matrix and authorized execution evidence exist |
 | Non-achieved terminal report handling | report goal achieved: no when approved horizon is only partially covered |
-| Target-producing path | EHA guard fixture spine |
-| Execution horizon | Batch 1 through Batch 8 are in the approved horizon |
-| Runtime authority | local code, local tests, local smoke, ledgers, runbooks, and evidence packages may be executed |
+| Required answer path | EHA guard fixture spine |
+| Work covered in this run | Batch 1 through Batch 8 are in the approved horizon |
+| What the agent may do | local code, local tests, local smoke, ledgers, runbooks, and evidence packages may be executed |
 | Forbidden live / irreversible actions | remote deployment, production nginx cutover, service restart, and production artifact overwrite |
 | Required handling for unauthorized actions | prepare runbook / rollback / evidence checklist and report not executed |
 | Explicitly out-of-scope items | none |
@@ -105,16 +105,16 @@ class ExecutionHorizonAuthorityTest(unittest.TestCase):
             "",
             "| Element | Requirement |",
             "|---|---|",
-            "| Single target-achieved predicate | approved horizon coverage is accounted for |",
+            "| What counts as done | approved horizon coverage is accounted for |",
             "| Required target-producing evidence | horizon coverage matrix and authorized execution evidence exist |",
             "| Allowed achieved claim | `goal achieved: yes` only when approved horizon coverage is accounted for |",
-            "| Target-producing spine | EHA guard fixture spine |",
+            "| Steps that make the result true | EHA guard fixture spine |",
             "",
         ]
         if include_goal_eha:
             goal_parts.extend(
                 [
-                    "## Execution Horizon and Authority Contract",
+                    "## Work Covered And Allowed Actions Contract",
                     "",
                     "| Element | Requirement |",
                     "|---|---|",
@@ -145,9 +145,9 @@ class ExecutionHorizonAuthorityTest(unittest.TestCase):
         if include_plan_eha:
             plan_parts.extend(
                 [
-                    "## Horizon and Authority Coverage Matrix",
+                    "## Work Coverage And Action Limits Matrix",
                     "",
-                    "| Batch / surface | In approved horizon? | Runtime authority | Required runtime handling | Counts as achieved? |",
+                    "| Batch / surface | In approved horizon? | What the agent may do | Required runtime handling | Counts as achieved? |",
                     "|---|---|---|---|---|",
                     "| Batch 1 local route parity | yes | execute | modify and test locally | yes if sensors pass |",
                     "| Batch 6 remote deployment | yes | forbidden-not-executed | prepare runbook and rollback checklist | no live claim |",
@@ -158,7 +158,7 @@ class ExecutionHorizonAuthorityTest(unittest.TestCase):
             plan_parts.append("")
         plan_parts.extend(
             [
-                "## Target-Producing Spine",
+                "## Steps That Make The Result True",
                 "",
                 "| Spine node | Required state transition | Required evidence |",
                 "|---|---|---|",
@@ -191,7 +191,7 @@ class ExecutionHorizonAuthorityTest(unittest.TestCase):
                 "",
                 "Selected topology: `Main-only`",
                 "",
-                "Selected delegation substrate: `none`",
+                "Selected agent workflow: `none`",
                 "",
                 "Topology rationale:",
                 "",
@@ -258,8 +258,8 @@ class ExecutionHorizonAuthorityTest(unittest.TestCase):
             "- Purpose feedback adequacy: `yes`",
             "- Realization surface closure adequacy: `yes`",
             "- Target achievement predicate fidelity: `yes`",
-            "- Target-producing spine fidelity: `yes`",
-            f"- Execution horizon and authority fidelity: `{review_eha_independence}`",
+            "- answer path check: `yes`",
+            f"- Work covered in this run and authority fidelity: `{review_eha_independence}`",
             "",
             "## Context Management / Execution Topology",
             "",
@@ -281,7 +281,7 @@ class ExecutionHorizonAuthorityTest(unittest.TestCase):
             "Findings:",
             "- The single target-achieved predicate is separated from non-achieved terminal reports.",
             "",
-            "## Target-Producing Spine Fidelity",
+            "## Answer Path Check",
             "",
             "Findings:",
             "- Work packages map to the fixture spine node.",
@@ -290,7 +290,7 @@ class ExecutionHorizonAuthorityTest(unittest.TestCase):
         if include_review_eha:
             review_parts.extend(
                 [
-                    "## Execution Horizon and Authority Fidelity",
+                    "## Work Covered And Allowed Actions Check",
                     "",
                     "Findings:",
                     "- Approved horizon remains in scope while authority limits define execute / prepare-only / forbidden-not-executed handling.",
@@ -342,25 +342,25 @@ class ExecutionHorizonAuthorityTest(unittest.TestCase):
         review = self.read(".agents/skills/reviewing-cybernetic-control-structures/assets/control-review-template.md")
 
         for required in (
-            "Execution horizon",
-            "Runtime authority",
+            "Work covered in this run",
+            "What the agent may do",
             "Forbidden live / irreversible actions",
             "Required handling for unauthorized actions",
             "Explicitly out-of-scope items",
         ):
             self.assertIn(required, requirements)
 
-        self.assertIn("Execution Horizon and Authority Contract", goal)
+        self.assertIn("Work Covered And Allowed Actions Contract", goal)
         self.assertIn("Approved horizon", goal)
         self.assertIn("Runtime-authorized actions", goal)
         self.assertIn("Horizon completion rule", goal)
 
-        self.assertIn("Horizon and Authority Coverage Matrix", plan)
-        self.assertIn("Runtime authority", plan)
+        self.assertIn("Work Coverage And Action Limits Matrix", plan)
+        self.assertIn("What the agent may do", plan)
         self.assertIn("Required runtime handling", plan)
 
-        self.assertIn("Execution Horizon and Authority Fidelity", review)
-        self.assertIn("Execution horizon and authority fidelity", review)
+        self.assertIn("Work Covered And Allowed Actions Check", review)
+        self.assertIn("Work covered in this run and authority fidelity", review)
 
     def test_guard_accepts_complete_horizon_authority_chain(self):
         with tempfile.TemporaryDirectory() as tmpdir:
@@ -378,7 +378,7 @@ class ExecutionHorizonAuthorityTest(unittest.TestCase):
         output = result.stdout + result.stderr
         self.assertEqual(2, result.returncode, output)
         self.assertIn("NEXT: RunGoalWriting", output)
-        self.assertIn("Execution Horizon and Authority Contract", output)
+        self.assertIn("Work Covered And Allowed Actions Contract", output)
 
     def test_guard_rejects_plan_missing_horizon_authority_matrix(self):
         with tempfile.TemporaryDirectory() as tmpdir:
@@ -388,7 +388,7 @@ class ExecutionHorizonAuthorityTest(unittest.TestCase):
         output = result.stdout + result.stderr
         self.assertEqual(2, result.returncode, output)
         self.assertIn("NEXT: RunExecutionPolicy", output)
-        self.assertIn("Horizon and Authority Coverage Matrix", output)
+        self.assertIn("Work Coverage And Action Limits Matrix", output)
 
     def test_guard_rejects_review_missing_horizon_authority_fidelity(self):
         with tempfile.TemporaryDirectory() as tmpdir:
@@ -402,8 +402,8 @@ class ExecutionHorizonAuthorityTest(unittest.TestCase):
         output = result.stdout + result.stderr
         self.assertEqual(2, result.returncode, output)
         self.assertIn("NEXT: RunReview", output)
-        self.assertIn("Execution Horizon and Authority Fidelity", output)
-        self.assertIn("Execution horizon and authority fidelity: yes", output)
+        self.assertIn("Work Covered And Allowed Actions Check", output)
+        self.assertIn("Work covered in this run and authority fidelity: yes", output)
 
     def test_guard_rejects_future_roadmap_inside_approved_horizon_matrix(self):
         with tempfile.TemporaryDirectory() as tmpdir:
@@ -453,8 +453,8 @@ class ExecutionHorizonAuthorityTest(unittest.TestCase):
             contract_text = runtime_contract.read_text(encoding="utf-8") if runtime_contract.exists() else ""
 
         self.assertEqual(0, result.returncode, result.stdout + result.stderr)
-        self.assertIn("Horizon and Authority Coverage Matrix", contract_text)
-        self.assertIn("Execution Horizon and Authority Fidelity", contract_text)
+        self.assertIn("Work Coverage And Action Limits Matrix", contract_text)
+        self.assertIn("Work Covered And Allowed Actions Check", contract_text)
         self.assertIn("horizon coverage", contract_text)
         self.assertNotIn("future roadmap", contract_text.casefold())
 

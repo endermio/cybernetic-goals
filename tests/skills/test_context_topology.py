@@ -7,7 +7,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 
-HSA_FIXTURE = """## Human Setpoint Approval
+HSA_FIXTURE = """## What the User Approved
 
 Status: `Approved`
 
@@ -20,17 +20,17 @@ Status: `Approved`
 | Non-goals | do not test HSA behavior in this fixture |
 | Purpose Feedback Boundary | covered by dedicated PFB tests |
 | Realization Surface Closure | covered by dedicated RSC tests |
-| Single target-achieved predicate | context-topology guard fixture is structurally ready |
-| Target-producing evidence required | target-producing evidence is observed |
+| What counts as done | context-topology guard fixture is structurally ready |
+| Evidence needed to call it done | target-producing evidence is observed |
 | Non-achieved terminal report handling | report goal achieved: no |
-| Target-producing path | context topology guard fixture spine |
-| Execution horizon | context topology guard fixture horizon |
-| Runtime authority | local guard fixture checks |
+| Required answer path | context topology guard fixture spine |
+| Work covered in this run | context topology guard fixture horizon |
+| What the agent may do | local guard fixture checks |
 | Forbidden live / irreversible actions | none |
 | Required handling for unauthorized actions | none |
 | Explicitly out-of-scope items | none |
-| Runtime delegation preference | no preference |
-| Delegation substrate preference | no preference |
+| Agent delegation preference | no preference |
+| Agent workflow preference | no preference |
 | Parallel execution authority | not applicable |
 | Parallelism cap | not specified |
 | Output Contract | guard output |
@@ -56,7 +56,7 @@ class ContextTopologySkillTest(unittest.TestCase):
         selected_substrate_lines = []
         if selected_delegation_substrate is not None:
             selected_substrate_lines = [
-                f"Selected delegation substrate: `{selected_delegation_substrate}`",
+                f"Selected agent workflow: `{selected_delegation_substrate}`",
                 "",
             ]
         concurrency_lines = []
@@ -117,7 +117,7 @@ class ContextTopologySkillTest(unittest.TestCase):
                 "| Stop conditions | missing context, invariant conflict, unauthorized scope change |",
                 "| Expected return format | summary, files inspected, evidence, blockers, next integration note |",
                 "",
-                "Subagent delegation substrate:",
+                "Subagent workflow:",
                 "",
                 f"- {substrate}",
                 "",
@@ -188,7 +188,7 @@ class ContextTopologySkillTest(unittest.TestCase):
                 "",
                 "Task level: `Level 3`",
                 "",
-                f"Selected delegation substrate: `{selected_delegation_substrate}`",
+                f"Selected agent workflow: `{selected_delegation_substrate}`",
                 "",
                 *concurrency_lines,
                 "Topology rationale:",
@@ -222,7 +222,7 @@ class ContextTopologySkillTest(unittest.TestCase):
                 "| Stop conditions | missing context, invariant conflict, unauthorized scope change |",
                 "| Expected return format | summary, files inspected, evidence, blockers, next integration note |",
                 "",
-                "Subagent delegation substrate:",
+                "Subagent workflow:",
                 "",
                 f"- {substrate_note}",
                 "",
@@ -304,12 +304,12 @@ class ContextTopologySkillTest(unittest.TestCase):
                     "",
                     "| Element | Requirement |",
                     "|---|---|",
-                    "| Single target-achieved predicate | context-topology guard fixture is structurally ready |",
+                    "| What counts as done | context-topology guard fixture is structurally ready |",
                     "| Required target-producing evidence | target-producing evidence is observed |",
                     "| Allowed achieved claim | only target-achieved predicate supports goal achieved: yes |",
-                    "| Target-producing spine | context topology guard fixture spine |",
+                    "| Steps that make the result true | context topology guard fixture spine |",
                     "",
-                    "## Execution Horizon and Authority Contract",
+                    "## Work Covered And Allowed Actions Contract",
                     "",
                     "| Element | Requirement |",
                     "|---|---|",
@@ -338,13 +338,13 @@ class ContextTopologySkillTest(unittest.TestCase):
                     f"- Requirements analysis: `{requirements}`",
                     f"- Goal contract: `{goal}`",
                     "",
-                    "## Horizon and Authority Coverage Matrix",
+                    "## Work Coverage And Action Limits Matrix",
                     "",
-                    "| Batch / surface | In approved horizon? | Runtime authority | Required runtime handling | Counts as achieved? |",
+                    "| Batch / surface | In approved horizon? | What the agent may do | Required runtime handling | Counts as achieved? |",
                     "|---|---|---|---|---|",
                     "| context topology guard fixture | yes | execute | run guard / compiler fixture checks | yes if fixture passes |",
                     "",
-                    "## Target-Producing Spine",
+                    "## Steps That Make The Result True",
                     "",
                     "| Spine node | Required state transition | Required evidence |",
                     "|---|---|---|",
@@ -446,14 +446,14 @@ class ContextTopologySkillTest(unittest.TestCase):
                     "- Purpose feedback adequacy: `yes`",
                     "- Realization surface closure adequacy: `yes`",
                     "- Target achievement predicate fidelity: `yes`",
-                    "- Target-producing spine fidelity: `yes`",
-                    "- Execution horizon and authority fidelity: `yes`",
+                    "- answer path check: `yes`",
+                    "- Work covered in this run and authority fidelity: `yes`",
                     "- Subagent concurrency fidelity: `yes`",
                     "",
                     "## Context Management / Execution Topology",
                     "",
                     "Findings:",
-                    "- Reviewed selected topology, context pack requirements, delegation substrate, context compression, and integration gates; no Blocking/Major findings.",
+                    "- Reviewed selected topology, context pack requirements, agent workflow, context compression, and integration gates; no Blocking/Major findings.",
                     "",
                     "## Purpose Feedback Adequacy",
                     "",
@@ -476,12 +476,12 @@ class ContextTopologySkillTest(unittest.TestCase):
                     "Findings:",
                     "- The single target-achieved predicate is separated from non-achieved terminal reports.",
                     "",
-                    "## Target-Producing Spine Fidelity",
+                    "## Answer Path Check",
                     "",
                     "Findings:",
                     "- Work packages map to the fixture spine node.",
                     "",
-                    "## Execution Horizon and Authority Fidelity",
+                    "## Work Covered And Allowed Actions Check",
                     "",
                     "Findings:",
                     "- Approved horizon and runtime authority are compact and fixture-bounded.",
@@ -489,7 +489,7 @@ class ContextTopologySkillTest(unittest.TestCase):
                     "## Subagent Concurrency Fidelity",
                     "",
                     "Findings:",
-                    "- Subagent execution mode matches the selected topology and fixture delegation substrate.",
+                    "- Subagent execution mode matches the selected topology and fixture agent workflow.",
                     "",
                 ]
             )
@@ -535,7 +535,7 @@ class ContextTopologySkillTest(unittest.TestCase):
             self.assertIn("Task level", text)
             self.assertIn("Context Pack Requirements", text)
             self.assertIn("Context Compression Rule", text)
-            self.assertIn("Selected delegation substrate", text)
+            self.assertIn("Selected agent workflow", text)
             self.assertIn("delegation-substrate-registry.json", text)
 
         self.assertIn("main agent owns", template.casefold())
@@ -624,7 +624,7 @@ class ContextTopologySkillTest(unittest.TestCase):
         self.assertIn("Execute the runtime goal contract at", result.stdout)
         self.assertNotIn("$superpowers:subagent-driven-development", result.stdout)
         self.assertIn("Selected topology: `Serial subagent-driven`", contract_text)
-        self.assertIn("Selected delegation substrate: `bounded-protocol`", contract_text)
+        self.assertIn("Selected agent workflow: `bounded-protocol`", contract_text)
         self.assertIn("bounded delegation protocol", contract_text)
         self.assertNotIn("Execute serially according to the approved batch rhythm", result.stdout)
 
@@ -668,7 +668,7 @@ class ContextTopologySkillTest(unittest.TestCase):
 
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
         self.assertNotIn("$superpowers:subagent-driven-development", result.stdout)
-        self.assertIn("Selected delegation substrate: `superpowers-subagent-driven-development`", contract_text)
+        self.assertIn("Selected agent workflow: `superpowers-subagent-driven-development`", contract_text)
         self.assertIn("$superpowers:subagent-driven-development", contract_text)
         self.assertNotIn("$superpowers:dispatching-parallel-agents", contract_text)
 
@@ -712,7 +712,7 @@ class ContextTopologySkillTest(unittest.TestCase):
 
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
         self.assertNotIn("$superpowers:dispatching-parallel-agents", result.stdout)
-        self.assertIn("Selected delegation substrate: `superpowers-dispatching-parallel-agents`", contract_text)
+        self.assertIn("Selected agent workflow: `superpowers-dispatching-parallel-agents`", contract_text)
         self.assertIn("$superpowers:dispatching-parallel-agents", contract_text)
         self.assertNotIn("$superpowers:subagent-driven-development` only", contract_text)
 
@@ -756,8 +756,8 @@ class ContextTopologySkillTest(unittest.TestCase):
 
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
         self.assertNotIn("$superpowers:subagent-driven-development", result.stdout)
-        self.assertIn("Selected delegation substrate: `bounded-protocol`", contract_text)
-        self.assertNotIn("Selected delegation substrate: `superpowers-subagent-driven-development`", contract_text)
+        self.assertIn("Selected agent workflow: `bounded-protocol`", contract_text)
+        self.assertNotIn("Selected agent workflow: `superpowers-subagent-driven-development`", contract_text)
 
     def test_control_chain_guard_requires_review_of_context_topology(self):
         with tempfile.TemporaryDirectory() as tmpdir:
@@ -879,7 +879,7 @@ class ContextTopologySkillTest(unittest.TestCase):
         for result in (control_guard, orchestration_guard):
             output = result.stdout + result.stderr
             self.assertNotEqual(result.returncode, 0)
-            self.assertIn("Selected delegation substrate", output)
+            self.assertIn("Selected agent workflow", output)
 
     def test_guards_reject_none_selected_delegation_substrate_for_subagent_topology(self):
         with tempfile.TemporaryDirectory() as tmpdir:
@@ -932,7 +932,7 @@ class ContextTopologySkillTest(unittest.TestCase):
         for result in (control_guard, orchestration_guard):
             output = result.stdout + result.stderr
             self.assertNotEqual(result.returncode, 0)
-            self.assertIn("Selected delegation substrate", output)
+            self.assertIn("Selected agent workflow", output)
 
     def test_guards_reject_level_3_main_only_without_context_load_justification(self):
         topology_body = "\n".join(
@@ -1008,7 +1008,7 @@ class ContextTopologySkillTest(unittest.TestCase):
             [
                 "Selected topology: `Main-only`",
                 "",
-                "Selected delegation substrate: `none`",
+                "Selected agent workflow: `none`",
                 "",
                 "Topology rationale:",
                 "",
@@ -1269,8 +1269,8 @@ class ContextTopologySkillTest(unittest.TestCase):
             )
             requirements.write_text(
                 requirements.read_text(encoding="utf-8").replace(
-                    "| Runtime delegation preference | no preference |",
-                    "| Runtime delegation preference | max-safe-parallel |",
+                    "| Agent delegation preference | no preference |",
+                    "| Agent delegation preference | max-safe-parallel |",
                 ).replace(
                     "| Parallel execution authority | not applicable |",
                     "| Parallel execution authority | approved |",
@@ -1535,12 +1535,12 @@ class ContextTopologySkillTest(unittest.TestCase):
             requirements.write_text(
                 requirements.read_text(encoding="utf-8")
                 .replace(
-                    "| Runtime delegation preference | no preference |",
-                    "| Runtime delegation preference | max-safe-parallel |",
+                    "| Agent delegation preference | no preference |",
+                    "| Agent delegation preference | max-safe-parallel |",
                 )
                 .replace(
-                    "| Delegation substrate preference | no preference |",
-                    "| Delegation substrate preference | superpowers-subagent-driven-development |",
+                    "| Agent workflow preference | no preference |",
+                    "| Agent workflow preference | superpowers-subagent-driven-development |",
                 )
                 .replace(
                     "| Parallel execution authority | not applicable |",
@@ -1577,7 +1577,7 @@ class ContextTopologySkillTest(unittest.TestCase):
         output = result.stdout + result.stderr
         self.assertNotEqual(result.returncode, 0)
         self.assertIn("NEXT: ReturnToRequirementsAnalysis", output)
-        self.assertIn("Delegation substrate preference", output)
+        self.assertIn("Agent workflow preference", output)
         self.assertIn("max-safe-parallel", output)
 
     def test_runtime_compiler_preserves_and_can_expect_subagent_execution_mode(self):
@@ -1672,7 +1672,7 @@ class ContextTopologySkillTest(unittest.TestCase):
                 "|---|---|---|---|---|---|",
                 "| Package A | serial subagent | requirements, goal, plan | inspect files | summary | review |",
                 "",
-                "Subagent delegation substrate:",
+                "Subagent workflow:",
                 "",
                 "- Runtime target-work delegation uses `$superpowers:subagent-driven-development` discipline.",
                 "",

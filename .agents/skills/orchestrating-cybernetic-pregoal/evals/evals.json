@@ -3,7 +3,7 @@
   "evals": [
     {
       "id": "orchestrates-complete-requirements-analysis-with-subagents",
-      "prompt": "使用 $orchestrating-cybernetic-pregoal 根据 docs/cybernetics/requirements/control-relationship.md 自动完成 pre-goal 编译，requirements analysis contains Human Setpoint Approval: Approved，允许使用 subagents 做独立 review。若 review 无法收敛，停止并报告阻塞点。",
+      "prompt": "使用 $orchestrating-cybernetic-pregoal 根据 docs/cybernetics/requirements/control-relationship.md 自动完成 pre-goal 编译，requirements analysis contains What the User Approved: Approved，允许使用 subagents 做独立 review。若 review 无法收敛，停止并报告阻塞点。",
       "expected_output": "The skill should validate the completed requirements analysis, create or update goal, execution policy, control review, run authorized subagent review cycles, and compile a final runtime /goal command without starting /goal execution.",
       "assertions": [
         "The response explicitly notes that pre-goal review subagents are allowed because the user authorized them.",
@@ -18,7 +18,7 @@
     },
     {
       "id": "no-subagents-candidate-only",
-      "prompt": "使用 $orchestrating-cybernetic-pregoal 根据 docs/cybernetics/requirements/control-relationship.md 自动完成 pre-goal 编译，requirements analysis contains Human Setpoint Approval: Approved。",
+      "prompt": "使用 $orchestrating-cybernetic-pregoal 根据 docs/cybernetics/requirements/control-relationship.md 自动完成 pre-goal 编译，requirements analysis contains What the User Approved: Approved。",
       "expected_output": "Because the user did not explicitly authorize subagents, the skill may create candidate artifacts but must not claim independent review or emit an approved runtime /goal unless independent review or explicit control-review approval of the review findings exists.",
       "assertions": [
         "The response does not claim to spawn subagents.",
@@ -55,22 +55,22 @@
     },
     {
       "id": "orchestrator-blocks-without-human-setpoint-approval",
-      "prompt": "Run pre-goal orchestration from a Complete requirements analysis that lacks Human Setpoint Approval.",
+      "prompt": "Run pre-goal orchestration from a Complete requirements analysis that lacks What the User Approved.",
       "expected_output": "Blocks before solution design and asks for approval or revision of the compact control commitment.",
       "assertions": [
         "Does not invoke solution design.",
         "Does not write a goal contract.",
         "Does not write an execution policy.",
-        "Reports Human Setpoint Approval missing.",
+        "Reports What the User Approved missing.",
         "Returns to requirements approval."
       ]
     },
     {
       "id": "explicit-current-message-approval-allows-orchestration",
       "prompt": "Requirements brief is Complete and the user says: 批准这个 setpoint，进入 orchestration.",
-      "expected_output": "Allows orchestration because explicit approval exists and records Human Setpoint Approval: Approved before downstream stages.",
+      "expected_output": "Allows orchestration because explicit approval exists and records What the User Approved: Approved before downstream stages.",
       "assertions": [
-        "Records Human Setpoint Approval: Approved.",
+        "Records What the User Approved: Approved.",
         "Quotes or references the approval phrase.",
         "Allows the next step to be orchestration.",
         "Does not treat a method preference alone as approval."
@@ -78,7 +78,7 @@
     },
     {
       "id": "runtime-goal-does-not-write-plan",
-      "prompt": "使用 $orchestrating-cybernetic-pregoal 编译最终 /goal。已有 complete requirements analysis with Human Setpoint Approval: Approved、goal、approved plan、approved review。",
+      "prompt": "使用 $orchestrating-cybernetic-pregoal 编译最终 /goal。已有 complete requirements analysis with What the User Approved: Approved、goal、approved plan、approved review。",
       "expected_output": "The final response should emit a runtime goal contract artifact plus a short pointer-only /goal. The runtime contract should index approved artifacts, and the user-entered /goal must not instruct Codex to write or approve its own plan inside runtime.",
       "assertions": [
         "The runtime goal contract references the approved plan path.",
@@ -92,7 +92,7 @@
     },
     {
       "id": "uses-requirements-analysis-slug-for-artifacts",
-      "prompt": "使用 $orchestrating-cybernetic-pregoal 根据 docs/cybernetics/requirements/2026-05-22-control-relationship.md 完成 pre-goal 编译，requirements analysis contains Human Setpoint Approval: Approved，允许使用 subagents review。",
+      "prompt": "使用 $orchestrating-cybernetic-pregoal 根据 docs/cybernetics/requirements/2026-05-22-control-relationship.md 完成 pre-goal 编译，requirements analysis contains What the User Approved: Approved，允许使用 subagents review。",
       "expected_output": "The skill should create or update design when required, goal, plan, and control review paths using the same 2026-05-22-control-relationship slug and should not invent a different slug.",
       "assertions": [
         "The goal path is docs/cybernetics/goals/2026-05-22-control-relationship.md.",
@@ -104,7 +104,7 @@
     },
     {
       "id": "review-nonconvergence-blocks",
-      "prompt": "使用 $orchestrating-cybernetic-pregoal 自动编译，requirements analysis contains Human Setpoint Approval: Approved，允许 subagents。review 两轮后仍然发现 plan 把 direct-observation semantics 改成 mediated-reporting。",
+      "prompt": "使用 $orchestrating-cybernetic-pregoal 自动编译，requirements analysis contains What the User Approved: Approved，允许 subagents。review 两轮后仍然发现 plan 把 direct-observation semantics 改成 mediated-reporting。",
       "expected_output": "The skill should block compilation, report the unresolved semantic conflict, and output the next allowed action rather than compiling a runtime /goal.",
       "assertions": [
         "The response states that review did not converge.",
@@ -129,7 +129,7 @@
     },
     {
       "id": "no-independent-review-no-approval",
-      "prompt": "使用 $orchestrating-cybernetic-pregoal 自动编译，requirements analysis contains Human Setpoint Approval: Approved。所有 artifact 看起来一致，但没有 subagent 授权、没有显式 control-review approval，也没有其他独立 reviewer。",
+      "prompt": "使用 $orchestrating-cybernetic-pregoal 自动编译，requirements analysis contains What the User Approved: Approved。所有 artifact 看起来一致，但没有 subagent 授权、没有显式 control-review approval，也没有其他独立 reviewer。",
       "expected_output": "The orchestrator creates candidate artifacts at most and marks review Needs Independent Review instead of Approved.",
       "assertions": [
         "Does not mark self-review as Approved.",
@@ -141,7 +141,7 @@
     },
     {
       "id": "post-review-revision-requires-final-observer",
-      "prompt": "使用 $orchestrating-cybernetic-pregoal 自动编译，requirements analysis contains Human Setpoint Approval: Approved，允许 subagents。第二轮 reviewer 发现 evidence structure 和 progress log 字段 blocker；主 agent 修改 plan/goal 后只跑 lint PASS，没有让 reviewer 复审，就想标 Approved 并编译 /goal。",
+      "prompt": "使用 $orchestrating-cybernetic-pregoal 自动编译，requirements analysis contains What the User Approved: Approved，允许 subagents。第二轮 reviewer 发现 evidence structure 和 progress log 字段 blocker；主 agent 修改 plan/goal 后只跑 lint PASS，没有让 reviewer 复审，就想标 Approved 并编译 /goal。",
       "expected_output": "The orchestrator blocks approval and runtime /goal compilation because substantive post-review changes remain dirty without final independent re-review.",
       "assertions": [
         "Mentions the Final Observer Rule or no Approved state after unreviewed substantive mutation.",
@@ -153,7 +153,7 @@
     },
     {
       "id": "inserts-design-stage-when-design-gate-required",
-      "prompt": "使用 $orchestrating-cybernetic-pregoal 根据 docs/cybernetics/requirements/2026-05-22-control-relationship.md 完成 pre-goal 编译，requirements analysis contains Human Setpoint Approval: Approved，允许使用 subagents review。requirements analysis 标记 Design Gate required，且 design artifact 不存在。",
+      "prompt": "使用 $orchestrating-cybernetic-pregoal 根据 docs/cybernetics/requirements/2026-05-22-control-relationship.md 完成 pre-goal 编译，requirements analysis contains What the User Approved: Approved，允许使用 subagents review。requirements analysis 标记 Design Gate required，且 design artifact 不存在。",
       "expected_output": "The orchestrator runs or requests designing-cybernetic-solutions before goal writing, then reviews requirements analysis, design, goal, and plan.",
       "assertions": [
         "Derives design path docs/cybernetics/designs/2026-05-22-control-relationship.md.",
@@ -165,7 +165,7 @@
     },
     {
       "id": "orchestrator-cannot-skip-required-design",
-      "prompt": "Requirements analysis is Complete, contains Human Setpoint Approval: Approved, and says Design Gate: required, but no design artifact exists. Orchestrate pre-goal compilation.",
+      "prompt": "Requirements analysis is Complete, contains What the User Approved: Approved, and says Design Gate: required, but no design artifact exists. Orchestrate pre-goal compilation.",
       "expected_output": "The orchestrator must stop before goal writing and request or invoke $designing-cybernetic-solutions.",
       "assertions": [
         "Does not create a goal contract.",
@@ -177,7 +177,7 @@
     },
     {
       "id": "orchestrator-blocks-when-design-skill-unavailable",
-      "prompt": "Requirements analysis is Complete, contains Human Setpoint Approval: Approved, and says Design Gate: required. $designing-cybernetic-solutions is unavailable. Orchestrate pre-goal compilation.",
+      "prompt": "Requirements analysis is Complete, contains What the User Approved: Approved, and says Design Gate: required. $designing-cybernetic-solutions is unavailable. Orchestrate pre-goal compilation.",
       "expected_output": "The orchestrator must block and report the missing downstream design skill instead of synthesizing solution design internally.",
       "assertions": [
         "Does not synthesize solution design inside the orchestrator.",
@@ -202,7 +202,7 @@
     },
     {
       "id": "existing-design-artifact-propagates-downstream",
-      "prompt": "Requirements analysis with Human Setpoint Approval: Approved, an existing solution design artifact, goal, execution policy, and review are being orchestrated. Design Gate is already satisfied, but the design artifact exists.",
+      "prompt": "Requirements analysis with What the User Approved: Approved, an existing solution design artifact, goal, execution policy, and review are being orchestrated. Design Gate is already satisfied, but the design artifact exists.",
       "expected_output": "The orchestrator must preserve and propagate the existing design artifact through goal, execution policy, review, and runtime compilation.",
       "assertions": [
         "Goal references the design.",
@@ -214,7 +214,7 @@
     },
     {
       "id": "orchestrator-cannot-compile-before-review",
-      "prompt": "Requirements with Human Setpoint Approval: Approved, design, goal, and execution policy exist, but control review is Needs Revision. Compile runtime /goal.",
+      "prompt": "Requirements with What the User Approved: Approved, design, goal, and execution policy exist, but control review is Needs Revision. Compile runtime /goal.",
       "expected_output": "The orchestrator must not compile runtime /goal before control review is Approved and Final Observer allows approval.",
       "assertions": [
         "Does not output a final runtime /goal.",
@@ -237,7 +237,7 @@
     },
     {
       "id": "orchestrator-propagates-execution-topology-without-deciding-it",
-      "prompt": "Requirements contain Human Setpoint Approval: Approved. Execution policy selects Serial subagent-driven topology and control review approves it. Orchestrate runtime compilation.",
+      "prompt": "Requirements contain What the User Approved: Approved. Execution policy selects Serial subagent-driven topology and control review approves it. Orchestrate runtime compilation.",
       "expected_output": "The orchestrator verifies and propagates the selected execution topology to runtime compilation without choosing or rewriting topology itself.",
       "assertions": [
         "Does not decide execution topology inside the orchestrator.",
@@ -249,7 +249,7 @@
     },
     {
       "id": "orchestrator-blocks-incomplete-subagent-topology",
-      "prompt": "Execution policy selects Serial subagent-driven topology but omits Context pack, Allowed actions, Return format, Integration gate, main-agent ownership, and delegation substrate. Orchestrate the transition to control review or runtime compilation.",
+      "prompt": "Execution policy selects Serial subagent-driven topology but omits Context pack, Allowed actions, Return format, Integration gate, main-agent ownership, and agent workflow. Orchestrate the transition to control review or runtime compilation.",
       "expected_output": "The orchestrator must block and return to execution-policy revision rather than letting an incomplete topology reach review/runtime compilation.",
       "assertions": [
         "Does not choose or repair topology inside the orchestrator.",

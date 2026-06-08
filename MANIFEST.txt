@@ -42,6 +42,7 @@
 .agents/skills/recording-cybernetic-run-outcomes/assets/run-outcome-template.md
 .agents/skills/recording-cybernetic-run-outcomes/evals/evals.json
 .agents/skills/references/delegation-substrate-registry.json
+.agents/skills/references/jargon-policy.yaml
 .agents/skills/references/task-skeleton-registry.json
 .agents/skills/reviewing-cybernetic-control-structures/SKILL.md
 .agents/skills/reviewing-cybernetic-control-structures/agents/openai.yaml

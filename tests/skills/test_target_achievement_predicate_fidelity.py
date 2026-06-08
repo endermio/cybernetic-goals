@@ -11,7 +11,7 @@ GUARD = ROOT / ".agents/skills/compiling-cybernetic-runtime-goals/scripts/contro
 COMPILER = ROOT / ".agents/skills/compiling-cybernetic-runtime-goals/scripts/compile_runtime_goal.py"
 
 
-HSA_APPROVED = """## Human Setpoint Approval
+HSA_APPROVED = """## What the User Approved
 
 Status: `Approved`
 
@@ -24,12 +24,12 @@ Status: `Approved`
 | Non-goals | do not create alternate success states |
 | Purpose Feedback Boundary | purpose feedback remains separately calibrated |
 | Realization Surface Closure | RSC remains separately calibrated |
-| Single target-achieved predicate | target-producing evidence is observed |
-| Target-producing evidence required | target-producing action runs or observation exists |
+| What counts as done | target-producing evidence is observed |
+| Evidence needed to call it done | target-producing action runs or observation exists |
 | Non-achieved terminal report handling | report goal achieved: no without creating alternate goals |
-| Target-producing path | TAP guard fixture spine |
-| Execution horizon | TAP guard fixture horizon |
-| Runtime authority | local guard fixture checks |
+| Required answer path | TAP guard fixture spine |
+| Work covered in this run | TAP guard fixture horizon |
+| What the agent may do | local guard fixture checks |
 | Forbidden live / irreversible actions | none |
 | Required handling for unauthorized actions | none |
 | Explicitly out-of-scope items | none |
@@ -72,15 +72,15 @@ class TargetAchievementPredicateFidelityTest(unittest.TestCase):
             [
                 "Codex may report `goal achieved: yes` only when:",
                 "",
-                "- Single target-achieved predicate in `Target Achievement Contract` is satisfied.",
+                "- What counts as done in `Target Achievement Contract` is satisfied.",
                 "- Required target-producing evidence is present.",
             ]
         )
         target_rows = [
-            "| Single target-achieved predicate | target-producing evidence is observed |",
+            "| What counts as done | target-producing evidence is observed |",
             "| Required target-producing evidence | target-producing action runs or observation exists |",
             "| Allowed achieved claim | `goal achieved: yes` only when the single predicate is met |",
-            "| Target-producing spine | TAP guard fixture spine |",
+            "| Steps that make the result true | TAP guard fixture spine |",
         ]
         target_rows.extend(target_contract_extra or [])
         goal.write_text(
@@ -125,7 +125,7 @@ class TargetAchievementPredicateFidelityTest(unittest.TestCase):
                     "|---|---|",
                     *target_rows,
                     "",
-                    "## Execution Horizon and Authority Contract",
+                    "## Work Covered And Allowed Actions Contract",
                     "",
                     "| Element | Requirement |",
                     "|---|---|",
@@ -153,13 +153,13 @@ class TargetAchievementPredicateFidelityTest(unittest.TestCase):
             f"- Requirements analysis: `{requirements}`",
             f"- Goal contract: `{goal}`",
             "",
-            "## Horizon and Authority Coverage Matrix",
+            "## Work Coverage And Action Limits Matrix",
             "",
-            "| Batch / surface | In approved horizon? | Runtime authority | Required runtime handling | Counts as achieved? |",
+            "| Batch / surface | In approved horizon? | What the agent may do | Required runtime handling | Counts as achieved? |",
             "|---|---|---|---|---|",
             "| TAP guard fixture | yes | execute | run guard / compiler fixture checks | yes if fixture passes |",
             "",
-            "## Target-Producing Spine",
+            "## Steps That Make The Result True",
             "",
             "| Spine node | Required state transition | Required evidence |",
             "|---|---|---|",
@@ -200,7 +200,7 @@ class TargetAchievementPredicateFidelityTest(unittest.TestCase):
                 "",
                 "Selected topology: `Main-only`",
                 "",
-                "Selected delegation substrate: `none`",
+                "Selected agent workflow: `none`",
                 "",
                 "Topology rationale:",
                 "",
@@ -267,8 +267,8 @@ class TargetAchievementPredicateFidelityTest(unittest.TestCase):
             "- Purpose feedback adequacy: `yes`",
             "- Realization surface closure adequacy: `yes`",
             f"- Target achievement predicate fidelity: `{review_tap_independence}`",
-            "- Target-producing spine fidelity: `yes`",
-            "- Execution horizon and authority fidelity: `yes`",
+            "- answer path check: `yes`",
+            "- Work covered in this run and authority fidelity: `yes`",
             "",
             "## Context Management / Execution Topology",
             "",
@@ -298,12 +298,12 @@ class TargetAchievementPredicateFidelityTest(unittest.TestCase):
             )
         review_parts.extend(
             [
-                "## Target-Producing Spine Fidelity",
+                "## Answer Path Check",
                 "",
                 "Findings:",
                 "- Work packages map to the fixture spine node.",
                 "",
-                "## Execution Horizon and Authority Fidelity",
+                "## Work Covered And Allowed Actions Check",
                 "",
                 "Findings:",
                 "- Approved horizon and runtime authority are compact and fixture-bounded.",
@@ -354,8 +354,8 @@ class TargetAchievementPredicateFidelityTest(unittest.TestCase):
         combined = "\n".join(self.read(path) for path in files)
 
         for required in (
-            "Single target-achieved predicate",
-            "Target-producing evidence required",
+            "What counts as done",
+            "Evidence needed to call it done",
             "Target Achievement Contract",
             "Target-Producing Action Strategy",
             "Target Achievement Predicate Fidelity",
@@ -433,7 +433,7 @@ class TargetAchievementPredicateFidelityTest(unittest.TestCase):
             requirements, goal, plan, review = self.write_chain(
                 Path(tmpdir),
                 target_contract_extra=[
-                    "| Alternative target-achieved predicate | a lower-cost report exists |",
+                    "| What counts as done | a lower-cost report exists |",
                 ],
             )
             result = self.guard(requirements, goal, plan, review)
@@ -441,7 +441,7 @@ class TargetAchievementPredicateFidelityTest(unittest.TestCase):
         output = result.stdout + result.stderr
         self.assertEqual(2, result.returncode, output)
         self.assertIn("NEXT: RunGoalWriting", output)
-        self.assertIn("exactly one target-achieved predicate", output)
+        self.assertIn("exactly one What counts as done field", output)
 
     def test_guard_rejects_plan_missing_target_producing_action_strategy(self):
         with tempfile.TemporaryDirectory() as tmpdir:
@@ -474,7 +474,7 @@ class TargetAchievementPredicateFidelityTest(unittest.TestCase):
         skill = self.read(".agents/skills/compiling-cybernetic-runtime-goals/SKILL.md")
 
         for text in (compiler, template, skill):
-            self.assertIn("single target-achieved predicate met: yes/no", text)
+            self.assertIn("what counts as done met: yes/no", text)
             self.assertIn("non-achieved reason", text)
             self.assertIn("target-producing action attempted or proof of impossibility", text)
             self.assertNotIn("fallback reason", text)
@@ -506,8 +506,8 @@ class TargetAchievementPredicateFidelityTest(unittest.TestCase):
 
         self.assertEqual(0, result.returncode, result.stdout + result.stderr)
         self.assertIn("Use this /goal:", result.stdout)
-        self.assertNotIn("single target-achieved predicate met: yes/no", result.stdout)
-        self.assertIn("single target-achieved predicate met: yes/no", contract_text)
+        self.assertNotIn("what counts as done met: yes/no", result.stdout)
+        self.assertIn("what counts as done met: yes/no", contract_text)
         self.assertIn("non-achieved reason", contract_text)
         self.assertNotIn("fallback reason", result.stdout)
 
@@ -578,7 +578,7 @@ class TargetAchievementPredicateFidelityTest(unittest.TestCase):
         self.assertIn("docs/cybernetics/runtime-goals/fixture.goal.md", pointer)
         self.assertNotIn("Purpose Feedback Boundary", pointer)
         self.assertNotIn("Realization Surface Closure", pointer)
-        self.assertNotIn("single target-achieved predicate met", pointer)
+        self.assertNotIn("what counts as done met", pointer)
         self.assertNotIn("subagent outputs are candidate results", pointer.casefold())
 
         self.assertIn("## Approved Control Chain", contract_text)
@@ -587,7 +587,7 @@ class TargetAchievementPredicateFidelityTest(unittest.TestCase):
         self.assertIn(str(plan), contract_text)
         self.assertIn(str(review), contract_text)
         self.assertIn("## Required Sections To Read", contract_text)
-        self.assertIn("Human Setpoint Approval", contract_text)
+        self.assertIn("What the User Approved", contract_text)
         self.assertIn("Target Achievement Contract", contract_text)
         self.assertIn("Purpose Feedback Contract", contract_text)
         self.assertIn("Realization Surface Contract", contract_text)
@@ -598,7 +598,7 @@ class TargetAchievementPredicateFidelityTest(unittest.TestCase):
         self.assertIn("Realization Surface Closure Adequacy", contract_text)
         self.assertIn("Final Observer Check", contract_text)
         self.assertIn("goal achieved: yes/no", contract_text)
-        self.assertIn("single target-achieved predicate met: yes/no", contract_text)
+        self.assertIn("what counts as done met: yes/no", contract_text)
         self.assertIn("smallest next target-producing attempt", contract_text)
 
     def test_matrix_and_evals_track_tap_invariant(self):

@@ -115,9 +115,9 @@ def main() -> int:
     if requirements_status != "Complete":
         return blocked(f"requirements analysis status is not Complete: {requirements_status!r}")
 
-    hsa_status = section_status(text, "Human Setpoint Approval")
+    hsa_status = section_status(text, "What the User Approved")
     if hsa_status != "Approved":
-        return blocked(f"Human Setpoint Approval is not Approved: {hsa_status!r}")
+        return blocked(f"What the User Approved is not Approved: {hsa_status!r}")
 
     paths = derive_paths(requirements_path)
     if paths is None:

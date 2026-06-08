@@ -47,6 +47,9 @@ SIZE_BUDGETS = {
     "review": (260, 500),
 }
 
+ROOT = Path(__file__).resolve().parents[1]
+JARGON_POLICY = ROOT / ".agents/skills/references/jargon-policy.yaml"
+
 
 @dataclass
 class Finding:
@@ -81,6 +84,73 @@ def artifact_kind(path: Path) -> str:
     if "control-reviews" in lowered or "review" in name:
         return "review"
     return "artifact"
+
+
+def repo_relative(path: Path) -> str:
+    try:
+        return path.resolve().relative_to(ROOT).as_posix()
+    except ValueError:
+        return path.as_posix()
+
+
+def simple_yaml_policy(path: Path = JARGON_POLICY) -> tuple[list[tuple[str, str]], list[str]]:
+    if not path.exists():
+        return [], []
+    terms: list[tuple[str, str]] = []
+    allowed_paths: list[str] = []
+    section: str | None = None
+    current_term: str | None = None
+    for raw_line in path.read_text(encoding="utf-8").splitlines():
+        line = raw_line.strip()
+        if not line or line.startswith("#"):
+            continue
+        if line.endswith(":") and not line.startswith("-"):
+            section = line[:-1]
+            current_term = None
+            continue
+        if section == "forbidden_in_user_artifacts":
+            if line.startswith("- term:"):
+                current_term = line.split(":", 1)[1].strip().strip('"')
+                continue
+            if current_term and line.startswith("replacement:"):
+                replacement = line.split(":", 1)[1].strip().strip('"')
+                terms.append((current_term, replacement))
+                current_term = None
+            continue
+        if section == "allowed_internal_paths" and line.startswith("- "):
+            allowed_paths.append(line[2:].strip().strip('"'))
+    return terms, allowed_paths
+
+
+def wildcard_path_match(path_text: str, pattern: str) -> bool:
+    if "*" not in pattern:
+        return path_text == pattern or path_text.startswith(pattern)
+    regex = "^" + re.escape(pattern).replace("\\*", ".*") + ".*$"
+    return bool(re.match(regex, path_text))
+
+
+def is_internal_language_path(path: Path) -> bool:
+    relative = repo_relative(path)
+    _terms, allowed_paths = simple_yaml_policy()
+    return any(wildcard_path_match(relative, pattern) for pattern in allowed_paths)
+
+
+def language_findings(path: Path, text: str) -> list[Finding]:
+    if is_internal_language_path(path):
+        return []
+    terms, _allowed_paths = simple_yaml_policy()
+    findings: list[Finding] = []
+    for term, replacement in terms:
+        pattern = re.compile(rf"\b{re.escape(term)}\b", re.IGNORECASE)
+        for match in pattern.finditer(text):
+            findings.append(
+                Finding(
+                    path,
+                    line_number(text, match.start()),
+                    f"user-visible jargon: {term}; use {replacement}",
+                )
+            )
+    return findings
 
 
 def duplicate_headings(path: Path, text: str) -> list[Finding]:
@@ -122,6 +192,7 @@ def duplicate_paragraphs(path: Path, text: str) -> list[Finding]:
 
 def hard_findings(path: Path, text: str) -> list[Finding]:
     findings: list[Finding] = []
+    findings.extend(language_findings(path, text))
 
     for match in ENUM_STATUS_RE.finditer(text):
         findings.append(Finding(path, line_number(text, match.start()), "unresolved enum status"))

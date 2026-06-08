@@ -1,6 +1,6 @@
 ---
 name: writing-cybernetic-goals
-description: 'Use when confirmed requirements and any required design exist and a control contract must be written for a Level 2 bounded goal or Level 3/4 full pre-goal orchestration. For Level 3/4, Human Setpoint Approval is required.'
+description: 'Use when confirmed requirements and any required design exist and a control contract must be written for a Level 2 bounded goal or Level 3/4 full pre-goal orchestration. For Level 3/4, What the User Approved is required.'
 ---
 
 # Writing Cybernetic Goals
@@ -29,9 +29,9 @@ For Level 3, Level 4, or full pre-goal work, stop after creating the goal contra
 
 Recommend `$writing-cybernetic-execution-policies` or `$reviewing-cybernetic-control-structures` directly only when the user explicitly chose a manual pre-goal chain or `$orchestrating-cybernetic-pregoal` is unavailable.
 
-For Level 3, Level 4, or full pre-goal work, do not create the goal contract unless the requirements analysis contains `Human Setpoint Approval: Approved`, or the current user message explicitly approves the compact control commitment. Human answers to requirements questions are inputs, not approval.
+For Level 3, Level 4, or full pre-goal work, do not create the goal contract unless the requirements analysis contains `What the User Approved: Approved`, or the current user message explicitly approves the compact control commitment. Human answers to requirements questions are inputs, not approval.
 
-If the current user message approves the compact control commitment, update the requirements analysis `Human Setpoint Approval` section first, quoting or referencing that approval, then continue. Do not rely on in-memory approval to pass orchestration or runtime guards.
+If the current user message approves the compact control commitment, update the requirements analysis `What the User Approved` section first, quoting or referencing that approval, then continue. Do not rely on in-memory approval to pass orchestration or runtime guards.
 
 Do not put “first write a plan, then execute it” inside an execution `/goal` for complex work.
 
@@ -136,18 +136,18 @@ For compiled runtime goals, include `Target Achievement Contract`.
 
 The goal must preserve or define:
 
-- Single target-achieved predicate: the only predicate that allows `goal achieved: yes`;
+- What counts as done: the only predicate that allows `goal achieved: yes`;
 - Required target-producing evidence: what must be observed, produced, run, or measured;
-- Allowed achieved claim: wording allowed only when the single target-achieved predicate is met;
-- Target-producing spine: the state-transition path or execution-policy spine that produces the predicate.
+- Allowed achieved claim: wording allowed only when the what counts as done is met;
+- Steps that make the result true: the state-transition path or execution-policy spine that produces the predicate.
 
 Non-achieved terminal reports are stop/report protocol, not alternate goals,
 target-achievement predicates, or success states.
 
-## Execution Horizon and Authority Contract
+## Work Covered And Allowed Actions Contract
 
-For full-route or multi-batch controlled work, include `Execution Horizon and
-Authority Contract`.
+For full-route or multi-batch controlled work, include `Work Covered And
+Allowed Actions Contract`.
 
 The goal must preserve or define:
 
@@ -155,7 +155,7 @@ The goal must preserve or define:
 - Runtime-authorized actions: what runtime may execute directly;
 - Forbidden actions: live, remote, destructive, irreversible, or externally risky actions runtime must not execute;
 - Prepare-only / observe-only actions: horizon items runtime may only prepare, observe, document, or report not executed;
-- Explicitly out-of-scope items: items excluded by Human Setpoint Approval;
+- Explicitly out-of-scope items: items excluded by What the User Approved;
 - Horizon completion rule: how each horizon item is counted as executed, prepared-only, forbidden-not-executed, or explicitly out of scope by HSA.
 
 Authority limits must not shrink the approved horizon or move approved horizon
@@ -205,7 +205,7 @@ Before creating a goal contract for complex work, check:
 
 - a requirements analysis brief exists;
 - `Requirements Analysis Status` is `Complete` or the user explicitly states the semantics are confirmed;
-- for Level 3/4 or full pre-goal work, `Human Setpoint Approval: Approved` is present unless the current user message explicitly approves the compact control commitment;
+- for Level 3/4 or full pre-goal work, `What the User Approved: Approved` is present unless the current user message explicitly approves the compact control commitment;
 - confirmed decisions are recorded;
 - required solution design exists, or the user explicitly says the Design Gate is unnecessary;
 - no blocking human decision remains unresolved.
@@ -226,7 +226,7 @@ The goal file must include:
 4. Purpose Feedback Contract
 5. Realization Surface Contract, always for compiled runtime goals; record `RSC not applicable with justification` when no target-state surface closure is required
 6. Target Achievement Contract
-7. Execution Horizon and Authority Contract, always for full-route or multi-batch work
+7. Work Covered And Allowed Actions Contract, always for full-route or multi-batch work
 8. Source of Truth
 9. Scope and Boundaries
 10. Invariants
@@ -241,9 +241,9 @@ The goal file must include:
 
 The goal must preserve confirmed semantics. It must not reinterpret or downscope them.
 
-For Level 3/4 or full pre-goal work, the goal must preserve the approved compact control commitment from `Human Setpoint Approval`: human purpose, input role binding, primary object, requested transformation, non-goals, Purpose Feedback Boundary, Realization Surface Closure, Single target-achieved predicate, Target-producing evidence required, Non-achieved terminal report handling, Target-producing path, Answering method, Not-sufficient substitute, Task skeleton family, Execution horizon, Runtime authority, Forbidden live / irreversible actions, Required handling for unauthorized actions, Explicitly out-of-scope items, Output Contract, workflow fit, and known assumptions.
+For Level 3/4 or full pre-goal work, the goal must preserve the approved compact control commitment from `What the User Approved`: human purpose, input role binding, primary object, requested transformation, non-goals, Purpose Feedback Boundary, Realization Surface Closure, What counts as done, Evidence needed to call it done, Non-achieved terminal report handling, Required answer path, How this should be answered, What is not enough, Answer type, Work covered in this run, What the agent may do, Forbidden live / irreversible actions, Required handling for unauthorized actions, Explicitly out-of-scope items, Output Contract, workflow fit, and known assumptions.
 
-If a design includes `Task Skeleton Fidelity`, the goal must not weaken the approved answering method or substitute a different task skeleton family. Bind the target-achieved predicate and target-producing spine to the design skeleton.
+If a design includes `Answer Method Check`, the goal must not weaken the approved answering method or substitute a different answer type. Bind the what counts as done and required answer path to the design skeleton.
 
 When a solution design is present, the goal must reference it under `Source of Truth`, preserve design invariants, and avoid freezing tactical design details as semantic invariants unless the design explicitly marks them as invariant.
 
@@ -259,7 +259,7 @@ Map requirements analysis to:
 - Sensors: approved sensors, checks, evidence channels, and reviews
 - Purpose feedback: purpose-realizing outcome, beneficiary/observer boundary, sufficient evidence level, and allowed completion wording
 - Realization surface closure: target state, required surfaces, RSC status wording, residual reconciliation, and target-realization claim calibration
-- Target achievement predicate: single target-achieved predicate, required target-producing evidence, and allowed achieved claim
+- Target achievement predicate: what counts as done, required target-producing evidence, and allowed achieved claim
 - Error function: rubric for interpreting sensor output when the task is evaluative
 - Output contract: final audience, purpose, medium, structure, detail level, evidence references, destination, and acceptance condition
 - Constraints: invariants and non-goals
@@ -365,9 +365,9 @@ If the user explicitly requests a small inline `/goal` and the task is low-risk,
 - [ ] Success conditions and stop conditions are explicit.
 - [ ] The goal includes Purpose Feedback Contract when requirements define Purpose Feedback Boundary or purpose-achievement evidence is non-obvious.
 - [ ] The goal includes Realization Surface Contract for compiled runtime goals; direct bounded goals include it when requirements define Realization Surface Closure or target-state realization spans surfaces.
-- [ ] The goal includes Target Achievement Contract for compiled runtime goals, including a target-producing spine reference.
-- [ ] For Level 3/4 or full pre-goal work, Human Setpoint Approval is Approved before the goal is written.
-- [ ] Success Condition allows `goal achieved: yes` only when the single target-achieved predicate is satisfied and PFB/RSC permit the matching achieved claims.
+- [ ] The goal includes Target Achievement Contract for compiled runtime goals, including a required answer path reference.
+- [ ] For Level 3/4 or full pre-goal work, What the User Approved is Approved before the goal is written.
+- [ ] Success Condition allows `goal achieved: yes` only when the what counts as done is satisfied and PFB/RSC permit the matching achieved claims.
 - [ ] Any strongest positive target-realization claim requires RSC adequate; partial, missing, unavailable, or not applicable with justification receives calibrated wording.
 - [ ] Sensors are named but not treated as the objective.
 - [ ] Evaluation tasks define an explicit rubric before any executable goal is emitted.

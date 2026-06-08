@@ -31,9 +31,9 @@ This skill does not analyze requirements, does not write the control contract, d
 
 Use a completed requirements analysis brief and a goal contract, plus solution design when Design Gate was required or a design artifact exists.
 
-For Level 3, Level 4, or full pre-goal work, do not create an execution policy unless the requirements analysis contains `Human Setpoint Approval: Approved`, or the current user message explicitly approves the compact control commitment. Level 1/2 bounded work does not require Human Setpoint Approval unless the requirements analysis records it as required.
+For Level 3, Level 4, or full pre-goal work, do not create an execution policy unless the requirements analysis contains `What the User Approved: Approved`, or the current user message explicitly approves the compact control commitment. Level 1/2 bounded work does not require What the User Approved unless the requirements analysis records it as required.
 
-If the current user message approves the compact control commitment, update the requirements analysis `Human Setpoint Approval` section first, quoting or referencing that approval, then continue. Do not rely on in-memory approval to pass orchestration or runtime guards.
+If the current user message approves the compact control commitment, update the requirements analysis `What the User Approved` section first, quoting or referencing that approval, then continue. Do not rely on in-memory approval to pass orchestration or runtime guards.
 
 ## Required Infrastructure
 
@@ -50,9 +50,9 @@ This skill supplies the cybernetic constraints that the planning substrate must 
 - tactical degrees of freedom;
 - dependency matrix requirement;
 - context management / execution topology;
-- horizon and authority coverage matrix for separating approved execution horizon from runtime authority limits;
+- work coverage and action limits matrix for separating work covered in this run from what the agent may do limits;
 - realization surface closure strategy for target-state surface coverage and residual reconciliation;
-- target-producing action strategy for satisfying the single target-achieved predicate;
+- target-producing action strategy for satisfying the what counts as done;
 - execution granularity and sensor budget;
 - batch cadence;
 - destructive intermediate-state policy;
@@ -76,9 +76,9 @@ The execution policy must include:
 4. Tactical Degrees of Freedom
 5. Dependency Matrix
 6. Context Management / Execution Topology
-7. Horizon and Authority Coverage Matrix
+7. Work Coverage And Action Limits Matrix
 8. Realization Surface Closure Strategy
-9. Target-Producing Spine
+9. Steps That Make The Result True
 10. Target-Producing Action Strategy
 11. Execution Granularity and Sensor Budget
 12. Batch Cadence
@@ -102,11 +102,11 @@ The execution policy must choose one approved topology:
 - `Serial subagent-driven`
 - `Parallel subagent-driven`
 
-The execution policy must record `Task level`, `Selected delegation substrate`, `Subagent execution mode`, and `Max concurrent subagents` next to the selected topology.
+The execution policy must record `Task level`, `Selected agent workflow`, `Subagent execution mode`, and `Max concurrent subagents` next to the selected topology.
 
 Use `.agents/skills/references/delegation-substrate-registry.json` as the source of substrate capability boundaries.
 
-Allowed `Selected delegation substrate` values:
+Allowed `Selected agent workflow` values:
 
 - `bounded-protocol`
 - `superpowers-subagent-driven-development`
@@ -129,7 +129,7 @@ Subagent execution modes:
 
 Substrate capability matrix:
 
-| Selected delegation substrate | Allowed topology | Allowed mode |
+| Selected agent workflow | Allowed topology | Allowed mode |
 |---|---|---|
 | `superpowers-subagent-driven-development` | `Serial subagent-driven` | `serial-single-active` |
 | `superpowers-dispatching-parallel-agents` | `Parallel subagent-driven` | `parallel-max-safe` |
@@ -137,11 +137,11 @@ Substrate capability matrix:
 | `adapter-specific` | `Serial subagent-driven / Parallel subagent-driven` | `serial-single-active / parallel-max-safe` |
 | `none` | `Main-only` | `none` |
 
-When Human Setpoint Approval records `Runtime delegation preference: max-safe-parallel`, preserve that preference as the runtime topology target. Do not silently downgrade to `Serial subagent-driven` unless the dependency matrix has no independent frontier, shared surfaces cannot be safely locked, subagent context packs cannot be bounded, or review rejects parallelism. If safe frontier is effectively one, record the reason in `Concurrency selection rationale`.
+When What the User Approved records `Agent delegation preference: max-safe-parallel`, preserve that preference as the runtime topology target. Do not silently downgrade to `Serial subagent-driven` unless the dependency matrix has no independent frontier, shared surfaces cannot be safely locked, subagent context packs cannot be bounded, or review rejects parallelism. If safe frontier is effectively one, record the reason in `Concurrency selection rationale`.
 
-When Human Setpoint Approval records `Delegation substrate preference`, preserve that substrate unless it conflicts with the approved topology/mode capability matrix. If the requested substrate is incompatible, return to HSA for conflict resolution or record a concrete `Substrate compatibility rationale`; do not silently substitute a different substrate.
+When What the User Approved records `Agent workflow preference`, preserve that substrate unless it conflicts with the approved topology/mode capability matrix. If the requested substrate is incompatible, return to HSA for conflict resolution or record a concrete `Agent workflow compatibility rationale`; do not silently substitute a different substrate.
 
-If HSA records both `Runtime delegation preference: max-safe-parallel` and `Delegation substrate preference: superpowers-subagent-driven-development`, treat this as a setpoint conflict. `$superpowers:subagent-driven-development` is serial-single-active only. Use `superpowers-dispatching-parallel-agents`, `bounded-protocol`, or `adapter-specific` for max-safe parallel execution.
+If HSA records both `Agent delegation preference: max-safe-parallel` and `Agent workflow preference: superpowers-subagent-driven-development`, treat this as a setpoint conflict. `$superpowers:subagent-driven-development` is serial-single-active only. Use `superpowers-dispatching-parallel-agents`, `bounded-protocol`, or `adapter-specific` for max-safe parallel execution.
 
 For every delegated work package, define:
 
@@ -164,7 +164,7 @@ The main agent owns approved control artifacts, current batch state, dispatch, i
 
 A subagent owns one bounded work package, bounded investigation, or bounded verification pass. A subagent must not change control artifacts, widen scope, replace the execution topology, or bypass integration gates.
 
-For serial or parallel subagent-driven topology, `Selected delegation substrate` must be `bounded-protocol`, `superpowers-subagent-driven-development`, `superpowers-dispatching-parallel-agents`, or `adapter-specific`; it must not be `none`. Record the matching approved bounded subagent delegation protocol under `Subagent delegation substrate`. Do not treat `$superpowers:subagent-driven-development` as the generic delegation substrate. Use it only with `Serial subagent-driven`, `serial-single-active`, and `Max concurrent subagents: 1`. Use `$superpowers:dispatching-parallel-agents` only with `Parallel subagent-driven`, `parallel-max-safe`, and the approved wave/lock/barrier/integration structure.
+For serial or parallel subagent-driven topology, `Selected agent workflow` must be `bounded-protocol`, `superpowers-subagent-driven-development`, `superpowers-dispatching-parallel-agents`, or `adapter-specific`; it must not be `none`. Record the matching approved bounded subagent delegation protocol under `Subagent workflow`. Do not treat `$superpowers:subagent-driven-development` as the generic agent workflow. Use it only with `Serial subagent-driven`, `serial-single-active`, and `Max concurrent subagents: 1`. Use `$superpowers:dispatching-parallel-agents` only with `Parallel subagent-driven`, `parallel-max-safe`, and the approved wave/lock/barrier/integration structure.
 
 For serial subagent-driven topology, record `Ordered work package sequence` and `Integration gate after each package`.
 
@@ -174,11 +174,11 @@ For `Main-only` Level 3/4 work, include a meaningful `Main-only context-load jus
 
 At each batch boundary, the progress log must compress active context: current control summary, completed work packages, integrated subagent outputs, evidence produced, deferred sensors, unresolved blockers, policy deviations, and next allowed action.
 
-## Horizon and Authority Coverage Matrix
+## Work Coverage And Action Limits Matrix
 
 For full-route or multi-batch work, the execution policy must account for every approved horizon item and classify runtime handling as execute, prepare-only, observe-only, forbidden-not-executed, or explicitly out-of-scope by HSA.
 
-Runtime authority limits must not move approved horizon items to future roadmap, handoff, later goal, or out-of-scope status. If the approved horizon is too broad, return to requirements/HSA revision.
+What the agent may do limits must not move approved horizon items to future roadmap, handoff, later goal, or out-of-scope status. If the approved horizon is too broad, return to requirements/HSA revision.
 
 ## Realization Surface Closure Strategy
 
@@ -223,9 +223,9 @@ Define Residual Reconciliation:
 Domain adapters own concrete discovery and verification methods. The core
 policy owns surface/action/residual/reconciliation structure.
 
-## Target-Producing Spine
+## Steps That Make The Result True
 
-For target-achieving implementation work, decompose by the actor-centered state transitions that produce the target-achieved predicate before decomposing by components, modules, files, or teams.
+For target-achieving implementation work, decompose by the actor-centered state transitions that produce the what counts as done before decomposing by components, modules, files, or teams.
 
 The execution policy must define:
 
@@ -241,7 +241,7 @@ Each `Candidate Plan Task` must record `Spine node(s)`, `Role`, `State transitio
 
 The execution policy must define:
 
-- Target-producing action required: the action, probe, experiment, change, or observation that must be attempted to satisfy the single target-achieved predicate;
+- Target-producing action required: the action, probe, experiment, change, or observation that must be attempted to satisfy the what counts as done;
 - Proof of impossibility, if any: what would prove the target-producing action cannot be attempted in this environment;
 - Non-achieved terminal report rule: a non-achieved report may be produced only after the target-producing action is attempted and fails, or after impossibility is proven.
 
@@ -363,7 +363,7 @@ The policy may choose tactical execution details, batch cadence, and workstream 
 - lifecycle or failure model;
 - design invariants.
 
-If the design includes `Task Skeleton Fidelity`, decompose work against that approved skeleton. Do not replace the design skeleton with a component-first or weaker validation skeleton.
+If the design includes `Answer Method Check`, decompose work against that approved skeleton. Do not replace the design skeleton with a component-first or weaker validation skeleton.
 
 If the design is missing, contradictory, or insufficient for planning, stop and route back to `$designing-cybernetic-solutions` or ask for the smallest design decision.
 
@@ -427,7 +427,7 @@ Response-only next step:
 ## Validation Checklist
 
 - [ ] Non-trivial execution policies invoke `$superpowers:writing-plans` or load and follow its `SKILL.md` instructions, otherwise stop/report missing infrastructure.
-- [ ] For Level 3/4 or full pre-goal work, Human Setpoint Approval is Approved before execution-policy writing starts.
+- [ ] For Level 3/4 or full pre-goal work, What the User Approved is Approved before execution-policy writing starts.
 - [ ] The plan records planning substrate status.
 - [ ] The plan does not self-substitute for a missing required planning substrate.
 - [ ] If blocked, the assistant response includes a response-only next step.
@@ -437,19 +437,19 @@ Response-only next step:
 - [ ] The plan has dependency matrix.
 - [ ] The plan includes Context Management / Execution Topology.
 - [ ] The plan includes Realization Surface Closure Strategy for compiled runtime goals, with either full surface/action/residual structure or `RSC not applicable with justification`.
-- [ ] The plan includes Horizon and Authority Coverage Matrix for full-route or multi-batch work.
-- [ ] The plan includes Target-Producing Spine.
+- [ ] The plan includes Work Coverage And Action Limits Matrix for full-route or multi-batch work.
+- [ ] The plan includes Steps That Make The Result True.
 - [ ] Each Candidate Plan Task records `Spine node(s)`, `Role`, `State transition advanced`, `Transition evidence produced`, `Integration gate`, `Counts as goal progress`, and why it is not merely component completion.
 - [ ] The plan includes Target-Producing Action Strategy.
 - [ ] The plan selects `Main-only`, `Serial subagent-driven`, or `Parallel subagent-driven`.
-- [ ] The plan records `Selected delegation substrate`.
+- [ ] The plan records `Selected agent workflow`.
 - [ ] The plan records `Subagent execution mode` and `Max concurrent subagents`.
 - [ ] Level 3/4 main-only execution has an explicit context-load justification.
 - [ ] Delegated work packages define Context pack, Return format, and Integration gate.
 - [ ] Delegated work packages define Context Pack Requirements with relevant control excerpts, batch objective, allowed artifacts/surfaces, forbidden changes, required sensors/evidence, stop conditions, and expected return format.
 - [ ] The plan defines a Context Compression Rule for batch boundaries.
-- [ ] Serial or parallel subagent-driven topology records an approved bounded subagent delegation substrate.
-- [ ] Serial or parallel subagent-driven topology does not use `Selected delegation substrate: none`.
+- [ ] Serial or parallel subagent-driven topology records an approved bounded subagent agent workflow.
+- [ ] Serial or parallel subagent-driven topology does not use `Selected agent workflow: none`.
 - [ ] Serial subagent-driven topology uses `serial-single-active`, max concurrency `1`, ordered sequence, and per-package integration.
 - [ ] Parallel subagent-driven topology uses `parallel-max-safe`, wave matrix, lock model, failure policy, and integration barriers.
 - [ ] Parallel wave matrix records `Spine frontier`.

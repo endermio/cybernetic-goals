@@ -4,7 +4,7 @@
 
 Status: `Incomplete`
 
-## Human Setpoint Approval
+## What the User Approved
 
 Status: `Pending`
 
@@ -21,20 +21,20 @@ Approval applies only to this compact control commitment.
 | Non-goals | [what must not be done] |
 | Purpose Feedback Boundary | [how purpose realization will be observed or honestly reported] |
 | Realization Surface Closure | [which surfaces carry target-state realization and how residuals are reconciled] |
-| Single target-achieved predicate | [the only condition that allows "goal achieved: yes"] |
-| Target-producing evidence required | [evidence/action/observation required for the achieved predicate] |
+| What counts as done | [the only condition that allows "goal achieved: yes"] |
+| Evidence needed to call it done | [evidence/action/observation required before claiming done] |
 | Non-achieved terminal report handling | [how to report "goal achieved: no" without making it an alternate goal] |
-| Target-producing path | [one actor-centered path from initial state to target-achieved predicate] |
-| Answering method | [what method/evidence structure is required for this question to count as answered] |
-| Not-sufficient substitute | [plausible weaker answer that must not be substituted for the approved answering method] |
-| Task skeleton family | [implementation-spine / measurement-protocol / coverage-ceiling-measurement / claim-evidence-audit / diagnosis-discrimination / no special skeleton] |
-| Execution horizon | [complete scope this goal covers, including items the runtime may not execute directly] |
-| Runtime authority | [actions runtime may execute / prepare / observe / report] |
+| Required answer path | [one actor-centered path from initial state to done] |
+| How this should be answered | [what method/evidence structure is required for this question to count as answered] |
+| What is not enough | [plausible weaker answer that must not be substituted for the approved answering method] |
+| Answer type | [implementation-spine / measurement-protocol / coverage-ceiling-measurement / claim-evidence-audit / diagnosis-discrimination / no special skeleton] |
+| Work covered in this run | [complete scope this goal covers, including items the runtime may not execute directly] |
+| What the agent may do | [actions runtime may execute / prepare / observe / report] |
 | Forbidden live / irreversible actions | [live, remote, destructive, irreversible, or externally risky actions runtime must not execute] |
 | Required handling for unauthorized actions | [prepare-only / observe-only / forbidden-not-executed handling and required artifacts] |
 | Explicitly out-of-scope items | [items excluded from this goal by HSA, not merely unauthorized] |
-| Runtime delegation preference | [serial / max-safe-parallel / no preference] |
-| Delegation substrate preference | [superpowers-subagent-driven-development / superpowers-dispatching-parallel-agents / bounded-protocol / adapter-specific / no preference] |
+| Agent delegation preference | [serial / max-safe-parallel / no preference] |
+| Agent workflow preference | [superpowers-subagent-driven-development / superpowers-dispatching-parallel-agents / bounded-protocol / adapter-specific / no preference] |
 | Parallel execution authority | [approved / not approved / not applicable] |
 | Parallelism cap | [auto / N / not specified] |
 | Output Contract | [audience, purpose, medium, structure, destination, acceptance] |

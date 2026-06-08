@@ -14,7 +14,7 @@ Status: Candidate
 ## Superpowers Planning Substrate
 
 - Substrate status: Used.
-- Selected substrate: `superpowers:writing-plans` for implementation-plan structure and `superpowers:subagent-driven-development` as the runtime delegation substrate.
+- Selected substrate: `superpowers:writing-plans` for implementation-plan structure and `superpowers:subagent-driven-development` as the runtime agent workflow.
 - Why used: the eventual runtime work is a multi-artifact repository change with review checkpoints and bounded implementation batches.
 - Scope limit: this pre-goal policy prepares the runtime plan; it does not execute target implementation.
 
@@ -54,7 +54,7 @@ Task level: Level 3
 
 Selected topology: Serial subagent-driven
 
-Selected delegation substrate: `superpowers-subagent-driven-development`
+Selected agent workflow: `superpowers-subagent-driven-development`
 
 Topology rationale:
 
@@ -68,7 +68,7 @@ Main-only justification:
 
 Not applicable. The selected topology is serial subagent-driven.
 
-Subagent delegation substrate:
+Subagent workflow:
 
 Use the approved `superpowers-subagent-driven-development` substrate for runtime work. This refers to the `$superpowers:subagent-driven-development` skill when runtime invokes it. Only one execution subagent may be active at a time unless a later control review explicitly approves parallelization.
 

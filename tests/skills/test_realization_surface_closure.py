@@ -8,7 +8,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 
-HSA_FIXTURE = """## Human Setpoint Approval
+HSA_FIXTURE = """## What the User Approved
 
 Status: `Approved`
 
@@ -21,12 +21,12 @@ Status: `Approved`
 | Non-goals | do not test HSA behavior in this fixture |
 | Purpose Feedback Boundary | covered by compact fixture |
 | Realization Surface Closure | dedicated test target |
-| Single target-achieved predicate | target-producing evidence is observed |
-| Target-producing evidence required | target-producing evidence is observed |
+| What counts as done | target-producing evidence is observed |
+| Evidence needed to call it done | target-producing evidence is observed |
 | Non-achieved terminal report handling | report goal achieved: no |
-| Target-producing path | RSC guard fixture spine |
-| Execution horizon | RSC guard fixture horizon |
-| Runtime authority | local guard fixture checks |
+| Required answer path | RSC guard fixture spine |
+| Work covered in this run | RSC guard fixture horizon |
+| What the agent may do | local guard fixture checks |
 | Forbidden live / irreversible actions | none |
 | Required handling for unauthorized actions | none |
 | Explicitly out-of-scope items | none |
@@ -113,12 +113,12 @@ class RealizationSurfaceClosureTest(unittest.TestCase):
                 "",
                 "| Element | Requirement |",
                 "|---|---|",
-                "| Single target-achieved predicate | target-producing evidence is observed |",
+                "| What counts as done | target-producing evidence is observed |",
                     "| Required target-producing evidence | target-producing evidence is observed |",
                 "| Allowed achieved claim | only target-achieved predicate supports goal achieved: yes |",
-                "| Target-producing spine | RSC guard fixture spine |",
+                "| Steps that make the result true | RSC guard fixture spine |",
                 "",
-                "## Execution Horizon and Authority Contract",
+                "## Work Covered And Allowed Actions Contract",
                 "",
                 "| Element | Requirement |",
                 "|---|---|",
@@ -145,13 +145,13 @@ class RealizationSurfaceClosureTest(unittest.TestCase):
             f"- Requirements analysis: `{requirements}`",
             f"- Goal contract: `{goal}`",
             "",
-            "## Horizon and Authority Coverage Matrix",
+            "## Work Coverage And Action Limits Matrix",
             "",
-            "| Batch / surface | In approved horizon? | Runtime authority | Required runtime handling | Counts as achieved? |",
+            "| Batch / surface | In approved horizon? | What the agent may do | Required runtime handling | Counts as achieved? |",
             "|---|---|---|---|---|",
             "| RSC guard fixture | yes | execute | run guard / compiler fixture checks | yes if fixture passes |",
             "",
-            "## Target-Producing Spine",
+            "## Steps That Make The Result True",
             "",
             "| Spine node | Required state transition | Required evidence |",
             "|---|---|---|",
@@ -218,7 +218,7 @@ class RealizationSurfaceClosureTest(unittest.TestCase):
                 "",
                 "Selected topology: `Main-only`",
                 "",
-                "Selected delegation substrate: `none`",
+                "Selected agent workflow: `none`",
                 "",
                 "Topology rationale:",
                 "",
@@ -284,8 +284,8 @@ class RealizationSurfaceClosureTest(unittest.TestCase):
             "- Purpose feedback adequacy: `yes`",
             f"- Realization surface closure adequacy: `{review_independence_rsc}`",
             "- Target achievement predicate fidelity: `yes`",
-            "- Target-producing spine fidelity: `yes`",
-            "- Execution horizon and authority fidelity: `yes`",
+            "- answer path check: `yes`",
+            "- Work covered in this run and authority fidelity: `yes`",
             "",
             "## Context Management / Execution Topology",
             "",
@@ -321,12 +321,12 @@ class RealizationSurfaceClosureTest(unittest.TestCase):
                 "Findings:",
                 "- The single target-achieved predicate is separated from non-achieved terminal reports.",
                 "",
-                "## Target-Producing Spine Fidelity",
+                "## Answer Path Check",
                 "",
                 "Findings:",
                 "- Work packages map to the fixture spine node.",
                 "",
-                "## Execution Horizon and Authority Fidelity",
+                "## Work Covered And Allowed Actions Check",
                 "",
                 "Findings:",
                 "- Approved horizon and runtime authority are compact and fixture-bounded.",

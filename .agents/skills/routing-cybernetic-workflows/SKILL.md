@@ -320,7 +320,7 @@ Recommended next step:
 $analyzing-cybernetic-requirements <需求>
 ```
 
-After requirements analysis is complete and Human Setpoint Approval is Approved:
+After requirements analysis is complete and What the User Approved is Approved:
 
 ```text
 $orchestrating-cybernetic-pregoal 根据 <requirements-path> 完成 pre-goal 编译，允许使用 subagents review。

@@ -268,7 +268,7 @@ def selected_delegation_substrate(plan: str | None) -> str | None:
     body = section_body(plan or "", "Context Management / Execution Topology")
     if body is None:
         return None
-    match = re.search(r"(?im)^\s*Selected delegation substrate\s*:\s*`?([^`\n]+?)`?\s*$", body)
+    match = re.search(r"(?im)^\s*Selected agent workflow\s*:\s*`?([^`\n]+?)`?\s*$", body)
     if not match:
         return None
 
@@ -547,11 +547,11 @@ def check_execution_topology(plan: str | None, errors: list[str]) -> None:
         check_labeled_requirements(body, "Context Pack Requirements", CONTEXT_PACK_FIELDS, errors)
         substrate = selected_delegation_substrate(plan)
         if substrate is None:
-            errors.append("subagent-driven topology missing valid Selected delegation substrate")
+            errors.append("subagent-driven topology missing valid Selected agent workflow")
         elif substrate == "none":
-            errors.append("subagent-driven topology cannot use Selected delegation substrate: none")
-        if not labeled_block_has_content(body, "Subagent delegation substrate"):
-            errors.append("subagent-driven topology missing approved bounded subagent delegation substrate")
+            errors.append("subagent-driven topology cannot use Selected agent workflow: none")
+        if not labeled_block_has_content(body, "Subagent workflow"):
+            errors.append("subagent-driven topology missing approved bounded subagent workflow")
 
         mode = selected_subagent_execution_mode(plan)
         max_concurrent = max_concurrent_subagents(plan)
@@ -605,24 +605,24 @@ def check_substrate_mode_compatibility(
         allowed_mode = registry_list_field(definition, "allowed_mode")
         max_rule = str(definition.get("max_concurrent", "")).strip()
         if allowed_topology and topology not in allowed_topology:
-            errors.append(f"Selected delegation substrate {substrate} is not compatible with topology {topology}")
+            errors.append(f"Selected agent workflow {substrate} is not compatible with topology {topology}")
         if allowed_mode and mode not in allowed_mode:
-            errors.append(f"Selected delegation substrate {substrate} is not compatible with Subagent execution mode: {mode}")
+            errors.append(f"Selected agent workflow {substrate} is not compatible with Subagent execution mode: {mode}")
         if max_rule == "1" and max_concurrent != "1":
-            errors.append(f"Selected delegation substrate {substrate} requires Max concurrent subagents: 1")
+            errors.append(f"Selected agent workflow {substrate} requires Max concurrent subagents: 1")
 
     if substrate == "superpowers-subagent-driven-development":
         if topology != "Serial subagent-driven" or mode != "serial-single-active" or max_concurrent != "1":
             errors.append(
-                "Selected delegation substrate superpowers-subagent-driven-development supports only Serial subagent-driven, Subagent execution mode: serial-single-active, Max concurrent subagents: 1; it cannot be used with parallel-max-safe"
+                "Selected agent workflow superpowers-subagent-driven-development supports only Serial subagent-driven, Subagent execution mode: serial-single-active, Max concurrent subagents: 1; it cannot be used with parallel-max-safe"
             )
     if substrate == "superpowers-dispatching-parallel-agents":
         if topology != "Parallel subagent-driven" or mode != "parallel-max-safe":
             errors.append(
-                "Selected delegation substrate superpowers-dispatching-parallel-agents supports only Parallel subagent-driven with Subagent execution mode: parallel-max-safe"
+                "Selected agent workflow superpowers-dispatching-parallel-agents supports only Parallel subagent-driven with Subagent execution mode: parallel-max-safe"
             )
     if mode == "parallel-max-safe" and substrate == "superpowers-subagent-driven-development":
-        errors.append("parallel-max-safe cannot use Selected delegation substrate: superpowers-subagent-driven-development")
+        errors.append("parallel-max-safe cannot use Selected agent workflow: superpowers-subagent-driven-development")
 
 
 def check_final_observer(review: str, errors: list[str]) -> None:
@@ -689,22 +689,22 @@ def check_review_subagent_concurrency(plan: str, review: str, errors: list[str])
 
 
 def check_human_setpoint_approval(requirements: str, errors: list[str]) -> None:
-    body = section_body(requirements, "Human Setpoint Approval")
+    body = section_body(requirements, "What the User Approved")
     if body is None:
-        errors.append("requirements missing ## Human Setpoint Approval")
+        errors.append("requirements missing ## What the User Approved")
         return
 
-    status = section_status(requirements, "Human Setpoint Approval")
+    status = section_status(requirements, "What the User Approved")
     if status != "Approved":
-        errors.append(f"Human Setpoint Approval is not Approved: {status!r}")
+        errors.append(f"What the User Approved is not Approved: {status!r}")
 
 
 def check_max_safe_parallel_preference(requirements: str, plan: str | None, errors: list[str]) -> None:
-    hsa = section_body(requirements, "Human Setpoint Approval")
+    hsa = section_body(requirements, "What the User Approved")
     if hsa is None or plan is None:
         return
 
-    preference = field_value(hsa, "Runtime delegation preference")
+    preference = field_value(hsa, "Agent delegation preference")
     if preference is None or preference.casefold() != "max-safe-parallel":
         return
 
@@ -716,24 +716,24 @@ def check_max_safe_parallel_preference(requirements: str, plan: str | None, erro
     rationale = field_value(topology_body, "Concurrency selection rationale")
     if rationale is None or "safe frontier" not in rationale.casefold():
         errors.append(
-            "HSA Runtime delegation preference is max-safe-parallel but execution policy is not Parallel subagent-driven; Concurrency selection rationale must mention safe frontier"
+            "What the User Approved records Agent delegation preference as max-safe-parallel but execution policy is not Parallel subagent-driven; Concurrency selection rationale must mention safe frontier"
         )
 
 
 def check_delegation_substrate_preference(requirements: str, plan: str | None, errors: list[str]) -> None:
-    hsa = section_body(requirements, "Human Setpoint Approval")
+    hsa = section_body(requirements, "What the User Approved")
     if hsa is None:
         return
 
-    raw_preference = field_value(hsa, "Delegation substrate preference")
+    raw_preference = field_value(hsa, "Agent workflow preference")
     substrate_preference = normalize_delegation_substrate(raw_preference)
     if substrate_preference in {None, "no preference"}:
         return
 
-    runtime_preference = (field_value(hsa, "Runtime delegation preference") or "").casefold()
+    runtime_preference = (field_value(hsa, "Agent delegation preference") or "").casefold()
     if runtime_preference == "max-safe-parallel" and substrate_preference == "superpowers-subagent-driven-development":
         errors.append(
-            "HSA Delegation substrate preference conflicts with Runtime delegation preference: max-safe-parallel; superpowers-subagent-driven-development is serial-single-active only"
+            "What the User Approved records conflicting Agent workflow preference and Agent delegation preference: max-safe-parallel; superpowers-subagent-driven-development is serial-single-active only"
         )
         return
 
@@ -746,14 +746,14 @@ def check_delegation_substrate_preference(requirements: str, plan: str | None, e
 
     topology_body = section_body(plan, "Context Management / Execution Topology") or ""
     rationale = (
-        field_value(topology_body, "Substrate compatibility rationale")
-        or field_value(topology_body, "Delegation substrate compatibility rationale")
+        field_value(topology_body, "Agent workflow compatibility rationale")
+        or field_value(topology_body, "Agent workflow compatibility rationale")
         or ""
     )
     lowered = rationale.casefold()
     if not any(term in lowered for term in ("incompatible", "not compatible", "capability boundary", "unsupported")):
         errors.append(
-            f"HSA Delegation substrate preference is {substrate_preference}, but execution policy selected {selected}; record a substrate compatibility rationale before changing substrate"
+            f"What the User Approved records Agent workflow preference as {substrate_preference}, but execution policy selected {selected}; record an agent workflow compatibility rationale before changing it"
         )
 
 
@@ -780,40 +780,40 @@ def registry_string_list(definition: dict[str, object], key: str) -> list[str]:
 
 
 def check_design_skeleton_fidelity(requirements: str | None, design: str | None, errors: list[str]) -> None:
-    hsa = section_body(requirements or "", "Human Setpoint Approval")
+    hsa = section_body(requirements or "", "What the User Approved")
     if hsa is None or design is None:
         return
 
-    answering_method = field_value(hsa, "Answering method")
-    not_sufficient = field_value(hsa, "Not-sufficient substitute")
-    skeleton_family = field_value(hsa, "Task skeleton family")
+    answering_method = field_value(hsa, "How this should be answered")
+    not_sufficient = field_value(hsa, "What is not enough")
+    skeleton_family = field_value(hsa, "Answer type")
     if not any((answering_method, not_sufficient, skeleton_family)):
         return
 
-    body = section_body(design, "Task Skeleton Fidelity")
+    body = section_body(design, "Answer Method Check")
     if body is None:
-        errors.append("design missing ## Task Skeleton Fidelity for approved answering method / task skeleton family")
+        errors.append("design missing ## Answer Method Check for approved answer method / answer type")
         return
 
     for label in (
-        "Approved answering method",
-        "Approved skeleton family",
-        "Instantiated skeleton",
-        "Mandatory nodes coverage",
-        "Forbidden substitution avoided",
+        "Approved answer method",
+        "Approved answer type",
+        "Required answer path",
+        "Required steps covered",
+        "What is not enough avoided",
     ):
         if not labeled_or_table_field_has_content(body, label):
-            errors.append(f"design Task Skeleton Fidelity missing {label}")
+            errors.append(f"design Answer Method Check missing {label}")
 
     family = (skeleton_family or "").casefold()
-    approved_family = (field_value(body, "Approved skeleton family") or "").casefold()
-    instantiated = (field_value(body, "Instantiated skeleton") or "").casefold()
-    mandatory = (field_value(body, "Mandatory nodes coverage") or "").casefold()
-    avoided = (field_value(body, "Forbidden substitution avoided") or "").casefold()
+    approved_family = (field_value(body, "Approved answer type") or "").casefold()
+    instantiated = (field_value(body, "Required answer path") or "").casefold()
+    mandatory = (field_value(body, "Required steps covered") or "").casefold()
+    avoided = (field_value(body, "What is not enough avoided") or "").casefold()
     substitute = (not_sufficient or "").casefold()
 
     if family and family not in approved_family:
-        errors.append("design Task Skeleton Fidelity does not preserve approved skeleton family")
+        errors.append("design Answer Method Check does not preserve approved answer type")
 
     definition = task_skeleton_definition(family)
     forbidden_substitutions = registry_string_list(definition, "forbidden_substitutions")
@@ -823,27 +823,27 @@ def check_design_skeleton_fidelity(requirements: str | None, design: str | None,
         forbidden_lower = forbidden.casefold()
         if forbidden_lower in instantiated or (substitute and substitute == forbidden_lower and substitute in instantiated):
             errors.append(
-                f"design Task Skeleton Fidelity substitutes {forbidden} for {family}"
+                f"design Answer Method Check substitutes {forbidden} for {family}"
             )
             break
     if family and forbidden_substitutions:
         if avoided.startswith("no") or " no" in avoided[:12]:
-            errors.append("design Task Skeleton Fidelity records forbidden substitution was not avoided")
+            errors.append("design Answer Method Check records forbidden substitution was not avoided")
     for node in mandatory_nodes:
         if node.casefold() not in mandatory:
-            errors.append(f"design Task Skeleton Fidelity missing {family} mandatory node: {node}")
+            errors.append(f"design Answer Method Check missing {family} mandatory node: {node}")
 
 
 def hsa_requires_design_skeleton_review(requirements: str | None) -> bool:
-    hsa = section_body(requirements or "", "Human Setpoint Approval")
+    hsa = section_body(requirements or "", "What the User Approved")
     if hsa is None:
         return False
     return any(
         field_value(hsa, label)
         for label in (
-            "Answering method",
-            "Not-sufficient substitute",
-            "Task skeleton family",
+            "How this should be answered",
+            "What is not enough",
+            "Answer type",
         )
     )
 
@@ -854,18 +854,18 @@ def check_review_design_skeleton(requirements: str, review: str, errors: list[st
 
     independence = section_body(review, "Review Independence")
     if independence is None:
-        errors.append("control review missing ## Review Independence for Design Skeleton Fidelity")
+        errors.append("control review missing ## Review Independence for Design Answer Method Check")
     else:
-        reviewed = yes_no_value(independence, "Design skeleton fidelity")
+        reviewed = yes_no_value(independence, "Design answer method check")
         if reviewed != "yes":
-            errors.append("control review did not record Design skeleton fidelity: yes in ## Review Independence")
+            errors.append("control review did not record Design answer method check: yes in ## Review Independence")
 
-    body = section_body(review, "Design Skeleton Fidelity")
+    body = section_body(review, "Design Answer Method Check")
     if body is None:
-        errors.append("control review missing ## Design Skeleton Fidelity")
+        errors.append("control review missing ## Design Answer Method Check")
         return
     if not labeled_block_has_content(body, "Findings"):
-        errors.append("control review Design Skeleton Fidelity section has no meaningful findings")
+        errors.append("control review Design Answer Method Check section has no meaningful findings")
 
 
 def check_goal_purpose_feedback(goal: str, errors: list[str]) -> None:
@@ -955,10 +955,10 @@ def check_goal_target_achievement(goal: str, errors: list[str]) -> None:
         return
 
     required_fields = [
-        "Single target-achieved predicate",
+        "What counts as done",
         "Required target-producing evidence",
         "Allowed achieved claim",
-        "Target-producing spine",
+        "Steps that make the result true",
     ]
     for field in required_fields:
         if not labeled_or_table_field_has_content(body, field):
@@ -966,7 +966,7 @@ def check_goal_target_achievement(goal: str, errors: list[str]) -> None:
 
     predicate_count = target_achieved_predicate_field_count(body)
     if predicate_count != 1:
-        errors.append("goal Target Achievement Contract must contain exactly one target-achieved predicate")
+        errors.append("goal Target Achievement Contract must contain exactly one What counts as done field")
 
     for line in body.splitlines():
         lowered = line.casefold()
@@ -991,9 +991,9 @@ def check_goal_target_achievement(goal: str, errors: list[str]) -> None:
 
 
 def check_goal_execution_horizon_authority(goal: str, errors: list[str]) -> None:
-    body = section_body(goal, "Execution Horizon and Authority Contract")
+    body = section_body(goal, "Work Covered And Allowed Actions Contract")
     if body is None:
-        errors.append("goal missing ## Execution Horizon and Authority Contract")
+        errors.append("goal missing ## Work Covered And Allowed Actions Contract")
         return
 
     required_fields = [
@@ -1006,7 +1006,7 @@ def check_goal_execution_horizon_authority(goal: str, errors: list[str]) -> None
     ]
     for field in required_fields:
         if not labeled_or_table_field_has_content(body, field):
-            errors.append(f"goal Execution Horizon and Authority Contract missing {field}")
+            errors.append(f"goal Work Covered And Allowed Actions Contract missing {field}")
 
 
 def target_achieved_predicate_field_count(text: str) -> int:
@@ -1017,11 +1017,11 @@ def target_achieved_predicate_field_count(text: str) -> int:
             continue
         if "|" in stripped:
             cells = [cell.strip().casefold() for cell in stripped.strip("|").split("|")]
-            if cells and "target-achieved predicate" in cells[0]:
+            if cells and "what counts as done" in cells[0]:
                 count += 1
             continue
         label = stripped.split(":", 1)[0].strip("-* ").casefold()
-        if "target-achieved predicate" in label:
+        if "what counts as done" in label:
             count += 1
     return count
 
@@ -1043,9 +1043,9 @@ def check_plan_target_producing_strategy(plan: str, errors: list[str]) -> None:
 
 
 def check_plan_target_producing_spine(plan: str, errors: list[str]) -> None:
-    body = section_body(plan, "Target-Producing Spine")
+    body = section_body(plan, "Steps That Make The Result True")
     if body is None:
-        errors.append("execution policy missing ## Target-Producing Spine")
+        errors.append("execution policy missing ## Steps That Make The Result True")
         return
 
     lowered = body.casefold()
@@ -1056,7 +1056,7 @@ def check_plan_target_producing_spine(plan: str, errors: list[str]) -> None:
     ]
     for column in required_columns:
         if column not in lowered:
-            errors.append(f"execution policy Target-Producing Spine missing {column}")
+            errors.append(f"execution policy Steps That Make The Result True missing {column}")
 
     has_data_row = False
     for line in body.splitlines():
@@ -1073,7 +1073,7 @@ def check_plan_target_producing_spine(plan: str, errors: list[str]) -> None:
             has_data_row = True
 
     if not has_data_row:
-        errors.append("execution policy Target-Producing Spine has no meaningful spine transition rows")
+        errors.append("execution policy Steps That Make The Result True has no meaningful spine transition rows")
 
 
 def check_candidate_plan_tasks_spine_nodes(plan: str, errors: list[str]) -> None:
@@ -1107,22 +1107,22 @@ def check_candidate_plan_tasks_spine_nodes(plan: str, errors: list[str]) -> None
 
 
 def check_plan_horizon_authority(plan: str, errors: list[str]) -> None:
-    body = section_body(plan, "Horizon and Authority Coverage Matrix")
+    body = section_body(plan, "Work Coverage And Action Limits Matrix")
     if body is None:
-        errors.append("execution policy missing ## Horizon and Authority Coverage Matrix")
+        errors.append("execution policy missing ## Work Coverage And Action Limits Matrix")
         return
 
     lowered = body.casefold()
     required_columns = [
         "batch / surface",
         "in approved horizon?",
-        "runtime authority",
+        "what the agent may do",
         "required runtime handling",
         "counts as achieved?",
     ]
     for column in required_columns:
         if column not in lowered:
-            errors.append(f"execution policy Horizon and Authority Coverage Matrix missing {column}")
+            errors.append(f"execution policy Work Coverage And Action Limits Matrix missing {column}")
 
     has_data_row = False
     for line in body.splitlines():
@@ -1138,10 +1138,10 @@ def check_plan_horizon_authority(plan: str, errors: list[str]) -> None:
         if len(cells) >= len(required_columns) and all(meaningful_line(cell) for cell in cells[: len(required_columns)]):
             has_data_row = True
         if "future roadmap" in row_lowered:
-            errors.append("execution policy future roadmap cannot replace approved horizon in ## Horizon and Authority Coverage Matrix")
+            errors.append("execution policy future roadmap cannot replace approved horizon in ## Work Coverage And Action Limits Matrix")
 
     if not has_data_row:
-        errors.append("execution policy Horizon and Authority Coverage Matrix has no meaningful coverage rows")
+        errors.append("execution policy Work Coverage And Action Limits Matrix has no meaningful coverage rows")
 
 
 def check_plan_realization_surface(plan: str, errors: list[str]) -> None:
@@ -1213,35 +1213,35 @@ def check_review_target_achievement_predicate(review: str, errors: list[str]) ->
 def check_review_target_producing_spine(review: str, errors: list[str]) -> None:
     independence = section_body(review, "Review Independence")
     if independence is None:
-        errors.append("control review missing ## Review Independence for Target-Producing Spine Fidelity")
+        errors.append("control review missing ## Review Independence for Answer Path Check")
     else:
-        reviewed = yes_no_value(independence, "Target-producing spine fidelity")
+        reviewed = yes_no_value(independence, "answer path check")
         if reviewed != "yes":
-            errors.append("control review did not record Target-producing spine fidelity: yes in ## Review Independence")
+            errors.append("control review did not record answer path check: yes in ## Review Independence")
 
-    body = section_body(review, "Target-Producing Spine Fidelity")
+    body = section_body(review, "Answer Path Check")
     if body is None:
-        errors.append("control review missing ## Target-Producing Spine Fidelity")
+        errors.append("control review missing ## Answer Path Check")
         return
     if not labeled_block_has_content(body, "Findings"):
-        errors.append("control review Target-Producing Spine Fidelity section has no meaningful findings")
+        errors.append("control review Answer Path Check section has no meaningful findings")
 
 
 def check_review_execution_horizon_authority(review: str, errors: list[str]) -> None:
     independence = section_body(review, "Review Independence")
     if independence is None:
-        errors.append("control review missing ## Review Independence for Execution Horizon and Authority Fidelity")
+        errors.append("control review missing ## Review Independence for Work Covered And Allowed Actions Check")
     else:
-        reviewed = yes_no_value(independence, "Execution horizon and authority fidelity")
+        reviewed = yes_no_value(independence, "Work covered in this run and authority fidelity")
         if reviewed != "yes":
-            errors.append("control review did not record Execution horizon and authority fidelity: yes in ## Review Independence")
+            errors.append("control review did not record Work covered in this run and authority fidelity: yes in ## Review Independence")
 
-    body = section_body(review, "Execution Horizon and Authority Fidelity")
+    body = section_body(review, "Work Covered And Allowed Actions Check")
     if body is None:
-        errors.append("control review missing ## Execution Horizon and Authority Fidelity")
+        errors.append("control review missing ## Work Covered And Allowed Actions Check")
         return
     if not labeled_block_has_content(body, "Findings"):
-        errors.append("control review Execution Horizon and Authority Fidelity section has no meaningful findings")
+        errors.append("control review Work Covered And Allowed Actions Check section has no meaningful findings")
 
 
 def suggest_next_action(errors: list[str]) -> str:
@@ -1250,15 +1250,16 @@ def suggest_next_action(errors: list[str]) -> str:
 
     if (
         "requirements analysis status is not complete" in joined
-        or "human setpoint approval" in joined
-        or "hsa delegation substrate preference conflicts" in joined
+        or "requirements missing ## what the user approved" in joined
+        or "what the user approved is not approved" in joined
+        or "records conflicting agent workflow preference" in joined
     ):
         return "ReturnToRequirementsAnalysis"
     if (
         "design gate is required" in joined
         or "design status" in joined
         or "design does not reference" in joined
-        or "task skeleton fidelity" in joined
+        or ("answer method check" in joined and "control review" not in joined)
     ):
         return "RunDesign"
     if (
@@ -1272,10 +1273,10 @@ def suggest_next_action(errors: list[str]) -> str:
         or "goal realization surface contract missing" in joined
         or "goal missing ## target achievement contract" in joined
         or "goal target achievement contract missing" in joined
-        or "goal target achievement contract missing target-producing spine" in joined
-        or "goal missing ## execution horizon and authority contract" in joined
-        or "goal execution horizon and authority contract missing" in joined
-        or "goal target achievement contract must contain exactly one target-achieved predicate" in joined
+        or "goal target achievement contract missing steps that make the result true" in joined
+        or "goal missing ## work covered and allowed actions contract" in joined
+        or "goal work covered in this run and authority contract missing" in joined
+        or "goal target achievement contract must contain exactly one what counts as done field" in joined
         or "goal success condition contains non-achieved terminal report term" in joined
         or "goal target achievement contract contains non-achieved or fallback term" in joined
     ):
@@ -1287,13 +1288,13 @@ def suggest_next_action(errors: list[str]) -> str:
         or "execution policy realization surface closure strategy missing" in joined
         or "execution policy missing ## target-producing action strategy" in joined
         or "execution policy target-producing action strategy missing" in joined
-        or "execution policy missing ## target-producing spine" in joined
-        or "execution policy target-producing spine" in joined
+        or "execution policy missing ## steps that make the result true" in joined
+        or "execution policy steps that make the result true" in joined
         or "execution policy missing ## candidate plan tasks" in joined
         or "execution policy candidate plan task missing" in joined
         or "candidate plan tasks has no candidate tasks" in joined
-        or "execution policy missing ## horizon and authority coverage matrix" in joined
-        or "execution policy horizon and authority coverage matrix" in joined
+        or "execution policy missing ## work coverage and action limits matrix" in joined
+        or "execution policy work coverage and action limits matrix" in joined
         or "future roadmap cannot replace approved horizon" in joined
         or "plan does not reference" in joined
         or "subagent execution mode" in joined
@@ -1306,7 +1307,7 @@ def suggest_next_action(errors: list[str]) -> str:
         or "concurrency frontier rule" in joined
         or "safe frontier" in joined
         or "runtime delegation preference" in joined
-        or "delegation substrate preference" in joined
+        or "agent workflow preference" in joined
         or "main-agent integration rule" in joined
         or any(
             error.startswith(
@@ -1330,26 +1331,26 @@ def suggest_next_action(errors: list[str]) -> str:
         or "review does not reference" in joined
         or "control review missing ## review independence" in joined
         or "control review missing ## context management / execution topology" in joined
-        or "control review missing ## design skeleton fidelity" in joined
+        or "control review missing ## design answer method check" in joined
         or "control review missing ## purpose feedback adequacy" in joined
         or "control review missing ## realization surface closure adequacy" in joined
         or "control review missing ## target achievement predicate fidelity" in joined
-        or "control review missing ## target-producing spine fidelity" in joined
-        or "control review missing ## execution horizon and authority fidelity" in joined
+        or "control review missing ## answer path check" in joined
+        or "control review missing ## work covered in this run and authority fidelity" in joined
         or "control review missing ## subagent concurrency fidelity" in joined
-        or "design skeleton fidelity section has no meaningful findings" in joined
+        or "design answer method check section has no meaningful findings" in joined
         or "purpose feedback adequacy section has no meaningful findings" in joined
         or "realization surface closure adequacy section has no meaningful findings" in joined
         or "target achievement predicate fidelity section has no meaningful findings" in joined
-        or "target-producing spine fidelity section has no meaningful findings" in joined
-        or "execution horizon and authority fidelity section has no meaningful findings" in joined
+        or "answer path check section has no meaningful findings" in joined
+        or "work covered in this run and authority fidelity section has no meaningful findings" in joined
         or "subagent concurrency fidelity section has no meaningful findings" in joined
-        or "did not record design skeleton fidelity" in joined
+        or "did not record design answer method check" in joined
         or "did not record purpose feedback adequacy" in joined
         or "did not record realization surface closure adequacy" in joined
         or "did not record target achievement predicate fidelity" in joined
-        or "did not record target-producing spine fidelity" in joined
-        or "did not record execution horizon and authority fidelity" in joined
+        or "did not record answer path check" in joined
+        or "did not record work covered in this run and authority fidelity" in joined
         or "did not record subagent concurrency fidelity" in joined
         or "context management / execution topology section has no meaningful findings" in joined
         or "did not record context management / execution topology" in joined

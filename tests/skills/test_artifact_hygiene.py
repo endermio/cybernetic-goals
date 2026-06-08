@@ -8,9 +8,10 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[2]
 HYGIENE_LINT = ROOT / "scripts/lint_cybernetic_artifact_hygiene.py"
 CONTROL_GUARD = ROOT / ".agents/skills/compiling-cybernetic-runtime-goals/scripts/control_chain_guard.py"
+JARGON_POLICY = ROOT / ".agents/skills/references/jargon-policy.yaml"
 
 
-HSA_APPROVED = """## Human Setpoint Approval
+HSA_APPROVED = """## What the User Approved
 
 Status: `Approved`
 
@@ -23,12 +24,12 @@ Status: `Approved`
 | Non-goals | do not test semantic adequacy |
 | Purpose Feedback Boundary | purpose feedback remains separately calibrated |
 | Realization Surface Closure | RSC remains separately calibrated |
-| Single target-achieved predicate | artifact hygiene target-producing evidence is observed |
-| Target-producing evidence required | target-producing evidence is observed |
+| What counts as done | artifact hygiene target-producing evidence is observed |
+| Evidence needed to call it done | target-producing evidence is observed |
 | Non-achieved terminal report handling | report goal achieved: no |
-| Target-producing path | artifact hygiene guard fixture spine |
-| Execution horizon | artifact hygiene guard fixture horizon |
-| Runtime authority | local guard fixture checks |
+| Required answer path | artifact hygiene guard fixture spine |
+| Work covered in this run | artifact hygiene guard fixture horizon |
+| What the agent may do | local guard fixture checks |
 | Forbidden live / irreversible actions | none |
 | Required handling for unauthorized actions | none |
 | Explicitly out-of-scope items | none |
@@ -120,12 +121,12 @@ class ArtifactHygieneTest(unittest.TestCase):
                     "",
                     "| Element | Requirement |",
                     "|---|---|",
-                    "| Single target-achieved predicate | artifact hygiene target-producing evidence is observed |",
+                    "| What counts as done | artifact hygiene target-producing evidence is observed |",
                     "| Required target-producing evidence | target-producing evidence is observed |",
                     "| Allowed achieved claim | only target-achieved predicate supports goal achieved: yes |",
-                    "| Target-producing spine | artifact hygiene guard fixture spine |",
+                    "| Steps that make the result true | artifact hygiene guard fixture spine |",
                     "",
-                    "## Execution Horizon and Authority Contract",
+                    "## Work Covered And Allowed Actions Contract",
                     "",
                     "| Element | Requirement |",
                     "|---|---|",
@@ -171,13 +172,13 @@ class ArtifactHygieneTest(unittest.TestCase):
                     f"- Requirements analysis: `{requirements}`",
                     f"- Goal contract: `{goal}`",
                     "",
-                    "## Horizon and Authority Coverage Matrix",
+                    "## Work Coverage And Action Limits Matrix",
                     "",
-                    "| Batch / surface | In approved horizon? | Runtime authority | Required runtime handling | Counts as achieved? |",
+                    "| Batch / surface | In approved horizon? | What the agent may do | Required runtime handling | Counts as achieved? |",
                     "|---|---|---|---|---|",
                     "| artifact hygiene guard fixture | yes | execute | run guard / compiler fixture checks | yes if fixture passes |",
                     "",
-                    "## Target-Producing Spine",
+                    "## Steps That Make The Result True",
                     "",
                     "| Spine node | Required state transition | Required evidence |",
                     "|---|---|---|",
@@ -210,7 +211,7 @@ class ArtifactHygieneTest(unittest.TestCase):
                     "",
                     "Selected topology: `Main-only`",
                     "",
-                    "Selected delegation substrate: `none`",
+                    "Selected agent workflow: `none`",
                     "",
                     "Topology rationale:",
                     "",
@@ -280,8 +281,8 @@ class ArtifactHygieneTest(unittest.TestCase):
                     "- Purpose feedback adequacy: `yes`",
                     "- Realization surface closure adequacy: `yes`",
                     "- Target achievement predicate fidelity: `yes`",
-                    "- Target-producing spine fidelity: `yes`",
-                    "- Execution horizon and authority fidelity: `yes`",
+                    "- answer path check: `yes`",
+                    "- Work covered in this run and authority fidelity: `yes`",
                     "",
                     "## Human Setpoint Fidelity",
                     "",
@@ -308,12 +309,12 @@ class ArtifactHygieneTest(unittest.TestCase):
                     "Findings:",
                     "- The single target-achieved predicate is separated from non-achieved terminal reports.",
                     "",
-                    "## Target-Producing Spine Fidelity",
+                    "## Answer Path Check",
                     "",
                     "Findings:",
                     "- Work packages map to the fixture spine node.",
                     "",
-                    "## Execution Horizon and Authority Fidelity",
+                    "## Work Covered And Allowed Actions Check",
                     "",
                     "Findings:",
                     "- Approved horizon and runtime authority are compact and fixture-bounded.",
@@ -348,7 +349,7 @@ class ArtifactHygieneTest(unittest.TestCase):
                     [
                         "# Requirements",
                         "",
-                        "## Human Setpoint Approval",
+                        "## What the User Approved",
                         "",
                         "Status: `Pending / Approved / Rejected / Needs Revision / Not required`",
                         "",
@@ -415,6 +416,59 @@ class ArtifactHygieneTest(unittest.TestCase):
         self.assertEqual(0, result.returncode, result.stdout + result.stderr)
         self.assertIn("SKIP", result.stdout)
 
+    def test_jargon_policy_exists_for_user_visible_artifacts(self):
+        policy = JARGON_POLICY.read_text(encoding="utf-8")
+
+        self.assertIn("forbidden_in_user_artifacts", policy)
+        self.assertIn("Task skeleton family", policy)
+        self.assertIn("How this should be answered", policy)
+        self.assertIn("Target-achieved predicate", policy)
+        self.assertIn("What counts as done", policy)
+        self.assertIn("allowed_internal_paths", policy)
+
+    def test_hygiene_lint_rejects_user_visible_jargon(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            artifact = Path(tmpdir) / "requirements.md"
+            artifact.write_text(
+                "\n".join(
+                    [
+                        "# Requirements",
+                        "",
+                        "## What The User Approved",
+                        "",
+                        "| Element | Commitment |",
+                        "|---|---|",
+                        "| Task skeleton family | coverage-ceiling-measurement |",
+                        "| Target-achieved predicate | candidate report complete |",
+                        "",
+                    ]
+                ),
+                encoding="utf-8",
+            )
+
+            result = self.run_lint(artifact)
+
+            self.assertEqual(2, result.returncode, result.stdout + result.stderr)
+            self.assertIn("user-visible jargon", result.stdout)
+            self.assertIn("Task skeleton family", result.stdout)
+            self.assertIn("How this should be answered", result.stdout)
+
+    def test_user_facing_templates_use_plain_answering_language(self):
+        requirements_template = (
+            ROOT / ".agents/skills/analyzing-cybernetic-requirements/assets/requirements-analysis-template.md"
+        ).read_text(encoding="utf-8")
+        design_template = (
+            ROOT / ".agents/skills/designing-cybernetic-solutions/assets/solution-design-template.md"
+        ).read_text(encoding="utf-8")
+
+        self.assertIn("How this should be answered", requirements_template)
+        self.assertIn("What is not enough", requirements_template)
+        self.assertIn("Required answer path", requirements_template)
+        self.assertNotIn("Task skeleton family", requirements_template)
+        self.assertNotIn("Not-sufficient substitute", requirements_template)
+        self.assertIn("Approved answer method", design_template)
+        self.assertIn("Approved answer type", design_template)
+
     def test_hygiene_lint_enforces_hard_size_budget_with_justification_escape(self):
         with tempfile.TemporaryDirectory() as tmpdir:
             plan = Path(tmpdir) / "plan.md"
@@ -440,7 +494,7 @@ class ArtifactHygieneTest(unittest.TestCase):
             encoding="utf-8"
         )
 
-        hsa_section = template.split("## Human Setpoint Approval", 1)[1].split("## Human Purpose", 1)[0]
+        hsa_section = template.split("## What the User Approved", 1)[1].split("## Human Purpose", 1)[0]
         self.assertIn("Status: `Pending`", hsa_section)
         self.assertIn("Allowed values: `Pending / Approved / Rejected / Needs Revision / Not required`", hsa_section)
         self.assertNotIn("Status: `Pending / Approved", hsa_section)
@@ -451,6 +505,8 @@ class ArtifactHygieneTest(unittest.TestCase):
         self.assertIn("INV-HYG-001", matrix)
         self.assertIn("lint_cybernetic_artifact_hygiene.py", matrix)
         self.assertIn("Artifact Hygiene / Signal-to-Noise", matrix)
+        self.assertIn("INV-LANG-001", matrix)
+        self.assertIn("jargon-policy.yaml", matrix)
 
     def test_control_chain_guard_rejects_goal_hygiene_pollution(self):
         with tempfile.TemporaryDirectory() as tmpdir:

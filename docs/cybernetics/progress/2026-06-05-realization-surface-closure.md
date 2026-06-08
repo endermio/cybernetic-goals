@@ -69,11 +69,11 @@
   - `git diff --check`: clean;
 - next gate: operator packaging decision.
 
-## 2026-06-05 Human Setpoint Approval Invariant
+## 2026-06-05 What the User Approved Invariant
 
 - batch/status: `INV-HSA-001` implemented as a core pre-design approval invariant;
 - surfaces acted on or inspected: requirements skill/template/evals, router wording/evals, orchestrator skill/evals/guard, design/goal/execution-policy skills, review skill/template/evals, runtime compiler skill/template/script/evals, control-chain guard, invariant matrix, MANIFEST, tests, and current RSC dogfood requirements/review/runtime-goal artifacts;
-- residuals and reconciliation: `Requirements Analysis Status: Complete` no longer implies human approval; answered clarification questions remain inputs; full pre-goal orchestration and runtime compile now require `Human Setpoint Approval: Approved`; downstream review checks Human Setpoint Fidelity rather than asking humans to review execution artifacts later;
+- residuals and reconciliation: `Requirements Analysis Status: Complete` no longer implies human approval; answered clarification questions remain inputs; full pre-goal orchestration and runtime compile now require `What the User Approved: Approved`; downstream review checks Human Setpoint Fidelity rather than asking humans to review execution artifacts later;
 - commands run and summarized results:
   - `python3 -m unittest tests.skills.test_human_setpoint_approval`: `OK`, 7 tests;
   - `python3 -m unittest tests.skills.test_context_topology tests.skills.test_purpose_feedback_boundary tests.skills.test_realization_surface_closure tests.skills.test_human_setpoint_approval`: `OK`, 48 tests;

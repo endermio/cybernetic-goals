@@ -13,7 +13,7 @@ SCRIPT = (
 )
 
 
-HSA_APPROVED = """## Human Setpoint Approval
+HSA_APPROVED = """## What the User Approved
 
 Status: `Approved`
 
@@ -100,13 +100,13 @@ class PregoalHandoffPredictorTest(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmpdir:
             requirements = self.write_requirements(
                 Path(tmpdir),
-                hsa="## Human Setpoint Approval\n\nStatus: `Pending`\n",
+                hsa="## What the User Approved\n\nStatus: `Pending`\n",
             )
             result = self.run_script(requirements)
 
         output = result.stdout + result.stderr
         self.assertNotEqual(result.returncode, 0)
-        self.assertIn("Human Setpoint Approval is not Approved", output)
+        self.assertIn("What the User Approved is not Approved", output)
         self.assertIn("approve or revise the compact control commitment", output)
         self.assertNotIn("$orchestrating-cybernetic-pregoal", output)
         self.assertNotIn("/goal Execute", output)

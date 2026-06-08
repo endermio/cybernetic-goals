@@ -12,7 +12,7 @@ Produce a runtime goal contract artifact and a short executable `/goal` pointer 
 Inputs:
 
 - requirements analysis brief with status Complete
-- Human Setpoint Approval: Approved in the requirements analysis
+- What the User Approved: Approved in the requirements analysis
 - solution design, when Design Gate was required or a design exists
 - goal contract
 - execution policy / plan
@@ -35,17 +35,17 @@ The user-entered `/goal` must be pointer-only and length-bounded. It points to a
 Do not output `/goal` unless:
 
 - requirements analysis status is Complete;
-- requirements analysis includes `Human Setpoint Approval: Approved`;
+- requirements analysis includes `What the User Approved: Approved`;
 - goal contract exists;
 - solution design exists when Design Gate was required or a design artifact exists;
 - execution policy exists;
 - control review status is Approved;
-- if HSA records an answering method or task skeleton family, solution design includes `Task Skeleton Fidelity`;
-- if HSA records an answering method or task skeleton family, control review records `Design skeleton fidelity: yes` in Review Independence and includes meaningful `Design Skeleton Fidelity` findings;
+- if HSA records an answering method or answer type, solution design includes `Answer Method Check`;
+- if HSA records an answering method or answer type, control review records `Design answer method check: yes` in Review Independence and includes meaningful `Design Answer Method Check` findings;
 - control review records `Context management / execution topology: yes` in Review Independence;
 - control review includes meaningful `Context Management / Execution Topology` findings;
 - when subagent-driven topology is selected, execution policy records `Subagent execution mode` and `Max concurrent subagents`;
-- when a Superpowers delegation substrate is selected, execution policy uses a compatible mode: `$superpowers:subagent-driven-development` only for `serial-single-active`, and `$superpowers:dispatching-parallel-agents` only for `parallel-max-safe`;
+- when a Superpowers agent workflow is selected, execution policy uses a compatible mode: `$superpowers:subagent-driven-development` only for `serial-single-active`, and `$superpowers:dispatching-parallel-agents` only for `parallel-max-safe`;
 - when subagent-driven topology is selected, control review records `Subagent concurrency fidelity: yes` in Review Independence and includes meaningful `Subagent Concurrency Fidelity` findings;
 - goal includes a compact `Purpose Feedback Contract`;
 - control review records `Purpose feedback adequacy: yes` in Review Independence;
@@ -55,18 +55,18 @@ Do not output `/goal` unless:
 - control review records `Realization surface closure adequacy: yes` in Review Independence;
 - control review includes meaningful `Realization Surface Closure Adequacy` findings;
 - goal includes a compact `Target Achievement Contract`;
-- goal `Target Achievement Contract` includes a target-producing spine reference;
-- execution policy includes `Target-Producing Spine`;
+- goal `Target Achievement Contract` includes a required answer path reference;
+- execution policy includes `Steps That Make The Result True`;
 - execution policy includes `Target-Producing Action Strategy`;
 - execution policy `Candidate Plan Tasks` map work packages to `Spine node(s)`;
 - control review records `Target achievement predicate fidelity: yes` in Review Independence;
 - control review includes meaningful `Target Achievement Predicate Fidelity` findings;
-- control review records `Target-producing spine fidelity: yes` in Review Independence;
-- control review includes meaningful `Target-Producing Spine Fidelity` findings;
-- goal includes a compact `Execution Horizon and Authority Contract`;
-- execution policy includes `Horizon and Authority Coverage Matrix`;
-- control review records `Execution horizon and authority fidelity: yes` in Review Independence;
-- control review includes meaningful `Execution Horizon and Authority Fidelity` findings;
+- control review records `answer path check: yes` in Review Independence;
+- control review includes meaningful `Answer Path Check` findings;
+- goal includes a compact `Work Covered And Allowed Actions Contract`;
+- execution policy includes `Work Coverage And Action Limits Matrix`;
+- control review records `Work covered in this run and authority fidelity: yes` in Review Independence;
+- control review includes meaningful `Work Covered And Allowed Actions Check` findings;
 - control review includes `Final Observer Check`;
 - final observer check allows approval;
 - any substantive post-review change has final re-review recorded;
@@ -82,10 +82,10 @@ Do not output `/goal` unless:
 The contract artifact must be an index-style control contract, not a long copied prompt. It must include:
 
 - approved control chain paths for requirements, design when present, goal, execution policy, and control review;
-- a runtime execution rule that forbids reinterpreting the approved setpoint, answering method, task skeleton, target-achieved predicate, output contract, topology, sensors, or control strategy;
-- a human-approved setpoint rule that treats primary object, requested transformation, non-goals, answering method, not-sufficient substitute, task skeleton family, execution horizon, runtime authority, forbidden actions, purpose feedback, realization surface closure, single target-achieved predicate, output contract, workflow fit, and known assumptions as source-owned by requirements;
-- required sections to read, including `Human Setpoint Approval`, design `Task Skeleton Fidelity` when design exists, `Target Achievement Contract`, `Execution Horizon and Authority Contract`, `Purpose Feedback Contract`, `Realization Surface Contract`, `Horizon and Authority Coverage Matrix`, `Target-Producing Spine`, `Target-Producing Action Strategy`, `Candidate Plan Tasks`, `Context Management / Execution Topology`, substrate compatibility, subagent execution mode/concurrency sections, `Design Skeleton Fidelity`, `Execution Horizon and Authority Fidelity`, `Subagent Concurrency Fidelity`, `Target-Producing Spine Fidelity`, `Target Achievement Predicate Fidelity`, `Purpose Feedback Adequacy`, `Realization Surface Closure Adequacy`, and `Final Observer Check`;
-- final report fields: `goal achieved: yes/no`, `single target-achieved predicate met: yes/no`, target-producing evidence, target-producing spine coverage and transition evidence, skeleton completion evidence when HSA/design define a task skeleton family, non-achieved reason when no, target-producing action attempted or proof of impossibility when no, smallest next target-producing attempt when no, approved execution horizon, horizon coverage, executed, prepared-only, forbidden-not-executed, explicitly out-of-scope by HSA, purpose feedback status and highest purpose-relevant evidence observed, and realization surfaces covered, actions completed or justified, residuals reconciled, and pending or unknown surfaces when RSC applies;
+- a runtime execution rule that forbids reinterpreting the what the user approved, answering method, task skeleton, what counts as done, output contract, topology, sensors, or control strategy;
+- a What the User Approved rule that treats primary object, requested transformation, non-goals, answering method, what is not enough, answer type, work covered in this run, what the agent may do, forbidden actions, purpose feedback, realization surface closure, what counts as done, output contract, workflow fit, and known assumptions as source-owned by requirements;
+- required sections to read, including `What the User Approved`, design `Answer Method Check` when design exists, `Target Achievement Contract`, `Work Covered And Allowed Actions Contract`, `Purpose Feedback Contract`, `Realization Surface Contract`, `Work Coverage And Action Limits Matrix`, `Steps That Make The Result True`, `Target-Producing Action Strategy`, `Candidate Plan Tasks`, `Context Management / Execution Topology`, substrate compatibility, subagent execution mode/concurrency sections, `Design Answer Method Check`, `Work Covered And Allowed Actions Check`, `Subagent Concurrency Fidelity`, `Answer Path Check`, `Target Achievement Predicate Fidelity`, `Purpose Feedback Adequacy`, `Realization Surface Closure Adequacy`, and `Final Observer Check`;
+- final report fields: `goal achieved: yes/no`, `what counts as done met: yes/no`, target-producing evidence, required answer path coverage and step evidence, answer method completion evidence when requirements/design define an answer type, non-achieved reason when no, target-producing action attempted or proof of impossibility when no, smallest next target-producing attempt when no, work covered in this run, horizon coverage, executed, prepared-only, forbidden-not-executed, explicitly out-of-scope by HSA, purpose feedback status and highest purpose-relevant evidence observed, and realization surfaces covered, actions completed or justified, residuals reconciled, and pending or unknown surfaces when RSC applies;
 - a stop rule for missing, unapproved, inconsistent, or insufficient referenced artifacts.
 
 The final `/goal` command must only point to this runtime goal contract and tell runtime Codex to read it first.
@@ -126,7 +126,7 @@ Use this /goal:
 
 Preflight:
 - Requirements analysis: Complete
-- Human Setpoint Approval: Approved
+- What the User Approved: Approved
 - Goal: present
 - Solution design: present or not required
 - Execution policy: present
@@ -159,8 +159,8 @@ Do not create or modify target-work artifacts.
 ## Validation Checklist
 
 - [ ] Guard passed or equivalent checks passed.
-- [ ] Requirements analysis contains Human Setpoint Approval: Approved.
-- [ ] Design Skeleton Fidelity is reviewed when HSA records an answering method or skeleton family.
+- [ ] Requirements analysis contains What the User Approved: Approved.
+- [ ] Design Answer Method Check is reviewed when HSA records an answering method or skeleton family.
 - [ ] No control artifact was rewritten.
 - [ ] Control review records `Context management / execution topology: yes` in Review Independence.
 - [ ] Control review includes meaningful `Context Management / Execution Topology` findings.
@@ -171,10 +171,10 @@ Do not create or modify target-work artifacts.
 - [ ] Runtime goal contract references all approved files.
 - [ ] Runtime goal contract indexes the goal's Final Output Contract when present or required.
 - [ ] Runtime goal contract preserves the approved execution topology through the plan section index.
-- [ ] Runtime goal contract preserves the human-approved setpoint through the requirements section index.
-- [ ] Runtime goal contract indexes design `Task Skeleton Fidelity` and review `Design Skeleton Fidelity` when design exists.
+- [ ] Runtime goal contract preserves the What the User Approved through the requirements section index.
+- [ ] Runtime goal contract indexes design `Answer Method Check` and review `Design Answer Method Check` when design exists.
 - [ ] Runtime goal contract includes final report fields for EHA, PFB, RSC, and TAP claim calibration.
-- [ ] Runtime goal contract indexes the approved Target-Producing Spine and review fidelity section.
+- [ ] Runtime goal contract indexes the approved Steps That Make The Result True and review fidelity section.
 - [ ] The user-entered `/goal` is pointer-only and length-bounded.
 - [ ] The user-entered `/goal` does not inline HSA, PFB, RSC, TAP, topology, sensor-governance, review, or subagent protocol prose.
 - [ ] The final `/goal` does not ask runtime Codex to write a new plan.

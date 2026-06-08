@@ -44,7 +44,7 @@
         "Mentions unresolved requirement semantics.",
         "Mentions unresolved observation-flow semantics.",
         "Recommends $analyzing-cybernetic-requirements.",
-        "Recommends $orchestrating-cybernetic-pregoal only after requirements analysis is complete and Human Setpoint Approval is Approved."
+        "Recommends $orchestrating-cybernetic-pregoal only after requirements analysis is complete and What the User Approved is Approved."
       ]
     },
     {
@@ -160,7 +160,7 @@
         "Includes Required gates with Design Gate required.",
         "Explains that the execution agent would otherwise need to invent the solution structure.",
         "Recommends $analyzing-cybernetic-requirements before pre-goal orchestration.",
-        "Recommends $orchestrating-cybernetic-pregoal only after requirements analysis is complete and Human Setpoint Approval is Approved.",
+        "Recommends $orchestrating-cybernetic-pregoal only after requirements analysis is complete and What the User Approved is Approved.",
         "Does not recommend $designing-cybernetic-solutions as a standalone manual step before orchestration for Level 3 full pre-goal work.",
         "Explains that the orchestrator invokes or requests $designing-cybernetic-solutions when Design Gate is required.",
         "Keeps the routing decision as Level 3 without encoding a suffix such as Level 3D."

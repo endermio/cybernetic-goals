@@ -24,9 +24,9 @@ Cybernetic constraints supplied to the substrate:
 - dependency matrix;
 - context management / execution topology;
 - subagent execution mode and concurrency policy;
-- horizon and authority coverage matrix;
+- work coverage and action limits matrix;
 - realization surface closure strategy;
-- target-producing spine;
+- required answer path;
 - target-producing action strategy;
 - execution granularity and sensor budget;
 - batch cadence;
@@ -65,7 +65,7 @@ Task level: `Level 0 / Level 1 / Level 2 / Level 3 / Level 4`
 
 Selected topology: `Main-only / Serial subagent-driven / Parallel subagent-driven`
 
-Selected delegation substrate: `bounded-protocol / superpowers-subagent-driven-development / superpowers-dispatching-parallel-agents / adapter-specific / none`
+Selected agent workflow: `bounded-protocol / superpowers-subagent-driven-development / superpowers-dispatching-parallel-agents / adapter-specific / none`
 
 Subagent execution mode: `none / serial-single-active / parallel-max-safe`
 
@@ -75,7 +75,7 @@ Substrate compatibility:
 
 Use `.agents/skills/references/delegation-substrate-registry.json` as the source of substrate capability boundaries.
 
-| Selected delegation substrate | Allowed topology | Allowed mode |
+| Selected agent workflow | Allowed topology | Allowed mode |
 |---|---|---|
 | `superpowers-subagent-driven-development` | `Serial subagent-driven` | `serial-single-active` |
 | `superpowers-dispatching-parallel-agents` | `Parallel subagent-driven` | `parallel-max-safe` |
@@ -83,7 +83,7 @@ Use `.agents/skills/references/delegation-substrate-registry.json` as the source
 | `adapter-specific` | `Serial subagent-driven / Parallel subagent-driven` | `serial-single-active / parallel-max-safe` |
 | `none` | `Main-only` | `none` |
 
-Substrate compatibility rationale:
+Agent workflow compatibility rationale:
 
 - [required when HSA substrate preference is not used or when a requested substrate is incompatible with the selected topology/mode]
 
@@ -158,10 +158,10 @@ Each delegated work package must define a bounded operating context, not just ar
 | Stop conditions | [conditions that force the subagent to stop and report rather than continue] |
 | Expected return format | [summary/evidence/blocker format required for integration] |
 
-Subagent delegation substrate:
+Subagent workflow:
 
 - [Record the approved bounded subagent delegation protocol for serial or parallel subagent-driven topology.]
-- [This must match Selected delegation substrate.]
+- [This must match Selected agent workflow.]
 - [Use `superpowers-subagent-driven-development` only for `Serial subagent-driven` + `serial-single-active` + `Max concurrent subagents: 1`.]
 - [Use `superpowers-dispatching-parallel-agents` only for `Parallel subagent-driven` + `parallel-max-safe` under the approved wave/lock/barrier/integration structure.]
 
@@ -179,9 +179,9 @@ Rules:
 - Use `Serial subagent-driven` with `Subagent execution mode: serial-single-active` and `Max concurrent subagents: 1`.
 - The main agent must coordinate, integrate, maintain the progress log, and detect stop conditions.
 - A subagent must not modify control artifacts, widen scope, replace topology, or bypass the integration gate.
-- Do not treat `$superpowers:subagent-driven-development` as the generic delegation substrate; it is serial-single-active only.
+- Do not treat `$superpowers:subagent-driven-development` as the generic agent workflow; it is serial-single-active only.
 - Do not use `$superpowers:subagent-driven-development` with `parallel-max-safe`; use `superpowers-dispatching-parallel-agents`, `bounded-protocol`, or `adapter-specific` for max-safe parallel execution.
-- `Selected delegation substrate: none` is allowed only for `Main-only`.
+- `Selected agent workflow: none` is allowed only for `Main-only`.
 - If the selected topology becomes insufficient, stop and revise the execution policy; do not let runtime improvise a new topology.
 
 Context Compression Rule:
@@ -197,18 +197,18 @@ At each batch boundary, update the progress log with:
 - Deviations from policy: [deviations and whether execution must stop]
 - Next allowed action: [next policy-approved action]
 
-## Horizon and Authority Coverage Matrix
+## Work Coverage And Action Limits Matrix
 
 Use this section for full-route or multi-batch controlled work. Authority limits define runtime handling; they must not silently shrink the approved horizon.
 
-| Batch / surface | In approved horizon? | Runtime authority | Required runtime handling | Counts as achieved? |
+| Batch / surface | In approved horizon? | What the agent may do | Required runtime handling | Counts as achieved? |
 |---|---|---|---|---|
 | [batch or surface] | `yes/no; if no, cite HSA out-of-scope item` | `execute / prepare-only / observe-only / forbidden-not-executed / explicitly out-of-scope by HSA` | [execute, prepare runbook, observe, report not executed, or exclude by HSA] | [yes/no and claim wording] |
 
 Rules:
 
 - Every approved horizon item must be accounted for as executed, prepared-only, observe-only, forbidden-not-executed, or explicitly out-of-scope by HSA.
-- Runtime authority limits change handling, not scope.
+- What the agent may do limits change handling, not scope.
 - Do not move approved horizon items to future roadmap, handoff, or later goal because they are unauthorized for direct execution.
 - Unauthorized live or irreversible actions must be reported as not executed, with required preparation evidence when applicable.
 - If the approved horizon itself is too broad, stop and return to requirements/HSA revision instead of narrowing it inside the execution policy.
@@ -267,7 +267,7 @@ After action, reconcile:
 
 Domain adapters own concrete surface discovery and verification methods. The core policy owns surface/action/residual/reconciliation structure.
 
-## Target-Producing Spine
+## Steps That Make The Result True
 
 For target-achieving implementation work, decompose by the state transitions that produce the target, not by component inventory.
 
@@ -286,7 +286,7 @@ Rules:
 
 Target-producing action required:
 
-- [the action, probe, experiment, change, or observation that must be attempted to satisfy the single target-achieved predicate]
+- [the action, probe, experiment, change, or observation that must be attempted to satisfy the what counts as done]
 
 Proof of impossibility, if any:
 
@@ -295,7 +295,7 @@ Proof of impossibility, if any:
 Non-achieved terminal report rule:
 
 - A non-achieved report may be produced only after the target-producing action is attempted and fails, or after impossibility is proven.
-- A non-achieved report cannot satisfy the single target-achieved predicate.
+- A non-achieved report cannot satisfy the what counts as done.
 
 ## Execution Granularity and Sensor Budget
 
@@ -504,9 +504,9 @@ Each entry must include:
 - result
 - sensor interpretation
 - purpose feedback status
-- single target-achieved predicate met
+- what counts as done met
 - target-producing evidence
-- target-producing spine node status
+- required answer path step status
 - spine transitions satisfied
 - spine transitions failed / blocked / unobserved
 - supporting-only work completed

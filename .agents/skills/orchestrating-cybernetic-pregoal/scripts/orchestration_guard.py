@@ -45,7 +45,11 @@ NEXT_ACTION = {
 def blocked_next_action(errors: list[str]) -> str:
     """Return the next corrective orchestration action for a blocked transition."""
     joined = "\n".join(errors).casefold()
-    if "human setpoint approval" in joined or "hsa delegation substrate preference conflicts" in joined:
+    if (
+        "requirements missing ## what the user approved" in joined
+        or "what the user approved is not approved" in joined
+        or "records conflicting agent workflow preference" in joined
+    ):
         return "ReturnToRequirementsAnalysis"
     if "$designing-cybernetic-solutions is unavailable" in joined:
         return "Blocked"
@@ -55,7 +59,7 @@ def blocked_next_action(errors: list[str]) -> str:
         "design status" in joined
         or "design does not reference" in joined
         or "design has blocking" in joined
-        or "task skeleton fidelity" in joined
+        or "answer method check" in joined
     ):
         return "RunDesign"
     if "output contract gate" in joined and "design lacks" in joined:
@@ -81,17 +85,17 @@ def blocked_next_action(errors: list[str]) -> str:
         or "concurrency frontier rule" in joined
         or "safe frontier" in joined
         or "runtime delegation preference" in joined
-        or "delegation substrate preference" in joined
+        or "agent workflow preference" in joined
         or "main-agent integration rule" in joined
         or "execution policy missing ## target-producing action strategy" in joined
         or "execution policy target-producing action strategy missing" in joined
-        or "execution policy missing ## target-producing spine" in joined
-        or "execution policy target-producing spine" in joined
+        or "execution policy missing ## steps that make the result true" in joined
+        or "execution policy steps that make the result true" in joined
         or "execution policy missing ## candidate plan tasks" in joined
         or "execution policy candidate plan task missing" in joined
         or "candidate plan tasks has no candidate tasks" in joined
-        or "execution policy missing ## horizon and authority coverage matrix" in joined
-        or "execution policy horizon and authority coverage matrix" in joined
+        or "execution policy missing ## work coverage and action limits matrix" in joined
+        or "execution policy work coverage and action limits matrix" in joined
     ):
         return "RunExecutionPolicy"
     if (
@@ -259,7 +263,7 @@ def selected_delegation_substrate(plan: str | None) -> str | None:
     body = section_body(plan or "", "Context Management / Execution Topology")
     if body is None:
         return None
-    match = re.search(r"(?im)^\s*Selected delegation substrate\s*:\s*`?([^`\n]+?)`?\s*$", body)
+    match = re.search(r"(?im)^\s*Selected agent workflow\s*:\s*`?([^`\n]+?)`?\s*$", body)
     if not match:
         return None
 
@@ -538,11 +542,11 @@ def check_execution_topology(plan: str | None, errors: list[str]) -> None:
         check_labeled_requirements(body, "Context Pack Requirements", CONTEXT_PACK_FIELDS, errors)
         substrate = selected_delegation_substrate(plan)
         if substrate is None:
-            errors.append("subagent-driven topology missing valid Selected delegation substrate")
+            errors.append("subagent-driven topology missing valid Selected agent workflow")
         elif substrate == "none":
-            errors.append("subagent-driven topology cannot use Selected delegation substrate: none")
-        if not labeled_block_has_content(body, "Subagent delegation substrate"):
-            errors.append("subagent-driven topology missing approved bounded subagent delegation substrate")
+            errors.append("subagent-driven topology cannot use Selected agent workflow: none")
+        if not labeled_block_has_content(body, "Subagent workflow"):
+            errors.append("subagent-driven topology missing approved bounded subagent workflow")
 
         mode = selected_subagent_execution_mode(plan)
         max_concurrent = max_concurrent_subagents(plan)
@@ -596,24 +600,24 @@ def check_substrate_mode_compatibility(
         allowed_mode = registry_list_field(definition, "allowed_mode")
         max_rule = str(definition.get("max_concurrent", "")).strip()
         if allowed_topology and topology not in allowed_topology:
-            errors.append(f"Selected delegation substrate {substrate} is not compatible with topology {topology}")
+            errors.append(f"Selected agent workflow {substrate} is not compatible with topology {topology}")
         if allowed_mode and mode not in allowed_mode:
-            errors.append(f"Selected delegation substrate {substrate} is not compatible with Subagent execution mode: {mode}")
+            errors.append(f"Selected agent workflow {substrate} is not compatible with Subagent execution mode: {mode}")
         if max_rule == "1" and max_concurrent != "1":
-            errors.append(f"Selected delegation substrate {substrate} requires Max concurrent subagents: 1")
+            errors.append(f"Selected agent workflow {substrate} requires Max concurrent subagents: 1")
 
     if substrate == "superpowers-subagent-driven-development":
         if topology != "Serial subagent-driven" or mode != "serial-single-active" or max_concurrent != "1":
             errors.append(
-                "Selected delegation substrate superpowers-subagent-driven-development supports only Serial subagent-driven, Subagent execution mode: serial-single-active, Max concurrent subagents: 1; it cannot be used with parallel-max-safe"
+                "Selected agent workflow superpowers-subagent-driven-development supports only Serial subagent-driven, Subagent execution mode: serial-single-active, Max concurrent subagents: 1; it cannot be used with parallel-max-safe"
             )
     if substrate == "superpowers-dispatching-parallel-agents":
         if topology != "Parallel subagent-driven" or mode != "parallel-max-safe":
             errors.append(
-                "Selected delegation substrate superpowers-dispatching-parallel-agents supports only Parallel subagent-driven with Subagent execution mode: parallel-max-safe"
+                "Selected agent workflow superpowers-dispatching-parallel-agents supports only Parallel subagent-driven with Subagent execution mode: parallel-max-safe"
             )
     if mode == "parallel-max-safe" and substrate == "superpowers-subagent-driven-development":
-        errors.append("parallel-max-safe cannot use Selected delegation substrate: superpowers-subagent-driven-development")
+        errors.append("parallel-max-safe cannot use Selected agent workflow: superpowers-subagent-driven-development")
 
 
 def check_plan_target_producing_strategy(plan: str | None, errors: list[str]) -> None:
@@ -631,13 +635,13 @@ def check_plan_target_producing_strategy(plan: str | None, errors: list[str]) ->
 
 
 def check_plan_target_producing_spine(plan: str | None, errors: list[str]) -> None:
-    body = section_body(plan or "", "Target-Producing Spine")
+    body = section_body(plan or "", "Steps That Make The Result True")
     if body is None:
-        errors.append("execution policy missing ## Target-Producing Spine")
+        errors.append("execution policy missing ## Steps That Make The Result True")
         return
     required_columns = ["Spine node", "Required state transition", "Required evidence"]
     if not has_table_with_data_row(body, required_columns):
-        errors.append("execution policy Target-Producing Spine has no meaningful spine transition rows")
+        errors.append("execution policy Steps That Make The Result True has no meaningful spine transition rows")
 
 
 def check_candidate_plan_tasks_spine_nodes(plan: str | None, errors: list[str]) -> None:
@@ -671,19 +675,19 @@ def check_candidate_plan_tasks_spine_nodes(plan: str | None, errors: list[str]) 
 
 
 def check_plan_horizon_authority(plan: str | None, errors: list[str]) -> None:
-    body = section_body(plan or "", "Horizon and Authority Coverage Matrix")
+    body = section_body(plan or "", "Work Coverage And Action Limits Matrix")
     if body is None:
-        errors.append("execution policy missing ## Horizon and Authority Coverage Matrix")
+        errors.append("execution policy missing ## Work Coverage And Action Limits Matrix")
         return
     required_columns = [
         "Batch / surface",
         "In approved horizon?",
-        "Runtime authority",
+        "What the agent may do",
         "Required runtime handling",
         "Counts as achieved?",
     ]
     if not has_table_with_data_row(body, required_columns):
-        errors.append("execution policy Horizon and Authority Coverage Matrix has no meaningful coverage rows")
+        errors.append("execution policy Work Coverage And Action Limits Matrix has no meaningful coverage rows")
 
 
 def has_blocking_design_questions(design: str) -> bool:
@@ -756,21 +760,21 @@ def check_requirements(requirements: str | None, errors: list[str]) -> None:
     status = first_section_status(requirements, "Requirements Analysis Status", "Clarification Status")
     if status != "Complete":
         errors.append(f"requirements analysis status is not Complete: {status!r}")
-    hsa_body = section_body(requirements, "Human Setpoint Approval")
+    hsa_body = section_body(requirements, "What the User Approved")
     if hsa_body is None:
-        errors.append("requirements missing ## Human Setpoint Approval")
+        errors.append("requirements missing ## What the User Approved")
         return
-    hsa_status = section_status(requirements, "Human Setpoint Approval")
+    hsa_status = section_status(requirements, "What the User Approved")
     if hsa_status != "Approved":
-        errors.append(f"Human Setpoint Approval is not Approved: {hsa_status!r}")
+        errors.append(f"What the User Approved is not Approved: {hsa_status!r}")
 
 
 def check_max_safe_parallel_preference(requirements: str | None, plan: str | None, errors: list[str]) -> None:
-    hsa = section_body(requirements or "", "Human Setpoint Approval")
+    hsa = section_body(requirements or "", "What the User Approved")
     if hsa is None or plan is None:
         return
 
-    preference = field_value(hsa, "Runtime delegation preference")
+    preference = field_value(hsa, "Agent delegation preference")
     if preference is None or preference.casefold() != "max-safe-parallel":
         return
 
@@ -782,23 +786,23 @@ def check_max_safe_parallel_preference(requirements: str | None, plan: str | Non
     rationale = field_value(topology_body, "Concurrency selection rationale")
     if rationale is None or "safe frontier" not in rationale.casefold():
         errors.append(
-            "HSA Runtime delegation preference is max-safe-parallel but execution policy is not Parallel subagent-driven; Concurrency selection rationale must mention safe frontier"
+            "What the User Approved records Agent delegation preference as max-safe-parallel but execution policy is not Parallel subagent-driven; Concurrency selection rationale must mention safe frontier"
         )
 
 
 def check_delegation_substrate_preference(requirements: str | None, plan: str | None, errors: list[str]) -> None:
-    hsa = section_body(requirements or "", "Human Setpoint Approval")
+    hsa = section_body(requirements or "", "What the User Approved")
     if hsa is None:
         return
 
-    substrate_preference = normalize_delegation_substrate(field_value(hsa, "Delegation substrate preference"))
+    substrate_preference = normalize_delegation_substrate(field_value(hsa, "Agent workflow preference"))
     if substrate_preference in {None, "no preference"}:
         return
 
-    runtime_preference = (field_value(hsa, "Runtime delegation preference") or "").casefold()
+    runtime_preference = (field_value(hsa, "Agent delegation preference") or "").casefold()
     if runtime_preference == "max-safe-parallel" and substrate_preference == "superpowers-subagent-driven-development":
         errors.append(
-            "HSA Delegation substrate preference conflicts with Runtime delegation preference: max-safe-parallel; superpowers-subagent-driven-development is serial-single-active only"
+            "What the User Approved records conflicting Agent workflow preference and Agent delegation preference: max-safe-parallel; superpowers-subagent-driven-development is serial-single-active only"
         )
         return
 
@@ -811,14 +815,14 @@ def check_delegation_substrate_preference(requirements: str | None, plan: str | 
 
     topology_body = section_body(plan, "Context Management / Execution Topology") or ""
     rationale = (
-        field_value(topology_body, "Substrate compatibility rationale")
-        or field_value(topology_body, "Delegation substrate compatibility rationale")
+        field_value(topology_body, "Agent workflow compatibility rationale")
+        or field_value(topology_body, "Agent workflow compatibility rationale")
         or ""
     )
     lowered = rationale.casefold()
     if not any(term in lowered for term in ("incompatible", "not compatible", "capability boundary", "unsupported")):
         errors.append(
-            f"HSA Delegation substrate preference is {substrate_preference}, but execution policy selected {selected}; record a substrate compatibility rationale before changing substrate"
+            f"What the User Approved records Agent workflow preference as {substrate_preference}, but execution policy selected {selected}; record an agent workflow compatibility rationale before changing it"
         )
 
 
@@ -872,39 +876,39 @@ def registry_string_list(definition: dict[str, object], key: str) -> list[str]:
 
 
 def check_design_skeleton_fidelity(requirements: str | None, design: str | None, errors: list[str]) -> None:
-    hsa = section_body(requirements or "", "Human Setpoint Approval")
+    hsa = section_body(requirements or "", "What the User Approved")
     if hsa is None or design is None:
         return
 
-    answering_method = field_value(hsa, "Answering method")
-    not_sufficient = field_value(hsa, "Not-sufficient substitute")
-    skeleton_family = field_value(hsa, "Task skeleton family")
+    answering_method = field_value(hsa, "How this should be answered")
+    not_sufficient = field_value(hsa, "What is not enough")
+    skeleton_family = field_value(hsa, "Answer type")
     if not any((answering_method, not_sufficient, skeleton_family)):
         return
 
-    body = section_body(design, "Task Skeleton Fidelity")
+    body = section_body(design, "Answer Method Check")
     if body is None:
-        errors.append("design missing ## Task Skeleton Fidelity for approved answering method / task skeleton family")
+        errors.append("design missing ## Answer Method Check for approved answer method / answer type")
         return
 
     for label in (
-        "Approved answering method",
-        "Approved skeleton family",
-        "Instantiated skeleton",
-        "Mandatory nodes coverage",
-        "Forbidden substitution avoided",
+        "Approved answer method",
+        "Approved answer type",
+        "Required answer path",
+        "Required steps covered",
+        "What is not enough avoided",
     ):
         if not labeled_or_table_field_has_content(body, label):
-            errors.append(f"design Task Skeleton Fidelity missing {label}")
+            errors.append(f"design Answer Method Check missing {label}")
 
     family = (skeleton_family or "").casefold()
-    instantiated = (field_value(body, "Instantiated skeleton") or "").casefold()
-    mandatory = (field_value(body, "Mandatory nodes coverage") or "").casefold()
-    avoided = (field_value(body, "Forbidden substitution avoided") or "").casefold()
+    instantiated = (field_value(body, "Required answer path") or "").casefold()
+    mandatory = (field_value(body, "Required steps covered") or "").casefold()
+    avoided = (field_value(body, "What is not enough avoided") or "").casefold()
     substitute = (not_sufficient or "").casefold()
 
-    if family and family not in (field_value(body, "Approved skeleton family") or "").casefold():
-        errors.append("design Task Skeleton Fidelity does not preserve approved skeleton family")
+    if family and family not in (field_value(body, "Approved answer type") or "").casefold():
+        errors.append("design Answer Method Check does not preserve approved answer type")
 
     definition = task_skeleton_definition(family)
     forbidden_substitutions = registry_string_list(definition, "forbidden_substitutions")
@@ -914,15 +918,15 @@ def check_design_skeleton_fidelity(requirements: str | None, design: str | None,
         forbidden_lower = forbidden.casefold()
         if forbidden_lower in instantiated or (substitute and substitute == forbidden_lower and substitute in instantiated):
             errors.append(
-                f"design Task Skeleton Fidelity substitutes {forbidden} for {family}"
+                f"design Answer Method Check substitutes {forbidden} for {family}"
             )
             break
     if family and forbidden_substitutions:
         if avoided.startswith("no") or " no" in avoided[:12]:
-            errors.append("design Task Skeleton Fidelity records forbidden substitution was not avoided")
+            errors.append("design Answer Method Check records forbidden substitution was not avoided")
     for node in mandatory_nodes:
         if node.casefold() not in mandatory:
-            errors.append(f"design Task Skeleton Fidelity missing {family} mandatory node: {node}")
+            errors.append(f"design Answer Method Check missing {family} mandatory node: {node}")
 
 
 def check_goal_ready(

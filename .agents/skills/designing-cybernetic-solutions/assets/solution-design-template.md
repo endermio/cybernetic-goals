@@ -25,17 +25,17 @@ Status: `Candidate`
 - `$superpowers:brainstorming` status: `Not required / Used / Blocked`
 - Reason: `[why brainstorming was or was not needed]`
 
-## Task Skeleton Fidelity
+## Answer Method Check
 
-Design must be skeleton-first. Use when HSA records an answering method or task skeleton family.
+Design must be skeleton-first. Use when HSA records an answering method or answer type.
 
 | Element | Design |
 |---|---|
-| Approved answering method | [from HSA] |
-| Approved skeleton family | [from HSA] |
-| Instantiated skeleton | [design skeleton] |
-| Mandatory nodes coverage | [required skeleton nodes and coverage status] |
-| Forbidden substitution avoided | [yes/no + rationale; if no, stop and return to HSA revision] |
+| Approved answer method | [from HSA] |
+| Approved answer type | [from HSA] |
+| Required answer path | [design answer path] |
+| Required steps covered | [required answer-path steps and coverage status] |
+| What is not enough avoided | [yes/no + rationale; if no, stop and return to HSA revision] |
 
 ## Target Skeleton Instance
 

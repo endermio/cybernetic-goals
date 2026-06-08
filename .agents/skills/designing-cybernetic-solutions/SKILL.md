@@ -66,9 +66,9 @@ docs/cybernetics/designs/YYYY-MM-DD-<slug>.md
 
 If the requirements analysis is missing, incomplete, or has open blocking human decisions, stop and return to `$analyzing-cybernetic-requirements`.
 
-For Level 3, Level 4, or full pre-goal work, do not proceed unless the requirements analysis contains `Human Setpoint Approval: Approved`, or the current user message explicitly approves the compact control commitment. Level 1/2 bounded design work does not require Human Setpoint Approval unless the requirements analysis records it as required.
+For Level 3, Level 4, or full pre-goal work, do not proceed unless the requirements analysis contains `What the User Approved: Approved`, or the current user message explicitly approves the compact control commitment. Level 1/2 bounded design work does not require What the User Approved unless the requirements analysis records it as required.
 
-If the current user message approves the compact control commitment, update the requirements analysis `Human Setpoint Approval` section first, quoting or referencing that approval, then continue. Do not rely on in-memory approval to pass orchestration or runtime guards.
+If the current user message approves the compact control commitment, update the requirements analysis `What the User Approved` section first, quoting or referencing that approval, then continue. Do not rely on in-memory approval to pass orchestration or runtime guards.
 
 ## Optional Infrastructure
 
@@ -124,23 +124,23 @@ If the output requires a table, matrix, schema, evidence index, structured repor
 
 Do not leave runtime execution to invent the final output shape. Do not define output shape in the response-only handoff; put the design-owned structure in the design artifact.
 
-## Task Skeleton Fidelity
+## Answer Method Check
 
 Design must be skeleton-first. The first design-owned product is the task skeleton instance; support objects, mechanisms, relationships, flows, and evidence model are derived from that skeleton.
 
-For Level 3/4 or full pre-goal work, the design must preserve the approved answering method from Human Setpoint Approval.
+For Level 3/4 or full pre-goal work, the design must preserve the approved answering method from What the User Approved.
 
-When HSA records `Answering method`, `Not-sufficient substitute`, or `Task skeleton family`, the design must include `## Task Skeleton Fidelity` and record:
+When HSA records `How this should be answered`, `What is not enough`, or `Answer type`, the design must include `## Answer Method Check` and record:
 
 - approved answering method;
 - approved skeleton family;
 - instantiated skeleton;
 - mandatory nodes coverage;
-- whether the not-sufficient substitute was avoided.
+- whether the what is not enough was avoided.
 
 The design must not replace the approved answering method with a weaker skeleton because it is easier to execute or verify. If the approved skeleton family is insufficient, infeasible, or unsuitable, stop and return to `$analyzing-cybernetic-requirements` for HSA revision instead of substituting another skeleton.
 
-Use `.agents/skills/references/task-skeleton-registry.json` for skeleton-family mandatory nodes, forbidden substitutions, minimum evidence, and review red flags. If the HSA task skeleton family is missing from the registry, record the gap and return to HSA or design-maintenance work rather than inventing an unreviewed family.
+Use `.agents/skills/references/task-skeleton-registry.json` for skeleton-family mandatory nodes, forbidden substitutions, minimum evidence, and review red flags. If the HSA answer type is missing from the registry, record the gap and return to HSA or design-maintenance work rather than inventing an unreviewed family.
 
 For `coverage-ceiling-measurement`, the design must instantiate a coverage skeleton with these mandatory nodes:
 
@@ -162,7 +162,7 @@ The design artifact must include:
 3. Human Purpose
 4. Confirmed Semantics
 5. Design Substrate
-6. Task Skeleton Fidelity, when HSA records an answering method or task skeleton family
+6. Answer Method Check, when HSA records an answering method or answer type
 7. Target Skeleton Instance
 8. Support Model Mapping
 9. Detailed Design
@@ -187,12 +187,12 @@ Open design questions that affect requirement semantics, controlled relationship
 ## Process
 
 1. Read the completed requirements analysis brief.
-2. For Level 3/4 or full pre-goal work, verify `Human Setpoint Approval: Approved` before deriving or writing the design.
+2. For Level 3/4 or full pre-goal work, verify `What the User Approved: Approved` before deriving or writing the design.
 3. Derive the design path from the requirements path.
 4. Inspect the routing context from the user request, router output, and requirements gates.
 5. Inspect only enough context to avoid generic design.
 6. Identify whether `$superpowers:brainstorming` is required, used, blocked, or not required.
-7. If HSA records an answering method or task skeleton family, instantiate that skeleton and record Task Skeleton Fidelity before deriving any model.
+7. If HSA records an answering method or answer type, instantiate that skeleton and record Answer Method Check before deriving any model.
 8. Build the target skeleton instance: skeleton nodes, answer/state transitions, required evidence, and completion conditions.
 9. Derive the support model mapping from skeleton nodes: support objects, mechanisms, relationships, flows, boundaries, alternatives, and invariants.
 10. Build the detailed model from the support mapping: mechanisms, interfaces/contracts, state/lifecycle, failure model, evidence/sensor model, compatibility/integration, decisions.
@@ -254,7 +254,7 @@ Smallest input needed:
 
 Response-only next step:
 - If requirements analysis is incomplete or has blocking human decisions: return to `$analyzing-cybernetic-requirements` with the missing decision.
-- If Level 3/4 or full pre-goal work lacks `Human Setpoint Approval: Approved`: return to `$analyzing-cybernetic-requirements` for setpoint approval or revision.
+- If Level 3/4 or full pre-goal work lacks `What the User Approved: Approved`: return to `$analyzing-cybernetic-requirements` for setpoint approval or revision.
 - If a design decision is missing: answer the smallest design question, then rerun `$designing-cybernetic-solutions`.
 - For Level 3/4 or full pre-goal work: return this blocked status to `$orchestrating-cybernetic-pregoal`; do not write the goal contract.
 - If the human explicitly says Design Gate is unnecessary: return to the route-appropriate next stage.
@@ -265,8 +265,8 @@ Do not write the goal contract until this design decision is resolved or the hum
 ## Validation Checklist
 
 - [ ] Requirements analysis is complete before design is approved.
-- [ ] For Level 3/4 or full pre-goal work, Human Setpoint Approval is Approved before design starts.
-- [ ] If HSA records Answering method, Not-sufficient substitute, or Task skeleton family, the design includes Task Skeleton Fidelity and does not substitute a weaker skeleton.
+- [ ] For Level 3/4 or full pre-goal work, What the User Approved is Approved before design starts.
+- [ ] If HSA records How this should be answered, What is not enough, or Answer type, the design includes Answer Method Check and does not substitute a weaker skeleton.
 - [ ] The design path uses the requirements analysis date/slug.
 - [ ] The design stays within core cybernetic vocabulary unless an explicit adapter supplies additional terms.
 - [ ] Task skeleton instance appears before support model mapping.

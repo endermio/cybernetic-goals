@@ -60,7 +60,7 @@ def topology_section(plan_path: str) -> str:
 
 def selected_delegation_substrate(plan_path: str) -> str | None:
     body = topology_section(plan_path)
-    match = re.search(r"(?im)^\s*Selected delegation substrate\s*:\s*`?([^`\n]+?)`?\s*$", body)
+    match = re.search(r"(?im)^\s*Selected agent workflow\s*:\s*`?([^`\n]+?)`?\s*$", body)
     if not match:
         return None
 
@@ -164,7 +164,7 @@ def runtime_goal_contract(
 ) -> str:
     design_line = f"- Design: `{design}`" if design else "- Design: `not required`"
     design_required_line = (
-        f"- Design `{design}`: `Task Skeleton Fidelity`, `Output Contract Design`, `Design-to-Goal Mapping`, `Design-to-Execution Mapping`."
+        f"- Design `{design}`: `Answer Method Check`, `Output Contract Design`, `Design-to-Goal Mapping`, `Design-to-Execution Mapping`."
         if design
         else "- Design: `not required`."
     )
@@ -174,14 +174,14 @@ def runtime_goal_contract(
     max_concurrent = max_concurrent_subagents(plan) or "read from approved execution policy"
     if substrate == "superpowers-subagent-driven-development":
         substrate_line = (
-            "- Because the selected delegation substrate is `superpowers-subagent-driven-development`, use `$superpowers:subagent-driven-development` only in `serial-single-active` mode for approved current-session implementation-plan work packages."
+            "- Because the selected agent workflow is `superpowers-subagent-driven-development`, use `$superpowers:subagent-driven-development` only in `serial-single-active` mode for approved current-session implementation-plan work packages."
         )
     elif substrate == "superpowers-dispatching-parallel-agents":
         substrate_line = (
-            "- Because the selected delegation substrate is `superpowers-dispatching-parallel-agents`, use `$superpowers:dispatching-parallel-agents` only for the approved independent work packages in the current wave, under the plan's spine frontier, lock, barrier, failure, and main-agent integration rules."
+            "- Because the selected agent workflow is `superpowers-dispatching-parallel-agents`, use `$superpowers:dispatching-parallel-agents` only for the approved independent work packages in the current wave, under the plan's spine frontier, lock, barrier, failure, and main-agent integration rules."
         )
     else:
-        substrate_line = "- Use only the selected delegation substrate recorded in the approved execution policy."
+        substrate_line = "- Use only the selected agent workflow recorded in the approved execution policy."
 
     return "\n".join(
         [
@@ -197,28 +197,28 @@ def runtime_goal_contract(
             "",
             "## Runtime Execution Rule",
             "",
-            "Execute the approved execution policy under the approved control chain. Do not reinterpret the approved setpoint, answering method, task skeleton, target-achieved predicate, output contract, topology, sensors, or control strategy.",
-            "Treat the human-approved setpoint as the source for primary object, requested transformation, non-goals, answering method, not-sufficient substitute, task skeleton family, execution horizon, runtime authority, forbidden actions, purpose feedback, realization surface closure, single target-achieved predicate, output contract, workflow fit, and known assumptions.",
+            "Execute the approved execution policy under the approved control chain. Do not reinterpret what the user approved, how this should be answered, what counts as done, output contract, topology, checks, or control strategy.",
+            "Treat What the User Approved as the source for primary object, requested transformation, non-goals, how this should be answered, what is not enough, answer type, work covered in this run, what the agent may do, forbidden actions, purpose feedback, realization surface closure, what counts as done, output contract, workflow fit, and known assumptions.",
             "",
             f"- Selected topology: `{topology}`",
-            f"- Selected delegation substrate: `{substrate}`",
+            f"- Selected agent workflow: `{substrate}`",
             f"- Subagent execution mode: `{subagent_mode}`",
             f"- Max concurrent subagents: `{max_concurrent}`",
             "",
             "## Required Sections To Read",
             "",
-            f"- Requirements `{requirements}`: `Human Setpoint Approval`, `Purpose Feedback Boundary`, `Realization Surface Closure`, `Output Contract`.",
+            f"- Requirements `{requirements}`: `What the User Approved`, `Purpose Feedback Boundary`, `Realization Surface Closure`, `Output Contract`.",
             design_required_line,
-            f"- Goal `{goal}`: `Success Condition`, `Target Achievement Contract`, `Execution Horizon and Authority Contract`, `Purpose Feedback Contract`, `Realization Surface Contract`, `Final Output Contract`.",
-            f"- Execution policy `{plan}`: `Horizon and Authority Coverage Matrix`, `Target-Producing Spine`, `Target-Producing Action Strategy`, `Candidate Plan Tasks`, `Context Management / Execution Topology`, `Subagent execution mode`, `Parallel wave matrix`, `Conflict / lock model`, `Failure policy`, `Phase Gates`, `Progress Log Rules`, `Purpose Feedback Strategy`, `Realization Surface Closure Strategy`, `Sensor / Evidence Governance`.",
-            f"- Control review `{review}`: `Design Skeleton Fidelity`, `Execution Horizon and Authority Fidelity`, `Subagent Concurrency Fidelity`, `Target-Producing Spine Fidelity`, `Target Achievement Predicate Fidelity`, `Purpose Feedback Adequacy`, `Realization Surface Closure Adequacy`, `Context Management / Execution Topology`, `Final Observer Check`.",
+            f"- Goal `{goal}`: `Success Condition`, `Target Achievement Contract`, `Work Covered And Allowed Actions Contract`, `Purpose Feedback Contract`, `Realization Surface Contract`, `Final Output Contract`.",
+            f"- Execution policy `{plan}`: `Work Coverage And Action Limits Matrix`, `Steps That Make The Result True`, `Target-Producing Action Strategy`, `Candidate Plan Tasks`, `Context Management / Execution Topology`, `Subagent execution mode`, `Parallel wave matrix`, `Conflict / lock model`, `Failure policy`, `Phase Gates`, `Progress Log Rules`, `Purpose Feedback Strategy`, `Realization Surface Closure Strategy`, `Sensor / Evidence Governance`.",
+            f"- Control review `{review}`: `Design Answer Method Check`, `Work Covered And Allowed Actions Check`, `Subagent Concurrency Fidelity`, `Answer Path Check`, `Target Achievement Predicate Fidelity`, `Purpose Feedback Adequacy`, `Realization Surface Closure Adequacy`, `Context Management / Execution Topology`, `Final Observer Check`.",
             "",
             "## Runtime Discipline",
             "",
             "- Use `$superpowers:executing-plans` discipline against the approved execution policy.",
             "- Use `$superpowers:systematic-debugging` for unclear or repeated failures.",
             "- Use `$superpowers:verification-before-completion` before claiming completion.",
-            "- Follow the approved execution topology and delegation substrate recorded in the execution policy.",
+            "- Follow the approved execution topology and agent workflow recorded in the execution policy.",
             substrate_line,
             "- If `Subagent execution mode` is `serial-single-active`, run exactly one execution subagent at a time and integrate before launching the next.",
             "- If `Subagent execution mode` is `parallel-max-safe`, launch only the current approved wave up to the approved cap, after dependencies are satisfied and conflict locks are disjoint; integrate at the approved barrier before launching the next wave.",
@@ -228,14 +228,14 @@ def runtime_goal_contract(
             "## Final Report Required Fields",
             "",
             "- goal achieved: yes/no",
-            "- single target-achieved predicate met: yes/no",
+            "- what counts as done met: yes/no",
             "- target-producing evidence",
-            "- target-producing spine coverage and transition evidence",
-            "- skeleton completion evidence when HSA/design define a task skeleton family",
+            "- required answer path coverage and step evidence",
+            "- answer method completion evidence when requirements/design define an answer type",
             "- if no: non-achieved reason",
             "- if no: target-producing action attempted or proof of impossibility",
             "- if no: smallest next target-producing attempt",
-            "- approved execution horizon",
+            "- work covered in this run",
             "- horizon coverage: complete / partial / unavailable / explicitly bounded by HSA",
             "- executed",
             "- prepared-only",

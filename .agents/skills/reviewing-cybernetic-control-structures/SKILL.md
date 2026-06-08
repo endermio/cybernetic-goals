@@ -57,7 +57,7 @@ Deterministic-only changes may skip subagent re-review only when all of the foll
 Substantive changes include changes to:
 
 - confirmed semantics;
-- Human Setpoint Approval or the approved compact control commitment;
+- What the User Approved or the approved compact control commitment;
 - solution design objects, relationships, flows, boundaries, interfaces/contracts, evidence model, or design invariants;
 - goal success conditions;
 - scope, boundaries, or invariants;
@@ -66,7 +66,7 @@ Substantive changes include changes to:
 - sensor or evidence structure;
 - purpose feedback boundary, purpose feedback strategy, or completion-claim wording;
 - realization surface closure strategy, residual reconciliation, or target-realization wording;
-- execution horizon, runtime authority, forbidden-action handling, or horizon coverage matrix;
+- work covered in this run, what the agent may do, forbidden-action handling, or horizon coverage matrix;
 - evidence lifecycle, retention, budget, or tracked-evidence policy;
 - progress log required fields;
 - stop conditions;
@@ -90,8 +90,8 @@ The author of a post-review revision must not be the sole approver of that revis
 Record gate verdicts before detailed findings:
 
 1. Design Skeleton Gate
-2. Target-Producing Spine Gate
-3. Execution Horizon / Authority Gate
+2. Steps That Make The Result True Gate
+3. Work Coverage / Action Limits Gate
 4. TAP / PFB / RSC Gate
 5. Topology / Subagent Gate
 
@@ -105,7 +105,7 @@ Every confirmed human decision in the requirements analysis brief must appear in
 
 ### 2. Human Setpoint Fidelity
 
-For Level 3/4 or full pre-goal work, requirements analysis must contain `Human Setpoint Approval: Approved`.
+For Level 3/4 or full pre-goal work, requirements analysis must contain `What the User Approved: Approved`.
 
 Check that design, goal, and execution policy preserve the approved compact control commitment:
 
@@ -116,20 +116,20 @@ Check that design, goal, and execution policy preserve the approved compact cont
 - non-goals;
 - Purpose Feedback Boundary;
 - Realization Surface Closure;
-- Single target-achieved predicate;
-- Target-producing evidence required;
+- What counts as done;
+- Evidence needed to call it done;
 - Non-achieved terminal report handling;
-- Answering method;
-- Not-sufficient substitute;
-- Task skeleton family;
+- How this should be answered;
+- What is not enough;
+- Answer type;
 - Output Contract;
-- Execution horizon;
-- Runtime authority;
+- Work covered in this run;
+- What the agent may do;
 - Forbidden live / irreversible actions;
 - Required handling for unauthorized actions;
 - Explicitly out-of-scope items;
-- Runtime delegation preference;
-- Delegation substrate preference;
+- Agent delegation preference;
+- Agent workflow preference;
 - Parallel execution authority;
 - Parallelism cap;
 - workflow fit;
@@ -151,15 +151,15 @@ When a solution design exists or Design Gate was required:
 - tactical degrees of freedom must not be frozen as semantic invariants unless the design explicitly says so;
 - the plan must not redesign the solution model.
 
-### 5. Design Skeleton Fidelity
+### 5. Design Answer Method Check
 
-When HSA records `Answering method`, `Not-sufficient substitute`, or `Task skeleton family`, the design is a semantic compiler for that approved answering method.
+When HSA records `How this should be answered`, `What is not enough`, or `Answer type`, the design is a semantic compiler for that approved answering method.
 
 Flag as Major or Blocking when:
 
 - design substitutes a weaker skeleton for the approved answering method;
-- design instantiates a different task skeleton family without returning to HSA;
-- design reports the not-sufficient substitute as sufficient;
+- design instantiates a different answer type without returning to HSA;
+- design reports the what is not enough as sufficient;
 - `coverage-ceiling-measurement` lacks full workflow scope inventory, major removable source / bottleneck inventory, ceiling coverage criterion, candidate coverage matrix, same-workload full workflow run, or interpretation against coverage matrix;
 - goal or execution policy inherits a weaker skeleton than the design;
 - review approves run-validation evidence as coverage-ceiling evidence.
@@ -266,31 +266,31 @@ surfaces or residuals remain unresolved.
 
 Flag as Major or Blocking when:
 
-- there is more than one target-achieved predicate;
+- there is more than one what counts as done;
 - any partial, diagnostic, blocked, invalid, unavailable, fallback, or non-achieved report appears in Success Condition;
 - any non-achieved report status is listed under target-achieved states;
 - the execution policy lacks a target-producing action or proof-of-impossibility path;
-- the plan can terminate with `goal achieved: yes` without satisfying the single target-achieved predicate;
+- the plan can terminate with `goal achieved: yes` without satisfying the what counts as done;
 - "valid final status" is used without separating `goal achieved: yes` from `goal achieved: no`.
 
-### 13. Target-Producing Spine Fidelity
+### 13. Answer Path Check
 
 Flag as Major or Blocking when:
 
-- implementation decomposes by components without a target-producing spine;
-- no mainline work package owns the actor-centered path from initial state to target-achieved predicate;
+- implementation decomposes by components without a required answer path;
+- no mainline work package owns the actor-centered path from initial state to what counts as done;
 - candidate tasks lack `Spine node(s)`, `Role`, state-transition, transition-evidence, integration-gate, or goal-progress fields;
 - supporting-only work is allowed to satisfy goal progress by itself;
 - final integration path, primary use path, or spine transition evidence is deferred to future work while achieved claims remain possible;
 - component, module, or substrate evidence replaces spine transition evidence;
 - failed, blocked, or unobserved spine transitions are recorded only as residual risk while review remains Approved.
 
-### 14. Execution Horizon and Authority Fidelity
+### 14. Work Covered And Allowed Actions Check
 
 Flag as Major or Blocking when:
 
 - approved full horizon is silently reduced to the first safe segment;
-- runtime authority limits are used as scope removal instead of execute / prepare-only / observe-only / forbidden-not-executed handling;
+- what the agent may do limits are used as scope removal instead of execute / prepare-only / observe-only / forbidden-not-executed handling;
 - unauthorized live or irreversible actions are moved to future roadmap, handoff, or later goal while still inside the approved horizon;
 - approved horizon items lack coverage in the execution policy;
 - prepare-only or forbidden-not-executed work is claimed as executed or live complete;
@@ -317,9 +317,9 @@ Use `Major` when execution-policy revision can repair topology. Use `Blocking` w
 
 Flag as Major or Blocking when:
 
-- the human-approved setpoint requests max-safe-parallel but the plan selects serial without a concrete safe-frontier reason;
+- the What the User Approved requests max-safe-parallel but the plan selects serial without a concrete safe-frontier reason;
 - HSA requests `superpowers-subagent-driven-development` and max-safe-parallel at the same time without returning to setpoint revision;
-- selected subagent execution mode does not match selected topology or delegation substrate;
+- selected subagent execution mode does not match selected topology or agent workflow;
 - the selected Superpowers substrate does not support the selected execution mode;
 - `$superpowers:subagent-driven-development` is used with `parallel-max-safe`;
 - `$superpowers:dispatching-parallel-agents` is treated as if it provides the implementer/spec-review/code-quality review loop from subagent-driven-development;
@@ -327,7 +327,7 @@ Flag as Major or Blocking when:
 - parallel subagent-driven execution lacks dependency independence, concurrency frontier, wave matrix, conflict / lock model, integration barriers, or failure policy;
 - two parallel work packages can touch the same surface without a lock rule or barrier;
 - subagent outputs can become final without main-agent integration;
-- selected delegation substrate does not fit the approved work packages.
+- selected agent workflow does not fit the approved work packages.
 
 ### 17. Execution Granularity / Sensor Load
 
@@ -368,7 +368,7 @@ Closure status. Do not claim target-state realization from local action alone
 when Realization Surface Closure is required. Strongest positive
 target-realization claims require RSC adequate.
 
-Runtime target-achievement claims must be calibrated to the single target-achieved predicate. Non-achieved terminal reports may stop execution honestly, but they do not support `goal achieved: yes`.
+Runtime target-achievement claims must be calibrated to the what counts as done. Non-achieved terminal reports may stop execution honestly, but they do not support `goal achieved: yes`.
 
 ### 21. Review Independence
 
@@ -410,10 +410,10 @@ The review must be either:
 Only mark `Approved` when:
 
 - requirements analysis, required design, goal, and plan are consistent;
-- Human Setpoint Approval is Approved when full pre-goal orchestration is used, and Human Setpoint Fidelity has no Blocking/Major findings;
-- Execution Horizon and Authority Fidelity has no Blocking/Major findings for full-route or multi-batch work;
+- What the User Approved is Approved when full pre-goal orchestration is used, and Human Setpoint Fidelity has no Blocking/Major findings;
+- Work Covered And Allowed Actions Check has no Blocking/Major findings for full-route or multi-batch work;
 - required design exists and is consistent with requirements analysis, goal, and plan;
-- Design Skeleton Fidelity has no Blocking/Major findings when HSA records an answering method or skeleton family;
+- Design Answer Method Check has no Blocking/Major findings when HSA records an answering method or skeleton family;
 - any upstream output contract is preserved in the goal and supported by the execution policy;
 - no unresolved semantic decision remains;
 - execution policy does not self-authorize uncontrolled changes;
@@ -421,7 +421,7 @@ Only mark `Approved` when:
 - execution granularity and sensor load do not create micro-step overcontrol or sensor overcoupling;
 - purpose feedback adequacy supports the permitted completion wording and does not confuse internal progress evidence with purpose achievement;
 - realization surface closure adequacy supports target-realization wording and does not confuse local action with global realization;
-- target achievement predicate fidelity preserves the single target-achieved predicate;
+- target achievement predicate fidelity preserves the what counts as done;
 - evidence lifecycle keeps tracked evidence reviewable and prevents raw sensor output explosion;
 - sensor/evidence governance is explicit;
 - runtime `/goal` can execute without writing or approving a new plan.
@@ -468,7 +468,7 @@ Response-only next step:
 - [ ] Review status is explicit.
 - [ ] Review independence is recorded.
 - [ ] Human Setpoint Fidelity was checked when full pre-goal orchestration is used.
-- [ ] Design Skeleton Fidelity was checked when HSA records an answering method or skeleton family.
+- [ ] Design Answer Method Check was checked when HSA records an answering method or skeleton family.
 - [ ] Final observer check is recorded.
 - [ ] The review does not mark self-review as `Approved`.
 - [ ] If subagents were not authorized and no human approval exists, status is `Needs Independent Review`.
@@ -480,8 +480,8 @@ Response-only next step:
 - [ ] Purpose feedback adequacy was checked.
 - [ ] Realization Surface Closure adequacy was checked.
 - [ ] Target Achievement Predicate Fidelity was checked.
-- [ ] Target-Producing Spine Fidelity was checked.
-- [ ] Execution Horizon and Authority Fidelity was checked.
+- [ ] Answer Path Check was checked.
+- [ ] Work Covered And Allowed Actions Check was checked.
 - [ ] Subagent Concurrency Fidelity was checked.
 - [ ] Execution granularity and sensor load were checked.
 - [ ] Required revisions are actionable.

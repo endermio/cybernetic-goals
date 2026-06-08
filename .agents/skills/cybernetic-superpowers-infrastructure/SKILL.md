@@ -39,8 +39,8 @@ Pre-goal review subagents require explicit authorization in the orchestration re
 | Control review approval | Independent subagent review discipline | Required for `Approved` unless explicit human approval exists |
 | Runtime execution | `$superpowers:executing-plans` discipline | Required |
 | Runtime target-work delegation | Approved bounded subagent delegation protocol | Required when execution policy selects serial or parallel subagent-driven topology |
-| Runtime serial implementation-plan delegation | `$superpowers:subagent-driven-development` discipline | Conditional: use only when the approved execution policy records `Selected delegation substrate: superpowers-subagent-driven-development`, `Subagent execution mode: serial-single-active`, and `Max concurrent subagents: 1` |
-| Runtime parallel independent-domain delegation | `$superpowers:dispatching-parallel-agents` discipline | Conditional: use only when the approved execution policy records `Selected delegation substrate: superpowers-dispatching-parallel-agents`, `Subagent execution mode: parallel-max-safe`, and approved wave/lock/barrier/integration rules |
+| Runtime serial implementation-plan delegation | `$superpowers:subagent-driven-development` discipline | Conditional: use only when the approved execution policy records `Selected agent workflow: superpowers-subagent-driven-development`, `Subagent execution mode: serial-single-active`, and `Max concurrent subagents: 1` |
+| Runtime parallel independent-domain delegation | `$superpowers:dispatching-parallel-agents` discipline | Conditional: use only when the approved execution policy records `Selected agent workflow: superpowers-dispatching-parallel-agents`, `Subagent execution mode: parallel-max-safe`, and approved wave/lock/barrier/integration rules |
 | Unclear or repeated runtime failure | `$superpowers:systematic-debugging` | Required |
 | Completion claim | `$superpowers:verification-before-completion` | Required |
 

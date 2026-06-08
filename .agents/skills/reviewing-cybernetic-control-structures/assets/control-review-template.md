@@ -18,15 +18,15 @@ Status: `Needs Revision`
   - Requirement traceability: `yes/no`
   - Human setpoint fidelity: `yes/no`
   - Design fidelity: `yes/no`
-  - Design skeleton fidelity: `yes/no`
+  - Design answer method check: `yes/no`
   - Output contract fidelity: `yes/no`
   - Goal fidelity: `yes/no`
   - Context management / execution topology: `yes/no`
   - Purpose feedback adequacy: `yes/no`
   - Realization surface closure adequacy: `yes/no`
   - Target achievement predicate fidelity: `yes/no`
-  - Target-producing spine fidelity: `yes/no`
-  - Execution horizon and authority fidelity: `yes/no`
+  - answer path check: `yes/no`
+  - Work covered in this run and authority fidelity: `yes/no`
   - Subagent concurrency fidelity: `yes/no`
   - Execution granularity / sensor load: `yes/no`
   - Sensor governance: `yes/no`
@@ -42,8 +42,8 @@ Notes:
 ## Gate Verdicts
 
 - Design Skeleton Gate: `PASS / FAIL / Not applicable`
-- Target-Producing Spine Gate: `PASS / FAIL / Not applicable`
-- Execution Horizon / Authority Gate: `PASS / FAIL / Not applicable`
+- Steps That Make The Result True Gate: `PASS / FAIL / Not applicable`
+- Work Coverage / Action Limits Gate: `PASS / FAIL / Not applicable`
 - TAP / PFB / RSC Gate: `PASS / FAIL / Not applicable`
 - Topology / Subagent Gate: `PASS / FAIL / Not applicable`
 
@@ -88,10 +88,10 @@ Findings:
 
 Check:
 
-- requirements analysis contains `Human Setpoint Approval: Approved` when full pre-goal orchestration is used;
+- requirements analysis contains `What the User Approved: Approved` when full pre-goal orchestration is used;
 - goal preserves the approved compact control commitment;
 - design, goal, and execution policy do not reinterpret human purpose, input role binding, primary object, requested transformation, non-goals, Purpose Feedback Boundary, Realization Surface Closure, Output Contract, workflow fit, or known assumptions;
-- downstream artifacts do not expand or change the approved setpoint without explicit human reapproval.
+- downstream artifacts do not expand or change the what the user approved without explicit human reapproval.
 
 Findings:
 
@@ -109,11 +109,11 @@ Findings:
 
 - [finding]
 
-## Design Skeleton Fidelity
+## Design Answer Method Check
 
 Check:
 
-- HSA `Answering method`, `Not-sufficient substitute`, and `Task skeleton family` are preserved when present;
+- HSA `How this should be answered`, `What is not enough`, and `Answer type` are preserved when present;
 - design instantiates the approved skeleton family or returns to HSA instead of substituting another skeleton;
 - `coverage-ceiling-measurement` includes full workflow scope inventory, major removable source / bottleneck inventory, ceiling coverage criterion, candidate coverage matrix, same-workload full workflow run, and interpretation against coverage matrix;
 - goal and execution policy do not weaken the design skeleton.
@@ -221,22 +221,22 @@ Findings:
 
 Check:
 
-- there is exactly one target-achieved predicate;
+- there is exactly one what counts as done;
 - no partial, diagnostic, blocked, invalid, unavailable, fallback, or non-achieved report appears in Success Condition;
 - no non-achieved report status is listed under target-achieved states;
 - execution policy includes a target-producing action or proof-of-impossibility path;
-- the plan cannot terminate with `goal achieved: yes` without satisfying the single target-achieved predicate;
+- the plan cannot terminate with `goal achieved: yes` without satisfying the what counts as done;
 - any use of "valid final status" separates `goal achieved: yes` from `goal achieved: no`.
 
 Findings:
 
 - [finding]
 
-## Target-Producing Spine Fidelity
+## Answer Path Check
 
 Check:
 
-- execution decomposition starts from an actor-centered target-producing spine, not component inventory;
+- execution decomposition starts from an actor-centered required answer path, not component inventory;
 - every mainline work package maps to at least one spine node;
 - supporting-only work is explicitly marked and cannot satisfy goal progress by itself;
 - no final integration path or primary use path is deferred to future work while achieved claims remain possible;
@@ -247,12 +247,12 @@ Findings:
 
 - [finding]
 
-## Execution Horizon and Authority Fidelity
+## Work Covered And Allowed Actions Check
 
 Check:
 
-- approved execution horizon is not silently reduced to the first safe segment;
-- runtime authority limits define execute / prepare-only / observe-only / forbidden-not-executed handling, not scope removal;
+- work covered in this run is not silently reduced to the first safe segment;
+- what the agent may do limits define execute / prepare-only / observe-only / forbidden-not-executed handling, not scope removal;
 - unauthorized live or irreversible actions remain in horizon accounting unless explicitly out of scope by HSA;
 - approved horizon items are not moved to future roadmap, handoff, or later goal because runtime lacks direct authority;
 - execution policy can continue authorized downstream work that does not depend on forbidden actions;
@@ -268,7 +268,7 @@ Findings:
 Check:
 
 - max-safe-parallel requests are preserved unless the policy records a concrete safe-frontier reason for serial execution;
-- selected subagent execution mode matches selected topology and delegation substrate;
+- selected subagent execution mode matches selected topology and agent workflow;
 - selected Superpowers substrate supports the selected execution mode;
 - `$superpowers:subagent-driven-development` is not used with `parallel-max-safe`;
 - `$superpowers:dispatching-parallel-agents` is used only for independent parallel domains and remains governed by the approved wave, lock, barrier, failure, and integration rules;
@@ -276,7 +276,7 @@ Check:
 - parallel subagent-driven execution has dependency independence, concurrency frontier, wave matrix, conflict / lock model, integration barriers, and failure policy;
 - no parallel work package can modify the same surface without a lock rule or barrier;
 - subagent outputs remain candidate results until main-agent integration;
-- selected delegation substrate fits the approved work packages.
+- selected agent workflow fits the approved work packages.
 
 Findings:
 
@@ -340,7 +340,7 @@ The control structure may be approved only if:
 
 - requirements analysis status is Complete;
 - required solution design exists and preserves requirements analysis semantics;
-- design skeleton fidelity preserves the approved answering method and skeleton family when HSA records them;
+- design answer method check preserves the approved answer method and answer type when What the User Approved records them;
 - goal preserves requirements analysis semantics;
 - goal and execution policy preserve required design invariants;
 - any upstream output contract is preserved in the goal and supported by the execution policy;
@@ -350,9 +350,9 @@ The control structure may be approved only if:
 - evidence lifecycle keeps tracked evidence reviewable and prevents raw sensor output explosion;
 - purpose feedback adequacy supports the permitted completion wording and does not confuse internal progress evidence with purpose achievement;
 - realization surface closure adequacy supports target-realization wording and does not confuse local action with global realization;
-- target achievement predicate fidelity preserves a single target-achieved predicate;
-- target-producing spine fidelity preserves an actor-centered state-transition path and work-package mapping;
-- execution horizon and authority fidelity preserves the approved horizon and does not convert authority limits into out-of-scope roadmap items;
+- target achievement predicate fidelity preserves a what counts as done;
+- required answer path fidelity preserves an actor-centered state-transition path and work-package mapping;
+- work covered in this run and authority fidelity preserves the approved horizon and does not convert authority limits into out-of-scope roadmap items;
 - subagent concurrency fidelity preserves the approved execution mode, wave/barrier model, and main-agent integration rule;
 - sensor/evidence governance is explicit;
 - batch cadence is explicit;

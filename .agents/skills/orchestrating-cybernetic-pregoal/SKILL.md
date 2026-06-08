@@ -79,11 +79,11 @@ one of these fit checks is satisfied:
 - `$routing-cybernetic-workflows` has recommended a Level 3 or Level 4 workflow or full pre-goal pipeline;
 - `$analyzing-cybernetic-requirements` has explicitly recorded that full pre-goal orchestration is required.
 
-The same requirements brief must record `Human Setpoint Approval: Approved`,
+The same requirements brief must record `What the User Approved: Approved`,
 or the current user message must explicitly approve the compact control
 commitment recorded in that requirements brief.
 
-If the current user message approves the compact control commitment, update the requirements analysis `Human Setpoint Approval` section first, quoting or referencing that approval, then continue. Do not rely on in-memory approval to pass orchestration or runtime guards.
+If the current user message approves the compact control commitment, update the requirements analysis `What the User Approved` section first, quoting or referencing that approval, then continue. Do not rely on in-memory approval to pass orchestration or runtime guards.
 
 A user request to use full pre-goal compilation is not sufficient by itself.
 If the request expresses method preference, uncertainty, dissatisfaction, or
@@ -131,7 +131,7 @@ Approval.
 If missing or not `Approved`, stop before design and output:
 
 ```text
-Blocked: Human Setpoint Approval missing.
+Blocked: What the User Approved missing.
 Next: ask the user to approve or revise the compact control commitment in the requirements analysis.
 ```
 
@@ -139,7 +139,7 @@ Do not compensate by asking the user to review design, goal, or execution
 policy later. Human answers are inputs; they are not approval unless the user
 explicitly approves the compact control commitment. If the current user message
 approves the compact control commitment, update the requirements analysis
-`Human Setpoint Approval` section first before downstream guard checks.
+`What the User Approved` section first before downstream guard checks.
 
 ## Required Input
 
@@ -195,7 +195,7 @@ Behavior:
 3. Create or update goal contract.
 4. Create or update execution policy only if required planning substrate is satisfied or not required.
 5. Create a control review draft marked `Needs Independent Review`.
-6. Do not compile final runtime `/goal` unless the control review has independent approval or the user gives explicit control-review approval of the review findings. Do not ask for artifact-by-artifact review as a substitute for Human Setpoint Approval.
+6. Do not compile final runtime `/goal` unless the control review has independent approval or the user gives explicit control-review approval of the review findings. Do not ask for artifact-by-artifact review as a substitute for What the User Approved.
 
 ### Mode B: Subagent-Reviewed Compilation Mode
 
@@ -239,7 +239,7 @@ the guard fails, stop and report the next allowed action from the guard.
 The requirements analysis is acceptable only when:
 
 - `Requirements Analysis Status: Complete`;
-- `Human Setpoint Approval: Approved`;
+- `What the User Approved: Approved`;
 - routing or requirements recorded Level 3/4 or full pre-goal fit.
 
 If requirements analysis is incomplete or HSA is missing/not Approved, stop
@@ -298,18 +298,18 @@ Design artifacts with status `Candidate`, `Reviewed`, or `Approved` may enter do
 - the artifact was produced by `$designing-cybernetic-solutions` or explicitly provided by the user;
 - it references the requirements analysis in `Source Contracts`;
 - it has no blocking open design questions;
-- if HSA records `Answering method`, `Not-sufficient substitute`, or `Task skeleton family`, the design includes `Task Skeleton Fidelity` that preserves the approved answering method and skeleton family;
-- final control review will check Design Fidelity and Design Skeleton Fidelity when HSA records an answering method or skeleton family.
+- if What the User Approved records `How this should be answered`, `What is not enough`, or `Answer type`, the design includes `Answer Method Check` that preserves the approved answer method and answer type;
+- final control review will check Design Fidelity and Design Answer Method Check when What the User Approved records an answer method or answer type.
 
 If any design artifact exists, propagate its path to goal writing, execution-policy writing, control review, and runtime compilation, even when Design Gate is satisfied or no longer required.
 
-## Design Skeleton Gate
+## Design Answer Method Gate
 
-Before goal writing, validate design skeleton fidelity when HSA records an approved answering method or task skeleton family.
+Before goal writing, validate that design preserves the approved answer method when What the User Approved records an answer method or answer type.
 
-The design must instantiate the approved skeleton family. It must not replace the approved answering method with a not-sufficient substitute because the substitute is easier to run or verify.
+The design must instantiate the approved answer type. It must not replace the approved answer method with what the user marked as not enough because the substitute is easier to run or verify.
 
-If the approved skeleton cannot be instantiated, return to requirements/HSA for revision. Do not ask the user to review downstream goal or plan artifacts as compensation.
+If the approved answer type cannot be instantiated, return to requirements for revision. Do not ask the user to review downstream goal or plan artifacts as compensation.
 
 For `coverage-ceiling-measurement`, the design must include:
 
@@ -340,8 +340,8 @@ If any non-emulatable stage is required and unavailable, stop and report the mis
 
 | Current State | Required condition | Next Action | Forbidden Action |
 |---|---|---|---|
-| `RequirementsMissing` | requirements absent, incomplete, or Human Setpoint Approval missing/not Approved | `Blocked` / `ReturnToRequirementsAnalysis` | design / goal / policy / review / runtime compile |
-| `RequirementsComplete` | requirements Complete and Human Setpoint Approval Approved; Design Gate required and design missing | `RunDesign` | goal writing |
+| `RequirementsMissing` | requirements absent, incomplete, or What the User Approved missing/not Approved | `Blocked` / `ReturnToRequirementsAnalysis` | design / goal / policy / review / runtime compile |
+| `RequirementsComplete` | requirements Complete and What the User Approved Approved; Design Gate required and design missing | `RunDesign` | goal writing |
 | `DesignReady` | design exists, references requirements, has no blocking open questions, and passes Design Skeleton Gate when HSA records an answering method or skeleton family | `RunGoalWriting` | execution policy |
 | `GoalReady` | goal exists and references requirements plus any design path | `RunExecutionPolicy` | review |
 | `PolicyReady` | execution policy exists, references requirements, goal, any design path, and records selected execution topology | `RunReview` | runtime compile |
