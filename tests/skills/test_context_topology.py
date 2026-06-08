@@ -30,6 +30,7 @@ Status: `Approved`
 | Required handling for unauthorized actions | none |
 | Explicitly out-of-scope items | none |
 | Runtime delegation preference | no preference |
+| Delegation substrate preference | no preference |
 | Parallel execution authority | not applicable |
 | Parallelism cap | not specified |
 | Output Contract | guard output |
@@ -136,11 +137,14 @@ class ContextTopologySkillTest(unittest.TestCase):
     def complete_parallel_topology(
         self,
         *,
+        selected_delegation_substrate: str = "bounded-protocol",
+        delegation_substrate: str | None = None,
         human_approval: str = "yes",
         dependency_independence: str = "yes",
         control_review_approval: str = "yes",
         include_concurrency_policy: bool = True,
     ) -> str:
+        substrate_note = delegation_substrate or "Approved bounded subagent delegation protocol for parallel bounded work packages."
         concurrency_lines = []
         if include_concurrency_policy:
             concurrency_lines = [
@@ -184,7 +188,7 @@ class ContextTopologySkillTest(unittest.TestCase):
                 "",
                 "Task level: `Level 3`",
                 "",
-                "Selected delegation substrate: `bounded-protocol`",
+                f"Selected delegation substrate: `{selected_delegation_substrate}`",
                 "",
                 *concurrency_lines,
                 "Topology rationale:",
@@ -220,7 +224,7 @@ class ContextTopologySkillTest(unittest.TestCase):
                 "",
                 "Subagent delegation substrate:",
                 "",
-                "- Approved bounded subagent delegation protocol for parallel bounded work packages.",
+                f"- {substrate_note}",
                 "",
                 "Parallel approval record:",
                 "",
@@ -633,6 +637,51 @@ class ContextTopologySkillTest(unittest.TestCase):
         self.assertNotIn("$superpowers:subagent-driven-development", result.stdout)
         self.assertIn("Selected delegation substrate: `superpowers-subagent-driven-development`", contract_text)
         self.assertIn("$superpowers:subagent-driven-development", contract_text)
+        self.assertNotIn("$superpowers:dispatching-parallel-agents", contract_text)
+
+    def test_runtime_compiler_uses_dispatching_parallel_agents_when_plan_selects_it(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            tmp = Path(tmpdir)
+            requirements, goal, plan, review = self.write_artifact_chain(
+                tmp,
+                self.complete_parallel_topology(
+                    selected_delegation_substrate="superpowers-dispatching-parallel-agents",
+                    delegation_substrate="Approved parallel independent-domain delegation uses `$superpowers:dispatching-parallel-agents` under the plan wave, lock, and integration barriers.",
+                ),
+            )
+            runtime_contract = tmp / "runtime.goal.md"
+
+            result = subprocess.run(
+                [
+                    sys.executable,
+                    str(
+                        ROOT
+                        / ".agents/skills/compiling-cybernetic-runtime-goals/scripts/compile_runtime_goal.py"
+                    ),
+                    "--requirements",
+                    str(requirements),
+                    "--goal",
+                    str(goal),
+                    "--plan",
+                    str(plan),
+                    "--review",
+                    str(review),
+                    "--skip-guard",
+                    "--i-understand-this-bypasses-phase-gates",
+                    "--out",
+                    str(runtime_contract),
+                ],
+                cwd=ROOT,
+                text=True,
+                capture_output=True,
+            )
+            contract_text = runtime_contract.read_text(encoding="utf-8")
+
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        self.assertNotIn("$superpowers:dispatching-parallel-agents", result.stdout)
+        self.assertIn("Selected delegation substrate: `superpowers-dispatching-parallel-agents`", contract_text)
+        self.assertIn("$superpowers:dispatching-parallel-agents", contract_text)
+        self.assertNotIn("$superpowers:subagent-driven-development` only", contract_text)
 
     def test_runtime_compiler_does_not_infer_superpowers_substrate_from_notes(self):
         with tempfile.TemporaryDirectory() as tmpdir:
@@ -1299,6 +1348,204 @@ class ContextTopologySkillTest(unittest.TestCase):
         self.assertIn("Parallel wave matrix", output)
         self.assertIn("Conflict / lock model", output)
         self.assertIn("Failure policy", output)
+
+    def test_guard_rejects_parallel_mode_with_superpowers_subagent_driven_development(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            requirements, goal, plan, review = self.write_artifact_chain(
+                Path(tmpdir),
+                self.complete_parallel_topology(
+                    selected_delegation_substrate="superpowers-subagent-driven-development",
+                    delegation_substrate="Invalid fixture: SDD cannot dispatch multiple implementation subagents concurrently.",
+                ),
+            )
+
+            result = subprocess.run(
+                [
+                    sys.executable,
+                    str(
+                        ROOT
+                        / ".agents/skills/compiling-cybernetic-runtime-goals/scripts/control_chain_guard.py"
+                    ),
+                    "--requirements",
+                    str(requirements),
+                    "--goal",
+                    str(goal),
+                    "--plan",
+                    str(plan),
+                    "--review",
+                    str(review),
+                ],
+                cwd=ROOT,
+                text=True,
+                capture_output=True,
+            )
+
+        output = result.stdout + result.stderr
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("NEXT: RunExecutionPolicy", output)
+        self.assertIn("superpowers-subagent-driven-development", output)
+        self.assertIn("parallel-max-safe", output)
+
+    def test_guard_accepts_parallel_mode_with_dispatching_parallel_agents_substrate(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            requirements, goal, plan, review = self.write_artifact_chain(
+                Path(tmpdir),
+                self.complete_parallel_topology(
+                    selected_delegation_substrate="superpowers-dispatching-parallel-agents",
+                    delegation_substrate="Approved parallel independent-domain delegation uses `$superpowers:dispatching-parallel-agents` under the plan wave, lock, and integration barriers.",
+                ),
+            )
+
+            result = subprocess.run(
+                [
+                    sys.executable,
+                    str(
+                        ROOT
+                        / ".agents/skills/compiling-cybernetic-runtime-goals/scripts/control_chain_guard.py"
+                    ),
+                    "--requirements",
+                    str(requirements),
+                    "--goal",
+                    str(goal),
+                    "--plan",
+                    str(plan),
+                    "--review",
+                    str(review),
+                ],
+                cwd=ROOT,
+                text=True,
+                capture_output=True,
+            )
+
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+
+    def test_orchestration_guard_rejects_parallel_sdd_before_review(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            requirements, goal, plan, _review = self.write_artifact_chain(
+                Path(tmpdir),
+                self.complete_parallel_topology(
+                    selected_delegation_substrate="superpowers-subagent-driven-development",
+                    delegation_substrate="Invalid fixture: SDD cannot dispatch multiple implementation subagents concurrently.",
+                ),
+            )
+
+            result = subprocess.run(
+                [
+                    sys.executable,
+                    str(
+                        ROOT
+                        / ".agents/skills/orchestrating-cybernetic-pregoal/scripts/orchestration_guard.py"
+                    ),
+                    "--state",
+                    "before-review",
+                    "--requirements",
+                    str(requirements),
+                    "--goal",
+                    str(goal),
+                    "--plan",
+                    str(plan),
+                ],
+                cwd=ROOT,
+                text=True,
+                capture_output=True,
+            )
+
+        output = result.stdout + result.stderr
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("NEXT: RunExecutionPolicy", output)
+        self.assertIn("superpowers-subagent-driven-development", output)
+        self.assertIn("parallel-max-safe", output)
+
+    def test_orchestration_guard_accepts_parallel_dispatch_before_review(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            requirements, goal, plan, _review = self.write_artifact_chain(
+                Path(tmpdir),
+                self.complete_parallel_topology(
+                    selected_delegation_substrate="superpowers-dispatching-parallel-agents",
+                    delegation_substrate="Approved parallel independent-domain delegation uses `$superpowers:dispatching-parallel-agents` under the plan wave, lock, and integration barriers.",
+                ),
+            )
+
+            result = subprocess.run(
+                [
+                    sys.executable,
+                    str(
+                        ROOT
+                        / ".agents/skills/orchestrating-cybernetic-pregoal/scripts/orchestration_guard.py"
+                    ),
+                    "--state",
+                    "before-review",
+                    "--requirements",
+                    str(requirements),
+                    "--goal",
+                    str(goal),
+                    "--plan",
+                    str(plan),
+                ],
+                cwd=ROOT,
+                text=True,
+                capture_output=True,
+            )
+
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+
+    def test_hsa_rejects_conflicting_max_safe_parallel_with_sdd_substrate_preference(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            tmp = Path(tmpdir)
+            requirements, goal, plan, review = self.write_artifact_chain(
+                tmp,
+                self.complete_serial_topology(
+                    "Implementation-plan same-session delegation uses `$superpowers:subagent-driven-development` discipline for bounded work packages.",
+                    selected_delegation_substrate="superpowers-subagent-driven-development",
+                ),
+            )
+            requirements.write_text(
+                requirements.read_text(encoding="utf-8")
+                .replace(
+                    "| Runtime delegation preference | no preference |",
+                    "| Runtime delegation preference | max-safe-parallel |",
+                )
+                .replace(
+                    "| Delegation substrate preference | no preference |",
+                    "| Delegation substrate preference | superpowers-subagent-driven-development |",
+                )
+                .replace(
+                    "| Parallel execution authority | not applicable |",
+                    "| Parallel execution authority | approved |",
+                )
+                .replace(
+                    "| Parallelism cap | not specified |",
+                    "| Parallelism cap | auto |",
+                ),
+                encoding="utf-8",
+            )
+
+            result = subprocess.run(
+                [
+                    sys.executable,
+                    str(
+                        ROOT
+                        / ".agents/skills/compiling-cybernetic-runtime-goals/scripts/control_chain_guard.py"
+                    ),
+                    "--requirements",
+                    str(requirements),
+                    "--goal",
+                    str(goal),
+                    "--plan",
+                    str(plan),
+                    "--review",
+                    str(review),
+                ],
+                cwd=ROOT,
+                text=True,
+                capture_output=True,
+            )
+
+        output = result.stdout + result.stderr
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("NEXT: ReturnToRequirementsAnalysis", output)
+        self.assertIn("Delegation substrate preference", output)
+        self.assertIn("max-safe-parallel", output)
 
     def test_runtime_compiler_preserves_and_can_expect_subagent_execution_mode(self):
         topology = self.complete_serial_topology(

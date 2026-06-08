@@ -108,6 +108,7 @@ Allowed `Selected delegation substrate` values:
 
 - `bounded-protocol`
 - `superpowers-subagent-driven-development`
+- `superpowers-dispatching-parallel-agents`
 - `adapter-specific`
 - `none`
 
@@ -124,7 +125,21 @@ Subagent execution modes:
 - `serial-single-active`: selected for `Serial subagent-driven`; `Max concurrent subagents` must be `1`.
 - `parallel-max-safe`: selected for `Parallel subagent-driven`; `Max concurrent subagents` must be `auto` or an explicit cap.
 
+Substrate capability matrix:
+
+| Selected delegation substrate | Allowed topology | Allowed mode |
+|---|---|---|
+| `superpowers-subagent-driven-development` | `Serial subagent-driven` | `serial-single-active` |
+| `superpowers-dispatching-parallel-agents` | `Parallel subagent-driven` | `parallel-max-safe` |
+| `bounded-protocol` | `Serial subagent-driven / Parallel subagent-driven` | `serial-single-active / parallel-max-safe` |
+| `adapter-specific` | `Serial subagent-driven / Parallel subagent-driven` | `serial-single-active / parallel-max-safe` |
+| `none` | `Main-only` | `none` |
+
 When Human Setpoint Approval records `Runtime delegation preference: max-safe-parallel`, preserve that preference as the runtime topology target. Do not silently downgrade to `Serial subagent-driven` unless the dependency matrix has no independent frontier, shared surfaces cannot be safely locked, subagent context packs cannot be bounded, or review rejects parallelism. If safe frontier is effectively one, record the reason in `Concurrency selection rationale`.
+
+When Human Setpoint Approval records `Delegation substrate preference`, preserve that substrate unless it conflicts with the approved topology/mode capability matrix. If the requested substrate is incompatible, return to HSA for conflict resolution or record a concrete `Substrate compatibility rationale`; do not silently substitute a different substrate.
+
+If HSA records both `Runtime delegation preference: max-safe-parallel` and `Delegation substrate preference: superpowers-subagent-driven-development`, treat this as a setpoint conflict. `$superpowers:subagent-driven-development` is serial-single-active only. Use `superpowers-dispatching-parallel-agents`, `bounded-protocol`, or `adapter-specific` for max-safe parallel execution.
 
 For every delegated work package, define:
 
@@ -147,7 +162,7 @@ The main agent owns approved control artifacts, current batch state, dispatch, i
 
 A subagent owns one bounded work package, bounded investigation, or bounded verification pass. A subagent must not change control artifacts, widen scope, replace the execution topology, or bypass integration gates.
 
-For serial or parallel subagent-driven topology, `Selected delegation substrate` must be `bounded-protocol`, `superpowers-subagent-driven-development`, or `adapter-specific`; it must not be `none`. Record the matching approved bounded subagent delegation protocol under `Subagent delegation substrate`. Do not treat `$superpowers:subagent-driven-development` as the generic delegation substrate. Use it only when the work packages fit its implementation-plan, current-session workflow and `Selected delegation substrate` is `superpowers-subagent-driven-development`.
+For serial or parallel subagent-driven topology, `Selected delegation substrate` must be `bounded-protocol`, `superpowers-subagent-driven-development`, `superpowers-dispatching-parallel-agents`, or `adapter-specific`; it must not be `none`. Record the matching approved bounded subagent delegation protocol under `Subagent delegation substrate`. Do not treat `$superpowers:subagent-driven-development` as the generic delegation substrate. Use it only with `Serial subagent-driven`, `serial-single-active`, and `Max concurrent subagents: 1`. Use `$superpowers:dispatching-parallel-agents` only with `Parallel subagent-driven`, `parallel-max-safe`, and the approved wave/lock/barrier/integration structure.
 
 For serial subagent-driven topology, record `Ordered work package sequence` and `Integration gate after each package`.
 
@@ -432,7 +447,8 @@ Response-only next step:
 - [ ] Serial subagent-driven topology uses `serial-single-active`, max concurrency `1`, ordered sequence, and per-package integration.
 - [ ] Parallel subagent-driven topology uses `parallel-max-safe`, wave matrix, lock model, failure policy, and integration barriers.
 - [ ] Parallel wave matrix records `Spine frontier`.
-- [ ] `$superpowers:subagent-driven-development` is used only when `Selected delegation substrate` is `superpowers-subagent-driven-development` for compatible implementation-plan, current-session work packages.
+- [ ] `$superpowers:subagent-driven-development` is used only with `serial-single-active` and max concurrency `1`.
+- [ ] `$superpowers:dispatching-parallel-agents` is used only with `parallel-max-safe` and approved wave/lock/barrier/integration rules.
 - [ ] Parallel subagent-driven execution records human approval, dependency independence, and review approval as explicitly `yes` or `approved`.
 - [ ] The plan includes Execution Granularity and Sensor Budget.
 - [ ] Batches are coherent target-state slices, not mechanical micro-steps.

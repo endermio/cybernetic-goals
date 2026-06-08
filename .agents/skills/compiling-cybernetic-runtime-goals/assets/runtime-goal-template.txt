@@ -31,7 +31,8 @@ Treat the human-approved setpoint as the source for primary object, requested tr
 - Use `$superpowers:systematic-debugging` for unclear or repeated failures.
 - Use `$superpowers:verification-before-completion` before claiming completion.
 - Follow the approved execution topology and delegation substrate recorded in the execution policy.
-- If the selected delegation substrate is `superpowers-subagent-driven-development`, use `$superpowers:subagent-driven-development` only for approved matching work packages.
+- If the selected delegation substrate is `superpowers-subagent-driven-development`, use `$superpowers:subagent-driven-development` only in `serial-single-active` mode for approved current-session implementation-plan work packages.
+- If the selected delegation substrate is `superpowers-dispatching-parallel-agents`, use `$superpowers:dispatching-parallel-agents` only for approved independent work packages in the current wave, under the plan's spine frontier, lock, barrier, failure, and main-agent integration rules.
 - If `Subagent execution mode` is `serial-single-active`, run exactly one execution subagent at a time and integrate before launching the next.
 - If `Subagent execution mode` is `parallel-max-safe`, launch only the current approved wave up to the approved cap, after dependencies are satisfied and conflict locks are disjoint; integrate at the approved barrier before launching the next wave.
 - Treat subagent work as governed by the execution policy's bounded delegation protocol and integration gates.

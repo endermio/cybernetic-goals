@@ -65,11 +65,25 @@ Task level: `Level 0 / Level 1 / Level 2 / Level 3 / Level 4`
 
 Selected topology: `Main-only / Serial subagent-driven / Parallel subagent-driven`
 
-Selected delegation substrate: `bounded-protocol / superpowers-subagent-driven-development / adapter-specific / none`
+Selected delegation substrate: `bounded-protocol / superpowers-subagent-driven-development / superpowers-dispatching-parallel-agents / adapter-specific / none`
 
 Subagent execution mode: `none / serial-single-active / parallel-max-safe`
 
 Max concurrent subagents: `1 / auto / N`
+
+Substrate compatibility:
+
+| Selected delegation substrate | Allowed topology | Allowed mode |
+|---|---|---|
+| `superpowers-subagent-driven-development` | `Serial subagent-driven` | `serial-single-active` |
+| `superpowers-dispatching-parallel-agents` | `Parallel subagent-driven` | `parallel-max-safe` |
+| `bounded-protocol` | `Serial subagent-driven / Parallel subagent-driven` | `serial-single-active / parallel-max-safe` |
+| `adapter-specific` | `Serial subagent-driven / Parallel subagent-driven` | `serial-single-active / parallel-max-safe` |
+| `none` | `Main-only` | `none` |
+
+Substrate compatibility rationale:
+
+- [required when HSA substrate preference is not used or when a requested substrate is incompatible with the selected topology/mode]
 
 Concurrency selection rationale:
 
@@ -146,7 +160,8 @@ Subagent delegation substrate:
 
 - [Record the approved bounded subagent delegation protocol for serial or parallel subagent-driven topology.]
 - [This must match Selected delegation substrate.]
-- [Use `superpowers-subagent-driven-development` only when these work packages fit that implementation-plan, current-session workflow; otherwise select `bounded-protocol` or `adapter-specific`.]
+- [Use `superpowers-subagent-driven-development` only for `Serial subagent-driven` + `serial-single-active` + `Max concurrent subagents: 1`.]
+- [Use `superpowers-dispatching-parallel-agents` only for `Parallel subagent-driven` + `parallel-max-safe` under the approved wave/lock/barrier/integration structure.]
 
 Parallel approval record:
 
@@ -162,7 +177,8 @@ Rules:
 - Use `Serial subagent-driven` with `Subagent execution mode: serial-single-active` and `Max concurrent subagents: 1`.
 - The main agent must coordinate, integrate, maintain the progress log, and detect stop conditions.
 - A subagent must not modify control artifacts, widen scope, replace topology, or bypass the integration gate.
-- Do not treat `$superpowers:subagent-driven-development` as the generic delegation substrate; it applies only when `Selected delegation substrate` is `superpowers-subagent-driven-development` for compatible implementation-plan work packages.
+- Do not treat `$superpowers:subagent-driven-development` as the generic delegation substrate; it is serial-single-active only.
+- Do not use `$superpowers:subagent-driven-development` with `parallel-max-safe`; use `superpowers-dispatching-parallel-agents`, `bounded-protocol`, or `adapter-specific` for max-safe parallel execution.
 - `Selected delegation substrate: none` is allowed only for `Main-only`.
 - If the selected topology becomes insufficient, stop and revise the execution policy; do not let runtime improvise a new topology.
 

@@ -176,7 +176,8 @@
         "Runtime goal contract records the selected topology from the execution policy.",
         "Runtime goal contract records the selected delegation substrate.",
         "Pointer /goal does not inline subagent protocol prose.",
-        "Does not require $superpowers:subagent-driven-development unless the approved execution policy records Selected delegation substrate: superpowers-subagent-driven-development for compatible implementation-plan work packages.",
+        "Does not require $superpowers:subagent-driven-development unless the approved execution policy records a compatible serial SDD substrate.",
+        "Does not require $superpowers:dispatching-parallel-agents unless the approved execution policy records a compatible parallel dispatch substrate.",
         "Does not replace the approved topology with generic serial main-agent execution.",
         "Stops if runtime would need to invent or replace execution topology."
       ]
@@ -197,13 +198,14 @@
       ]
     },
     {
-      "id": "uses-subagent-driven-development-only-when-selected",
+      "id": "uses-selected-superpowers-substrate-only-when-compatible",
       "prompt": "requirements analysis Complete, goal exists, execution policy status Candidate and selects Serial subagent-driven topology with Selected delegation substrate: bounded-protocol and an approved bounded delegation protocol. control review Approved and Final Observer Check allows approval；编译最终 /goal。",
       "expected_output": "Writes a runtime goal contract that records serial subagent-driven topology and bounded-protocol substrate without adding $superpowers:subagent-driven-development, then emits a short pointer-only /goal.",
       "assertions": [
         "Runtime goal contract records the approved execution topology from the execution policy.",
         "Runtime goal contract records the selected bounded-protocol substrate.",
-        "Does not add $superpowers:subagent-driven-development when the plan does not record Selected delegation substrate: superpowers-subagent-driven-development.",
+        "Does not add $superpowers:subagent-driven-development when the plan selects bounded-protocol.",
+        "Does not add $superpowers:dispatching-parallel-agents when the plan selects bounded-protocol.",
         "Pointer /goal does not inline subagent protocol prose."
       ]
     },

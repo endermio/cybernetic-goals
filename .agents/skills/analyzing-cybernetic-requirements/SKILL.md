@@ -41,7 +41,7 @@ Owned analysis:
 - identify the Realization Surface Closure boundary when target state must be realized across a controlled object: Target state, Realization surfaces, Required surface action, Residual reconciliation, and RSC status;
 - identify the Execution Horizon and Authority boundary for full-route or multi-batch work: approved horizon, runtime authority, forbidden actions, unauthorized-action handling, and explicitly out-of-scope items;
 - identify the target-producing path for target-achieving implementation work: one actor-centered path from initial state to the target-achieved predicate;
-- prepare the Human Setpoint Approval compact control commitment for Level 3/4 or full pre-goal work: Human purpose, Input role binding, Primary object, Requested transformation, Non-goals, Purpose Feedback Boundary, Realization Surface Closure, Single target-achieved predicate, Target-producing evidence required, Non-achieved terminal report handling, Target-producing path, Execution horizon, Runtime authority, Forbidden live / irreversible actions, Required handling for unauthorized actions, Explicitly out-of-scope items, Runtime delegation preference, Parallel execution authority, Parallelism cap, Output Contract, Workflow fit, and Known assumptions;
+- prepare the Human Setpoint Approval compact control commitment for Level 3/4 or full pre-goal work: Human purpose, Input role binding, Primary object, Requested transformation, Non-goals, Purpose Feedback Boundary, Realization Surface Closure, Single target-achieved predicate, Target-producing evidence required, Non-achieved terminal report handling, Target-producing path, Execution horizon, Runtime authority, Forbidden live / irreversible actions, Required handling for unauthorized actions, Explicitly out-of-scope items, Runtime delegation preference, Delegation substrate preference, Parallel execution authority, Parallelism cap, Output Contract, Workflow fit, and Known assumptions;
 - identify constraints, invariants, assumptions, and stop conditions;
 - decide whether Semantic, Rubric, Output Contract, Design, Goal Contract, Execution Policy, Control Review, or Risk gates are required;
 - ask high-value human questions;
@@ -69,7 +69,7 @@ Execution complexity may be recorded as execution risk, planning concern, eviden
 
 Ask the human a question only if all are true:
 
-1. The answer materially changes any Human Setpoint Approval compact control commitment field, including purpose feedback boundary, beneficiary/observer, sufficient evidence level, feedback-unavailable handling, realization surface closure, target state surface model, required surface action, residual reconciliation, preserved/excluded surfaces, target-achievement predicate, target-producing path, execution horizon, runtime authority, forbidden actions, unauthorized-action handling, explicit out-of-scope items, runtime delegation preference, parallel execution authority, or parallelism cap; or changes requirement semantics, evaluation rubric, output contract, visibility boundary, authorization model, external contract semantics, observer-visible behavior, downstream consumption, acceptance condition, or control boundaries.
+1. The answer materially changes any Human Setpoint Approval compact control commitment field, including purpose feedback boundary, beneficiary/observer, sufficient evidence level, feedback-unavailable handling, realization surface closure, target state surface model, required surface action, residual reconciliation, preserved/excluded surfaces, target-achievement predicate, target-producing path, execution horizon, runtime authority, forbidden actions, unauthorized-action handling, explicit out-of-scope items, runtime delegation preference, delegation substrate preference, parallel execution authority, or parallelism cap; or changes requirement semantics, evaluation rubric, output contract, visibility boundary, authorization model, external contract semantics, observer-visible behavior, downstream consumption, acceptance condition, or control boundaries.
 2. There are at least two plausible business choices.
 3. The correct answer cannot be safely inferred from the user request, existing source artifacts, or common requirement conventions.
 4. A wrong default would be costly to reverse or would cause serious misalignment.
@@ -113,6 +113,7 @@ Before handoff to `$orchestrating-cybernetic-pregoal`, present a compact control
 - Required handling for unauthorized actions;
 - Explicitly out-of-scope items;
 - Runtime delegation preference;
+- Delegation substrate preference;
 - Parallel execution authority;
 - Parallelism cap;
 - Output Contract;

@@ -271,17 +271,27 @@ def selected_delegation_substrate(plan: str | None) -> str | None:
     if not match:
         return None
 
-    value = match.group(1).strip().strip("`").casefold()
+    return normalize_delegation_substrate(match.group(1))
+
+
+def normalize_delegation_substrate(value: str | None) -> str | None:
+    if value is None:
+        return None
+    value = value.strip().strip("`").casefold()
     if "/" in value:
         return None
     if value in {"bounded-protocol", "bounded protocol"}:
         return "bounded-protocol"
     if value in {"superpowers-subagent-driven-development", "$superpowers:subagent-driven-development"}:
         return "superpowers-subagent-driven-development"
+    if value in {"superpowers-dispatching-parallel-agents", "$superpowers:dispatching-parallel-agents"}:
+        return "superpowers-dispatching-parallel-agents"
     if value in {"adapter-specific", "adapter specific"}:
         return "adapter-specific"
     if value == "none":
         return "none"
+    if value in {"no preference", "not specified", "unspecified", "not applicable", "n/a"}:
+        return "no preference"
     return None
 
 
@@ -522,6 +532,7 @@ def check_execution_topology(plan: str | None, errors: list[str]) -> None:
 
         mode = selected_subagent_execution_mode(plan)
         max_concurrent = max_concurrent_subagents(plan)
+        check_substrate_mode_compatibility(topology, substrate, mode, max_concurrent, errors)
         if topology == "Serial subagent-driven":
             if mode != "serial-single-active":
                 errors.append("Serial subagent-driven topology requires Subagent execution mode: serial-single-active")
@@ -556,6 +567,27 @@ def check_execution_topology(plan: str | None, errors: list[str]) -> None:
         for label in ("Human approval", "Dependency independence", "Control-review approval"):
             if not approval_value_is_yes(body, label):
                 errors.append(f"parallel execution topology requires {label}: yes/approved")
+
+
+def check_substrate_mode_compatibility(
+    topology: str,
+    substrate: str | None,
+    mode: str | None,
+    max_concurrent: str | None,
+    errors: list[str],
+) -> None:
+    if substrate == "superpowers-subagent-driven-development":
+        if topology != "Serial subagent-driven" or mode != "serial-single-active" or max_concurrent != "1":
+            errors.append(
+                "Selected delegation substrate superpowers-subagent-driven-development supports only Serial subagent-driven, Subagent execution mode: serial-single-active, Max concurrent subagents: 1; it cannot be used with parallel-max-safe"
+            )
+    if substrate == "superpowers-dispatching-parallel-agents":
+        if topology != "Parallel subagent-driven" or mode != "parallel-max-safe":
+            errors.append(
+                "Selected delegation substrate superpowers-dispatching-parallel-agents supports only Parallel subagent-driven with Subagent execution mode: parallel-max-safe"
+            )
+    if mode == "parallel-max-safe" and substrate == "superpowers-subagent-driven-development":
+        errors.append("parallel-max-safe cannot use Selected delegation substrate: superpowers-subagent-driven-development")
 
 
 def check_final_observer(review: str, errors: list[str]) -> None:
@@ -650,6 +682,43 @@ def check_max_safe_parallel_preference(requirements: str, plan: str | None, erro
     if rationale is None or "safe frontier" not in rationale.casefold():
         errors.append(
             "HSA Runtime delegation preference is max-safe-parallel but execution policy is not Parallel subagent-driven; Concurrency selection rationale must mention safe frontier"
+        )
+
+
+def check_delegation_substrate_preference(requirements: str, plan: str | None, errors: list[str]) -> None:
+    hsa = section_body(requirements, "Human Setpoint Approval")
+    if hsa is None:
+        return
+
+    raw_preference = field_value(hsa, "Delegation substrate preference")
+    substrate_preference = normalize_delegation_substrate(raw_preference)
+    if substrate_preference in {None, "no preference"}:
+        return
+
+    runtime_preference = (field_value(hsa, "Runtime delegation preference") or "").casefold()
+    if runtime_preference == "max-safe-parallel" and substrate_preference == "superpowers-subagent-driven-development":
+        errors.append(
+            "HSA Delegation substrate preference conflicts with Runtime delegation preference: max-safe-parallel; superpowers-subagent-driven-development is serial-single-active only"
+        )
+        return
+
+    if plan is None:
+        return
+
+    selected = selected_delegation_substrate(plan)
+    if selected == substrate_preference:
+        return
+
+    topology_body = section_body(plan, "Context Management / Execution Topology") or ""
+    rationale = (
+        field_value(topology_body, "Substrate compatibility rationale")
+        or field_value(topology_body, "Delegation substrate compatibility rationale")
+        or ""
+    )
+    lowered = rationale.casefold()
+    if not any(term in lowered for term in ("incompatible", "not compatible", "capability boundary", "unsupported")):
+        errors.append(
+            f"HSA Delegation substrate preference is {substrate_preference}, but execution policy selected {selected}; record a substrate compatibility rationale before changing substrate"
         )
 
 
@@ -1023,7 +1092,11 @@ def suggest_next_action(errors: list[str]) -> str:
     joined = "\n".join(errors).casefold()
     lowered_errors = [error.casefold() for error in errors]
 
-    if "requirements analysis status is not complete" in joined or "human setpoint approval" in joined:
+    if (
+        "requirements analysis status is not complete" in joined
+        or "human setpoint approval" in joined
+        or "hsa delegation substrate preference conflicts" in joined
+    ):
         return "ReturnToRequirementsAnalysis"
     if "design gate is required" in joined or "design status" in joined or "design does not reference" in joined:
         return "RunDesign"
@@ -1072,6 +1145,7 @@ def suggest_next_action(errors: list[str]) -> str:
         or "concurrency frontier rule" in joined
         or "safe frontier" in joined
         or "runtime delegation preference" in joined
+        or "delegation substrate preference" in joined
         or "main-agent integration rule" in joined
         or any(
             error.startswith(
@@ -1191,6 +1265,7 @@ def main() -> int:
         check_plan_horizon_authority(plan, errors)
         check_execution_topology(plan, errors)
         check_max_safe_parallel_preference(requirements, plan, errors)
+        check_delegation_substrate_preference(requirements, plan, errors)
 
     if review:
         check_artifact_hygiene("review", review, errors)

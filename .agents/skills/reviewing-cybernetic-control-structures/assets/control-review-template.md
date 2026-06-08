@@ -242,6 +242,9 @@ Check:
 
 - max-safe-parallel requests are preserved unless the policy records a concrete safe-frontier reason for serial execution;
 - selected subagent execution mode matches selected topology and delegation substrate;
+- selected Superpowers substrate supports the selected execution mode;
+- `$superpowers:subagent-driven-development` is not used with `parallel-max-safe`;
+- `$superpowers:dispatching-parallel-agents` is used only for independent parallel domains and remains governed by the approved wave, lock, barrier, failure, and integration rules;
 - serial subagent-driven execution uses one active subagent, ordered work package sequence, and integration after each package;
 - parallel subagent-driven execution has dependency independence, concurrency frontier, wave matrix, conflict / lock model, integration barriers, and failure policy;
 - no parallel work package can modify the same surface without a lock rule or barrier;

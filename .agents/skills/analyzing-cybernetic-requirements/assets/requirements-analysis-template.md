@@ -31,6 +31,7 @@ Approval applies only to this compact control commitment.
 | Required handling for unauthorized actions | [prepare-only / observe-only / forbidden-not-executed handling and required artifacts] |
 | Explicitly out-of-scope items | [items excluded from this goal by HSA, not merely unauthorized] |
 | Runtime delegation preference | [serial / max-safe-parallel / no preference] |
+| Delegation substrate preference | [superpowers-subagent-driven-development / superpowers-dispatching-parallel-agents / bounded-protocol / adapter-specific / no preference] |
 | Parallel execution authority | [approved / not approved / not applicable] |
 | Parallelism cap | [auto / N / not specified] |
 | Output Contract | [audience, purpose, medium, structure, destination, acceptance] |

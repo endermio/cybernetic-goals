@@ -71,6 +71,8 @@ def selected_delegation_substrate(plan_path: str) -> str | None:
         return "bounded-protocol"
     if value in {"superpowers-subagent-driven-development", "$superpowers:subagent-driven-development"}:
         return "superpowers-subagent-driven-development"
+    if value in {"superpowers-dispatching-parallel-agents", "$superpowers:dispatching-parallel-agents"}:
+        return "superpowers-dispatching-parallel-agents"
     if value in {"adapter-specific", "adapter specific"}:
         return "adapter-specific"
     if value == "none":
@@ -165,11 +167,16 @@ def runtime_goal_contract(
     substrate = selected_delegation_substrate(plan) or "read from approved execution policy"
     subagent_mode = selected_subagent_execution_mode(plan) or "read from approved execution policy"
     max_concurrent = max_concurrent_subagents(plan) or "read from approved execution policy"
-    substrate_line = (
-        "- If the selected delegation substrate is `superpowers-subagent-driven-development`, use `$superpowers:subagent-driven-development` only for approved matching work packages."
-        if substrate == "superpowers-subagent-driven-development"
-        else "- Use only the selected delegation substrate recorded in the approved execution policy."
-    )
+    if substrate == "superpowers-subagent-driven-development":
+        substrate_line = (
+            "- Because the selected delegation substrate is `superpowers-subagent-driven-development`, use `$superpowers:subagent-driven-development` only in `serial-single-active` mode for approved current-session implementation-plan work packages."
+        )
+    elif substrate == "superpowers-dispatching-parallel-agents":
+        substrate_line = (
+            "- Because the selected delegation substrate is `superpowers-dispatching-parallel-agents`, use `$superpowers:dispatching-parallel-agents` only for the approved independent work packages in the current wave, under the plan's spine frontier, lock, barrier, failure, and main-agent integration rules."
+        )
+    else:
+        substrate_line = "- Use only the selected delegation substrate recorded in the approved execution policy."
 
     return "\n".join(
         [

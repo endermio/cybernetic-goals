@@ -114,6 +114,7 @@ Check that design, goal, and execution policy preserve the approved compact cont
 - Required handling for unauthorized actions;
 - Explicitly out-of-scope items;
 - Runtime delegation preference;
+- Delegation substrate preference;
 - Parallel execution authority;
 - Parallelism cap;
 - workflow fit;
@@ -287,7 +288,11 @@ Use `Major` when execution-policy revision can repair topology. Use `Blocking` w
 Flag as Major or Blocking when:
 
 - the human-approved setpoint requests max-safe-parallel but the plan selects serial without a concrete safe-frontier reason;
+- HSA requests `superpowers-subagent-driven-development` and max-safe-parallel at the same time without returning to setpoint revision;
 - selected subagent execution mode does not match selected topology or delegation substrate;
+- the selected Superpowers substrate does not support the selected execution mode;
+- `$superpowers:subagent-driven-development` is used with `parallel-max-safe`;
+- `$superpowers:dispatching-parallel-agents` is treated as if it provides the implementer/spec-review/code-quality review loop from subagent-driven-development;
 - serial subagent-driven execution lacks `serial-single-active`, `Max concurrent subagents: 1`, ordered sequence, or integration after each package;
 - parallel subagent-driven execution lacks dependency independence, concurrency frontier, wave matrix, conflict / lock model, integration barriers, or failure policy;
 - two parallel work packages can touch the same surface without a lock rule or barrier;
