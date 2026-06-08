@@ -16,21 +16,21 @@ Status: `Approved`
 
 | Element | Commitment |
 |---|---|
-| Human purpose | complete the approved execution horizon without shrinking it to the first safe segment |
+| Human purpose | produce a target state through an actor-centered path |
 | Input role binding | fixture source material is approved background |
-| Primary object | horizon and authority fidelity fixture |
-| Requested transformation | approved full horizon into bounded runtime execution |
-| Non-goals | do not execute forbidden live actions |
+| Primary object | target-producing spine fixture |
+| Requested transformation | approved target into spine-first execution policy |
+| Non-goals | do not count component-only work as goal progress |
 | Purpose Feedback Boundary | purpose feedback remains separately calibrated |
 | Realization Surface Closure | RSC remains separately calibrated |
-| Single target-achieved predicate | approved horizon coverage is accounted for |
-| Target-producing evidence required | horizon coverage matrix and authorized execution evidence exist |
-| Non-achieved terminal report handling | report goal achieved: no when approved horizon is only partially covered |
-| Target-producing path | EHA guard fixture spine |
-| Execution horizon | Batch 1 through Batch 8 are in the approved horizon |
-| Runtime authority | local code, local tests, local smoke, ledgers, runbooks, and evidence packages may be executed |
-| Forbidden live / irreversible actions | remote deployment, production nginx cutover, service restart, and production artifact overwrite |
-| Required handling for unauthorized actions | prepare runbook / rollback / evidence checklist and report not executed |
+| Single target-achieved predicate | all required spine transitions are satisfied |
+| Target-producing evidence required | spine transition evidence exists |
+| Non-achieved terminal report handling | report goal achieved: no when spine transitions are unsatisfied |
+| Target-producing path | S0 no durable state -> S1 durable state -> S2 observable target state |
+| Execution horizon | target-producing spine fixture horizon |
+| Runtime authority | local guard fixture checks |
+| Forbidden live / irreversible actions | none |
+| Required handling for unauthorized actions | none |
 | Explicitly out-of-scope items | none |
 | Output Contract | guard output |
 | Workflow fit | full pre-goal guard fixture |
@@ -39,11 +39,11 @@ Status: `Approved`
 Approval record:
 
 - Approved by: `test fixture`
-- Approval phrase or source: `approved full horizon`
+- Approval phrase or source: `approved target-producing spine`
 """
 
 
-class ExecutionHorizonAuthorityTest(unittest.TestCase):
+class TargetProducingSpineTest(unittest.TestCase):
     def read(self, path: str) -> str:
         return (ROOT / path).read_text(encoding="utf-8")
 
@@ -51,11 +51,11 @@ class ExecutionHorizonAuthorityTest(unittest.TestCase):
         self,
         tmp: Path,
         *,
-        include_goal_eha: bool = True,
-        include_plan_eha: bool = True,
-        include_review_eha: bool = True,
-        review_eha_independence: str = "yes",
-        future_roadmap_in_plan: bool = False,
+        include_goal_spine: bool = True,
+        include_plan_spine: bool = True,
+        include_candidate_spine_nodes: bool = True,
+        include_review_spine: bool = True,
+        review_spine_independence: str = "yes",
     ) -> tuple[Path, Path, Path, Path]:
         requirements = tmp / "requirements.md"
         goal = tmp / "goal.md"
@@ -67,67 +67,71 @@ class ExecutionHorizonAuthorityTest(unittest.TestCase):
             encoding="utf-8",
         )
 
-        goal_parts = [
-            "# Goal",
-            "",
-            "## Source Contracts",
-            "",
-            f"- Requirements analysis: `{requirements}`",
-            "",
-            "## Success Condition",
-            "",
-            "Codex may report `goal achieved: yes` only when the single target-achieved predicate is satisfied.",
-            "",
-            "## Purpose Feedback Contract",
-            "",
-            "| Element | Requirement |",
-            "|---|---|",
-            "| Beneficiary / observer | operator |",
-            "| Purpose-realizing outcome observed | operator observes approved horizon coverage |",
-            "| Supporting Evidence | internal checks support progress only |",
-            "| Sufficient evidence level | purpose-boundary |",
-            "| Purpose feedback unavailable handling | report pending and next observation |",
-            "| Allowed completion wording | achieved only when approved horizon coverage is accounted for |",
-            "",
-            "## Realization Surface Contract",
-            "",
-            "| Element | Requirement |",
-            "|---|---|",
-            "| Target state | guard fixture target state |",
-            "| Required surfaces | guard fixture surface model |",
-            "| Surface actions | act / inspect / preserve / exclude / discover |",
-            "| Residual reconciliation | account for old state, unknown surfaces, exclusions, preserved surfaces, and remaining mismatches |",
-            "| RSC status wording | strongest target-realization claim requires RSC adequate |",
-            "| Partial/unavailable handling | report non-achieved terminal status without target-realization claim |",
-            "| RSC / PFB boundary | RSC calibrates target-state and surface-closure claims while PFB calibrates human-purpose realization claims |",
-            "",
-            "## Target Achievement Contract",
-            "",
-            "| Element | Requirement |",
-            "|---|---|",
-            "| Single target-achieved predicate | approved horizon coverage is accounted for |",
-            "| Required target-producing evidence | horizon coverage matrix and authorized execution evidence exist |",
-            "| Allowed achieved claim | `goal achieved: yes` only when approved horizon coverage is accounted for |",
-            "| Target-producing spine | EHA guard fixture spine |",
-            "",
+        target_rows = [
+            "| Single target-achieved predicate | all required spine transitions are satisfied |",
+            "| Required target-producing evidence | spine transition evidence exists |",
+            "| Allowed achieved claim | goal achieved: yes only when all required spine transitions are satisfied |",
         ]
-        if include_goal_eha:
-            goal_parts.extend(
+        if include_goal_spine:
+            target_rows.append("| Target-producing spine | S1 and S2 transitions in the execution policy Target-Producing Spine |")
+
+        goal.write_text(
+            "\n".join(
                 [
+                    "# Goal",
+                    "",
+                    "## Source Contracts",
+                    "",
+                    f"- Requirements analysis: `{requirements}`",
+                    "",
+                    "## Success Condition",
+                    "",
+                    "Codex may report `goal achieved: yes` only when the single target-achieved predicate is satisfied.",
+                    "",
+                    "## Purpose Feedback Contract",
+                    "",
+                    "| Element | Requirement |",
+                    "|---|---|",
+                    "| Beneficiary / observer | operator |",
+                    "| Purpose-realizing outcome observed | operator observes the target-producing path completed |",
+                    "| Supporting Evidence | internal checks support progress only |",
+                    "| Sufficient evidence level | purpose-boundary |",
+                    "| Purpose feedback unavailable handling | report pending and next observation |",
+                    "| Allowed completion wording | achieved only when spine transitions are satisfied |",
+                    "",
+                    "## Realization Surface Contract",
+                    "",
+                    "| Element | Requirement |",
+                    "|---|---|",
+                    "| Target state | guard fixture target state |",
+                    "| Required surfaces | guard fixture surface model |",
+                    "| Surface actions | act / inspect / preserve / exclude / discover |",
+                    "| Residual reconciliation | account for old state, unknown surfaces, exclusions, preserved surfaces, and remaining mismatches |",
+                    "| RSC status wording | strongest target-realization claim requires RSC adequate |",
+                    "| Partial/unavailable handling | report non-achieved terminal status without target-realization claim |",
+                    "| RSC / PFB boundary | RSC calibrates target-state and surface-closure claims while PFB calibrates human-purpose realization claims |",
+                    "",
+                    "## Target Achievement Contract",
+                    "",
+                    "| Element | Requirement |",
+                    "|---|---|",
+                    *target_rows,
+                    "",
                     "## Execution Horizon and Authority Contract",
                     "",
                     "| Element | Requirement |",
                     "|---|---|",
-                    "| Approved horizon | Batch 1 through Batch 8 are in the approved horizon |",
-                    "| Runtime-authorized actions | local code, local tests, local smoke, ledgers, runbooks, and evidence packages |",
-                    "| Forbidden actions | remote deployment, production nginx cutover, service restart, production artifact overwrite |",
-                    "| Prepare-only / observe-only actions | forbidden live actions must produce runbook / rollback / evidence checklist only |",
+                    "| Approved horizon | target-producing spine fixture horizon |",
+                    "| Runtime-authorized actions | local guard fixture checks |",
+                    "| Forbidden actions | none |",
+                    "| Prepare-only / observe-only actions | none |",
                     "| Explicitly out-of-scope items | none |",
-                    "| Horizon completion rule | every approved horizon item must be executed, prepared-only, forbidden-not-executed, or explicitly out of scope by HSA |",
+                    "| Horizon completion rule | every horizon item is accounted for in this fixture |",
                     "",
                 ]
-            )
-        goal.write_text("\n".join(goal_parts), encoding="utf-8")
+            ),
+            encoding="utf-8",
+        )
 
         plan_parts = [
             "# Plan",
@@ -141,47 +145,45 @@ class ExecutionHorizonAuthorityTest(unittest.TestCase):
             f"- Requirements analysis: `{requirements}`",
             f"- Goal contract: `{goal}`",
             "",
+            "## Horizon and Authority Coverage Matrix",
+            "",
+            "| Batch / surface | In approved horizon? | Runtime authority | Required runtime handling | Counts as achieved? |",
+            "|---|---|---|---|---|",
+            "| target-producing spine fixture | yes | execute | run guard / compiler fixture checks | yes if fixture passes |",
+            "",
         ]
-        if include_plan_eha:
+        if include_plan_spine:
             plan_parts.extend(
                 [
-                    "## Horizon and Authority Coverage Matrix",
+                    "## Target-Producing Spine",
                     "",
-                    "| Batch / surface | In approved horizon? | Runtime authority | Required runtime handling | Counts as achieved? |",
-                    "|---|---|---|---|---|",
-                    "| Batch 1 local route parity | yes | execute | modify and test locally | yes if sensors pass |",
-                    "| Batch 6 remote deployment | yes | forbidden-not-executed | prepare runbook and rollback checklist | no live claim |",
+                    "| Spine node | Required state transition | Required evidence |",
+                    "|---|---|---|",
+                    "| S1 | no durable state -> durable state exists | durable state id is recorded |",
+                    "| S2 | durable state exists -> observable target state | target observation references durable state id |",
+                    "",
                 ]
             )
-            if future_roadmap_in_plan:
-                plan_parts.append("| Batch 7-8 remaining route families | yes | future roadmap | move to later handoff | no |")
-            plan_parts.append("")
         plan_parts.extend(
             [
-                "## Target-Producing Spine",
-                "",
-                "| Spine node | Required state transition | Required evidence |",
-                "|---|---|---|",
-                "| S1 | approved horizon exists -> horizon coverage accounted | horizon coverage matrix has coverage rows |",
-                "",
                 "## Target-Producing Action Strategy",
                 "",
                 "Target-producing action required:",
                 "",
-                "- Account for every approved horizon item by execution, prepare-only handling, forbidden-not-executed handling, or explicit HSA out-of-scope classification.",
+                "- Satisfy S1 and S2 spine transitions before any achieved claim.",
                 "",
                 "Proof of impossibility, if any:",
                 "",
-                "- Record the condition proving a target-producing action cannot be attempted.",
+                "- Record the condition proving a spine transition cannot be attempted.",
                 "",
                 "Non-achieved terminal report rule:",
                 "",
-                "- A non-achieved terminal report may be produced only after horizon coverage is accounted for or impossibility is proven.",
+                "- A non-achieved report may be produced only after the transition is attempted and fails, or impossibility is proven.",
                 "",
                 "## Realization Surface Closure Strategy",
                 "",
                 "- RSC status: `RSC not applicable with justification`",
-                "- Why no target-state surface closure is required: this fixture only checks EHA structure.",
+                "- Why no target-state surface closure is required: this fixture only checks TPS structure.",
                 "- Why no surface discovery / residual reconciliation is needed: no controlled-object target state is changed.",
                 "- Allowed target-realization wording: do not claim target-state realization.",
                 "",
@@ -205,15 +207,34 @@ class ExecutionHorizonAuthorityTest(unittest.TestCase):
                 "",
                 "## Candidate Plan Tasks",
                 "",
-                "### Batch 1: EHA guard fixture",
+                "### Batch 1: satisfy spine fixture",
                 "",
-                "Spine node(s):",
-                "",
-                "- S1",
-                "",
+            ]
+        )
+        if include_candidate_spine_nodes:
+            plan_parts.extend(
+                [
+                    "Spine node(s):",
+                    "",
+                    "- S1",
+                    "- S2",
+                    "",
+                ]
+            )
+        plan_parts.extend(
+            [
                 "Goal:",
                 "",
-                "- Keep the EHA guard fixture structurally ready.",
+                "- Drive the fixture through the approved target-producing spine.",
+                "",
+                "Batch-end gate:",
+                "",
+                "- S1 and S2 evidence recorded.",
+                "",
+                "Steps:",
+                "",
+                "- [ ] Record S1 evidence.",
+                "- [ ] Record S2 evidence.",
                 "",
             ]
         )
@@ -238,8 +259,8 @@ class ExecutionHorizonAuthorityTest(unittest.TestCase):
             "- Purpose feedback adequacy: `yes`",
             "- Realization surface closure adequacy: `yes`",
             "- Target achievement predicate fidelity: `yes`",
-            "- Target-producing spine fidelity: `yes`",
-            f"- Execution horizon and authority fidelity: `{review_eha_independence}`",
+            f"- Target-producing spine fidelity: `{review_spine_independence}`",
+            "- Execution horizon and authority fidelity: `yes`",
             "",
             "## Context Management / Execution Topology",
             "",
@@ -261,24 +282,24 @@ class ExecutionHorizonAuthorityTest(unittest.TestCase):
             "Findings:",
             "- The single target-achieved predicate is separated from non-achieved terminal reports.",
             "",
-            "## Target-Producing Spine Fidelity",
-            "",
-            "Findings:",
-            "- Work packages map to the fixture spine node.",
-            "",
         ]
-        if include_review_eha:
+        if include_review_spine:
             review_parts.extend(
                 [
-                    "## Execution Horizon and Authority Fidelity",
+                    "## Target-Producing Spine Fidelity",
                     "",
                     "Findings:",
-                    "- Approved horizon remains in scope while authority limits define execute / prepare-only / forbidden-not-executed handling.",
+                    "- Work packages are mapped to S1/S2 spine transitions and supporting-only work cannot satisfy goal progress by itself.",
                     "",
                 ]
             )
         review_parts.extend(
             [
+                "## Execution Horizon and Authority Fidelity",
+                "",
+                "Findings:",
+                "- Approved horizon and runtime authority are compact and fixture-bounded.",
+                "",
                 "## Final Observer Check",
                 "",
                 "- Last independent review completed at: `test`",
@@ -315,34 +336,20 @@ class ExecutionHorizonAuthorityTest(unittest.TestCase):
             capture_output=True,
         )
 
-    def test_templates_include_execution_horizon_and_authority_fields(self):
+    def test_templates_include_target_producing_spine(self):
         requirements = self.read(".agents/skills/analyzing-cybernetic-requirements/assets/requirements-analysis-template.md")
         goal = self.read(".agents/skills/writing-cybernetic-goals/assets/goal-contract-template.md")
         plan = self.read(".agents/skills/writing-cybernetic-execution-policies/assets/execution-policy-template.md")
         review = self.read(".agents/skills/reviewing-cybernetic-control-structures/assets/control-review-template.md")
 
-        for required in (
-            "Execution horizon",
-            "Runtime authority",
-            "Forbidden live / irreversible actions",
-            "Required handling for unauthorized actions",
-            "Explicitly out-of-scope items",
-        ):
-            self.assertIn(required, requirements)
+        self.assertIn("Target-producing path", requirements)
+        self.assertIn("Target-producing spine", goal)
+        self.assertIn("Target-Producing Spine", plan)
+        self.assertIn("Spine node(s)", plan)
+        self.assertIn("Target-Producing Spine Fidelity", review)
+        self.assertIn("Target-producing spine fidelity", review)
 
-        self.assertIn("Execution Horizon and Authority Contract", goal)
-        self.assertIn("Approved horizon", goal)
-        self.assertIn("Runtime-authorized actions", goal)
-        self.assertIn("Horizon completion rule", goal)
-
-        self.assertIn("Horizon and Authority Coverage Matrix", plan)
-        self.assertIn("Runtime authority", plan)
-        self.assertIn("Required runtime handling", plan)
-
-        self.assertIn("Execution Horizon and Authority Fidelity", review)
-        self.assertIn("Execution horizon and authority fidelity", review)
-
-    def test_guard_accepts_complete_horizon_authority_chain(self):
+    def test_guard_accepts_complete_target_producing_spine_chain(self):
         with tempfile.TemporaryDirectory() as tmpdir:
             requirements, goal, plan, review = self.write_chain(Path(tmpdir))
             result = self.guard(requirements, goal, plan, review)
@@ -350,62 +357,59 @@ class ExecutionHorizonAuthorityTest(unittest.TestCase):
         self.assertEqual(0, result.returncode, result.stdout + result.stderr)
         self.assertIn("NEXT: CompileRuntimeGoal", result.stdout)
 
-    def test_guard_rejects_goal_missing_horizon_authority_contract(self):
+    def test_guard_rejects_goal_missing_target_producing_spine_reference(self):
         with tempfile.TemporaryDirectory() as tmpdir:
-            requirements, goal, plan, review = self.write_chain(Path(tmpdir), include_goal_eha=False)
+            requirements, goal, plan, review = self.write_chain(Path(tmpdir), include_goal_spine=False)
             result = self.guard(requirements, goal, plan, review)
 
         output = result.stdout + result.stderr
         self.assertEqual(2, result.returncode, output)
         self.assertIn("NEXT: RunGoalWriting", output)
-        self.assertIn("Execution Horizon and Authority Contract", output)
+        self.assertIn("Target-producing spine", output)
 
-    def test_guard_rejects_plan_missing_horizon_authority_matrix(self):
+    def test_guard_rejects_plan_missing_target_producing_spine(self):
         with tempfile.TemporaryDirectory() as tmpdir:
-            requirements, goal, plan, review = self.write_chain(Path(tmpdir), include_plan_eha=False)
+            requirements, goal, plan, review = self.write_chain(Path(tmpdir), include_plan_spine=False)
             result = self.guard(requirements, goal, plan, review)
 
         output = result.stdout + result.stderr
         self.assertEqual(2, result.returncode, output)
         self.assertIn("NEXT: RunExecutionPolicy", output)
-        self.assertIn("Horizon and Authority Coverage Matrix", output)
+        self.assertIn("Target-Producing Spine", output)
 
-    def test_guard_rejects_review_missing_horizon_authority_fidelity(self):
+    def test_guard_rejects_candidate_task_without_spine_nodes(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            requirements, goal, plan, review = self.write_chain(Path(tmpdir), include_candidate_spine_nodes=False)
+            result = self.guard(requirements, goal, plan, review)
+
+        output = result.stdout + result.stderr
+        self.assertEqual(2, result.returncode, output)
+        self.assertIn("NEXT: RunExecutionPolicy", output)
+        self.assertIn("Spine node(s)", output)
+
+    def test_guard_rejects_review_missing_spine_fidelity(self):
         with tempfile.TemporaryDirectory() as tmpdir:
             requirements, goal, plan, review = self.write_chain(
                 Path(tmpdir),
-                include_review_eha=False,
-                review_eha_independence="no",
+                include_review_spine=False,
+                review_spine_independence="no",
             )
             result = self.guard(requirements, goal, plan, review)
 
         output = result.stdout + result.stderr
         self.assertEqual(2, result.returncode, output)
         self.assertIn("NEXT: RunReview", output)
-        self.assertIn("Execution Horizon and Authority Fidelity", output)
-        self.assertIn("Execution horizon and authority fidelity: yes", output)
+        self.assertIn("Target-Producing Spine Fidelity", output)
+        self.assertIn("Target-producing spine fidelity: yes", output)
 
-    def test_guard_rejects_future_roadmap_inside_approved_horizon_matrix(self):
-        with tempfile.TemporaryDirectory() as tmpdir:
-            requirements, goal, plan, review = self.write_chain(Path(tmpdir), future_roadmap_in_plan=True)
-            result = self.guard(requirements, goal, plan, review)
-
-        output = result.stdout + result.stderr
-        self.assertEqual(2, result.returncode, output)
-        self.assertIn("NEXT: RunExecutionPolicy", output)
-        self.assertIn("future roadmap cannot replace approved horizon", output)
-
-    def test_runtime_contract_requires_horizon_coverage_report_fields(self):
+    def test_runtime_contract_indexes_target_producing_spine(self):
         compiler = self.read(".agents/skills/compiling-cybernetic-runtime-goals/scripts/compile_runtime_goal.py")
         template = self.read(".agents/skills/compiling-cybernetic-runtime-goals/assets/runtime-goal-template.txt")
         skill = self.read(".agents/skills/compiling-cybernetic-runtime-goals/SKILL.md")
 
         for text in (compiler, template, skill):
-            self.assertIn("horizon coverage", text)
-            self.assertIn("executed", text)
-            self.assertIn("prepared-only", text)
-            self.assertIn("forbidden-not-executed", text)
-            self.assertIn("explicitly out-of-scope by HSA", text)
+            self.assertIn("Target-Producing Spine", text)
+            self.assertIn("Target-Producing Spine Fidelity", text)
 
         with tempfile.TemporaryDirectory() as tmpdir:
             tmp = Path(tmpdir)
@@ -433,10 +437,8 @@ class ExecutionHorizonAuthorityTest(unittest.TestCase):
             contract_text = runtime_contract.read_text(encoding="utf-8") if runtime_contract.exists() else ""
 
         self.assertEqual(0, result.returncode, result.stdout + result.stderr)
-        self.assertIn("Horizon and Authority Coverage Matrix", contract_text)
-        self.assertIn("Execution Horizon and Authority Fidelity", contract_text)
-        self.assertIn("horizon coverage", contract_text)
-        self.assertNotIn("future roadmap", contract_text.casefold())
+        self.assertIn("Target-Producing Spine", contract_text)
+        self.assertIn("Target-Producing Spine Fidelity", contract_text)
 
 
 if __name__ == "__main__":

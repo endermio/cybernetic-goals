@@ -26,6 +26,7 @@ Status: `Approved`
 | Single target-achieved predicate | artifact hygiene target-producing evidence is observed |
 | Target-producing evidence required | target-producing evidence is observed |
 | Non-achieved terminal report handling | report goal achieved: no |
+| Target-producing path | artifact hygiene guard fixture spine |
 | Execution horizon | artifact hygiene guard fixture horizon |
 | Runtime authority | local guard fixture checks |
 | Forbidden live / irreversible actions | none |
@@ -122,6 +123,7 @@ class ArtifactHygieneTest(unittest.TestCase):
                     "| Single target-achieved predicate | artifact hygiene target-producing evidence is observed |",
                     "| Required target-producing evidence | target-producing evidence is observed |",
                     "| Allowed achieved claim | only target-achieved predicate supports goal achieved: yes |",
+                    "| Target-producing spine | artifact hygiene guard fixture spine |",
                     "",
                     "## Execution Horizon and Authority Contract",
                     "",
@@ -175,6 +177,12 @@ class ArtifactHygieneTest(unittest.TestCase):
                     "|---|---|---|---|---|",
                     "| artifact hygiene guard fixture | yes | execute | run guard / compiler fixture checks | yes if fixture passes |",
                     "",
+                    "## Target-Producing Spine",
+                    "",
+                    "| Spine node | Required state transition | Required evidence |",
+                    "|---|---|---|",
+                    "| S1 | fixture input -> artifact hygiene guard-ready chain | guard fixture files exist |",
+                    "",
                     "## Target-Producing Action Strategy",
                     "",
                     "Target-producing action required:",
@@ -214,6 +222,18 @@ class ArtifactHygieneTest(unittest.TestCase):
                     "- progress log",
                     "- stop-condition detection",
                     "",
+                    "## Candidate Plan Tasks",
+                    "",
+                    "### Batch 1: artifact hygiene guard fixture",
+                    "",
+                    "Spine node(s):",
+                    "",
+                    "- S1",
+                    "",
+                    "Goal:",
+                    "",
+                    "- Keep the artifact hygiene guard fixture structurally ready.",
+                    "",
                 ]
             ),
             encoding="utf-8",
@@ -240,6 +260,7 @@ class ArtifactHygieneTest(unittest.TestCase):
                     "- Purpose feedback adequacy: `yes`",
                     "- Realization surface closure adequacy: `yes`",
                     "- Target achievement predicate fidelity: `yes`",
+                    "- Target-producing spine fidelity: `yes`",
                     "- Execution horizon and authority fidelity: `yes`",
                     "",
                     "## Human Setpoint Fidelity",
@@ -266,6 +287,11 @@ class ArtifactHygieneTest(unittest.TestCase):
                     "",
                     "Findings:",
                     "- The single target-achieved predicate is separated from non-achieved terminal reports.",
+                    "",
+                    "## Target-Producing Spine Fidelity",
+                    "",
+                    "Findings:",
+                    "- Work packages map to the fixture spine node.",
                     "",
                     "## Execution Horizon and Authority Fidelity",
                     "",

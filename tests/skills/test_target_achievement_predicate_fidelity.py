@@ -27,6 +27,7 @@ Status: `Approved`
 | Single target-achieved predicate | target-producing evidence is observed |
 | Target-producing evidence required | target-producing action runs or observation exists |
 | Non-achieved terminal report handling | report goal achieved: no without creating alternate goals |
+| Target-producing path | TAP guard fixture spine |
 | Execution horizon | TAP guard fixture horizon |
 | Runtime authority | local guard fixture checks |
 | Forbidden live / irreversible actions | none |
@@ -79,6 +80,7 @@ class TargetAchievementPredicateFidelityTest(unittest.TestCase):
             "| Single target-achieved predicate | target-producing evidence is observed |",
             "| Required target-producing evidence | target-producing action runs or observation exists |",
             "| Allowed achieved claim | `goal achieved: yes` only when the single predicate is met |",
+            "| Target-producing spine | TAP guard fixture spine |",
         ]
         target_rows.extend(target_contract_extra or [])
         goal.write_text(
@@ -157,6 +159,12 @@ class TargetAchievementPredicateFidelityTest(unittest.TestCase):
             "|---|---|---|---|---|",
             "| TAP guard fixture | yes | execute | run guard / compiler fixture checks | yes if fixture passes |",
             "",
+            "## Target-Producing Spine",
+            "",
+            "| Spine node | Required state transition | Required evidence |",
+            "|---|---|---|",
+            "| S1 | fixture input -> TAP guard-ready chain | guard fixture files exist |",
+            "",
         ]
         if include_plan_strategy:
             plan_parts.extend(
@@ -204,6 +212,18 @@ class TargetAchievementPredicateFidelityTest(unittest.TestCase):
                 "- progress log",
                 "- stop-condition detection",
                 "",
+                "## Candidate Plan Tasks",
+                "",
+                "### Batch 1: TAP guard fixture",
+                "",
+                "Spine node(s):",
+                "",
+                "- S1",
+                "",
+                "Goal:",
+                "",
+                "- Keep the TAP guard fixture structurally ready.",
+                "",
             ]
         )
         plan.write_text("\n".join(plan_parts), encoding="utf-8")
@@ -227,6 +247,7 @@ class TargetAchievementPredicateFidelityTest(unittest.TestCase):
             "- Purpose feedback adequacy: `yes`",
             "- Realization surface closure adequacy: `yes`",
             f"- Target achievement predicate fidelity: `{review_tap_independence}`",
+            "- Target-producing spine fidelity: `yes`",
             "- Execution horizon and authority fidelity: `yes`",
             "",
             "## Context Management / Execution Topology",
@@ -257,6 +278,11 @@ class TargetAchievementPredicateFidelityTest(unittest.TestCase):
             )
         review_parts.extend(
             [
+                "## Target-Producing Spine Fidelity",
+                "",
+                "Findings:",
+                "- Work packages map to the fixture spine node.",
+                "",
                 "## Execution Horizon and Authority Fidelity",
                 "",
                 "Findings:",

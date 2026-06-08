@@ -78,20 +78,21 @@ The execution policy must include:
 6. Context Management / Execution Topology
 7. Horizon and Authority Coverage Matrix
 8. Realization Surface Closure Strategy
-9. Target-Producing Action Strategy
-10. Execution Granularity and Sensor Budget
-11. Batch Cadence
-12. Destructive Intermediate-State Policy
-13. Output Material / Evidence Collection
-14. Purpose Feedback Strategy
-15. Evidence Lifecycle / Evidence Budget
-16. Sensor / Evidence Governance
-17. Stale Sensor Retirement and Rewrite Policy
-18. Phase Gates
-19. Execution Rhythm
-20. Stop Conditions
-21. Progress Log Rules
-22. Candidate Plan Tasks
+9. Target-Producing Spine
+10. Target-Producing Action Strategy
+11. Execution Granularity and Sensor Budget
+12. Batch Cadence
+13. Destructive Intermediate-State Policy
+14. Output Material / Evidence Collection
+15. Purpose Feedback Strategy
+16. Evidence Lifecycle / Evidence Budget
+17. Sensor / Evidence Governance
+18. Stale Sensor Retirement and Rewrite Policy
+19. Phase Gates
+20. Execution Rhythm
+21. Stop Conditions
+22. Progress Log Rules
+23. Candidate Plan Tasks
 
 ## Context Management / Execution Topology
 
@@ -192,6 +193,18 @@ Define Residual Reconciliation:
 
 Domain adapters own concrete discovery and verification methods. The core
 policy owns surface/action/residual/reconciliation structure.
+
+## Target-Producing Spine
+
+For target-achieving implementation work, decompose by the actor-centered state transitions that produce the target-achieved predicate before decomposing by components, modules, files, or teams.
+
+The execution policy must define:
+
+- Spine node: stable node id such as `S1`;
+- Required state transition: the state change this node produces;
+- Required evidence: evidence that the transition is satisfied.
+
+Every mainline work package must map to at least one spine node. Supporting-only work may exist, but it must be marked `supporting-only` and cannot satisfy goal progress by itself.
 
 ## Target-Producing Action Strategy
 
@@ -392,6 +405,8 @@ Response-only next step:
 - [ ] The plan includes Context Management / Execution Topology.
 - [ ] The plan includes Realization Surface Closure Strategy for compiled runtime goals, with either full surface/action/residual structure or `RSC not applicable with justification`.
 - [ ] The plan includes Horizon and Authority Coverage Matrix for full-route or multi-batch work.
+- [ ] The plan includes Target-Producing Spine.
+- [ ] Each Candidate Plan Task maps to `Spine node(s)` or is explicitly supporting-only.
 - [ ] The plan includes Target-Producing Action Strategy.
 - [ ] The plan selects `Main-only`, `Serial subagent-driven`, or `Parallel subagent-driven`.
 - [ ] The plan records `Selected delegation substrate`.

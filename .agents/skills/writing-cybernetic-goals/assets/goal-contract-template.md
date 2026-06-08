@@ -52,6 +52,7 @@ Use this section when the task changes or realizes target state across controlle
 | Single target-achieved predicate | [the only predicate that allows `goal achieved: yes`] |
 | Required target-producing evidence | [what must be observed, produced, run, or measured] |
 | Allowed achieved claim | [exact wording allowed only when the predicate is met] |
+| Target-producing spine | [state-transition path or execution-policy spine that produces the predicate] |
 
 Non-achieved terminal reports are not target states and must not be listed here.
 

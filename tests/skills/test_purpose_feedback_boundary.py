@@ -24,6 +24,7 @@ Status: `Approved`
 | Single target-achieved predicate | purpose-boundary evidence is observed |
 | Target-producing evidence required | target-producing evidence is observed |
 | Non-achieved terminal report handling | report goal achieved: no |
+| Target-producing path | PFB guard fixture spine |
 | Execution horizon | PFB guard fixture horizon |
 | Runtime authority | local guard fixture checks |
 | Forbidden live / irreversible actions | none |
@@ -113,6 +114,7 @@ class PurposeFeedbackBoundaryTest(unittest.TestCase):
                 "| Single target-achieved predicate | purpose-boundary evidence is observed |",
                     "| Required target-producing evidence | target-producing evidence is observed |",
                 "| Allowed achieved claim | only target-achieved predicate supports goal achieved: yes |",
+                "| Target-producing spine | PFB guard fixture spine |",
                 "",
                 "## Execution Horizon and Authority Contract",
                 "",
@@ -148,6 +150,12 @@ class PurposeFeedbackBoundaryTest(unittest.TestCase):
                     "| Batch / surface | In approved horizon? | Runtime authority | Required runtime handling | Counts as achieved? |",
                     "|---|---|---|---|---|",
                     "| PFB guard fixture | yes | execute | run guard / compiler fixture checks | yes if fixture passes |",
+                    "",
+                    "## Target-Producing Spine",
+                    "",
+                    "| Spine node | Required state transition | Required evidence |",
+                    "|---|---|---|",
+                    "| S1 | fixture input -> PFB guard-ready chain | guard fixture files exist |",
                     "",
                     "## Target-Producing Action Strategy",
                     "",
@@ -201,6 +209,18 @@ class PurposeFeedbackBoundaryTest(unittest.TestCase):
                     "- progress log",
                     "- stop-condition detection",
                     "",
+                    "## Candidate Plan Tasks",
+                    "",
+                    "### Batch 1: PFB guard fixture",
+                    "",
+                    "Spine node(s):",
+                    "",
+                    "- S1",
+                    "",
+                    "Goal:",
+                    "",
+                    "- Keep the PFB guard fixture structurally ready.",
+                    "",
                 ]
             ),
             encoding="utf-8",
@@ -224,6 +244,7 @@ class PurposeFeedbackBoundaryTest(unittest.TestCase):
             f"- Purpose feedback adequacy: `{review_independence_pfb}`",
             "- Realization surface closure adequacy: `yes`",
             "- Target achievement predicate fidelity: `yes`",
+            "- Target-producing spine fidelity: `yes`",
             "- Execution horizon and authority fidelity: `yes`",
             "",
             "## Context Management / Execution Topology",
@@ -260,6 +281,11 @@ class PurposeFeedbackBoundaryTest(unittest.TestCase):
                 "",
                 "Findings:",
                 "- Target-achieved status is separate from non-achieved report statuses.",
+                "",
+                "## Target-Producing Spine Fidelity",
+                "",
+                "Findings:",
+                "- Work packages map to the fixture spine node.",
                 "",
                 "## Execution Horizon and Authority Fidelity",
                 "",

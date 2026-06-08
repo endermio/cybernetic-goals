@@ -17,8 +17,8 @@ Treat the human-approved setpoint as the source for primary object, requested tr
 
 - Requirements `{requirements}`: `Human Setpoint Approval`, `Purpose Feedback Boundary`, `Realization Surface Closure`, `Output Contract`.
 - Goal `{goal}`: `Success Condition`, `Target Achievement Contract`, `Execution Horizon and Authority Contract`, `Purpose Feedback Contract`, `Realization Surface Contract`, `Final Output Contract`.
-- Execution policy `{plan}`: `Horizon and Authority Coverage Matrix`, `Target-Producing Action Strategy`, `Context Management / Execution Topology`, `Phase Gates`, `Progress Log Rules`, `Purpose Feedback Strategy`, `Realization Surface Closure Strategy`, `Sensor / Evidence Governance`.
-- Control review `{review}`: `Execution Horizon and Authority Fidelity`, `Target Achievement Predicate Fidelity`, `Purpose Feedback Adequacy`, `Realization Surface Closure Adequacy`, `Context Management / Execution Topology`, `Final Observer Check`.
+- Execution policy `{plan}`: `Horizon and Authority Coverage Matrix`, `Target-Producing Spine`, `Target-Producing Action Strategy`, `Candidate Plan Tasks`, `Context Management / Execution Topology`, `Phase Gates`, `Progress Log Rules`, `Purpose Feedback Strategy`, `Realization Surface Closure Strategy`, `Sensor / Evidence Governance`.
+- Control review `{review}`: `Execution Horizon and Authority Fidelity`, `Target-Producing Spine Fidelity`, `Target Achievement Predicate Fidelity`, `Purpose Feedback Adequacy`, `Realization Surface Closure Adequacy`, `Context Management / Execution Topology`, `Final Observer Check`.
 
 ## Runtime Discipline
 
@@ -35,6 +35,7 @@ Treat the human-approved setpoint as the source for primary object, requested tr
 - goal achieved: yes/no
 - single target-achieved predicate met: yes/no
 - target-producing evidence
+- target-producing spine coverage and transition evidence
 - if no: non-achieved reason
 - if no: target-producing action attempted or proof of impossibility
 - if no: smallest next target-producing attempt

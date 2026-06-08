@@ -599,6 +599,7 @@ def check_goal_target_achievement(goal: str, errors: list[str]) -> None:
         "Single target-achieved predicate",
         "Required target-producing evidence",
         "Allowed achieved claim",
+        "Target-producing spine",
     ]
     for field in required_fields:
         if not labeled_or_table_field_has_content(body, field):
@@ -680,6 +681,60 @@ def check_plan_target_producing_strategy(plan: str, errors: list[str]) -> None:
     for field in required_fields:
         if not labeled_or_table_field_has_content(body, field):
             errors.append(f"execution policy Target-Producing Action Strategy missing {field}")
+
+
+def check_plan_target_producing_spine(plan: str, errors: list[str]) -> None:
+    body = section_body(plan, "Target-Producing Spine")
+    if body is None:
+        errors.append("execution policy missing ## Target-Producing Spine")
+        return
+
+    lowered = body.casefold()
+    required_columns = [
+        "spine node",
+        "required state transition",
+        "required evidence",
+    ]
+    for column in required_columns:
+        if column not in lowered:
+            errors.append(f"execution policy Target-Producing Spine missing {column}")
+
+    has_data_row = False
+    for line in body.splitlines():
+        stripped = line.strip()
+        if "|" not in stripped:
+            continue
+        if re.fullmatch(r"\|?\s*:?-{3,}:?\s*(\|\s*:?-{3,}:?\s*)+\|?", stripped):
+            continue
+        row_lowered = stripped.casefold()
+        if all(column in row_lowered for column in required_columns):
+            continue
+        cells = [cell.strip() for cell in stripped.strip("|").split("|")]
+        if len(cells) >= len(required_columns) and all(meaningful_line(cell) for cell in cells[: len(required_columns)]):
+            has_data_row = True
+
+    if not has_data_row:
+        errors.append("execution policy Target-Producing Spine has no meaningful spine transition rows")
+
+
+def check_candidate_plan_tasks_spine_nodes(plan: str, errors: list[str]) -> None:
+    body = section_body(plan, "Candidate Plan Tasks")
+    if body is None:
+        errors.append("execution policy missing ## Candidate Plan Tasks")
+        return
+
+    task_matches = list(re.finditer(r"(?m)^###\s+(.+?)\s*$", body))
+    if not task_matches:
+        errors.append("execution policy Candidate Plan Tasks has no candidate tasks")
+        return
+
+    for index, match in enumerate(task_matches):
+        start = match.end()
+        end = task_matches[index + 1].start() if index + 1 < len(task_matches) else len(body)
+        task_body = body[start:end]
+        if not labeled_or_table_field_has_content(task_body, "Spine node(s)"):
+            task_name = match.group(1).strip()
+            errors.append(f"execution policy Candidate Plan Task missing Spine node(s): {task_name}")
 
 
 def check_plan_horizon_authority(plan: str, errors: list[str]) -> None:
@@ -786,6 +841,23 @@ def check_review_target_achievement_predicate(review: str, errors: list[str]) ->
         errors.append("control review Target Achievement Predicate Fidelity section has no meaningful findings")
 
 
+def check_review_target_producing_spine(review: str, errors: list[str]) -> None:
+    independence = section_body(review, "Review Independence")
+    if independence is None:
+        errors.append("control review missing ## Review Independence for Target-Producing Spine Fidelity")
+    else:
+        reviewed = yes_no_value(independence, "Target-producing spine fidelity")
+        if reviewed != "yes":
+            errors.append("control review did not record Target-producing spine fidelity: yes in ## Review Independence")
+
+    body = section_body(review, "Target-Producing Spine Fidelity")
+    if body is None:
+        errors.append("control review missing ## Target-Producing Spine Fidelity")
+        return
+    if not labeled_block_has_content(body, "Findings"):
+        errors.append("control review Target-Producing Spine Fidelity section has no meaningful findings")
+
+
 def check_review_execution_horizon_authority(review: str, errors: list[str]) -> None:
     independence = section_body(review, "Review Independence")
     if independence is None:
@@ -822,6 +894,7 @@ def suggest_next_action(errors: list[str]) -> str:
         or "goal realization surface contract missing" in joined
         or "goal missing ## target achievement contract" in joined
         or "goal target achievement contract missing" in joined
+        or "goal target achievement contract missing target-producing spine" in joined
         or "goal missing ## execution horizon and authority contract" in joined
         or "goal execution horizon and authority contract missing" in joined
         or "goal target achievement contract must contain exactly one target-achieved predicate" in joined
@@ -836,6 +909,11 @@ def suggest_next_action(errors: list[str]) -> str:
         or "execution policy realization surface closure strategy missing" in joined
         or "execution policy missing ## target-producing action strategy" in joined
         or "execution policy target-producing action strategy missing" in joined
+        or "execution policy missing ## target-producing spine" in joined
+        or "execution policy target-producing spine" in joined
+        or "execution policy missing ## candidate plan tasks" in joined
+        or "execution policy candidate plan task missing spine node(s)" in joined
+        or "candidate plan tasks has no candidate tasks" in joined
         or "execution policy missing ## horizon and authority coverage matrix" in joined
         or "execution policy horizon and authority coverage matrix" in joined
         or "future roadmap cannot replace approved horizon" in joined
@@ -865,14 +943,17 @@ def suggest_next_action(errors: list[str]) -> str:
         or "control review missing ## purpose feedback adequacy" in joined
         or "control review missing ## realization surface closure adequacy" in joined
         or "control review missing ## target achievement predicate fidelity" in joined
+        or "control review missing ## target-producing spine fidelity" in joined
         or "control review missing ## execution horizon and authority fidelity" in joined
         or "purpose feedback adequacy section has no meaningful findings" in joined
         or "realization surface closure adequacy section has no meaningful findings" in joined
         or "target achievement predicate fidelity section has no meaningful findings" in joined
+        or "target-producing spine fidelity section has no meaningful findings" in joined
         or "execution horizon and authority fidelity section has no meaningful findings" in joined
         or "did not record purpose feedback adequacy" in joined
         or "did not record realization surface closure adequacy" in joined
         or "did not record target achievement predicate fidelity" in joined
+        or "did not record target-producing spine fidelity" in joined
         or "did not record execution horizon and authority fidelity" in joined
         or "context management / execution topology section has no meaningful findings" in joined
         or "did not record context management / execution topology" in joined
@@ -947,6 +1028,8 @@ def main() -> int:
             errors.append(f"execution policy status under ## Execution Policy Status must be Candidate: {plan_status!r}")
         check_plan_realization_surface(plan, errors)
         check_plan_target_producing_strategy(plan, errors)
+        check_plan_target_producing_spine(plan, errors)
+        check_candidate_plan_tasks_spine_nodes(plan, errors)
         check_plan_horizon_authority(plan, errors)
         check_execution_topology(plan, errors)
 
@@ -960,6 +1043,7 @@ def main() -> int:
         check_review_purpose_feedback(review, errors)
         check_review_realization_surface(review, errors)
         check_review_target_achievement_predicate(review, errors)
+        check_review_target_producing_spine(review, errors)
         check_review_execution_horizon_authority(review, errors)
 
     for path, text, label in [

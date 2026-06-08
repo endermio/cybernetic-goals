@@ -24,6 +24,7 @@ Status: `Needs Revision`
   - Purpose feedback adequacy: `yes/no`
   - Realization surface closure adequacy: `yes/no`
   - Target achievement predicate fidelity: `yes/no`
+  - Target-producing spine fidelity: `yes/no`
   - Execution horizon and authority fidelity: `yes/no`
   - Execution granularity / sensor load: `yes/no`
   - Sensor governance: `yes/no`
@@ -203,6 +204,21 @@ Findings:
 
 - [finding]
 
+## Target-Producing Spine Fidelity
+
+Check:
+
+- execution decomposition starts from an actor-centered target-producing spine, not component inventory;
+- every mainline work package maps to at least one spine node;
+- supporting-only work is explicitly marked and cannot satisfy goal progress by itself;
+- no final integration path or primary use path is deferred to future work while achieved claims remain possible;
+- component, module, or substrate evidence is not substituted for spine transition evidence;
+- failed, blocked, or unobserved spine transitions are not moved into residual risk while review remains Approved.
+
+Findings:
+
+- [finding]
+
 ## Execution Horizon and Authority Fidelity
 
 Check:
@@ -287,6 +303,7 @@ The control structure may be approved only if:
 - purpose feedback adequacy supports the permitted completion wording and does not confuse internal progress evidence with purpose achievement;
 - realization surface closure adequacy supports target-realization wording and does not confuse local action with global realization;
 - target achievement predicate fidelity preserves a single target-achieved predicate;
+- target-producing spine fidelity preserves an actor-centered state-transition path and work-package mapping;
 - execution horizon and authority fidelity preserves the approved horizon and does not convert authority limits into out-of-scope roadmap items;
 - sensor/evidence governance is explicit;
 - batch cadence is explicit;

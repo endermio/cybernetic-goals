@@ -23,6 +23,7 @@ Status: `Approved`
 | Single target-achieved predicate | context-topology guard fixture is structurally ready |
 | Target-producing evidence required | target-producing evidence is observed |
 | Non-achieved terminal report handling | report goal achieved: no |
+| Target-producing path | context topology guard fixture spine |
 | Execution horizon | context topology guard fixture horizon |
 | Runtime authority | local guard fixture checks |
 | Forbidden live / irreversible actions | none |
@@ -238,6 +239,7 @@ class ContextTopologySkillTest(unittest.TestCase):
                     "| Single target-achieved predicate | context-topology guard fixture is structurally ready |",
                     "| Required target-producing evidence | target-producing evidence is observed |",
                     "| Allowed achieved claim | only target-achieved predicate supports goal achieved: yes |",
+                    "| Target-producing spine | context topology guard fixture spine |",
                     "",
                     "## Execution Horizon and Authority Contract",
                     "",
@@ -273,6 +275,12 @@ class ContextTopologySkillTest(unittest.TestCase):
                     "| Batch / surface | In approved horizon? | Runtime authority | Required runtime handling | Counts as achieved? |",
                     "|---|---|---|---|---|",
                     "| context topology guard fixture | yes | execute | run guard / compiler fixture checks | yes if fixture passes |",
+                    "",
+                    "## Target-Producing Spine",
+                    "",
+                    "| Spine node | Required state transition | Required evidence |",
+                    "|---|---|---|",
+                    "| S1 | fixture input -> context topology guard-ready chain | guard fixture files exist |",
                     "",
                     "## Target-Producing Action Strategy",
                     "",
@@ -312,6 +320,18 @@ class ContextTopologySkillTest(unittest.TestCase):
                     "",
                     topology_body,
                     "",
+                    "## Candidate Plan Tasks",
+                    "",
+                    "### Batch 1: context topology guard fixture",
+                    "",
+                    "Spine node(s):",
+                    "",
+                    "- S1",
+                    "",
+                    "Goal:",
+                    "",
+                    "- Keep the context topology guard fixture structurally ready.",
+                    "",
                 ]
             ),
             encoding="utf-8",
@@ -338,6 +358,7 @@ class ContextTopologySkillTest(unittest.TestCase):
                     "- Purpose feedback adequacy: `yes`",
                     "- Realization surface closure adequacy: `yes`",
                     "- Target achievement predicate fidelity: `yes`",
+                    "- Target-producing spine fidelity: `yes`",
                     "- Execution horizon and authority fidelity: `yes`",
                     "",
                     "## Context Management / Execution Topology",
@@ -365,6 +386,11 @@ class ContextTopologySkillTest(unittest.TestCase):
                     "",
                     "Findings:",
                     "- The single target-achieved predicate is separated from non-achieved terminal reports.",
+                    "",
+                    "## Target-Producing Spine Fidelity",
+                    "",
+                    "Findings:",
+                    "- Work packages map to the fixture spine node.",
                     "",
                     "## Execution Horizon and Authority Fidelity",
                     "",

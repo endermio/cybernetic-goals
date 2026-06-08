@@ -24,6 +24,7 @@ Status: `Approved`
 | Single target-achieved predicate | target-producing evidence is observed |
 | Target-producing evidence required | target-producing evidence is observed |
 | Non-achieved terminal report handling | report goal achieved: no |
+| Target-producing path | RSC guard fixture spine |
 | Execution horizon | RSC guard fixture horizon |
 | Runtime authority | local guard fixture checks |
 | Forbidden live / irreversible actions | none |
@@ -115,6 +116,7 @@ class RealizationSurfaceClosureTest(unittest.TestCase):
                 "| Single target-achieved predicate | target-producing evidence is observed |",
                     "| Required target-producing evidence | target-producing evidence is observed |",
                 "| Allowed achieved claim | only target-achieved predicate supports goal achieved: yes |",
+                "| Target-producing spine | RSC guard fixture spine |",
                 "",
                 "## Execution Horizon and Authority Contract",
                 "",
@@ -148,6 +150,12 @@ class RealizationSurfaceClosureTest(unittest.TestCase):
             "| Batch / surface | In approved horizon? | Runtime authority | Required runtime handling | Counts as achieved? |",
             "|---|---|---|---|---|",
             "| RSC guard fixture | yes | execute | run guard / compiler fixture checks | yes if fixture passes |",
+            "",
+            "## Target-Producing Spine",
+            "",
+            "| Spine node | Required state transition | Required evidence |",
+            "|---|---|---|",
+            "| S1 | fixture input -> RSC guard-ready chain | guard fixture files exist |",
             "",
             "## Target-Producing Action Strategy",
             "",
@@ -222,6 +230,18 @@ class RealizationSurfaceClosureTest(unittest.TestCase):
                 "- progress log",
                 "- stop-condition detection",
                 "",
+                "## Candidate Plan Tasks",
+                "",
+                "### Batch 1: RSC guard fixture",
+                "",
+                "Spine node(s):",
+                "",
+                "- S1",
+                "",
+                "Goal:",
+                "",
+                "- Keep the RSC guard fixture structurally ready.",
+                "",
             ]
         )
         plan.write_text("\n".join(plan_parts), encoding="utf-8")
@@ -244,6 +264,7 @@ class RealizationSurfaceClosureTest(unittest.TestCase):
             "- Purpose feedback adequacy: `yes`",
             f"- Realization surface closure adequacy: `{review_independence_rsc}`",
             "- Target achievement predicate fidelity: `yes`",
+            "- Target-producing spine fidelity: `yes`",
             "- Execution horizon and authority fidelity: `yes`",
             "",
             "## Context Management / Execution Topology",
@@ -279,6 +300,11 @@ class RealizationSurfaceClosureTest(unittest.TestCase):
                 "",
                 "Findings:",
                 "- The single target-achieved predicate is separated from non-achieved terminal reports.",
+                "",
+                "## Target-Producing Spine Fidelity",
+                "",
+                "Findings:",
+                "- Work packages map to the fixture spine node.",
                 "",
                 "## Execution Horizon and Authority Fidelity",
                 "",

@@ -138,7 +138,8 @@ The goal must preserve or define:
 
 - Single target-achieved predicate: the only predicate that allows `goal achieved: yes`;
 - Required target-producing evidence: what must be observed, produced, run, or measured;
-- Allowed achieved claim: wording allowed only when the single target-achieved predicate is met.
+- Allowed achieved claim: wording allowed only when the single target-achieved predicate is met;
+- Target-producing spine: the state-transition path or execution-policy spine that produces the predicate.
 
 Non-achieved terminal reports are stop/report protocol, not alternate goals,
 target-achievement predicates, or success states.
@@ -240,7 +241,7 @@ The goal file must include:
 
 The goal must preserve confirmed semantics. It must not reinterpret or downscope them.
 
-For Level 3/4 or full pre-goal work, the goal must preserve the approved compact control commitment from `Human Setpoint Approval`: human purpose, input role binding, primary object, requested transformation, non-goals, Purpose Feedback Boundary, Realization Surface Closure, Single target-achieved predicate, Target-producing evidence required, Non-achieved terminal report handling, Execution horizon, Runtime authority, Forbidden live / irreversible actions, Required handling for unauthorized actions, Explicitly out-of-scope items, Output Contract, workflow fit, and known assumptions.
+For Level 3/4 or full pre-goal work, the goal must preserve the approved compact control commitment from `Human Setpoint Approval`: human purpose, input role binding, primary object, requested transformation, non-goals, Purpose Feedback Boundary, Realization Surface Closure, Single target-achieved predicate, Target-producing evidence required, Non-achieved terminal report handling, Target-producing path, Execution horizon, Runtime authority, Forbidden live / irreversible actions, Required handling for unauthorized actions, Explicitly out-of-scope items, Output Contract, workflow fit, and known assumptions.
 
 When a solution design is present, the goal must reference it under `Source of Truth`, preserve design invariants, and avoid freezing tactical design details as semantic invariants unless the design explicitly marks them as invariant.
 
@@ -362,7 +363,7 @@ If the user explicitly requests a small inline `/goal` and the task is low-risk,
 - [ ] Success conditions and stop conditions are explicit.
 - [ ] The goal includes Purpose Feedback Contract when requirements define Purpose Feedback Boundary or purpose-achievement evidence is non-obvious.
 - [ ] The goal includes Realization Surface Contract for compiled runtime goals; direct bounded goals include it when requirements define Realization Surface Closure or target-state realization spans surfaces.
-- [ ] The goal includes Target Achievement Contract for compiled runtime goals.
+- [ ] The goal includes Target Achievement Contract for compiled runtime goals, including a target-producing spine reference.
 - [ ] For Level 3/4 or full pre-goal work, Human Setpoint Approval is Approved before the goal is written.
 - [ ] Success Condition allows `goal achieved: yes` only when the single target-achieved predicate is satisfied and PFB/RSC permit the matching achieved claims.
 - [ ] Any strongest positive target-realization claim requires RSC adequate; partial, missing, unavailable, or not applicable with justification receives calibrated wording.

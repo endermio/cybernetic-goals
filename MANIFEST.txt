@@ -103,3 +103,4 @@ tests/skills/test_purpose_feedback_boundary.py
 tests/skills/test_pregoal_handoff_predictor.py
 tests/skills/test_realization_surface_closure.py
 tests/skills/test_skill_repository_integrity.py
+tests/skills/test_target_producing_spine.py

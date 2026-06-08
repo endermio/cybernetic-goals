@@ -27,6 +27,7 @@ Approval applies only to this compact control commitment.
 | Single target-achieved predicate | approved HSA guard target is observed |
 | Target-producing evidence required | target-producing evidence is observed |
 | Non-achieved terminal report handling | report goal achieved: no |
+| Target-producing path | HSA guard fixture spine |
 | Execution horizon | HSA guard fixture horizon |
 | Runtime authority | local guard fixture checks |
 | Forbidden live / irreversible actions | none |
@@ -118,6 +119,7 @@ class HumanSetpointApprovalTest(unittest.TestCase):
                     "| Single target-achieved predicate | approved HSA guard target is observed |",
                     "| Required target-producing evidence | target-producing evidence is observed |",
                     "| Allowed achieved claim | only target-achieved predicate supports goal achieved: yes |",
+                    "| Target-producing spine | HSA guard fixture spine |",
                     "",
                     "## Execution Horizon and Authority Contract",
                     "",
@@ -169,6 +171,12 @@ class HumanSetpointApprovalTest(unittest.TestCase):
                     "|---|---|---|---|---|",
                     "| HSA guard fixture | yes | execute | run guard / compiler fixture checks | yes if fixture passes |",
                     "",
+                    "## Target-Producing Spine",
+                    "",
+                    "| Spine node | Required state transition | Required evidence |",
+                    "|---|---|---|",
+                    "| S1 | fixture input -> HSA guard-ready chain | guard fixture files exist |",
+                    "",
                     "## Target-Producing Action Strategy",
                     "",
                     "Target-producing action required:",
@@ -208,6 +216,18 @@ class HumanSetpointApprovalTest(unittest.TestCase):
                     "- progress log",
                     "- stop-condition detection",
                     "",
+                    "## Candidate Plan Tasks",
+                    "",
+                    "### Batch 1: HSA guard fixture",
+                    "",
+                    "Spine node(s):",
+                    "",
+                    "- S1",
+                    "",
+                    "Goal:",
+                    "",
+                    "- Keep the HSA guard fixture structurally ready.",
+                    "",
                 ]
             ),
             encoding="utf-8",
@@ -234,6 +254,7 @@ class HumanSetpointApprovalTest(unittest.TestCase):
                     "- Purpose feedback adequacy: `yes`",
                     "- Realization surface closure adequacy: `yes`",
                     "- Target achievement predicate fidelity: `yes`",
+                    "- Target-producing spine fidelity: `yes`",
                     "- Execution horizon and authority fidelity: `yes`",
                     "",
                     "## Human Setpoint Fidelity",
@@ -266,6 +287,11 @@ class HumanSetpointApprovalTest(unittest.TestCase):
                     "",
                     "Findings:",
                     "- The single target-achieved predicate is separated from non-achieved terminal reports.",
+                    "",
+                    "## Target-Producing Spine Fidelity",
+                    "",
+                    "Findings:",
+                    "- Work packages map to the fixture spine node.",
                     "",
                     "## Execution Horizon and Authority Fidelity",
                     "",

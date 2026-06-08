@@ -25,6 +25,7 @@ Cybernetic constraints supplied to the substrate:
 - context management / execution topology;
 - horizon and authority coverage matrix;
 - realization surface closure strategy;
+- target-producing spine;
 - target-producing action strategy;
 - execution granularity and sensor budget;
 - batch cadence;
@@ -213,6 +214,21 @@ After action, reconcile:
 - allowed target-realization wording for RSC adequate, partial, missing, unavailable, or not applicable with justification.
 
 Domain adapters own concrete surface discovery and verification methods. The core policy owns surface/action/residual/reconciliation structure.
+
+## Target-Producing Spine
+
+For target-achieving implementation work, decompose by the state transitions that produce the target, not by component inventory.
+
+| Spine node | Required state transition | Required evidence |
+|---|---|---|
+| [S1] | [initial/intermediate state -> next state] | [evidence that this transition is satisfied] |
+
+Rules:
+
+- Every mainline work package must map to at least one spine node.
+- Supporting-only work must be marked as supporting-only and cannot satisfy goal progress by itself.
+- Do not defer the primary actor-centered path to future work while claiming substrate or component completion.
+- Component evidence supports the spine; it does not replace spine transition evidence.
 
 ## Target-Producing Action Strategy
 
@@ -468,6 +484,10 @@ Each entry must include:
 ## Candidate Plan Tasks
 
 ### Batch 1: [Name]
+
+Spine node(s):
+
+- [S1 / supporting-only for S1]
 
 Goal:
 

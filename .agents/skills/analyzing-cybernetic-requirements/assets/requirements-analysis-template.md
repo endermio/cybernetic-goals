@@ -24,6 +24,7 @@ Approval applies only to this compact control commitment.
 | Single target-achieved predicate | [the only condition that allows "goal achieved: yes"] |
 | Target-producing evidence required | [evidence/action/observation required for the achieved predicate] |
 | Non-achieved terminal report handling | [how to report "goal achieved: no" without making it an alternate goal] |
+| Target-producing path | [one actor-centered path from initial state to target-achieved predicate] |
 | Execution horizon | [complete scope this goal covers, including items the runtime may not execute directly] |
 | Runtime authority | [actions runtime may execute / prepare / observe / report] |
 | Forbidden live / irreversible actions | [live, remote, destructive, irreversible, or externally risky actions runtime must not execute] |

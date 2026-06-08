@@ -50,9 +50,14 @@ Do not output `/goal` unless:
 - control review records `Realization surface closure adequacy: yes` in Review Independence;
 - control review includes meaningful `Realization Surface Closure Adequacy` findings;
 - goal includes a compact `Target Achievement Contract`;
+- goal `Target Achievement Contract` includes a target-producing spine reference;
+- execution policy includes `Target-Producing Spine`;
 - execution policy includes `Target-Producing Action Strategy`;
+- execution policy `Candidate Plan Tasks` map work packages to `Spine node(s)`;
 - control review records `Target achievement predicate fidelity: yes` in Review Independence;
 - control review includes meaningful `Target Achievement Predicate Fidelity` findings;
+- control review records `Target-producing spine fidelity: yes` in Review Independence;
+- control review includes meaningful `Target-Producing Spine Fidelity` findings;
 - goal includes a compact `Execution Horizon and Authority Contract`;
 - execution policy includes `Horizon and Authority Coverage Matrix`;
 - control review records `Execution horizon and authority fidelity: yes` in Review Independence;
@@ -74,8 +79,8 @@ The contract artifact must be an index-style control contract, not a long copied
 - approved control chain paths for requirements, design when present, goal, execution policy, and control review;
 - a runtime execution rule that forbids reinterpreting the approved setpoint, target-achieved predicate, output contract, topology, sensors, or control strategy;
 - a human-approved setpoint rule that treats primary object, requested transformation, non-goals, execution horizon, runtime authority, forbidden actions, purpose feedback, realization surface closure, single target-achieved predicate, output contract, workflow fit, and known assumptions as source-owned by requirements;
-- required sections to read, including `Human Setpoint Approval`, `Target Achievement Contract`, `Execution Horizon and Authority Contract`, `Purpose Feedback Contract`, `Realization Surface Contract`, `Horizon and Authority Coverage Matrix`, `Target-Producing Action Strategy`, `Context Management / Execution Topology`, `Execution Horizon and Authority Fidelity`, `Target Achievement Predicate Fidelity`, `Purpose Feedback Adequacy`, `Realization Surface Closure Adequacy`, and `Final Observer Check`;
-- final report fields: `goal achieved: yes/no`, `single target-achieved predicate met: yes/no`, target-producing evidence, non-achieved reason when no, target-producing action attempted or proof of impossibility when no, smallest next target-producing attempt when no, approved execution horizon, horizon coverage, executed, prepared-only, forbidden-not-executed, explicitly out-of-scope by HSA, purpose feedback status and highest purpose-relevant evidence observed, and realization surfaces covered, actions completed or justified, residuals reconciled, and pending or unknown surfaces when RSC applies;
+- required sections to read, including `Human Setpoint Approval`, `Target Achievement Contract`, `Execution Horizon and Authority Contract`, `Purpose Feedback Contract`, `Realization Surface Contract`, `Horizon and Authority Coverage Matrix`, `Target-Producing Spine`, `Target-Producing Action Strategy`, `Candidate Plan Tasks`, `Context Management / Execution Topology`, `Execution Horizon and Authority Fidelity`, `Target-Producing Spine Fidelity`, `Target Achievement Predicate Fidelity`, `Purpose Feedback Adequacy`, `Realization Surface Closure Adequacy`, and `Final Observer Check`;
+- final report fields: `goal achieved: yes/no`, `single target-achieved predicate met: yes/no`, target-producing evidence, target-producing spine coverage and transition evidence, non-achieved reason when no, target-producing action attempted or proof of impossibility when no, smallest next target-producing attempt when no, approved execution horizon, horizon coverage, executed, prepared-only, forbidden-not-executed, explicitly out-of-scope by HSA, purpose feedback status and highest purpose-relevant evidence observed, and realization surfaces covered, actions completed or justified, residuals reconciled, and pending or unknown surfaces when RSC applies;
 - a stop rule for missing, unapproved, inconsistent, or insufficient referenced artifacts.
 
 The final `/goal` command must only point to this runtime goal contract and tell runtime Codex to read it first.
@@ -159,6 +164,7 @@ Do not create or modify target-work artifacts.
 - [ ] Runtime goal contract preserves the approved execution topology through the plan section index.
 - [ ] Runtime goal contract preserves the human-approved setpoint through the requirements section index.
 - [ ] Runtime goal contract includes final report fields for EHA, PFB, RSC, and TAP claim calibration.
+- [ ] Runtime goal contract indexes the approved Target-Producing Spine and review fidelity section.
 - [ ] The user-entered `/goal` is pointer-only and length-bounded.
 - [ ] The user-entered `/goal` does not inline HSA, PFB, RSC, TAP, topology, sensor-governance, review, or subagent protocol prose.
 - [ ] The final `/goal` does not ask runtime Codex to write a new plan.

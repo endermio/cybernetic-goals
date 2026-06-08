@@ -239,7 +239,19 @@ Flag as Major or Blocking when:
 - the plan can terminate with `goal achieved: yes` without satisfying the single target-achieved predicate;
 - "valid final status" is used without separating `goal achieved: yes` from `goal achieved: no`.
 
-### 12. Execution Horizon and Authority Fidelity
+### 12. Target-Producing Spine Fidelity
+
+Flag as Major or Blocking when:
+
+- implementation decomposes by components without a target-producing spine;
+- no mainline work package owns the actor-centered path from initial state to target-achieved predicate;
+- candidate tasks lack `Spine node(s)` mapping;
+- supporting-only work is allowed to satisfy goal progress by itself;
+- final integration path, primary use path, or spine transition evidence is deferred to future work while achieved claims remain possible;
+- component, module, or substrate evidence replaces spine transition evidence;
+- failed, blocked, or unobserved spine transitions are recorded only as residual risk while review remains Approved.
+
+### 13. Execution Horizon and Authority Fidelity
 
 Flag as Major or Blocking when:
 
@@ -250,7 +262,7 @@ Flag as Major or Blocking when:
 - prepare-only or forbidden-not-executed work is claimed as executed or live complete;
 - the final report cannot distinguish executed, prepared-only, forbidden-not-executed, and explicitly out-of-scope by HSA.
 
-### 13. Execution Granularity / Sensor Load
+### 14. Execution Granularity / Sensor Load
 
 Flag as Major or Blocking when:
 
@@ -416,6 +428,7 @@ Response-only next step:
 - [ ] Purpose feedback adequacy was checked.
 - [ ] Realization Surface Closure adequacy was checked.
 - [ ] Target Achievement Predicate Fidelity was checked.
+- [ ] Target-Producing Spine Fidelity was checked.
 - [ ] Execution Horizon and Authority Fidelity was checked.
 - [ ] Execution granularity and sensor load were checked.
 - [ ] Required revisions are actionable.
