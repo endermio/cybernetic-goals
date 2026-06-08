@@ -61,6 +61,18 @@ Outside scope:
 
 - [invariant]
 
+## Task Skeleton Fidelity
+
+Use when HSA records an answering method or task skeleton family.
+
+| Element | Design |
+|---|---|
+| Approved answering method | [from HSA] |
+| Approved skeleton family | [from HSA] |
+| Instantiated skeleton | [design skeleton] |
+| Mandatory nodes coverage | [required skeleton nodes and coverage status] |
+| Forbidden substitution avoided | [yes/no + rationale; if no, stop and return to HSA revision] |
+
 ## Detailed Design
 
 ### Components / Mechanisms

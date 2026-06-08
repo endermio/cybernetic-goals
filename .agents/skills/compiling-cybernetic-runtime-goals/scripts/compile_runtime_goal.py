@@ -163,6 +163,11 @@ def runtime_goal_contract(
     review: str,
 ) -> str:
     design_line = f"- Design: `{design}`" if design else "- Design: `not required`"
+    design_required_line = (
+        f"- Design `{design}`: `Task Skeleton Fidelity`, `Output Contract Design`, `Design-to-Goal Mapping`, `Design-to-Execution Mapping`."
+        if design
+        else "- Design: `not required`."
+    )
     topology = selected_execution_topology(plan) or "read from approved execution policy"
     substrate = selected_delegation_substrate(plan) or "read from approved execution policy"
     subagent_mode = selected_subagent_execution_mode(plan) or "read from approved execution policy"
@@ -192,8 +197,8 @@ def runtime_goal_contract(
             "",
             "## Runtime Execution Rule",
             "",
-            "Execute the approved execution policy under the approved control chain. Do not reinterpret the approved setpoint, target-achieved predicate, output contract, topology, sensors, or control strategy.",
-            "Treat the human-approved setpoint as the source for primary object, requested transformation, non-goals, execution horizon, runtime authority, forbidden actions, purpose feedback, realization surface closure, single target-achieved predicate, output contract, workflow fit, and known assumptions.",
+            "Execute the approved execution policy under the approved control chain. Do not reinterpret the approved setpoint, answering method, task skeleton, target-achieved predicate, output contract, topology, sensors, or control strategy.",
+            "Treat the human-approved setpoint as the source for primary object, requested transformation, non-goals, answering method, not-sufficient substitute, task skeleton family, execution horizon, runtime authority, forbidden actions, purpose feedback, realization surface closure, single target-achieved predicate, output contract, workflow fit, and known assumptions.",
             "",
             f"- Selected topology: `{topology}`",
             f"- Selected delegation substrate: `{substrate}`",
@@ -203,9 +208,10 @@ def runtime_goal_contract(
             "## Required Sections To Read",
             "",
             f"- Requirements `{requirements}`: `Human Setpoint Approval`, `Purpose Feedback Boundary`, `Realization Surface Closure`, `Output Contract`.",
+            design_required_line,
             f"- Goal `{goal}`: `Success Condition`, `Target Achievement Contract`, `Execution Horizon and Authority Contract`, `Purpose Feedback Contract`, `Realization Surface Contract`, `Final Output Contract`.",
             f"- Execution policy `{plan}`: `Horizon and Authority Coverage Matrix`, `Target-Producing Spine`, `Target-Producing Action Strategy`, `Candidate Plan Tasks`, `Context Management / Execution Topology`, `Subagent execution mode`, `Parallel wave matrix`, `Conflict / lock model`, `Failure policy`, `Phase Gates`, `Progress Log Rules`, `Purpose Feedback Strategy`, `Realization Surface Closure Strategy`, `Sensor / Evidence Governance`.",
-            f"- Control review `{review}`: `Execution Horizon and Authority Fidelity`, `Subagent Concurrency Fidelity`, `Target-Producing Spine Fidelity`, `Target Achievement Predicate Fidelity`, `Purpose Feedback Adequacy`, `Realization Surface Closure Adequacy`, `Context Management / Execution Topology`, `Final Observer Check`.",
+            f"- Control review `{review}`: `Design Skeleton Fidelity`, `Execution Horizon and Authority Fidelity`, `Subagent Concurrency Fidelity`, `Target-Producing Spine Fidelity`, `Target Achievement Predicate Fidelity`, `Purpose Feedback Adequacy`, `Realization Surface Closure Adequacy`, `Context Management / Execution Topology`, `Final Observer Check`.",
             "",
             "## Runtime Discipline",
             "",
@@ -225,6 +231,7 @@ def runtime_goal_contract(
             "- single target-achieved predicate met: yes/no",
             "- target-producing evidence",
             "- target-producing spine coverage and transition evidence",
+            "- skeleton completion evidence when HSA/design define a task skeleton family",
             "- if no: non-achieved reason",
             "- if no: target-producing action attempted or proof of impossibility",
             "- if no: smallest next target-producing attempt",

@@ -359,6 +359,8 @@ The policy may choose tactical execution details, batch cadence, and workstream 
 - lifecycle or failure model;
 - design invariants.
 
+If the design includes `Task Skeleton Fidelity`, decompose work against that approved skeleton. Do not replace the design skeleton with a component-first or weaker validation skeleton.
+
 If the design is missing, contradictory, or insufficient for planning, stop and route back to `$designing-cybernetic-solutions` or ask for the smallest design decision.
 
 ## Response-Only Handoff Rule

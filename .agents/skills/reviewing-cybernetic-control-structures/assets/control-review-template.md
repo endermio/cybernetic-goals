@@ -18,6 +18,7 @@ Status: `Needs Revision`
   - Requirement traceability: `yes/no`
   - Human setpoint fidelity: `yes/no`
   - Design fidelity: `yes/no`
+  - Design skeleton fidelity: `yes/no`
   - Output contract fidelity: `yes/no`
   - Goal fidelity: `yes/no`
   - Context management / execution topology: `yes/no`
@@ -90,6 +91,19 @@ Findings:
 - [finding]
 
 ## Design Fidelity
+
+Findings:
+
+- [finding]
+
+## Design Skeleton Fidelity
+
+Check:
+
+- HSA `Answering method`, `Not-sufficient substitute`, and `Task skeleton family` are preserved when present;
+- design instantiates the approved skeleton family or returns to HSA instead of substituting another skeleton;
+- `coverage-ceiling-measurement` includes full workflow scope inventory, major removable source / bottleneck inventory, ceiling coverage criterion, candidate coverage matrix, same-workload full workflow run, and interpretation against coverage matrix;
+- goal and execution policy do not weaken the design skeleton.
 
 Findings:
 
@@ -313,6 +327,7 @@ The control structure may be approved only if:
 
 - requirements analysis status is Complete;
 - required solution design exists and preserves requirements analysis semantics;
+- design skeleton fidelity preserves the approved answering method and skeleton family when HSA records them;
 - goal preserves requirements analysis semantics;
 - goal and execution policy preserve required design invariants;
 - any upstream output contract is preserved in the goal and supported by the execution policy;

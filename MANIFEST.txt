@@ -91,6 +91,7 @@ tests/observability/test_run_event_scripts.py
 tests/observability/test_validate_run_events.py
 tests/skills/test_artifact_hygiene.py
 tests/skills/__init__.py
+tests/skills/test_design_skeleton_fidelity.py
 tests/skills/test_execution_horizon_authority.py
 tests/skills/test_target_achievement_predicate_fidelity.py
 tests/skills/test_context_topology.py

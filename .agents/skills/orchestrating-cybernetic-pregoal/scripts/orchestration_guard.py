@@ -51,7 +51,12 @@ def blocked_next_action(errors: list[str]) -> str:
         return "Blocked"
     if "design artifact is missing" in joined:
         return "RunDesign"
-    if "design status" in joined or "design does not reference" in joined or "design has blocking" in joined:
+    if (
+        "design status" in joined
+        or "design does not reference" in joined
+        or "design has blocking" in joined
+        or "task skeleton fidelity" in joined
+    ):
         return "RunDesign"
     if "output contract gate" in joined and "design lacks" in joined:
         return "RunDesign"
@@ -726,8 +731,66 @@ def check_design_ready(
     require_reference(design, requirements_path, "design", errors)
     if output_contract_gate_required(requirements, design) and not output_contract_present_upstream(requirements, design):
         errors.append("Output Contract Gate is required but no upstream output contract is present")
+    check_design_skeleton_fidelity(requirements, design, errors)
     if has_blocking_design_questions(design):
         errors.append("design has blocking open design questions")
+
+
+COVERAGE_CEILING_REQUIRED_NODES = (
+    "full workflow scope inventory",
+    "major removable source",
+    "ceiling coverage criterion",
+    "candidate coverage matrix",
+    "same-workload full workflow run",
+    "interpretation against coverage matrix",
+)
+
+
+def check_design_skeleton_fidelity(requirements: str | None, design: str | None, errors: list[str]) -> None:
+    hsa = section_body(requirements or "", "Human Setpoint Approval")
+    if hsa is None or design is None:
+        return
+
+    answering_method = field_value(hsa, "Answering method")
+    not_sufficient = field_value(hsa, "Not-sufficient substitute")
+    skeleton_family = field_value(hsa, "Task skeleton family")
+    if not any((answering_method, not_sufficient, skeleton_family)):
+        return
+
+    body = section_body(design, "Task Skeleton Fidelity")
+    if body is None:
+        errors.append("design missing ## Task Skeleton Fidelity for approved answering method / task skeleton family")
+        return
+
+    for label in (
+        "Approved answering method",
+        "Approved skeleton family",
+        "Instantiated skeleton",
+        "Mandatory nodes coverage",
+        "Forbidden substitution avoided",
+    ):
+        if not labeled_or_table_field_has_content(body, label):
+            errors.append(f"design Task Skeleton Fidelity missing {label}")
+
+    family = (skeleton_family or "").casefold()
+    instantiated = (field_value(body, "Instantiated skeleton") or "").casefold()
+    mandatory = (field_value(body, "Mandatory nodes coverage") or "").casefold()
+    avoided = (field_value(body, "Forbidden substitution avoided") or "").casefold()
+    substitute = (not_sufficient or "").casefold()
+
+    if family and family not in (field_value(body, "Approved skeleton family") or "").casefold():
+        errors.append("design Task Skeleton Fidelity does not preserve approved skeleton family")
+
+    if family == "coverage-ceiling-measurement":
+        if "full-workflow-run-validation" in instantiated or (substitute and substitute in instantiated):
+            errors.append(
+                "design Task Skeleton Fidelity substitutes full-workflow-run-validation for coverage-ceiling-measurement"
+            )
+        if avoided.startswith("no") or " no" in avoided[:12]:
+            errors.append("design Task Skeleton Fidelity records forbidden substitution was not avoided")
+        for node in COVERAGE_CEILING_REQUIRED_NODES:
+            if node not in mandatory:
+                errors.append(f"design Task Skeleton Fidelity missing coverage-ceiling mandatory node: {node}")
 
 
 def check_goal_ready(

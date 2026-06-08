@@ -107,6 +107,9 @@ Check that design, goal, and execution policy preserve the approved compact cont
 - Single target-achieved predicate;
 - Target-producing evidence required;
 - Non-achieved terminal report handling;
+- Answering method;
+- Not-sufficient substitute;
+- Task skeleton family;
 - Output Contract;
 - Execution horizon;
 - Runtime authority;
@@ -136,7 +139,22 @@ When a solution design exists or Design Gate was required:
 - tactical degrees of freedom must not be frozen as semantic invariants unless the design explicitly says so;
 - the plan must not redesign the solution model.
 
-### 5. Output Contract Fidelity
+### 5. Design Skeleton Fidelity
+
+When HSA records `Answering method`, `Not-sufficient substitute`, or `Task skeleton family`, the design is a semantic compiler for that approved answering method.
+
+Flag as Major or Blocking when:
+
+- design substitutes a weaker skeleton for the approved answering method;
+- design instantiates a different task skeleton family without returning to HSA;
+- design reports the not-sufficient substitute as sufficient;
+- `coverage-ceiling-measurement` lacks full workflow scope inventory, major removable source / bottleneck inventory, ceiling coverage criterion, candidate coverage matrix, same-workload full workflow run, or interpretation against coverage matrix;
+- goal or execution policy inherits a weaker skeleton than the design;
+- review approves run-validation evidence as coverage-ceiling evidence.
+
+If the approved skeleton is infeasible or unsuitable, require return to requirements/HSA. Do not approve a design that silently changes task type.
+
+### 6. Output Contract Fidelity
 
 When requirements analysis, solution design, or goal includes an output contract:
 
@@ -146,7 +164,7 @@ When requirements analysis, solution design, or goal includes an output contract
 - evidence-reference, destination, machine-readable, and acceptance-condition requirements must not be weakened;
 - runtime `/goal` must not be able to replace the audience, purpose, medium, structure, detail level, destination, or machine-readable shape.
 
-### 6. Control Law Quality
+### 7. Control Law Quality
 
 The execution policy must define a sane control law:
 
@@ -161,7 +179,7 @@ The execution policy must define a sane control law:
 - repair policy
 - stop conditions
 
-### 7. Sensor / Evidence Governance
+### 8. Sensor / Evidence Governance
 
 Approved sensors, checks, and evidence channels are sensors, not objectives.
 
@@ -172,7 +190,7 @@ Flag plans that:
 - lack stale sensor retirement rules;
 - lack target-state evidence.
 
-### 8. Purpose Feedback Adequacy
+### 9. Purpose Feedback Adequacy
 
 Block false completion claims, not necessarily continued execution.
 
@@ -192,7 +210,7 @@ Flag as Major or Blocking when:
 - the plan demands heavy end-to-end or operational feedback when a smaller purpose-boundary observation would suffice;
 - the goal defines success as sensor success; purpose-realizing outcome evidence is required unless the purpose is internal-state correctness.
 
-### 9. Evidence Lifecycle / Evidence Budget
+### 10. Evidence Lifecycle / Evidence Budget
 
 Flag as Major or Blocking when:
 
@@ -208,7 +226,7 @@ Flag as Major or Blocking when:
 
 Use `Major` when execution-policy revision can repair evidence lifecycle. Use `Blocking` when sensor output would likely swamp review, context management, or runtime completion.
 
-### 10. Realization Surface Closure Adequacy
+### 11. Realization Surface Closure Adequacy
 
 Classify RSC as one of:
 
@@ -232,7 +250,7 @@ Use `Major` when policy or goal revision can repair RSC wording. Use
 `Blocking` when runtime could claim target-state realization while important
 surfaces or residuals remain unresolved.
 
-### 11. Target Achievement Predicate Fidelity
+### 12. Target Achievement Predicate Fidelity
 
 Flag as Major or Blocking when:
 
@@ -243,7 +261,7 @@ Flag as Major or Blocking when:
 - the plan can terminate with `goal achieved: yes` without satisfying the single target-achieved predicate;
 - "valid final status" is used without separating `goal achieved: yes` from `goal achieved: no`.
 
-### 12. Target-Producing Spine Fidelity
+### 13. Target-Producing Spine Fidelity
 
 Flag as Major or Blocking when:
 
@@ -255,7 +273,7 @@ Flag as Major or Blocking when:
 - component, module, or substrate evidence replaces spine transition evidence;
 - failed, blocked, or unobserved spine transitions are recorded only as residual risk while review remains Approved.
 
-### 13. Execution Horizon and Authority Fidelity
+### 14. Execution Horizon and Authority Fidelity
 
 Flag as Major or Blocking when:
 
@@ -266,7 +284,7 @@ Flag as Major or Blocking when:
 - prepare-only or forbidden-not-executed work is claimed as executed or live complete;
 - the final report cannot distinguish executed, prepared-only, forbidden-not-executed, and explicitly out-of-scope by HSA.
 
-### 14. Context Management / Execution Topology
+### 15. Context Management / Execution Topology
 
 Flag as Major or Blocking when:
 
@@ -283,7 +301,7 @@ Flag as Major or Blocking when:
 
 Use `Major` when execution-policy revision can repair topology. Use `Blocking` when context overload would likely make runtime lose requirements, design invariants, output contract, stop conditions, or approval boundaries.
 
-### 15. Subagent Concurrency Fidelity
+### 16. Subagent Concurrency Fidelity
 
 Flag as Major or Blocking when:
 
@@ -299,7 +317,7 @@ Flag as Major or Blocking when:
 - subagent outputs can become final without main-agent integration;
 - selected delegation substrate does not fit the approved work packages.
 
-### 16. Execution Granularity / Sensor Load
+### 17. Execution Granularity / Sensor Load
 
 Flag as Major or Blocking when:
 
@@ -314,7 +332,7 @@ Flag as Major or Blocking when:
 
 Use `Major` when execution-policy revision can repair the control law. Use `Blocking` when the granularity or sensor load would prevent runtime completion or let sensors override confirmed semantics.
 
-### 17. Batch Rhythm
+### 18. Batch Rhythm
 
 Flag:
 
@@ -323,11 +341,11 @@ Flag:
 - no batch-end openability requirement;
 - no destructive intermediate-state policy.
 
-### 18. Semantic vs Tactical Boundary
+### 19. Semantic vs Tactical Boundary
 
 Semantic invariants must be frozen. Tactical execution details must remain adjustable.
 
-### 19. Runtime Suitability
+### 20. Runtime Suitability
 
 The runtime `/goal` must be able to execute the approved artifacts without inventing new control structures. Any required runtime discipline, including approved execution topology, bounded subagent delegation protocol, and conditionally selected Superpowers substrate, must be precompiled into the approved plan, review, or final `/goal`.
 
@@ -340,7 +358,7 @@ target-realization claims require RSC adequate.
 
 Runtime target-achievement claims must be calibrated to the single target-achieved predicate. Non-achieved terminal reports may stop execution honestly, but they do not support `goal achieved: yes`.
 
-### 20. Review Independence
+### 21. Review Independence
 
 The review must record:
 
@@ -349,7 +367,7 @@ The review must record:
 - whether approval is allowed;
 - why approval is blocked when independent review is missing.
 
-### 21. Final Observer Check
+### 22. Final Observer Check
 
 The review must record whether any substantive artifact changed after the latest independent review pass and whether a final independent observer confirmed no Blocking or Major findings after that change.
 
@@ -383,6 +401,7 @@ Only mark `Approved` when:
 - Human Setpoint Approval is Approved when full pre-goal orchestration is used, and Human Setpoint Fidelity has no Blocking/Major findings;
 - Execution Horizon and Authority Fidelity has no Blocking/Major findings for full-route or multi-batch work;
 - required design exists and is consistent with requirements analysis, goal, and plan;
+- Design Skeleton Fidelity has no Blocking/Major findings when HSA records an answering method or skeleton family;
 - any upstream output contract is preserved in the goal and supported by the execution policy;
 - no unresolved semantic decision remains;
 - execution policy does not self-authorize uncontrolled changes;
@@ -437,6 +456,7 @@ Response-only next step:
 - [ ] Review status is explicit.
 - [ ] Review independence is recorded.
 - [ ] Human Setpoint Fidelity was checked when full pre-goal orchestration is used.
+- [ ] Design Skeleton Fidelity was checked when HSA records an answering method or skeleton family.
 - [ ] Final observer check is recorded.
 - [ ] The review does not mark self-review as `Approved`.
 - [ ] If subagents were not authorized and no human approval exists, status is `Needs Independent Review`.

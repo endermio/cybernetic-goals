@@ -25,6 +25,9 @@ Approval applies only to this compact control commitment.
 | Target-producing evidence required | [evidence/action/observation required for the achieved predicate] |
 | Non-achieved terminal report handling | [how to report "goal achieved: no" without making it an alternate goal] |
 | Target-producing path | [one actor-centered path from initial state to target-achieved predicate] |
+| Answering method | [what method/evidence structure is required for this question to count as answered] |
+| Not-sufficient substitute | [plausible weaker answer that must not be substituted for the approved answering method] |
+| Task skeleton family | [implementation-spine / measurement-protocol / coverage-ceiling-measurement / claim-evidence-audit / diagnosis-discrimination / no special skeleton] |
 | Execution horizon | [complete scope this goal covers, including items the runtime may not execute directly] |
 | Runtime authority | [actions runtime may execute / prepare / observe / report] |
 | Forbidden live / irreversible actions | [live, remote, destructive, irreversible, or externally risky actions runtime must not execute] |

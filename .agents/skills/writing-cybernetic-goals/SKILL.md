@@ -241,7 +241,9 @@ The goal file must include:
 
 The goal must preserve confirmed semantics. It must not reinterpret or downscope them.
 
-For Level 3/4 or full pre-goal work, the goal must preserve the approved compact control commitment from `Human Setpoint Approval`: human purpose, input role binding, primary object, requested transformation, non-goals, Purpose Feedback Boundary, Realization Surface Closure, Single target-achieved predicate, Target-producing evidence required, Non-achieved terminal report handling, Target-producing path, Execution horizon, Runtime authority, Forbidden live / irreversible actions, Required handling for unauthorized actions, Explicitly out-of-scope items, Output Contract, workflow fit, and known assumptions.
+For Level 3/4 or full pre-goal work, the goal must preserve the approved compact control commitment from `Human Setpoint Approval`: human purpose, input role binding, primary object, requested transformation, non-goals, Purpose Feedback Boundary, Realization Surface Closure, Single target-achieved predicate, Target-producing evidence required, Non-achieved terminal report handling, Target-producing path, Answering method, Not-sufficient substitute, Task skeleton family, Execution horizon, Runtime authority, Forbidden live / irreversible actions, Required handling for unauthorized actions, Explicitly out-of-scope items, Output Contract, workflow fit, and known assumptions.
+
+If a design includes `Task Skeleton Fidelity`, the goal must not weaken the approved answering method or substitute a different task skeleton family. Bind the target-achieved predicate and target-producing spine to the design skeleton.
 
 When a solution design is present, the goal must reference it under `Source of Truth`, preserve design invariants, and avoid freezing tactical design details as semantic invariants unless the design explicitly marks them as invariant.
 

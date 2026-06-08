@@ -298,9 +298,29 @@ Design artifacts with status `Candidate`, `Reviewed`, or `Approved` may enter do
 - the artifact was produced by `$designing-cybernetic-solutions` or explicitly provided by the user;
 - it references the requirements analysis in `Source Contracts`;
 - it has no blocking open design questions;
-- final control review will check Design Fidelity.
+- if HSA records `Answering method`, `Not-sufficient substitute`, or `Task skeleton family`, the design includes `Task Skeleton Fidelity` that preserves the approved answering method and skeleton family;
+- final control review will check Design Fidelity and Design Skeleton Fidelity when HSA records an answering method or skeleton family.
 
 If any design artifact exists, propagate its path to goal writing, execution-policy writing, control review, and runtime compilation, even when Design Gate is satisfied or no longer required.
+
+## Design Skeleton Gate
+
+Before goal writing, validate design skeleton fidelity when HSA records an approved answering method or task skeleton family.
+
+The design must instantiate the approved skeleton family. It must not replace the approved answering method with a not-sufficient substitute because the substitute is easier to run or verify.
+
+If the approved skeleton cannot be instantiated, return to requirements/HSA for revision. Do not ask the user to review downstream goal or plan artifacts as compensation.
+
+For `coverage-ceiling-measurement`, the design must include:
+
+- full workflow scope inventory;
+- major removable source / bottleneck inventory;
+- ceiling coverage criterion;
+- candidate coverage matrix;
+- same-workload full workflow run;
+- interpretation against coverage matrix.
+
+If the design substitutes `full-workflow-run-validation` for `coverage-ceiling-measurement`, stop before goal writing and rerun design.
 
 ## Non-Fallback Rule
 
@@ -322,7 +342,7 @@ If any non-emulatable stage is required and unavailable, stop and report the mis
 |---|---|---|---|
 | `RequirementsMissing` | requirements absent, incomplete, or Human Setpoint Approval missing/not Approved | `Blocked` / `ReturnToRequirementsAnalysis` | design / goal / policy / review / runtime compile |
 | `RequirementsComplete` | requirements Complete and Human Setpoint Approval Approved; Design Gate required and design missing | `RunDesign` | goal writing |
-| `DesignReady` | design exists, references requirements, and has no blocking open questions | `RunGoalWriting` | execution policy |
+| `DesignReady` | design exists, references requirements, has no blocking open questions, and passes Design Skeleton Gate when HSA records an answering method or skeleton family | `RunGoalWriting` | execution policy |
 | `GoalReady` | goal exists and references requirements plus any design path | `RunExecutionPolicy` | review |
 | `PolicyReady` | execution policy exists, references requirements, goal, any design path, and records selected execution topology | `RunReview` | runtime compile |
 | `ReviewApproved` | review is Approved and Final Observer allows approval | `RunRuntimeCompile` | execution |

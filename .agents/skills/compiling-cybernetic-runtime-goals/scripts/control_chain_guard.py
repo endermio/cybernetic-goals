@@ -722,6 +722,98 @@ def check_delegation_substrate_preference(requirements: str, plan: str | None, e
         )
 
 
+COVERAGE_CEILING_REQUIRED_NODES = (
+    "full workflow scope inventory",
+    "major removable source",
+    "ceiling coverage criterion",
+    "candidate coverage matrix",
+    "same-workload full workflow run",
+    "interpretation against coverage matrix",
+)
+
+
+def check_design_skeleton_fidelity(requirements: str | None, design: str | None, errors: list[str]) -> None:
+    hsa = section_body(requirements or "", "Human Setpoint Approval")
+    if hsa is None or design is None:
+        return
+
+    answering_method = field_value(hsa, "Answering method")
+    not_sufficient = field_value(hsa, "Not-sufficient substitute")
+    skeleton_family = field_value(hsa, "Task skeleton family")
+    if not any((answering_method, not_sufficient, skeleton_family)):
+        return
+
+    body = section_body(design, "Task Skeleton Fidelity")
+    if body is None:
+        errors.append("design missing ## Task Skeleton Fidelity for approved answering method / task skeleton family")
+        return
+
+    for label in (
+        "Approved answering method",
+        "Approved skeleton family",
+        "Instantiated skeleton",
+        "Mandatory nodes coverage",
+        "Forbidden substitution avoided",
+    ):
+        if not labeled_or_table_field_has_content(body, label):
+            errors.append(f"design Task Skeleton Fidelity missing {label}")
+
+    family = (skeleton_family or "").casefold()
+    approved_family = (field_value(body, "Approved skeleton family") or "").casefold()
+    instantiated = (field_value(body, "Instantiated skeleton") or "").casefold()
+    mandatory = (field_value(body, "Mandatory nodes coverage") or "").casefold()
+    avoided = (field_value(body, "Forbidden substitution avoided") or "").casefold()
+    substitute = (not_sufficient or "").casefold()
+
+    if family and family not in approved_family:
+        errors.append("design Task Skeleton Fidelity does not preserve approved skeleton family")
+
+    if family == "coverage-ceiling-measurement":
+        if "full-workflow-run-validation" in instantiated or (substitute and substitute in instantiated):
+            errors.append(
+                "design Task Skeleton Fidelity substitutes full-workflow-run-validation for coverage-ceiling-measurement"
+            )
+        if avoided.startswith("no") or " no" in avoided[:12]:
+            errors.append("design Task Skeleton Fidelity records forbidden substitution was not avoided")
+        for node in COVERAGE_CEILING_REQUIRED_NODES:
+            if node not in mandatory:
+                errors.append(f"design Task Skeleton Fidelity missing coverage-ceiling mandatory node: {node}")
+
+
+def hsa_requires_design_skeleton_review(requirements: str | None) -> bool:
+    hsa = section_body(requirements or "", "Human Setpoint Approval")
+    if hsa is None:
+        return False
+    return any(
+        field_value(hsa, label)
+        for label in (
+            "Answering method",
+            "Not-sufficient substitute",
+            "Task skeleton family",
+        )
+    )
+
+
+def check_review_design_skeleton(requirements: str, review: str, errors: list[str]) -> None:
+    if not hsa_requires_design_skeleton_review(requirements):
+        return
+
+    independence = section_body(review, "Review Independence")
+    if independence is None:
+        errors.append("control review missing ## Review Independence for Design Skeleton Fidelity")
+    else:
+        reviewed = yes_no_value(independence, "Design skeleton fidelity")
+        if reviewed != "yes":
+            errors.append("control review did not record Design skeleton fidelity: yes in ## Review Independence")
+
+    body = section_body(review, "Design Skeleton Fidelity")
+    if body is None:
+        errors.append("control review missing ## Design Skeleton Fidelity")
+        return
+    if not labeled_block_has_content(body, "Findings"):
+        errors.append("control review Design Skeleton Fidelity section has no meaningful findings")
+
+
 def check_goal_purpose_feedback(goal: str, errors: list[str]) -> None:
     body = section_body(goal, "Purpose Feedback Contract")
     if body is None:
@@ -1098,7 +1190,12 @@ def suggest_next_action(errors: list[str]) -> str:
         or "hsa delegation substrate preference conflicts" in joined
     ):
         return "ReturnToRequirementsAnalysis"
-    if "design gate is required" in joined or "design status" in joined or "design does not reference" in joined:
+    if (
+        "design gate is required" in joined
+        or "design status" in joined
+        or "design does not reference" in joined
+        or "task skeleton fidelity" in joined
+    ):
         return "RunDesign"
     if (
         "output contract" in joined
@@ -1169,18 +1266,21 @@ def suggest_next_action(errors: list[str]) -> str:
         or "review does not reference" in joined
         or "control review missing ## review independence" in joined
         or "control review missing ## context management / execution topology" in joined
+        or "control review missing ## design skeleton fidelity" in joined
         or "control review missing ## purpose feedback adequacy" in joined
         or "control review missing ## realization surface closure adequacy" in joined
         or "control review missing ## target achievement predicate fidelity" in joined
         or "control review missing ## target-producing spine fidelity" in joined
         or "control review missing ## execution horizon and authority fidelity" in joined
         or "control review missing ## subagent concurrency fidelity" in joined
+        or "design skeleton fidelity section has no meaningful findings" in joined
         or "purpose feedback adequacy section has no meaningful findings" in joined
         or "realization surface closure adequacy section has no meaningful findings" in joined
         or "target achievement predicate fidelity section has no meaningful findings" in joined
         or "target-producing spine fidelity section has no meaningful findings" in joined
         or "execution horizon and authority fidelity section has no meaningful findings" in joined
         or "subagent concurrency fidelity section has no meaningful findings" in joined
+        or "did not record design skeleton fidelity" in joined
         or "did not record purpose feedback adequacy" in joined
         or "did not record realization surface closure adequacy" in joined
         or "did not record target achievement predicate fidelity" in joined
@@ -1240,6 +1340,7 @@ def main() -> int:
             errors.append(f"design does not reference required requirements path: {args.requirements}")
         if output_contract_gate_required(requirements, design) and not output_contract_present_upstream(requirements, design):
             errors.append("Output Contract Gate is required but no upstream output contract is present")
+        check_design_skeleton_fidelity(requirements, design, errors)
     elif design_gate_required(requirements, goal, plan, review):
         errors.append("Design Gate is required but --design was not provided")
 
@@ -1273,6 +1374,7 @@ def main() -> int:
         if review_status != "Approved":
             errors.append(f"control review status under ## Review Status is not Approved: {review_status!r}")
         check_final_observer(review, errors)
+        check_review_design_skeleton(requirements, review, errors)
         check_review_context_topology(review, errors)
         if plan:
             check_review_subagent_concurrency(plan, review, errors)
