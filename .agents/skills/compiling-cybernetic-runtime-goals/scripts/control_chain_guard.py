@@ -565,6 +565,23 @@ def check_goal_realization_surface(goal: str, errors: list[str]) -> None:
             errors.append(f"goal Realization Surface Contract missing {field}")
 
 
+def check_goal_completion_predicate(goal: str, errors: list[str]) -> None:
+    body = section_body(goal, "Completion Predicate Contract")
+    if body is None:
+        errors.append("goal missing ## Completion Predicate Contract")
+        return
+
+    required_fields = [
+        "Target-achieved predicate",
+        "Valid non-achieved report statuses",
+        "Fallback report handling",
+        "Allowed goal-achieved claim",
+    ]
+    for field in required_fields:
+        if not labeled_or_table_field_has_content(body, field):
+            errors.append(f"goal Completion Predicate Contract missing {field}")
+
+
 def check_plan_realization_surface(plan: str, errors: list[str]) -> None:
     body = section_body(plan, "Realization Surface Closure Strategy")
     if body is None:
@@ -614,6 +631,23 @@ def check_review_realization_surface(review: str, errors: list[str]) -> None:
         errors.append("control review Realization Surface Closure Adequacy section has no meaningful findings")
 
 
+def check_review_completion_predicate(review: str, errors: list[str]) -> None:
+    independence = section_body(review, "Review Independence")
+    if independence is None:
+        errors.append("control review missing ## Review Independence for Completion Predicate Fidelity")
+    else:
+        reviewed = yes_no_value(independence, "Completion predicate fidelity")
+        if reviewed != "yes":
+            errors.append("control review did not record Completion predicate fidelity: yes in ## Review Independence")
+
+    body = section_body(review, "Completion Predicate Fidelity")
+    if body is None:
+        errors.append("control review missing ## Completion Predicate Fidelity")
+        return
+    if not labeled_block_has_content(body, "Findings"):
+        errors.append("control review Completion Predicate Fidelity section has no meaningful findings")
+
+
 def suggest_next_action(errors: list[str]) -> str:
     joined = "\n".join(errors).casefold()
     lowered_errors = [error.casefold() for error in errors]
@@ -631,6 +665,8 @@ def suggest_next_action(errors: list[str]) -> str:
         or "goal purpose feedback contract missing" in joined
         or "goal missing ## realization surface contract" in joined
         or "goal realization surface contract missing" in joined
+        or "goal missing ## completion predicate contract" in joined
+        or "goal completion predicate contract missing" in joined
     ):
         return "RunGoalWriting"
     if (
@@ -663,10 +699,13 @@ def suggest_next_action(errors: list[str]) -> str:
         or "control review missing ## context management / execution topology" in joined
         or "control review missing ## purpose feedback adequacy" in joined
         or "control review missing ## realization surface closure adequacy" in joined
+        or "control review missing ## completion predicate fidelity" in joined
         or "purpose feedback adequacy section has no meaningful findings" in joined
         or "realization surface closure adequacy section has no meaningful findings" in joined
+        or "completion predicate fidelity section has no meaningful findings" in joined
         or "did not record purpose feedback adequacy" in joined
         or "did not record realization surface closure adequacy" in joined
+        or "did not record completion predicate fidelity" in joined
         or "context management / execution topology section has no meaningful findings" in joined
         or "did not record context management / execution topology" in joined
     ):
@@ -730,6 +769,7 @@ def main() -> int:
         check_artifact_hygiene("goal", goal, errors)
         check_goal_purpose_feedback(goal, errors)
         check_goal_realization_surface(goal, errors)
+        check_goal_completion_predicate(goal, errors)
 
     if plan:
         check_artifact_hygiene("plan", plan, errors)
@@ -748,6 +788,7 @@ def main() -> int:
         check_review_context_topology(review, errors)
         check_review_purpose_feedback(review, errors)
         check_review_realization_surface(review, errors)
+        check_review_completion_predicate(review, errors)
 
     for path, text, label in [
         (args.requirements, goal, "goal"),

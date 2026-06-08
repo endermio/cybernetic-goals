@@ -42,6 +42,16 @@ Use this section when the task changes or realizes target state across controlle
 | Partial/unavailable handling | partial, missing, unavailable, or not applicable with justification |
 | RSC / PFB boundary | RSC is distinct from Purpose Feedback Boundary; RSC calibrates target-state and surface-closure claims, while PFB calibrates human-purpose realization claims. |
 
+## Completion Predicate Contract
+
+| Element | Requirement |
+|---|---|
+| Target-achieved predicate | [status/evidence that allows "goal achieved"] |
+| Valid non-achieved report statuses | [partial / diagnostic / unavailable / invalid / blocked, if applicable] |
+| Fallback report handling | [how to stop or report honestly without claiming achieved] |
+| Allowed goal-achieved claim | [wording allowed only when target-achieved predicate is met] |
+| CPF / PFB / RSC boundary | CPF calibrates completion claims; PFB calibrates purpose feedback; RSC calibrates target-state surface closure. |
+
 ## Source of Truth
 
 Read first:
@@ -175,6 +185,12 @@ If blocked, report:
 
 When complete, report:
 
+- goal achieved: yes/no
+- target-achieved status
+- report status
+- target-producing evidence
+- fallback reason
+- smallest next target-producing attempt
 - purpose feedback status: achieved / partially observed / pending / unavailable / not required with justification
 - highest purpose-relevant evidence observed
 - RSC status: adequate / partial / missing / unavailable / not applicable with justification

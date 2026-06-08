@@ -192,6 +192,30 @@
       ]
     },
     {
+      "id": "fallback-report-status-cannot-be-goal-achieved",
+      "prompt": "A target-achieving goal lists partial, diagnostic, blocked, and invalid as valid final report statuses, then says one valid final status reached allows completion.",
+      "expected_output": "The review marks Completion Predicate Fidelity as inadequate because valid report statuses are being treated as target-achieved completion statuses.",
+      "assertions": [
+        "Identifies the target-achieved predicate.",
+        "Separates valid report status from target-achieved status.",
+        "Flags partial, diagnostic, blocked, unavailable, or invalid being treated as goal achieved.",
+        "Requires fallback report handling without claiming achieved.",
+        "Does not reject honest non-achieved reporting itself."
+      ]
+    },
+    {
+      "id": "classification-task-may-use-report-status-without-achieved-claim",
+      "prompt": "A Human Setpoint Approval says the human purpose is classification/reporting. The goal reports one of several valid classification statuses and does not claim target realization.",
+      "expected_output": "The review allows report statuses as valid output for the classification purpose, while preserving that target-achieved wording is only used when the approved setpoint defines it.",
+      "assertions": [
+        "Recognizes classification/reporting as the approved human purpose.",
+        "Does not require target-producing action for a pure reporting task.",
+        "Allows valid report statuses as output status.",
+        "Does not let report status imply target achieved unless approved by HSA.",
+        "Keeps Completion Predicate Fidelity separate from PFB and RSC."
+      ]
+    },
+    {
       "id": "local-action-cannot-claim-target-realization-without-rsc",
       "prompt": "A goal changes a target state carried by multiple controlled-object surfaces. The plan changes one local artifact and then claims the target state is fully realized without a surface model or residual reconciliation.",
       "expected_output": "The review marks Realization Surface Closure as missing or inadequate, treats local action as insufficient for target-state realization, and requires a surface model plus residual reconciliation before strongest positive wording.",

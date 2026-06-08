@@ -92,6 +92,16 @@ class PurposeFeedbackBoundaryTest(unittest.TestCase):
                 "| Partial/unavailable handling | report partial, missing, unavailable, or not applicable with justification |",
                 "| RSC / PFB boundary | RSC calibrates target-state and surface-closure claims while PFB calibrates human-purpose realization claims |",
                 "",
+                "## Completion Predicate Contract",
+                "",
+                "| Element | Requirement |",
+                "|---|---|",
+                "| Target-achieved predicate | purpose-boundary evidence is observed |",
+                "| Valid non-achieved report statuses | pending, partial, unavailable, blocked |",
+                "| Fallback report handling | report honestly without claiming achieved |",
+                "| Allowed goal-achieved claim | only target-achieved predicate supports goal achieved: yes |",
+                "| CPF / PFB / RSC boundary | CPF calibrates completion claims; PFB calibrates purpose feedback; RSC calibrates target-state surface closure |",
+                "",
             ]
         )
         goal.write_text("\n".join(goal_parts), encoding="utf-8")
@@ -170,6 +180,7 @@ class PurposeFeedbackBoundaryTest(unittest.TestCase):
             "- Context management / execution topology: `yes`",
             f"- Purpose feedback adequacy: `{review_independence_pfb}`",
             "- Realization surface closure adequacy: `yes`",
+            "- Completion predicate fidelity: `yes`",
             "",
             "## Context Management / Execution Topology",
             "",
@@ -200,6 +211,11 @@ class PurposeFeedbackBoundaryTest(unittest.TestCase):
                 "",
                 "Findings:",
                 "- Guard fixture includes RSC structure so PFB tests isolate purpose-feedback behavior.",
+                "",
+                "## Completion Predicate Fidelity",
+                "",
+                "Findings:",
+                "- Target-achieved status is separate from non-achieved report statuses.",
                 "",
             ]
         )
@@ -259,7 +275,7 @@ class PurposeFeedbackBoundaryTest(unittest.TestCase):
         template = self.read(".agents/skills/writing-cybernetic-goals/assets/goal-contract-template.md")
         final_report = template.split("## Final Report Format", 1)[1]
 
-        self.assertNotIn("- goal achieved", final_report)
+        self.assertIn("- goal achieved: yes/no", final_report)
         for required in (
             "purpose feedback status",
             "highest purpose-relevant evidence observed",

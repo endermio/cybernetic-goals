@@ -24,6 +24,7 @@ Cybernetic constraints supplied to the substrate:
 - dependency matrix;
 - context management / execution topology;
 - realization surface closure strategy;
+- completion predicate strategy;
 - execution granularity and sensor budget;
 - batch cadence;
 - destructive intermediate-state policy;
@@ -195,6 +196,20 @@ After action, reconcile:
 - allowed target-realization wording for RSC adequate, partial, missing, unavailable, or not applicable with justification.
 
 Domain adapters own concrete surface discovery and verification methods. The core policy owns surface/action/residual/reconciliation structure.
+
+## Completion Predicate Strategy
+
+Target-achieving action:
+
+- [what must be attempted or observed before "goal achieved" may be claimed]
+
+Fallback report statuses:
+
+- [partial / diagnostic / unavailable / invalid / blocked, if applicable]
+
+Fallback cannot replace:
+
+- [target-producing action or proof of impossibility]
 
 ## Execution Granularity and Sensor Budget
 
@@ -403,6 +418,12 @@ Each entry must include:
 - result
 - sensor interpretation
 - purpose feedback status
+- completion predicate status
+- target-achieved status
+- report status
+- target-producing evidence
+- fallback reason
+- smallest next target-producing attempt
 - RSC status
 - surfaces acted on or inspected
 - residuals and reconciliation

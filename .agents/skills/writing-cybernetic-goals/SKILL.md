@@ -130,6 +130,21 @@ RSC is distinct from Purpose Feedback Boundary. RSC calibrates target-state and
 surface-closure claims. Purpose Feedback Boundary calibrates human-purpose
 realization claims.
 
+## Completion Predicate Contract
+
+For compiled runtime goals, include `Completion Predicate Contract`.
+
+The goal must preserve or define:
+
+- Target-achieved predicate: the status/evidence that allows `goal achieved`;
+- Valid non-achieved report statuses: partial, diagnostic, unavailable,
+  invalid, blocked, or other honest report statuses;
+- Fallback report handling: how runtime reports without claiming achieved;
+- Allowed goal-achieved claim: wording allowed only when the target-achieved
+  predicate is met.
+
+Valid report status is distinct from target-achieved status.
+
 ## Goal Modes
 
 ### Mode A: Complex Control Contract
@@ -194,21 +209,22 @@ The goal file must include:
 3. Success Condition
 4. Purpose Feedback Contract
 5. Realization Surface Contract, always for compiled runtime goals; record `RSC not applicable with justification` when no target-state surface closure is required
-6. Source of Truth
-7. Scope and Boundaries
-8. Invariants
-9. Verification Surface
-10. Checkpoint Loop
-11. Repair Policy
-12. Progress Log
-13. Stop Conditions
-14. Blocked Report Format
-15. Final Report Format
-16. Final Output Contract, when output shape affects execution, acceptance, handoff, persistence, or downstream consumption
+6. Completion Predicate Contract
+7. Source of Truth
+8. Scope and Boundaries
+9. Invariants
+10. Verification Surface
+11. Checkpoint Loop
+12. Repair Policy
+13. Progress Log
+14. Stop Conditions
+15. Blocked Report Format
+16. Final Report Format
+17. Final Output Contract, when output shape affects execution, acceptance, handoff, persistence, or downstream consumption
 
 The goal must preserve confirmed semantics. It must not reinterpret or downscope them.
 
-For Level 3/4 or full pre-goal work, the goal must preserve the approved compact control commitment from `Human Setpoint Approval`: human purpose, input role binding, primary object, requested transformation, non-goals, Purpose Feedback Boundary, Realization Surface Closure, Output Contract, workflow fit, and known assumptions.
+For Level 3/4 or full pre-goal work, the goal must preserve the approved compact control commitment from `Human Setpoint Approval`: human purpose, input role binding, primary object, requested transformation, non-goals, Purpose Feedback Boundary, Realization Surface Closure, Completion Predicate, Non-achieved report statuses, Fallback report handling, Output Contract, workflow fit, and known assumptions.
 
 When a solution design is present, the goal must reference it under `Source of Truth`, preserve design invariants, and avoid freezing tactical design details as semantic invariants unless the design explicitly marks them as invariant.
 
@@ -224,6 +240,7 @@ Map requirements analysis to:
 - Sensors: approved sensors, checks, evidence channels, and reviews
 - Purpose feedback: purpose-realizing outcome, beneficiary/observer boundary, sufficient evidence level, and allowed completion wording
 - Realization surface closure: target state, required surfaces, RSC status wording, residual reconciliation, and target-realization claim calibration
+- Completion predicate: target-achieved predicate, valid non-achieved report statuses, fallback report handling, and allowed goal-achieved claim
 - Error function: rubric for interpreting sensor output when the task is evaluative
 - Output contract: final audience, purpose, medium, structure, detail level, evidence references, destination, and acceptance condition
 - Constraints: invariants and non-goals
@@ -329,6 +346,7 @@ If the user explicitly requests a small inline `/goal` and the task is low-risk,
 - [ ] Success conditions and stop conditions are explicit.
 - [ ] The goal includes Purpose Feedback Contract when requirements define Purpose Feedback Boundary or purpose-achievement evidence is non-obvious.
 - [ ] The goal includes Realization Surface Contract for compiled runtime goals; direct bounded goals include it when requirements define Realization Surface Closure or target-state realization spans surfaces.
+- [ ] The goal includes Completion Predicate Contract for compiled runtime goals.
 - [ ] For Level 3/4 or full pre-goal work, Human Setpoint Approval is Approved before the goal is written.
 - [ ] Success Condition is Purpose-realizing outcome observed, not internal sensor success unless the human purpose is internal-state correctness.
 - [ ] Any strongest positive target-realization claim requires RSC adequate; partial, missing, unavailable, or not applicable with justification receives calibrated wording.

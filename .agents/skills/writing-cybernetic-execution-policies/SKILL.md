@@ -51,6 +51,7 @@ This skill supplies the cybernetic constraints that the planning substrate must 
 - dependency matrix requirement;
 - context management / execution topology;
 - realization surface closure strategy for target-state surface coverage and residual reconciliation;
+- completion predicate strategy for separating target-achieved completion from non-achieved report statuses;
 - execution granularity and sensor budget;
 - batch cadence;
 - destructive intermediate-state policy;
@@ -75,19 +76,20 @@ The execution policy must include:
 5. Dependency Matrix
 6. Context Management / Execution Topology
 7. Realization Surface Closure Strategy
-8. Execution Granularity and Sensor Budget
-9. Batch Cadence
-10. Destructive Intermediate-State Policy
-11. Output Material / Evidence Collection
-12. Purpose Feedback Strategy
-13. Evidence Lifecycle / Evidence Budget
-14. Sensor / Evidence Governance
-15. Stale Sensor Retirement and Rewrite Policy
-16. Phase Gates
-17. Execution Rhythm
-18. Stop Conditions
-19. Progress Log Rules
-20. Candidate Plan Tasks
+8. Completion Predicate Strategy
+9. Execution Granularity and Sensor Budget
+10. Batch Cadence
+11. Destructive Intermediate-State Policy
+12. Output Material / Evidence Collection
+13. Purpose Feedback Strategy
+14. Evidence Lifecycle / Evidence Budget
+15. Sensor / Evidence Governance
+16. Stale Sensor Retirement and Rewrite Policy
+17. Phase Gates
+18. Execution Rhythm
+19. Stop Conditions
+20. Progress Log Rules
+21. Candidate Plan Tasks
 
 ## Context Management / Execution Topology
 
@@ -182,6 +184,14 @@ Define Residual Reconciliation:
 
 Domain adapters own concrete discovery and verification methods. The core
 policy owns surface/action/residual/reconciliation structure.
+
+## Completion Predicate Strategy
+
+The execution policy must define:
+
+- Target-achieving action: what must be attempted or observed before `goal achieved` may be claimed;
+- Fallback report statuses: partial, diagnostic, unavailable, invalid, blocked, or other honest report statuses;
+- Fallback cannot replace: target-producing action or proof of impossibility.
 
 ## Execution Granularity and Sensor Budget
 
@@ -373,6 +383,7 @@ Response-only next step:
 - [ ] The plan has dependency matrix.
 - [ ] The plan includes Context Management / Execution Topology.
 - [ ] The plan includes Realization Surface Closure Strategy for compiled runtime goals, with either full surface/action/residual structure or `RSC not applicable with justification`.
+- [ ] The plan includes Completion Predicate Strategy.
 - [ ] The plan selects `Main-only`, `Serial subagent-driven`, or `Parallel subagent-driven`.
 - [ ] The plan records `Selected delegation substrate`.
 - [ ] Level 3/4 main-only execution has an explicit context-load justification.

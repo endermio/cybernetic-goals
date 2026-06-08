@@ -23,6 +23,7 @@ Status: `Needs Revision`
   - Context management / execution topology: `yes/no`
   - Purpose feedback adequacy: `yes/no`
   - Realization surface closure adequacy: `yes/no`
+  - Completion predicate fidelity: `yes/no`
   - Execution granularity / sensor load: `yes/no`
   - Sensor governance: `yes/no`
   - Execution cadence: `yes/no`
@@ -186,6 +187,18 @@ Findings:
 
 - [finding]
 
+## Completion Predicate Fidelity
+
+Check:
+
+- target-achieved status is separate from valid report status;
+- fallback, partial, diagnostic, unavailable, invalid, or blocked report statuses are not treated as goal achieved;
+- fallback report handling cannot replace target-producing action or proof of impossibility.
+
+Findings:
+
+- [finding]
+
 ## Evidence Lifecycle / Evidence Budget
 
 Check:
@@ -253,6 +266,7 @@ The control structure may be approved only if:
 - evidence lifecycle keeps tracked evidence reviewable and prevents raw sensor output explosion;
 - purpose feedback adequacy supports the permitted completion wording and does not confuse internal progress evidence with purpose achievement;
 - realization surface closure adequacy supports target-realization wording and does not confuse local action with global realization;
+- completion predicate fidelity separates target-achieved completion from non-achieved report statuses;
 - sensor/evidence governance is explicit;
 - batch cadence is explicit;
 - runtime execution does not need to synthesize a new plan.

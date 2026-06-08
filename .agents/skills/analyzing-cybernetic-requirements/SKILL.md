@@ -39,7 +39,7 @@ Owned analysis:
 - identify the final output audience, purpose, medium, required structure level, detail level, evidence-reference needs, machine-readable needs, destination path, and acceptance condition;
 - identify the Purpose Feedback Boundary: who can observe purpose realization, what outcome realizes the human purpose, what feedback can judge it, and what internal sensors can or cannot prove;
 - identify the Realization Surface Closure boundary when target state must be realized across a controlled object: Target state, Realization surfaces, Required surface action, Residual reconciliation, and RSC status;
-- prepare the Human Setpoint Approval compact control commitment for Level 3/4 or full pre-goal work: Human purpose, Input role binding, Primary object, Requested transformation, Non-goals, Purpose Feedback Boundary, Realization Surface Closure, Output Contract, Workflow fit, and Known assumptions;
+- prepare the Human Setpoint Approval compact control commitment for Level 3/4 or full pre-goal work: Human purpose, Input role binding, Primary object, Requested transformation, Non-goals, Purpose Feedback Boundary, Realization Surface Closure, Completion Predicate, Non-achieved report statuses, Fallback report handling, Output Contract, Workflow fit, and Known assumptions;
 - identify constraints, invariants, assumptions, and stop conditions;
 - decide whether Semantic, Rubric, Output Contract, Design, Goal Contract, Execution Policy, Control Review, or Risk gates are required;
 - ask high-value human questions;
@@ -101,6 +101,9 @@ Before handoff to `$orchestrating-cybernetic-pregoal`, present a compact control
 - Non-goals;
 - Purpose Feedback Boundary;
 - Realization Surface Closure;
+- Completion Predicate;
+- Non-achieved report statuses;
+- Fallback report handling;
 - Output Contract;
 - Workflow fit;
 - Known assumptions.

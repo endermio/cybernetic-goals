@@ -92,6 +92,20 @@ class RealizationSurfaceClosureTest(unittest.TestCase):
                     ]
                 )
             goal_parts.extend(["## Realization Surface Contract", "", "| Element | Requirement |", "|---|---|", *rsc_rows, ""])
+        goal_parts.extend(
+            [
+                "## Completion Predicate Contract",
+                "",
+                "| Element | Requirement |",
+                "|---|---|",
+                "| Target-achieved predicate | target-producing evidence is observed |",
+                "| Valid non-achieved report statuses | partial, diagnostic, blocked, invalid |",
+                "| Fallback report handling | report honestly without claiming achieved |",
+                "| Allowed goal-achieved claim | only target-achieved predicate supports goal achieved: yes |",
+                "| CPF / PFB / RSC boundary | CPF calibrates completion claims; PFB calibrates purpose feedback; RSC calibrates target-state surface closure |",
+                "",
+            ]
+        )
         goal.write_text("\n".join(goal_parts), encoding="utf-8")
 
         plan_parts = [
@@ -186,6 +200,7 @@ class RealizationSurfaceClosureTest(unittest.TestCase):
             "- Context management / execution topology: `yes`",
             "- Purpose feedback adequacy: `yes`",
             f"- Realization surface closure adequacy: `{review_independence_rsc}`",
+            "- Completion predicate fidelity: `yes`",
             "",
             "## Context Management / Execution Topology",
             "",
@@ -214,6 +229,15 @@ class RealizationSurfaceClosureTest(unittest.TestCase):
                     "",
                 ]
             )
+        review_parts.extend(
+            [
+                "## Completion Predicate Fidelity",
+                "",
+                "Findings:",
+                "- Target-achieved status is separate from fallback report statuses.",
+                "",
+            ]
+        )
         review_parts.extend(
             [
                 "## Final Observer Check",
