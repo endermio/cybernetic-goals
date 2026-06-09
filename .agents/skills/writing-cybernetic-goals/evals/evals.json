@@ -4,9 +4,9 @@
     {
       "id": "complex-goal-contract-no-runtime-goal",
       "prompt": "根据已完成的 requirements analysis brief 创建复杂控制关系 goal。",
-      "expected_output": "Create a goal file file and do not output final runtime /goal until execution policy and review are approved.",
+      "expected_output": "Create goal.control.json and do not output final runtime /goal until execution policy and review are approved.",
       "assertions": [
-        "Creates docs/cybernetics/goals path.",
+        "Creates docs/cybernetics/runs/<slug>/goal.control.json path.",
         "Does not output final executable /goal for complex work.",
         "Mentions that execution policy is still required before runtime execution."
       ]
@@ -14,9 +14,9 @@
     {
       "id": "level-3-goal-handoff-returns-to-orchestrator",
       "prompt": "根据 complete requirements analysis 和 solution design 创建复杂 goal。路由结果是 Level 3 full pre-goal pipeline，execution-plan check required，review check required，$orchestrating-cybernetic-pregoal 可用。",
-      "expected_output": "Create the goal file, then in the response hand off back to $orchestrating-cybernetic-pregoal rather than directly recommending $writing-cybernetic-execution-policies.",
+      "expected_output": "Create goal.control.json, then in the response hand off back to $orchestrating-cybernetic-pregoal rather than directly recommending $writing-cybernetic-execution-policies.",
       "assertions": [
-        "Creates or references a docs/cybernetics/goals path.",
+        "Creates or references docs/cybernetics/runs/<slug>/goal.control.json.",
         "Does not output a final runtime /goal.",
         "Response-only handoff recommends $orchestrating-cybernetic-pregoal.",
         "Does not recommend $writing-cybernetic-execution-policies as the next user action for Level 3 full pre-goal work."
@@ -37,34 +37,34 @@
     {
       "id": "bounded-audit-goal-with-rubric-direct-runtime",
       "prompt": "router 已判定为 Level 2：为观察者路径闭环评估创建小型文件 goal。rubric 已定义：已闭环必须有实际操作流证据或已运行 runtime check；部分闭环是有 work artifact、文档或未运行传感器但没有实际路径证据；未闭环是只有占位/计划或没有可用入口；不可判定是需要外部凭证、外部环境、真实第三方服务或当前环境无法观测。只输出 docs/cybernetics/audits/2026-05-26-completion.md，不修改目标 artifacts。",
-      "expected_output": "Create a bounded file goal and output a direct /goal execution command because the evaluation rubric is explicit.",
+      "expected_output": "Create bounded goal.control.json and runtime.control.json, then output a short /goal pointer because the evaluation rubric is explicit.",
       "assertions": [
-        "Creates or references a docs/cybernetics/goals path for the bounded audit goal.",
+        "Creates or references docs/cybernetics/runs/<slug>/goal.control.json for the bounded audit goal.",
         "Preserves the explicit rubric in the goal.",
-        "Outputs a direct executable /goal that executes the bounded file goal.",
-        "The /goal tells Codex not to create an execution policy or review unless explicitly instructed.",
+        "Outputs a short executable /goal that points to runtime.control.json and names .agents/skills/using-control-json.",
+        "The /goal does not tell Codex to create an execution policy or review unless explicitly instructed.",
         "Does not recommend $writing-cybernetic-execution-policies as the default next step."
       ]
     },
     {
       "id": "complex-goal-requires-design-when-design-check-required",
-      "prompt": "根据已完成 requirements analysis 创建复杂控制关系 goal。router 标记 required design required，但 docs/cybernetics/designs/2026-05-22-control-relationship.md 不存在，用户也没有显式说跳过 design。",
-      "expected_output": "Do not create the final goal file; require solution design first.",
+      "prompt": "根据已完成 requirements analysis 创建复杂控制关系 goal。router 标记 required design required，但 docs/cybernetics/runs/2026-05-22-control-relationship/design.control.json 不存在，用户也没有显式说跳过 design。",
+      "expected_output": "Do not create final goal.control.json; require solution design first.",
       "assertions": [
         "States that required design is required.",
-        "Does not create a final complex goal file.",
+        "Does not create final complex goal.control.json.",
         "Recommends $designing-cybernetic-solutions with the requirements path.",
         "Does not output a runtime /goal."
       ]
     },
     {
       "id": "complex-goal-references-design-source",
-      "prompt": "根据 complete requirements analysis 和 docs/cybernetics/designs/2026-05-22-control-relationship.md 创建复杂 goal。",
-      "expected_output": "Create the goal file and include the solution design as a source of truth.",
+      "prompt": "根据 complete requirements analysis 和 docs/cybernetics/runs/2026-05-22-control-relationship/design.control.json 创建复杂 goal。",
+      "expected_output": "Create goal.control.json and include the solution design as a source of truth.",
       "assertions": [
-        "Creates or references docs/cybernetics/goals/2026-05-22-control-relationship.md.",
+        "Creates or references docs/cybernetics/runs/2026-05-22-control-relationship/goal.control.json.",
         "The Source of Truth includes the requirements path.",
-        "The Source of Truth includes docs/cybernetics/designs/2026-05-22-control-relationship.md.",
+        "The Source of Truth includes docs/cybernetics/runs/2026-05-22-control-relationship/design.control.json.",
         "The goal preserves design rules that cannot change without turning tactical details into frozen requirements.",
         "Does not output a final executable /goal unless approved plan and review already exist."
       ]

@@ -1,41 +1,43 @@
 ---
 name: writing-cybernetic-goals
-description: 'Use when confirmed requirements and any required design exist and a goal file must be written for a Level 2 bounded goal or Level 3/4 full pre-goal orchestration. For Level 3/4, What the User Approved is required.'
+description: 'Use when confirmed requirements and any required design exist and goal.control.json must be written for a Level 2 bounded goal or Level 3/4 full pre-goal orchestration. For Level 3/4, What the User Approved is required.'
 ---
 
 # Writing Cybernetic Goals
 
 ## Overview
 
-Create a goal file from confirmed meaning and any required solution design.
+Create `goal.control.json` from confirmed meaning and any required solution design.
 
-This skill writes the goal file. It does not analyze requirements, write execution policies, review approved work chains, or execute target work.
+This skill writes the goal control JSON. It does not analyze requirements, write execution policies, review approved work chains, or execute target work.
+
+Official persistent control facts are JSON only. Historical Markdown may be read as non-authoritative background, but do not create or compile Markdown as official guard, compiler, runtime, or long-term dual-path control input.
 
 For complex work, the output is:
 
 ```text
-docs/cybernetics/goals/YYYY-MM-DD-<slug>.md
+docs/cybernetics/runs/<slug>/goal.control.json
 ```
 
-Use `assets/goal-contract-template.md`.
+Use the approved goal control JSON shape for the run directory. Do not use Markdown templates as official control input.
 
 ## Runtime Limit
 
 For complex controlled work, this skill must not produce an executable `/goal` command unless any required solution design exists and an approved execution policy and approved review already exist.
 
-If `required design: required`, do not create the final complex goal file until a solution design exists or the human explicitly says the required design is unnecessary.
+If `required design: required`, do not create final complex `goal.control.json` until a solution design exists or the human explicitly says the required design is unnecessary.
 
-For Level 3, Level 4, or full pre-goal work, stop after creating the goal file and hand off back to `$orchestrating-cybernetic-pregoal` when it is available or already owns the chain.
+For Level 3, Level 4, or full pre-goal work, stop after creating `goal.control.json` and hand off back to `$orchestrating-cybernetic-pregoal` when it is available or already owns the chain.
 
 Recommend `$writing-cybernetic-execution-policies` or `$reviewing-cybernetic-control-structures` directly only when the user explicitly chose a manual pre-goal chain or `$orchestrating-cybernetic-pregoal` is unavailable.
 
-For Level 3, Level 4, or full pre-goal work, do not create the goal file unless the requirements analysis contains `What the User Approved: Approved`, or the current user message explicitly approves the compact control commitment. Human answers to requirements questions are inputs, not approval.
+For Level 3, Level 4, or full pre-goal work, do not create `goal.control.json` unless the requirements analysis contains `What the User Approved: Approved`, or the current user message explicitly approves the compact control commitment. Human answers to requirements questions are inputs, not approval.
 
 If the current user message approves the compact control commitment, update the requirements analysis `What the User Approved` section first, quoting or referencing that approval, then continue. Do not rely on in-memory approval to pass orchestration or runtime guards.
 
 Do not put “first write a plan, then execute it” inside an execution `/goal` for complex work.
 
-For Level 2 bounded file goals, output a direct `/goal` command after creating the small goal file only when the task limits and any required evaluation rubric are explicit. Do not recommend `$writing-cybernetic-execution-policies` or `$reviewing-cybernetic-control-structures` by default unless the user explicitly requests them or the task reveals unresolved control decisions.
+For Level 2 bounded goals, create `goal.control.json` and `runtime.control.json`, then output a short `/goal` pointer to `runtime.control.json` using `.agents/skills/using-control-json` only when the task limits and any required evaluation rubric are explicit. Do not recommend `$writing-cybernetic-execution-policies` or `$reviewing-cybernetic-control-structures` by default unless the user explicitly requests them or the task reveals unresolved control decisions.
 
 ## Evaluation Function Check
 
@@ -169,8 +171,8 @@ Use when the task is Level 3/4, a complex execution, or would require runtime Co
 Behavior:
 
 1. Check whether `required design: required`.
-2. If required, confirm `docs/cybernetics/designs/YYYY-MM-DD-<slug>.md` or an explicit design source exists.
-3. Create the goal file under `docs/cybernetics/goals/YYYY-MM-DD-<slug>.md`.
+2. If required, confirm `docs/cybernetics/runs/<slug>/design.control.json` or an explicit design source exists.
+3. Create `docs/cybernetics/runs/<slug>/goal.control.json`.
 4. Do not output an executable `/goal` unless an approved execution policy and approved review already exist.
 5. Use the route-appropriate response-only handoff: return to `$orchestrating-cybernetic-pregoal` for full pre-goal work, or recommend `$writing-cybernetic-execution-policies` only for an explicit manual chain.
 
@@ -191,18 +193,18 @@ Behavior:
 
 1. Run the Evaluation Function Check for audit/evaluation/status-classification tasks.
 2. If the rubric is missing or partial, stop with a blocked rubric analysis request.
-3. Create the small goal file under `docs/cybernetics/goals/YYYY-MM-DD-<slug>.md`.
-4. Make the goal file self-contained enough to execute directly.
+3. Create `docs/cybernetics/runs/<slug>/goal.control.json`.
+4. Create `docs/cybernetics/runs/<slug>/runtime.control.json` as the JSON-backed runtime pointer target.
 5. Preserve the rubric inside the goal when the task is evaluative.
-6. Output a direct executable `/goal` command that references the small goal file.
+6. Output a short executable `/goal` command that references `runtime.control.json` and names `.agents/skills/using-control-json`.
 7. Do not recommend execution policy or review by default.
 8. If the bounded goal proves insufficient, ambiguous, or dependent on new requirement/control decisions, instruct runtime Codex to stop and report the smallest required human decision.
 
 ## Preconditions
 
-Before creating a goal file for complex work, check:
+Before creating goal control JSON for complex work, check:
 
-- a requirements analysis brief exists;
+- `requirements.control.json` exists;
 - `Requirements Analysis Status` is `Complete` or the user explicitly states the meaning are confirmed;
 - for Level 3/4 or full pre-goal work, `What the User Approved: Approved` is present unless the current user message explicitly approves the compact control commitment;
 - confirmed decisions are recorded;
@@ -213,11 +215,11 @@ If the requirements analysis is missing or incomplete, route back to `$analyzing
 
 If required design is required and no design exists, route to `$designing-cybernetic-solutions`.
 
-For bounded file goals, a completed requirements analysis brief is optional when the user request or router decision already fixes the meaning, limits, output path, stop conditions, and any evaluation rubric. Record the user request or router decision as the source of truth.
+For bounded JSON goals, completed `requirements.control.json` is optional when the user request or router decision already fixes the meaning, limits, output path, stop conditions, and any evaluation rubric. Record the user request or router decision as the source of truth.
 
-## Goal File Requirements
+## Goal Control Requirements
 
-The goal file must include:
+`goal.control.json` must include the approved goal control facts for:
 
 1. Human Purpose
 2. Objective
@@ -238,7 +240,7 @@ The goal file must include:
 17. Final Report Format
 18. Final Final Answer Format, when output shape affects execution, acceptance, handoff, persistence, or downstream consumption
 
-The goal must preserve confirmed meaning. It must not reinterpret or downscope them.
+The goal control JSON must preserve confirmed meaning. It must not reinterpret or downscope them.
 
 For Level 3/4 or full pre-goal work, the goal must preserve the approved compact control commitment from `What the User Approved`: human purpose, input role binding, primary object, requested transformation, non-goals, How We Know The User Purpose Was Met, result placement, What counts as done, Evidence needed to call it done, If it is not done, what should be reported, Required answer path, How this should be answered, What is not enough, Work covered in this run, What the agent may do, Forbidden live / irreversible actions, Required handling for unauthorized actions, Explicitly out-of-scope items, Final Answer Format, why this process is needed, and known assumptions.
 
@@ -266,16 +268,16 @@ Map requirements analysis to:
 
 ## Output Format
 
-These output formats are response-only. The direct `/goal` command must be returned to the user in the assistant response, not written into the goal file. Goal files must not contain conversational next-step prompts.
+These output formats are response-only. The direct `/goal` command must be returned to the user in the assistant response, not written into control JSON. Control JSON files must not contain conversational next-step prompts.
 
-### Complex goal file
+### Complex goal control
 
-After creating a complex goal file:
+After creating complex goal control JSON:
 
 ```markdown
-Created goal file:
+Created goal control JSON:
 
-`docs/cybernetics/goals/YYYY-MM-DD-slug.md`
+`docs/cybernetics/runs/YYYY-MM-DD-slug/goal.control.json`
 
 Control map:
 - Objective: ...
@@ -290,14 +292,18 @@ Response-only handoff:
 - For an explicit manual chain only: use `$writing-cybernetic-execution-policies` to create the execution policy.
 ```
 
-### Bounded file goal
+### Bounded JSON goal
 
-After creating a Level 2 bounded file goal:
+After creating a Level 2 bounded JSON goal:
 
 ````markdown
-Created bounded file goal:
+Created bounded goal control JSON:
 
-`docs/cybernetics/goals/YYYY-MM-DD-slug.md`
+`docs/cybernetics/runs/YYYY-MM-DD-slug/goal.control.json`
+
+Runtime control JSON:
+
+`docs/cybernetics/runs/YYYY-MM-DD-slug/runtime.control.json`
 
 Control map:
 - Objective: ...
@@ -309,7 +315,7 @@ Control map:
 Response-only `/goal` command:
 
 ```text
-/goal Execute the bounded file goal in docs/cybernetics/goals/YYYY-MM-DD-slug.md as the controlling contract. Do not create an execution policy or review unless explicitly instructed. Do not reinterpret scope, expand requirements, or modify files outside the goal limits. If the goal is insufficient, ambiguous, or requires new requirement/control decisions, stop and report the smallest required human decision.
+/goal Use .agents/skills/using-control-json and execute docs/cybernetics/runs/YYYY-MM-DD-slug/runtime.control.json. If the JSON is missing, invalid, inconsistent, or insufficient, stop and report the smallest required human decision.
 ```
 ````
 
@@ -347,7 +353,7 @@ Reason:
 Response-only handoff:
 
 ```text
-$designing-cybernetic-solutions 根据 docs/cybernetics/requirements/YYYY-MM-DD-slug.md 创建 solution design。
+$designing-cybernetic-solutions 根据 docs/cybernetics/runs/YYYY-MM-DD-slug/requirements.control.json 创建 design.control.json。
 ```
 ````
 
@@ -357,9 +363,9 @@ If the user explicitly requests a small inline `/goal` and the task is low-risk,
 
 - [ ] Confirmed meaning are preserved.
 - [ ] No unresolved human decisions are silently assumed.
-- [ ] The goal file does not contain instructions to write and approve a plan during runtime.
-- [ ] The goal file references the requirements analysis brief.
-- [ ] If required design is required, the goal file references the solution design or blocks before creating the final goal.
+- [ ] `goal.control.json` does not contain instructions to write and approve a plan during runtime.
+- [ ] `goal.control.json` references `requirements.control.json`.
+- [ ] If required design is required, `goal.control.json` references `design.control.json` or blocks before creating the final goal.
 - [ ] The goal preserves design rules that cannot change without freezing tactical design details.
 - [ ] Success conditions and stop conditions are explicit.
 - [ ] The goal includes How We Know The User Purpose Was Met when requirements define How We Know The User Purpose Was Met or purpose-achievement evidence is non-obvious.
@@ -373,5 +379,5 @@ If the user explicitly requests a small inline `/goal` and the task is low-risk,
 - [ ] Output-sensitive tasks include a `Final Final Answer Format`.
 - [ ] The goal forbids runtime from substituting another output shape when a final final answer format is specified.
 - [ ] For complex work, no final runtime `/goal` was output unless approved plan and review exist.
-- [ ] For Level 2 bounded file goals, the response outputs a direct `/goal` and does not recommend execution policy by default.
-- [ ] Any bounded file `/goal` stops if the goal is insufficient, ambiguous, or requires new requirement/control decisions.
+- [ ] For Level 2 bounded goals, the response outputs a short `/goal` pointer to `runtime.control.json` and does not recommend execution policy by default.
+- [ ] Any bounded `/goal` stops if the runtime control JSON is insufficient, ambiguous, or requires new requirement/control decisions.

@@ -3,13 +3,13 @@
   "evals": [
     {
       "id": "orchestrates-complete-requirements-analysis-with-subagents",
-      "prompt": "使用 $orchestrating-cybernetic-pregoal 根据 docs/cybernetics/requirements/control-relationship.md 自动完成 pre-goal 编译，requirements analysis contains What the User Approved: Approved，允许使用 subagents 做独立 review。若 review 无法收敛，停止并报告阻塞点。",
+      "prompt": "使用 $orchestrating-cybernetic-pregoal 根据 docs/cybernetics/runs/control-relationship/requirements.control.json 自动完成 pre-goal 编译，requirements analysis contains What the User Approved: Approved，允许使用 subagents 做独立 review。若 review 无法收敛，停止并报告阻塞点。",
       "expected_output": "The skill should validate the completed requirements analysis, create or update goal, execution policy, review, run authorized subagent review cycles, and compile a final runtime /goal command without starting /goal execution.",
       "assertions": [
         "The response explicitly notes that pre-goal review subagents are allowed because the user authorized them.",
-        "The workflow creates or updates a goal file file under docs/cybernetics/goals/.",
-        "The workflow creates or updates an execution policy under docs/cybernetics/plans/.",
-        "The workflow creates or updates a review under docs/cybernetics/control-reviews/.",
+        "The workflow creates or updates goal.control.json under docs/cybernetics/runs/<slug>/.",
+        "The workflow creates or updates plan.control.json under docs/cybernetics/runs/<slug>/.",
+        "The workflow creates or updates review.control.json under docs/cybernetics/runs/<slug>/.",
         "The workflow checks required Superpowers workflow status and does not silently emulate missing infrastructure.",
         "The final /goal command references the requirements analysis, required design, goal, plan, and review files.",
         "The response does not start /goal execution.",
@@ -18,7 +18,7 @@
     },
     {
       "id": "no-subagents-candidate-only",
-      "prompt": "使用 $orchestrating-cybernetic-pregoal 根据 docs/cybernetics/requirements/control-relationship.md 自动完成 pre-goal 编译，requirements analysis contains What the User Approved: Approved。",
+      "prompt": "使用 $orchestrating-cybernetic-pregoal 根据 docs/cybernetics/runs/control-relationship/requirements.control.json 自动完成 pre-goal 编译，requirements analysis contains What the User Approved: Approved。",
       "expected_output": "Because the user did not explicitly authorize subagents, the skill may create candidate artifacts but must not claim independent review or emit an approved runtime /goal unless independent review or explicit control-review approval of the review findings exists.",
       "assertions": [
         "The response does not claim to spawn subagents.",
@@ -42,7 +42,7 @@
     },
     {
       "id": "incomplete-requirements-analysis-stops",
-      "prompt": "使用 $orchestrating-cybernetic-pregoal 根据 docs/cybernetics/requirements/incomplete-feature.md 自动完成 pre-goal 编译，允许使用 subagents。该 requirements analysis 还有开放的人类问题。",
+      "prompt": "使用 $orchestrating-cybernetic-pregoal 根据 docs/cybernetics/runs/incomplete-feature/requirements.control.json 自动完成 pre-goal 编译，允许使用 subagents。该 requirements analysis 还有开放的人类问题。",
       "expected_output": "The skill should stop before creating downstream approved artifacts because requirements analysis is incomplete, and output the next allowed action.",
       "assertions": [
         "The response states that the requirements analysis is incomplete or has open blocking questions.",
@@ -79,26 +79,26 @@
     {
       "id": "runtime-goal-does-not-write-plan",
       "prompt": "使用 $orchestrating-cybernetic-pregoal 编译最终 /goal。已有 complete requirements analysis with What the User Approved: Approved、goal、approved plan、approved review。",
-      "expected_output": "The final response should emit a runtime goal file artifact plus a short pointer-only /goal. The runtime contract should index approved artifacts, and the user-entered /goal must not instruct Codex to write or approve its own plan inside runtime.",
+      "expected_output": "The final response should emit runtime.control.json plus a short pointer-only /goal. The runtime contract should index approved JSON artifacts, and the user-entered /goal must not instruct Codex to write or approve its own plan inside runtime.",
       "assertions": [
-        "The runtime goal file references the approved plan path.",
-        "The runtime goal file references the approved review path.",
-        "The user-entered /goal points only to docs/cybernetics/runtime-goals/*.goal.md.",
+        "runtime.control.json references the approved plan.control.json path.",
+        "runtime.control.json references the approved review.control.json path.",
+        "The user-entered /goal points only to docs/cybernetics/runs/<slug>/runtime.control.json and names .agents/skills/using-control-json.",
         "The user-entered /goal does not say 'first write a plan'.",
         "The user-entered /goal does not inline execution, debugging, completion-verification, work assignment, evidence check-governance, What the User Approved, user-purpose evidence, result placement, what-counts-as-done, or work coverage and action limits prose.",
-        "The runtime goal file indexes the approved execution/debugging/completion-verification discipline.",
+        "runtime.control.json indexes the approved execution/debugging/completion-verification discipline.",
         "The pointer-only /goal tells Codex to stop if any referenced artifact is missing, not approved, or inconsistent."
       ]
     },
     {
       "id": "uses-requirements-analysis-slug-for-artifacts",
-      "prompt": "使用 $orchestrating-cybernetic-pregoal 根据 docs/cybernetics/requirements/2026-05-22-control-relationship.md 完成 pre-goal 编译，requirements analysis contains What the User Approved: Approved，允许使用 subagents review。",
+      "prompt": "使用 $orchestrating-cybernetic-pregoal 根据 docs/cybernetics/runs/2026-05-22-control-relationship/requirements.control.json 完成 pre-goal 编译，requirements analysis contains What the User Approved: Approved，允许使用 subagents review。",
       "expected_output": "The skill should create or update design when required, goal, plan, and review paths using the same 2026-05-22-control-relationship slug and should not invent a different slug.",
       "assertions": [
-        "The goal path is docs/cybernetics/goals/2026-05-22-control-relationship.md.",
-        "The design path is docs/cybernetics/designs/2026-05-22-control-relationship.md when required design is required.",
-        "The plan path is docs/cybernetics/plans/2026-05-22-control-relationship.md.",
-        "The review path is docs/cybernetics/control-reviews/2026-05-22-control-relationship.md.",
+        "The goal path is docs/cybernetics/runs/2026-05-22-control-relationship/goal.control.json.",
+        "The design path is docs/cybernetics/runs/2026-05-22-control-relationship/design.control.json when required design is required.",
+        "The plan path is docs/cybernetics/runs/2026-05-22-control-relationship/plan.control.json.",
+        "The review path is docs/cybernetics/runs/2026-05-22-control-relationship/review.control.json.",
         "The response does not choose a different slug unless the user explicitly requested alternate output paths."
       ]
     },
@@ -153,10 +153,10 @@
     },
     {
       "id": "inserts-design-stage-when-design-check-required",
-      "prompt": "使用 $orchestrating-cybernetic-pregoal 根据 docs/cybernetics/requirements/2026-05-22-control-relationship.md 完成 pre-goal 编译，requirements analysis contains What the User Approved: Approved，允许使用 subagents review。requirements analysis 标记 required design required，且 design artifact 不存在。",
+      "prompt": "使用 $orchestrating-cybernetic-pregoal 根据 docs/cybernetics/runs/2026-05-22-control-relationship/requirements.control.json 完成 pre-goal 编译，requirements analysis contains What the User Approved: Approved，允许使用 subagents review。requirements analysis 标记 required design required，且 design artifact 不存在。",
       "expected_output": "The orchestrator runs or requests designing-cybernetic-solutions before goal writing, then reviews requirements analysis, design, goal, and plan.",
       "assertions": [
-        "Derives design path docs/cybernetics/designs/2026-05-22-control-relationship.md.",
+        "Derives design path docs/cybernetics/runs/2026-05-22-control-relationship/design.control.json.",
         "Runs or recommends $designing-cybernetic-solutions before $writing-cybernetic-goals.",
         "Does not create goal and plan by inventing solution structure inside execution policy.",
         "Review includes the design artifact in its reviewed inputs.",

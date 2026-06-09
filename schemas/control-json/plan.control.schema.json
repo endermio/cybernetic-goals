@@ -1,0 +1,241 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://cybernetic-goals.local/schemas/control-json/plan.control.schema.json",
+  "title": "Cybernetic Execution Plan Control",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "artifact_type",
+    "schema_version",
+    "status",
+    "source_contracts",
+    "registry_bindings",
+    "required_steps",
+    "work_packages",
+    "runtime",
+    "progress",
+    "verifier"
+  ],
+  "properties": {
+    "artifact_type": {
+      "const": "plan.control"
+    },
+    "schema_version": {
+      "type": "string",
+      "minLength": 1
+    },
+    "status": {
+      "enum": [
+        "approved",
+        "candidate"
+      ]
+    },
+    "source_contracts": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "requirements",
+        "design",
+        "goal"
+      ],
+      "properties": {
+        "requirements": {
+          "type": "string",
+          "minLength": 1
+        },
+        "design": {
+          "type": "string",
+          "minLength": 1
+        },
+        "goal": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "approved_control": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "work_coverage",
+        "action_that_can_make_it_done"
+      ],
+      "properties": {
+        "work_coverage": {
+          "type": "string",
+          "minLength": 1
+        },
+        "action_that_can_make_it_done": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "registry_bindings": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "selected_agent_workflow",
+        "allowed_work_assignment",
+        "answer_method_key"
+      ],
+      "properties": {
+        "selected_agent_workflow": {
+          "type": "string",
+          "minLength": 1
+        },
+        "allowed_work_assignment": {
+          "type": "string",
+          "minLength": 1
+        },
+        "answer_method_key": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "required_steps": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "step_id",
+          "transition",
+          "evidence"
+        ],
+        "properties": {
+          "step_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "transition": {
+            "type": "string",
+            "minLength": 1
+          },
+          "evidence": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        }
+      }
+    },
+    "work_packages": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "work_package_id",
+          "required_steps",
+          "allowed_write_paths",
+          "forbidden_write_paths",
+          "required_tests"
+        ],
+        "properties": {
+          "work_package_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "required_steps": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "allowed_write_paths": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "forbidden_write_paths": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "required_tests": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        }
+      }
+    },
+    "runtime": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "readonly_files",
+        "writable_files"
+      ],
+      "properties": {
+        "readonly_files": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "writable_files": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    },
+    "progress": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "event_schema",
+        "append_only"
+      ],
+      "properties": {
+        "event_schema": {
+          "type": "string",
+          "minLength": 1
+        },
+        "append_only": {
+          "type": "boolean"
+        }
+      }
+    },
+    "verifier": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "required_before_goal_achieved",
+        "output_schema"
+      ],
+      "properties": {
+        "required_before_goal_achieved": {
+          "type": "boolean"
+        },
+        "output_schema": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    }
+  }
+}

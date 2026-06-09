@@ -1,0 +1,129 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://cybernetic-goals.local/schemas/control-json/goal.control.schema.json",
+  "title": "Cybernetic Goal Control",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "artifact_type",
+    "schema_version",
+    "status",
+    "source_contracts",
+    "approved_control",
+    "registry_bindings",
+    "required_steps"
+  ],
+  "properties": {
+    "artifact_type": {
+      "const": "goal.control"
+    },
+    "schema_version": {
+      "type": "string",
+      "minLength": 1
+    },
+    "status": {
+      "enum": [
+        "approved"
+      ]
+    },
+    "source_contracts": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "requirements",
+        "design"
+      ],
+      "properties": {
+        "requirements": {
+          "type": "string",
+          "minLength": 1
+        },
+        "design": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "approved_control": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "objective",
+        "success_condition",
+        "what_counts_as_done",
+        "rules_that_must_not_change"
+      ],
+      "properties": {
+        "objective": {
+          "type": "string",
+          "minLength": 1
+        },
+        "success_condition": {
+          "type": "string",
+          "minLength": 1
+        },
+        "what_counts_as_done": {
+          "type": "string",
+          "minLength": 1
+        },
+        "rules_that_must_not_change": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    },
+    "registry_bindings": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "answer_method_key",
+        "forbidden_substitute_key"
+      ],
+      "properties": {
+        "answer_method_key": {
+          "type": "string",
+          "minLength": 1
+        },
+        "forbidden_substitute_key": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "required_steps": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "step_id",
+          "transition",
+          "evidence"
+        ],
+        "properties": {
+          "step_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "transition": {
+            "type": "string",
+            "minLength": 1
+          },
+          "evidence": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        }
+      }
+    }
+  }
+}

@@ -13,17 +13,17 @@ When invoked, perform the requirements-analysis workflow from:
 .agents/skills/analyzing-cybernetic-requirements/SKILL.md
 ```
 
-Use the new artifact path:
+Use the current official control path:
 
 ```text
-docs/cybernetics/requirements/YYYY-MM-DD-<slug>.md
+docs/cybernetics/runs/<slug>/requirements.control.json
 ```
 
-Do not create files under `docs/cybernetics/clarifications/`.
+Do not create legacy Markdown clarification or requirements files. Historical Markdown is non-authoritative background only.
 
 Compatibility terms:
 
-- "clarification brief" means "requirements analysis brief".
+- "clarification brief" means historical terminology for requirements analysis; official persistence is `requirements.control.json`.
 - "Clarification Status" means "Requirements Analysis Status".
 - "Confirmed Decisions From Human" means "Confirmed Requirement Decisions".
 

@@ -1,0 +1,24 @@
+{
+  "artifact_type": "review.control",
+  "schema_version": "1",
+  "status": "approved",
+  "source_contracts": {
+    "requirements": "requirements.control.json",
+    "design": "design.control.json",
+    "goal": "goal.control.json",
+    "plan": "plan.control.json"
+  },
+  "registry_bindings": {
+    "answer_method_key": "implementation-spine",
+    "selected_agent_workflow": "superpowers-dispatching-parallel-agents"
+  },
+  "review_checks": [
+    {
+      "check_id": "json-only-template-hard-cut",
+      "status": "pass",
+      "evidence": [
+        "Markdown assets are deauthorized and JSON examples exist."
+      ]
+    }
+  ]
+}

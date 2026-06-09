@@ -1,0 +1,46 @@
+{
+  "artifact_type": "design.control",
+  "schema_version": "1.0.0",
+  "status": "approved",
+  "source_contracts": {
+    "requirements": "requirements.control.json",
+    "requirements_registry_sidecar": "requirements.control.json"
+  },
+  "approved_control": {
+    "confirmed_meaning": "Chat confirms the target; JSON files are the only official control facts; registries provide internal method and workflow keys; guards validate JSON schema plus registry consistency; runtime uses using-control-json and writes only progress/status/report files; verifier decides whether completion can be claimed.",
+    "required_answer_path": [
+      "initial state",
+      "state transition that makes the result true",
+      "observable target state"
+    ],
+    "what_is_not_enough_avoided": [
+      "component-inventory-completion",
+      "Markdown templates retained as official control inputs",
+      "JSON sidecars while Markdown remains authoritative",
+      "runtime self-claiming done without verifier permission"
+    ]
+  },
+  "registry_bindings": {
+    "answer_method_key": "implementation-spine",
+    "forbidden_substitute_key": "component-inventory-completion"
+  },
+  "required_steps": [
+    {
+      "step_id": "S1",
+      "transition": "initial Markdown-control dependency surface is retired from official guard/compiler/runtime inputs",
+      "evidence": [
+        "JSON-only guard/compiler/predictor scripts",
+        "tests rejecting legacy Markdown official input"
+      ]
+    },
+    {
+      "step_id": "S10",
+      "transition": "observable target state exists as a verified JSON-only control run",
+      "evidence": [
+        "validate_control_chain pass",
+        "verify_runtime_progress pass",
+        "full unittest pass"
+      ]
+    }
+  ]
+}

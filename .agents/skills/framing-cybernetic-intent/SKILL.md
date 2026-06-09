@@ -46,7 +46,7 @@ Routed elsewhere:
 
 - requirements meaning go to `$analyzing-cybernetic-requirements`;
 - why this process is needed goes to `$routing-cybernetic-workflows`;
-- solution design, goal files, execution policies, reviews,
+- solution design, goal control JSON, execution policies, reviews,
   progress logs, and runtime `/goal` commands belong to their downstream skills;
 - routine clarification stays in chat unless persistence is justified.
 

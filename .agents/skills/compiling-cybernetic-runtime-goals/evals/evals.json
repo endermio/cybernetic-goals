@@ -55,72 +55,72 @@
     {
       "id": "compiles-runtime-goal",
       "prompt": "requirements analysis Complete with What the User Approved: Approved, goal exists, execution policy status Candidate, review Approved, Final Independent Check allows approval；编译最终 /goal。",
-      "expected_output": "Writes a runtime goal file that references requirements analysis, goal, plan, and review paths, then outputs a short pointer-only /goal to that contract.",
+      "expected_output": "Writes runtime.control.json that references requirements analysis, goal, plan, and review control paths, then outputs a short pointer-only /goal to that contract.",
       "assertions": [
-        "Runtime goal file references all four artifact paths.",
-        "Pointer /goal references the runtime goal file path.",
+        "runtime.control.json references all four control paths.",
+        "Pointer /goal references the runtime.control.json path.",
         "Pointer /goal is short and does not inline What the User Approved, user-purpose evidence, result placement, what-counts-as-done, work assignment, evidence check, review, or subagent protocol prose.",
-        "Runtime goal file indexes What the User Approved.",
+        "runtime.control.json indexes What the User Approved.",
         "Requires Final Independent Check to allow approval.",
-        "Runtime goal file forbids reinterpretation of what the user approved, what counts as done, output contract, work assignment, evidence checks, or control strategy.",
-        "Runtime goal file mentions approved evidence checks, checks, and evidence channels as evidence checks, not objectives.",
-        "Runtime goal file mentions $superpowers:executing-plans, $superpowers:systematic-debugging, and $superpowers:verification-before-completion discipline.",
-        "Runtime goal file stops if any referenced artifact is missing, not approved, inconsistent, or insufficient."
+        "runtime.control.json forbids reinterpretation of what the user approved, what counts as done, output contract, work assignment, evidence checks, or control strategy.",
+        "runtime.control.json mentions approved evidence checks, checks, and evidence channels as evidence checks, not objectives.",
+        "runtime.control.json mentions $superpowers:executing-plans, $superpowers:systematic-debugging, and $superpowers:verification-before-completion discipline.",
+        "runtime.control.json stops if any referenced artifact is missing, not approved, inconsistent, or insufficient."
       ]
     },
     {
       "id": "runtime-command-is-pointer-only",
       "prompt": "requirements analysis Complete with What the User Approved: Approved, goal exists, execution policy status Candidate, review Approved, Final Independent Check allows approval；编译最终 runtime command。",
-      "expected_output": "Outputs a short /goal that points to docs/cybernetics/runtime-goals/*.goal.md and writes the full runtime goal file there.",
+      "expected_output": "Outputs a short /goal that points to docs/cybernetics/runs/<slug>/runtime.control.json and writes the full runtime control JSON there.",
       "assertions": [
-        "The user-entered /goal references a runtime goal file path.",
+        "The user-entered /goal references a runtime.control.json path.",
         "The user-entered /goal is length-bounded.",
         "The user-entered /goal does not contain How We Know The User Purpose Was Met, Where The Result Must Show Up, what counts as done final-report fields, or subagent protocol prose.",
-        "The runtime goal file contains Approved Control Chain.",
-        "The runtime goal file contains Required Sections To Read.",
-        "The runtime goal file contains Final Report Required Fields."
+        "runtime.control.json contains Approved Control Chain.",
+        "runtime.control.json contains Required Sections To Read.",
+        "runtime.control.json contains Final Report Required Fields."
       ]
     },
     {
       "id": "runtime-calibrates-user-purpose-evidence-claims",
       "prompt": "requirements analysis Complete, goal exists, execution policy includes User Purpose Strategy, review Approved and says user-purpose evidence pending is allowed. Compile runtime /goal.",
-      "expected_output": "The runtime goal file indexes purpose-feedback sections and requires final reporting of user purpose evidence status and highest purpose-relevant evidence observed.",
+      "expected_output": "runtime.control.json indexes purpose-feedback sections and requires final reporting of user purpose evidence status and highest purpose-relevant evidence observed.",
       "assertions": [
-        "Runtime goal file indexes How We Know The User Purpose Was Met.",
-        "Runtime goal file indexes User Purpose Evidence Check.",
-        "Runtime goal file includes final reporting of user purpose evidence status and highest purpose-relevant evidence observed.",
+        "runtime.control.json indexes How We Know The User Purpose Was Met.",
+        "runtime.control.json indexes User Purpose Evidence Check.",
+        "runtime.control.json includes final reporting of user purpose evidence status and highest purpose-relevant evidence observed.",
         "Pointer /goal does not inline purpose-feedback discipline prose."
       ]
     },
     {
       "id": "runtime-calibrates-result-placement-claims",
       "prompt": "requirements analysis Complete, goal includes Realization Place Contract, execution policy includes Where The Result Must Show Up Strategy, review Approved and says result placement partial or missing status is allowed only with calibrated wording. Compile runtime /goal.",
-      "expected_output": "The runtime goal file indexes result placement sections and requires final reporting of places covered, actions completed or justified, residuals reconciled, and pending or unknown places when result placement applies.",
+      "expected_output": "runtime.control.json indexes result placement sections and requires final reporting of places covered, actions completed or justified, residuals reconciled, and pending or unknown places when result placement applies.",
       "assertions": [
-        "Runtime goal file indexes Realization Place Contract.",
-        "Runtime goal file indexes Where The Result Must Show Up Strategy.",
-        "Runtime goal file indexes Where The Result Must Show Up Adequacy.",
-        "Runtime goal file includes final reporting of places covered, actions completed or justified, residuals reconciled, and pending or unknown places when result placement applies.",
+        "runtime.control.json indexes Realization Place Contract.",
+        "runtime.control.json indexes Where The Result Must Show Up Strategy.",
+        "runtime.control.json indexes Where The Result Must Show Up Adequacy.",
+        "runtime.control.json includes final reporting of places covered, actions completed or justified, residuals reconciled, and pending or unknown places when result placement applies.",
         "Pointer /goal does not inline result placement discipline prose."
       ]
     },
     {
       "id": "runtime-calibrates-what-counts-as-done-claims",
       "prompt": "requirements analysis Complete, goal includes Target Achievement Contract, execution policy includes Target-Producing Action Strategy, and review Approved says reports when not done are goal achieved: no. Compile runtime /goal.",
-      "expected_output": "The runtime goal file indexes done-claim sections and requires final reporting of goal achieved yes/no, done rule met yes/no, evidence needed to call it done, not done reason, action that can make it done attempted or proof of impossibility, and smallest next action that can make it done.",
+      "expected_output": "runtime.control.json indexes done-claim sections and requires final reporting of goal achieved yes/no, done rule met yes/no, evidence needed to call it done, not done reason, action that can make it done attempted or proof of impossibility, and smallest next action that can make it done.",
       "assertions": [
-        "Runtime goal file indexes Target Achievement Contract.",
-        "Runtime goal file indexes Target-Producing Action Strategy.",
-        "Runtime goal file indexes Target Achievement Done Rule Match.",
-        "Runtime goal file requires goal achieved: yes/no in the final report.",
-        "Runtime goal file requires what counts as done met: yes/no.",
-        "Runtime goal file requires evidence needed to call it done, not done reason, action that can make it done attempted or proof of impossibility, and smallest next action that can make it done.",
+        "runtime.control.json indexes Target Achievement Contract.",
+        "runtime.control.json indexes Target-Producing Action Strategy.",
+        "runtime.control.json indexes Target Achievement Done Rule Match.",
+        "runtime.control.json requires goal achieved: yes/no in the final report.",
+        "runtime.control.json requires what counts as done met: yes/no.",
+        "runtime.control.json requires evidence needed to call it done, not done reason, action that can make it done attempted or proof of impossibility, and smallest next action that can make it done.",
         "Pointer /goal does not inline target-achievement final-report fields."
       ]
     },
     {
       "id": "requires-design-when-design-check-required",
-      "prompt": "requirements analysis Complete 且写着 required design required，goal、plan、approved review 都存在，但没有传入 docs/cybernetics/designs/2026-05-22-control-relationship.md。请编译最终 /goal。",
+      "prompt": "requirements analysis Complete 且写着 required design required，goal、plan、approved review 都存在，但没有传入 docs/cybernetics/runs/2026-05-22-control-relationship/design.control.json。请编译最终 /goal。",
       "expected_output": "Refuse to compile runtime /goal because required solution design is missing, and include the next step to create or provide design before compilation.",
       "assertions": [
         "Does not output final /goal.",
@@ -146,13 +146,13 @@
     {
       "id": "compiles-runtime-goal-with-design",
       "prompt": "requirements analysis Complete, solution design exists, goal references design, execution policy references design, review Approved and references design；编译最终 /goal。",
-      "expected_output": "Writes a runtime goal file referencing requirements analysis, design, goal, plan, and review paths, then outputs a short pointer-only /goal to that contract.",
+      "expected_output": "Writes runtime.control.json referencing requirements analysis, design, goal, plan, and review paths, then outputs a short pointer-only /goal to that contract.",
       "assertions": [
-        "Runtime goal file references the solution design path.",
-        "Runtime goal file forbids reinterpreting approved control strategy.",
-        "Runtime goal file references requirements analysis, goal, plan, and review paths.",
-        "Runtime goal file uses executing, debugging, and completion verification discipline.",
-        "Pointer /goal references the runtime goal file path.",
+        "runtime.control.json references the solution design path.",
+        "runtime.control.json forbids reinterpreting approved control strategy.",
+        "runtime.control.json references requirements analysis, goal, plan, and review paths.",
+        "runtime.control.json uses executing, debugging, and completion verification discipline.",
+        "Pointer /goal references the runtime.control.json path.",
         "Stops if artifacts conflict or become insufficient."
       ]
     },
@@ -171,10 +171,10 @@
     {
       "id": "preserves-approved-subagent-work assignment",
       "prompt": "requirements analysis Complete, goal exists, execution policy status Candidate and selects Serial subagent-driven work assignment, review Approved and Final Independent Check allows approval；编译最终 /goal。",
-      "expected_output": "Writes a runtime goal file that records the approved serial subagent-driven work assignment and selected agent workflow, then emits a short pointer-only /goal.",
+      "expected_output": "Writes runtime.control.json that records the approved serial subagent-driven work assignment and selected agent workflow, then emits a short pointer-only /goal.",
       "assertions": [
-        "Runtime goal file records the selected work assignment from the execution policy.",
-        "Runtime goal file records the selected agent workflow.",
+        "runtime.control.json records the selected work assignment from the execution policy.",
+        "runtime.control.json records the selected agent workflow.",
         "Pointer /goal does not inline subagent protocol prose.",
         "Does not require $superpowers:subagent-driven-development unless the approved execution policy records a compatible serial SDD workflow.",
         "Does not require $superpowers:dispatching-parallel-agents unless the approved execution policy records a compatible parallel dispatch workflow.",
@@ -200,10 +200,10 @@
     {
       "id": "uses-selected-superpowers-workflow-only-when-compatible",
       "prompt": "requirements analysis Complete, goal exists, execution policy status Candidate and selects Serial subagent-driven work assignment with Selected agent workflow: bounded-protocol and an approved bounded delegation protocol. review Approved and Final Independent Check allows approval；编译最终 /goal。",
-      "expected_output": "Writes a runtime goal file that records serial subagent-driven work assignment and bounded-protocol workflow without adding $superpowers:subagent-driven-development, then emits a short pointer-only /goal.",
+      "expected_output": "Writes runtime.control.json that records serial subagent-driven work assignment and bounded-protocol workflow without adding $superpowers:subagent-driven-development, then emits a short pointer-only /goal.",
       "assertions": [
-        "Runtime goal file records the approved execution work assignment from the execution policy.",
-        "Runtime goal file records the selected bounded-protocol workflow.",
+        "runtime.control.json records the approved execution work assignment from the execution policy.",
+        "runtime.control.json records the selected bounded-protocol workflow.",
         "Does not add $superpowers:subagent-driven-development when the plan selects bounded-protocol.",
         "Does not add $superpowers:dispatching-parallel-agents when the plan selects bounded-protocol.",
         "Pointer /goal does not inline subagent protocol prose."

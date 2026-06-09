@@ -1,0 +1,34 @@
+{
+  "artifact_type": "design.control",
+  "schema_version": "1",
+  "status": "approved",
+  "source_contracts": {
+    "requirements": "requirements.control.json",
+    "requirements_registry_sidecar": "requirements.control.json"
+  },
+  "approved_control": {
+    "confirmed_meaning": "JSON is the only official persistent control fact for the cybernetic control chain.",
+    "required_answer_path": [
+      "Inventory old Markdown control inputs.",
+      "Create strict JSON control files.",
+      "Reject Markdown as official guard, compiler, and runtime input."
+    ],
+    "what_is_not_enough_avoided": [
+      "JSON sidecars while Markdown remains authoritative.",
+      "A short runtime pointer without a JSON operation protocol."
+    ]
+  },
+  "registry_bindings": {
+    "answer_method_key": "implementation-spine",
+    "forbidden_substitute_key": "component-inventory-completion"
+  },
+  "required_steps": [
+    {
+      "step_id": "S8",
+      "transition": "official Markdown templates are deleted, replaced, or deauthorized",
+      "evidence": [
+        "template hard-cut tests"
+      ]
+    }
+  ]
+}

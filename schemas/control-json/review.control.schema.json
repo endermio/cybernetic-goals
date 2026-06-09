@@ -1,0 +1,111 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://cybernetic-goals.local/schemas/control-json/review.control.schema.json",
+  "title": "Cybernetic Review Control",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "artifact_type",
+    "schema_version",
+    "status",
+    "source_contracts",
+    "registry_bindings",
+    "review_checks"
+  ],
+  "properties": {
+    "artifact_type": {
+      "const": "review.control"
+    },
+    "schema_version": {
+      "type": "string",
+      "minLength": 1
+    },
+    "status": {
+      "enum": [
+        "approved",
+        "needs_revision",
+        "rejected"
+      ]
+    },
+    "source_contracts": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "requirements",
+        "design",
+        "goal",
+        "plan"
+      ],
+      "properties": {
+        "requirements": {
+          "type": "string",
+          "minLength": 1
+        },
+        "design": {
+          "type": "string",
+          "minLength": 1
+        },
+        "goal": {
+          "type": "string",
+          "minLength": 1
+        },
+        "plan": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "registry_bindings": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "answer_method_key",
+        "selected_agent_workflow"
+      ],
+      "properties": {
+        "answer_method_key": {
+          "type": "string",
+          "minLength": 1
+        },
+        "selected_agent_workflow": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "review_checks": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "check_id",
+          "status",
+          "evidence"
+        ],
+        "properties": {
+          "check_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "status": {
+            "enum": [
+              "pass",
+              "fail",
+              "needs_revision"
+            ]
+          },
+          "evidence": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        }
+      }
+    }
+  }
+}

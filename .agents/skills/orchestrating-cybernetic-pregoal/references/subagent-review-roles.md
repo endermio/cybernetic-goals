@@ -4,7 +4,7 @@ Use these roles only when the user explicitly authorizes subagents.
 
 ## Requirement Traceability Reviewer
 
-Input: requirements analysis brief, solution design when present, goal file, execution policy.
+Input: `requirements.control.json`, `design.control.json` when present, `goal.control.json`, and `plan.control.json`.
 
 Check:
 
@@ -15,7 +15,7 @@ Check:
 
 ## Solution Design Match Reviewer
 
-Input: requirements analysis brief, solution design, goal file, execution policy.
+Input: `requirements.control.json`, `design.control.json`, `goal.control.json`, and `plan.control.json`.
 
 Check:
 
@@ -27,7 +27,7 @@ Check:
 
 ## Control Contract Reviewer
 
-Input: requirements analysis brief, solution design when present, and goal file.
+Input: `requirements.control.json`, `design.control.json` when present, and `goal.control.json`.
 
 Check:
 
@@ -37,7 +37,7 @@ Check:
 
 ## Execution Policy / Cadence Reviewer
 
-Input: solution design when present, goal file, and execution policy.
+Input: `design.control.json` when present, `goal.control.json`, and `plan.control.json`.
 
 Check:
 
@@ -51,7 +51,7 @@ Check:
 
 ## Evidence check / Evidence Governance Reviewer
 
-Input: solution design when present, goal file, and execution policy.
+Input: `design.control.json` when present, `goal.control.json`, and `plan.control.json`.
 
 Check:
 
@@ -62,12 +62,12 @@ Check:
 
 ## Runtime Limit Reviewer
 
-Input: all artifacts plus proposed runtime `/goal`.
+Input: all approved control JSON plus proposed runtime `/goal`.
 
 Check:
 
-- Runtime `/goal` only executes approved artifacts.
+- Runtime `/goal` only points to `runtime.control.json`.
 - Runtime `/goal` does not rewrite requirements, plan, evidence checks, or review.
 - Runtime `/goal` does not rewrite required solution design.
-- Runtime `/goal` references requirements analysis, required design, goal, plan, and review.
-- Runtime `/goal` stops if artifacts conflict or become insufficient.
+- `runtime.control.json` references requirements analysis, required design, goal, plan, and review control JSON.
+- Runtime execution stops if control JSON conflicts or becomes insufficient.

@@ -1,0 +1,36 @@
+{
+  "artifact_type": "requirements.control",
+  "schema_version": "1.0.0",
+  "status": "approved",
+  "approved_control": {
+    "human_purpose": "Make the cybernetic control chain use JSON as the only persistent control fact source.",
+    "primary_object": "cybernetic requirements, design, goal, plan, review, runtime, progress, and completion-verification chain",
+    "requested_transformation": "Replace official Markdown control artifacts with schema-validated JSON control files, registry-backed keys, JSON-only guards and compiler, a runtime JSON operation skill, append-only progress events, and verifier-gated completion.",
+    "non_goals": [
+      "long-term Markdown and JSON dual-path compatibility",
+      "treating Markdown control files as official guard/compiler/runtime inputs",
+      "letting runtime Codex rewrite approved control JSON"
+    ],
+    "how_we_know_purpose_was_met": "JSON schemas, registries, JSON-only guard/compiler/predictor/orchestration scripts, using-control-json runtime protocol, progress verifier, regression inventory, and focused/full tests pass while Markdown official inputs fail.",
+    "where_result_must_show_up": [
+      "schemas/control-json",
+      ".agents/skills/using-control-json",
+      "JSON-only guard/compiler/predictor/orchestration scripts",
+      "tests/skills JSON regression tests",
+      "docs/cybernetics/runs/2026-06-09-json-only-control-facts-migration"
+    ],
+    "what_counts_as_done": "Official control input is JSON-only; Markdown control input fails; runtime reads approved JSON as read-only; progress is JSONL; final goal_achieved true is allowed only when the verifier permits it; tests pass.",
+    "final_answer_format": {
+      "medium": "chat summary",
+      "required_structure": [
+        "what changed",
+        "verification commands",
+        "known limits"
+      ]
+    }
+  },
+  "registry_bindings": {
+    "answer_method_key": "implementation-spine",
+    "forbidden_substitute_key": "component-inventory-completion"
+  }
+}

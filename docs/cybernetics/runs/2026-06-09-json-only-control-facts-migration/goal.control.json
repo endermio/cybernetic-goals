@@ -1,0 +1,111 @@
+{
+  "artifact_type": "goal.control",
+  "schema_version": "1.0.0",
+  "status": "approved",
+  "source_contracts": {
+    "requirements": "requirements.control.json",
+    "design": "design.control.json"
+  },
+  "approved_control": {
+    "objective": "Migrate the cybernetic control chain to a JSON-only official control facts system.",
+    "success_condition": "Official guard/compiler/orchestration/predictor/runtime inputs use JSON run directories, Markdown official inputs fail, using-control-json defines runtime read/write protocol, progress is JSONL, and verifier-gated completion passes.",
+    "what_counts_as_done": "JSON schemas, registry checks, JSON-only scripts, runtime JSON operation skill, JSONL progress verifier, regression tests, and final run validation all pass.",
+    "rules_that_must_not_change": [
+      "Approved control JSON is read-only at runtime.",
+      "Runtime may write only progress.jsonl, runtime-status.json, and final-report.json.",
+      "Markdown does not participate in official guard/compiler/runtime control input.",
+      "The /goal command is a short text pointer, not a control fact.",
+      "goal_achieved true requires verifier permission."
+    ]
+  },
+  "registry_bindings": {
+    "answer_method_key": "implementation-spine",
+    "forbidden_substitute_key": "component-inventory-completion"
+  },
+  "required_steps": [
+    {
+      "step_id": "S1",
+      "transition": "JSON schemas exist for every official control file and runtime report/event type",
+      "evidence": [
+        "schemas/control-json/*.schema.json",
+        "tests/skills/test_control_json_schemas.py"
+      ]
+    },
+    {
+      "step_id": "S2",
+      "transition": "using-control-json skill defines runtime JSON read/write and verifier discipline",
+      "evidence": [
+        ".agents/skills/using-control-json/SKILL.md",
+        "tests/skills/test_using_control_json_protocol.py"
+      ]
+    },
+    {
+      "step_id": "S3",
+      "transition": "guard and compiler use JSON run directory as official input and reject Markdown official inputs",
+      "evidence": [
+        ".agents/skills/compiling-cybernetic-runtime-goals/scripts/control_chain_guard.py",
+        ".agents/skills/compiling-cybernetic-runtime-goals/scripts/compile_runtime_goal.py",
+        "tests/skills/test_json_official_guard_compiler_path.py"
+      ]
+    },
+    {
+      "step_id": "S4",
+      "transition": "orchestration and handoff prediction point to runtime.control.json, not runtime Markdown",
+      "evidence": [
+        ".agents/skills/orchestrating-cybernetic-pregoal/scripts/orchestration_guard.py",
+        ".agents/skills/analyzing-cybernetic-requirements/scripts/predict_pregoal_handoff.py"
+      ]
+    },
+    {
+      "step_id": "S5",
+      "transition": "runtime verifier checks progress JSONL, mainline evidence, final report, and verifier permission before achieved claims",
+      "evidence": [
+        ".agents/skills/using-control-json/scripts/verify_runtime_progress.py",
+        "tests/skills/test_runtime_json_progress_verifier.py"
+      ]
+    },
+    {
+      "step_id": "S6",
+      "transition": "Markdown control templates are deauthorized as official control facts and replaced by JSON examples",
+      "evidence": [
+        "tests/skills/test_json_control_template_hard_cut.py",
+        ".agents/skills/*/assets/*.control.example.json"
+      ]
+    },
+    {
+      "step_id": "S7",
+      "transition": "old accident classes are represented as JSON regressions",
+      "evidence": [
+        "tests/fixtures/cybernetics/json_only_control_regression_inventory.json",
+        "tests/skills/test_json_control_regression_inventory.py"
+      ]
+    },
+    {
+      "step_id": "S8",
+      "transition": "hot-path docs and skill instructions no longer teach old runtime goal files as official control input",
+      "evidence": [
+        "tests/skills/test_skill_hot_path_compression.py",
+        "rg hot-path scan"
+      ]
+    },
+    {
+      "step_id": "S9",
+      "transition": "actual JSON run directory validates through guard, runtime operation scripts, verifier, and compiler",
+      "evidence": [
+        "docs/cybernetics/runs/2026-06-09-json-only-control-facts-migration",
+        "validate_control_chain pass",
+        "verify_runtime_progress pass",
+        "compile_runtime_goal pass"
+      ]
+    },
+    {
+      "step_id": "S10",
+      "transition": "full repository verification passes after the JSON-only migration",
+      "evidence": [
+        "python3 -m unittest discover -s tests",
+        "python3 -m py_compile",
+        "git diff --check"
+      ]
+    }
+  ]
+}

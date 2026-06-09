@@ -3,10 +3,10 @@
   "evals": [
     {
       "id": "creates-general-solution-design-from-requirements-analysis",
-      "prompt": "使用 $designing-cybernetic-solutions 根据 docs/cybernetics/requirements/2026-05-22-control-relationship.md 创建 solution design。需求语义已经确认，但 Actor A、Group B、Entity C、identifier、记录观测和观察表面概念需要形成解决方案模型。",
-      "expected_output": "Create docs/cybernetics/designs/2026-05-22-control-relationship.md with required answer path, support mapping, and design details tied to required steps, without creating a goal, plan, review, or runtime /goal.",
+      "prompt": "使用 $designing-cybernetic-solutions 根据 docs/cybernetics/runs/2026-05-22-control-relationship/requirements.control.json 创建 solution design。需求语义已经确认，但 Actor A、Group B、Entity C、identifier、记录观测和观察表面概念需要形成解决方案模型。",
+      "expected_output": "Create docs/cybernetics/runs/2026-05-22-control-relationship/design.control.json with required answer path, support mapping, and design details tied to required steps, without creating a goal, plan, review, or runtime /goal.",
       "assertions": [
-        "Creates or references docs/cybernetics/designs/2026-05-22-control-relationship.md.",
+        "Creates or references docs/cybernetics/runs/2026-05-22-control-relationship/design.control.json.",
         "Includes Required Answer Path before support objects or mechanisms.",
         "Includes What Supports Each Required Step.",
         "Includes Design Details Tied To Required Steps where mechanisms, interfaces/contracts, lifecycle/state model, error/failure model, evidence/evidence check model, compatibility/integration, and design decisions each map to a required step or supporting-only role.",
@@ -18,7 +18,7 @@
     },
     {
       "id": "blocks-when-requirements-analysis-incomplete",
-      "prompt": "使用 $designing-cybernetic-solutions 根据 docs/cybernetics/requirements/incomplete-feature.md 创建 solution design。该 requirements analysis 还有开放的人类问题。",
+      "prompt": "使用 $designing-cybernetic-solutions 根据 docs/cybernetics/runs/incomplete-feature/requirements.control.json 创建 solution design。该 requirements analysis 还有开放的人类问题。",
       "expected_output": "Stop before creating an approved design because requirement meaning are incomplete, and include a response-only next step back to requirements analysis.",
       "assertions": [
         "States that requirements analysis must be Complete before design can be approved.",
@@ -63,10 +63,10 @@
     },
     {
       "id": "level-3-design-handoff-goes-to-orchestrator-not-goal-writer",
-      "prompt": "使用 $designing-cybernetic-solutions 根据 docs/cybernetics/requirements/2026-05-31-complex-control.md 创建 solution design。路由结果是 Level 3 full pre-goal pipeline，required design required，execution-plan check required，review check required。",
+      "prompt": "使用 $designing-cybernetic-solutions 根据 docs/cybernetics/runs/2026-05-31-complex-control/requirements.control.json 创建 solution design。路由结果是 Level 3 full pre-goal pipeline，required design required，execution-plan check required，review check required。",
       "expected_output": "Create the solution design artifact, then in the response hand off to $orchestrating-cybernetic-pregoal rather than directly to $writing-cybernetic-goals.",
       "assertions": [
-        "Creates or references docs/cybernetics/designs/2026-05-31-complex-control.md.",
+        "Creates or references docs/cybernetics/runs/2026-05-31-complex-control/design.control.json.",
         "Does not write a goal file.",
         "Does not write an execution policy.",
         "Does not include a Next Step or handoff prompt in the design artifact.",

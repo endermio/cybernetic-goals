@@ -1,6 +1,6 @@
 # Control Contract Rules
 
-A goal file is not a runtime command. It is a frozen statement of:
+`goal.control.json` is not a runtime command. It is a frozen JSON statement of:
 
 - intended result
 - constraints
@@ -8,9 +8,9 @@ A goal file is not a runtime command. It is a frozen statement of:
 - stop conditions
 - evidence requirements
 
-When required design is required, the goal file is downstream of the solution design. It should preserve design rules that cannot change and limit decisions without redoing the design or freezing tactical details as meaning.
+When required design is required, `goal.control.json` is downstream of `design.control.json`. It should preserve design rules that cannot change and limit decisions without redoing the design or freezing tactical details as meaning.
 
-For complex controlled work, do not let the runtime `/goal` write its own policy. The goal file must be paired with an approved execution policy and an approved review before execution.
+For complex controlled work, do not let the runtime `/goal` write its own policy. `goal.control.json` must be paired with approved `plan.control.json`, approved `review.control.json`, and compiled `runtime.control.json` before execution.
 
 ## Bad runtime goal pattern
 
@@ -21,9 +21,9 @@ For complex controlled work, do not let the runtime `/goal` write its own policy
 ## Good runtime goal pattern
 
 ```text
-/goal Execute the runtime goal file at docs/cybernetics/runtime-goals/YYYY-MM-DD-slug.goal.md. Read it first and follow it exactly. If any referenced artifact is missing, not approved, or inconsistent, stop and report the smallest required human decision.
+/goal Execute the runtime control JSON at docs/cybernetics/runs/YYYY-MM-DD-slug/runtime.control.json using .agents/skills/using-control-json. If the JSON is missing, invalid, inconsistent, or insufficient, stop and report the smallest required human decision.
 ```
 
-The runtime goal file artifact references the approved requirements,
-required design, goal, execution policy, and review. The user-entered
-`/goal` stays pointer-only and length-bounded.
+`runtime.control.json` references the approved requirements, required design,
+goal, execution policy, and review control JSON. The user-entered `/goal`
+stays pointer-only and length-bounded.

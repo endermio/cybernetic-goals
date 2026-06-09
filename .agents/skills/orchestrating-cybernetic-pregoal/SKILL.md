@@ -9,18 +9,21 @@ description: 'Use when completed requirements analysis exists and routing or req
 
 This skill orchestrates the **pre-goal compilation chain** after requirements have been analyzed.
 
-It turns a completed requirements analysis brief into approved approved files:
+It turns completed requirements control JSON into approved JSON control files:
 
 ```text
-requirements analysis brief
+requirements.control.json
   -> solution design, when required design is required
-  → goal file
-  → execution policy / plan
-  → control-structure review
-  → final runtime /goal command
+  -> design.control.json
+  -> goal.control.json
+  -> plan.control.json
+  -> review.control.json
+  -> runtime.control.json plus short /goal pointer
 ```
 
 This skill is a thin orchestrator. It does not replace the other cybernetic skills. It coordinates them.
+
+Official persistent control facts are JSON only. Historical Markdown may be read as non-authoritative background, but do not create or compile Markdown as official guard, compiler, runtime, or long-term dual-path control input.
 
 ## What This Skill Owns
 
@@ -29,15 +32,15 @@ cybernetic skills and preserves their ownership limits.
 
 Owned orchestration:
 
-- inspect a completed requirements analysis brief
+- inspect completed requirements control JSON
 - call existing cybernetic skills in the correct order
 - emulate narrow cybernetic formatting only when a downstream cybernetic skill is unavailable and that fallback is explicitly allowed
-- create or update approved files under `docs/cybernetics/`
+- create or update approved control files under `docs/cybernetics/runs/<slug>/`
 - invoke, request, or validate a solution design when required design is required
 - propacheck and validate output contract presence across downstream artifacts
 - use explicitly authorized subagents as independent reviewers
 - iterate review and revision up to the configured limit
-- compile the final `/goal` command after approval
+- compile `runtime.control.json` and the final short `/goal` pointer after approval
 
 Routed elsewhere or held for approval:
 
@@ -73,7 +76,7 @@ If a required workflow is unavailable, stop and report the missing infrastructur
 
 ## Relationship to Other Skills
 
-Use this skill only after a completed requirements analysis brief exists and
+Use this skill only after completed `requirements.control.json` exists and
 one of these fit checks is satisfied:
 
 - `$routing-cybernetic-workflows` has recommended a Level 3 or Level 4 workflow or full pre-goal pipeline;
@@ -143,18 +146,18 @@ approves the compact control commitment, update the requirements analysis
 
 ## Required Input
 
-A completed requirements analysis brief, usually:
+A completed requirements control JSON file, usually:
 
 ```text
-docs/cybernetics/requirements/YYYY-MM-DD-<slug>.md
+docs/cybernetics/runs/<slug>/requirements.control.json
 ```
 
-When the input path follows this pattern, the same `YYYY-MM-DD-<slug>` is the artifact identity for the whole pre-goal chain. Do not choose a different slug unless the user explicitly requests different output paths.
+When the input path follows this pattern, the same run directory is the artifact identity for the whole pre-goal chain. Do not choose a different slug unless the user explicitly requests different output paths.
 
 The user should invoke this skill with an explicit requirements path, for example:
 
 ```text
-$orchestrating-cybernetic-pregoal 根据 docs/cybernetics/requirements/2026-05-22-collaborative-supervision.md 自动完成 pre-goal 编译。允许使用 subagents 做独立 review。若 review 无法收敛，停止并报告阻塞点。
+$orchestrating-cybernetic-pregoal 根据 docs/cybernetics/runs/2026-05-22-collaborative-supervision/requirements.control.json 自动完成 pre-goal 编译。允许使用 subagents 做独立 review。若 review 无法收敛，停止并报告阻塞点。
 ```
 
 ## Subagent Authorization Rule
@@ -190,9 +193,9 @@ Use when pre-goal review subagents are not authorized.
 
 Behavior:
 
-1. Check the requirements analysis brief.
+1. Check requirements control JSON.
 2. Create or validate solution design if required design is required.
-3. Create or update goal file.
+3. Create or update `goal.control.json`.
 4. Create or update execution policy only if required planning workflow is satisfied or not required.
 5. Create a review draft marked `Needs Independent Review`.
 6. Do not compile final runtime `/goal` unless the review has independent approval or the user gives explicit control-review approval of the review findings. Do not ask for artifact-by-artifact review as a substitute for What the User Approved.
@@ -203,9 +206,9 @@ Use when pre-goal review subagents are explicitly authorized.
 
 Behavior:
 
-1. Check the requirements analysis brief.
+1. Check requirements control JSON.
 2. Create or validate solution design if required design is required.
-3. Create or update goal file.
+3. Create or update `goal.control.json`.
 4. Create or update execution policy only if required planning workflow is satisfied or not required.
 5. Run independent subagent review passes without running target execution or dispatching execution agents.
 6. Revise artifacts based on review findings.
@@ -247,29 +250,31 @@ before design.
 
 ### Determine Artifact Paths
 
-Derive the date and slug from the requirements path unless the user specifies
-paths.
+Derive the run directory from the requirements control path unless the user specifies paths.
 
 From:
 
 ```text
-docs/cybernetics/requirements/YYYY-MM-DD-<slug>.md
+docs/cybernetics/runs/YYYY-MM-DD-<slug>/requirements.control.json
 ```
 
 Use:
 
 ```text
-docs/cybernetics/designs/YYYY-MM-DD-<slug>.md
-docs/cybernetics/goals/YYYY-MM-DD-<slug>.md
-docs/cybernetics/plans/YYYY-MM-DD-<slug>.md
-docs/cybernetics/control-reviews/YYYY-MM-DD-<slug>.md
-docs/cybernetics/progress/YYYY-MM-DD-<slug>.md
-docs/cybernetics/orchestrations/YYYY-MM-DD-<slug>.md
+docs/cybernetics/runs/YYYY-MM-DD-<slug>/design.control.json
+docs/cybernetics/runs/YYYY-MM-DD-<slug>/goal.control.json
+docs/cybernetics/runs/YYYY-MM-DD-<slug>/plan.control.json
+docs/cybernetics/runs/YYYY-MM-DD-<slug>/review.control.json
+docs/cybernetics/runs/YYYY-MM-DD-<slug>/runtime.control.json
+docs/cybernetics/runs/YYYY-MM-DD-<slug>/progress.jsonl
+docs/cybernetics/runs/YYYY-MM-DD-<slug>/runtime-status.json
+docs/cybernetics/runs/YYYY-MM-DD-<slug>/final-report.json
+docs/cybernetics/runs/YYYY-MM-DD-<slug>/evidence/
 ```
 
-The design, goal, plan, review, and progress log must use the same derived date/slug. This keeps queue-friendly `/goal` commands emitted by `$analyzing-cybernetic-requirements` stable. If the requested path is ambiguous or lacks a deterministic date/slug, stop and ask for the smallest path decision; keep the slug unresolved until the decision exists.
+The design, goal, plan, review, runtime control JSON, and runtime outputs must use the same run directory. This keeps queue-friendly `/goal` commands emitted by `$analyzing-cybernetic-requirements` stable. If the requested path is ambiguous or lacks a deterministic slug, stop and ask for the smallest path decision; keep the slug unresolved until the decision exists.
 
-Use `assets/pregoal-orchestration-status-template.md` for the orchestration status artifact.
+Do not use Markdown orchestration status as official control input. If historical Markdown status exists, treat it as non-authoritative background only.
 
 ## Design Dispatch Rule
 
@@ -343,10 +348,10 @@ If any non-emulatable stage is required and unavailable, stop and report the mis
 | `RequirementsMissing` | requirements absent, incomplete, or What the User Approved missing/not Approved | `Blocked` / `ReturnToRequirementsAnalysis` | design / goal / policy / review / runtime compile |
 | `RequirementsComplete` | requirements Complete and What the User Approved Approved; required design required and design missing | `RunDesign` | goal writing |
 | `DesignReady` | design exists, references requirements, has no blocking open questions, and passes Design Answer Path Check when What the User Approved records an answering method or answer path family | `RunGoalWriting` | execution policy |
-| `GoalReady` | goal exists and references requirements plus any design path | `RunExecutionPolicy` | review |
+| `GoalReady` | `goal.control.json` exists and references requirements plus any design path | `RunExecutionPolicy` | review |
 | `PolicyReady` | execution policy exists, references requirements, goal, any design path, and records selected execution work assignment | `RunReview` | runtime compile |
 | `ReviewApproved` | review is Approved and Final Observer allows approval | `RunRuntimeCompile` | execution |
-| `RuntimeGoalReady` | final `/goal` is compiled | output command | start `/goal` |
+| `RuntimeGoalReady` | `runtime.control.json` and final short `/goal` pointer are compiled | output command | start `/goal` |
 | `Blocked` | any required check fails | report blocker | continue |
 
 ### Stage Responsibilities

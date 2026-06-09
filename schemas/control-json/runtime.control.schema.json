@@ -1,0 +1,197 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://cybernetic-goals.local/schemas/control-json/runtime.control.schema.json",
+  "title": "Cybernetic Runtime Control",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "artifact_type",
+    "schema_version",
+    "status",
+    "control_chain",
+    "registry_bindings",
+    "runtime",
+    "required_steps",
+    "progress",
+    "verifier"
+  ],
+  "properties": {
+    "artifact_type": {
+      "const": "runtime.control"
+    },
+    "schema_version": {
+      "type": "string",
+      "minLength": 1
+    },
+    "status": {
+      "enum": [
+        "compiled"
+      ]
+    },
+    "control_chain": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "requirements",
+        "design",
+        "goal",
+        "plan",
+        "review"
+      ],
+      "properties": {
+        "requirements": {
+          "type": "string",
+          "minLength": 1
+        },
+        "design": {
+          "type": "string",
+          "minLength": 1
+        },
+        "goal": {
+          "type": "string",
+          "minLength": 1
+        },
+        "plan": {
+          "type": "string",
+          "minLength": 1
+        },
+        "review": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "approved_control": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "objective",
+        "what_counts_as_done"
+      ],
+      "properties": {
+        "objective": {
+          "type": "string",
+          "minLength": 1
+        },
+        "what_counts_as_done": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "registry_bindings": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "answer_method_key",
+        "selected_agent_workflow"
+      ],
+      "properties": {
+        "answer_method_key": {
+          "type": "string",
+          "minLength": 1
+        },
+        "selected_agent_workflow": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "runtime": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "readonly_files",
+        "writable_files"
+      ],
+      "properties": {
+        "readonly_files": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "writable_files": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    },
+    "required_steps": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "step_id",
+          "transition",
+          "evidence"
+        ],
+        "properties": {
+          "step_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "transition": {
+            "type": "string",
+            "minLength": 1
+          },
+          "evidence": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        }
+      }
+    },
+    "progress": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "event_schema",
+        "append_only"
+      ],
+      "properties": {
+        "event_schema": {
+          "type": "string",
+          "minLength": 1
+        },
+        "append_only": {
+          "type": "boolean"
+        }
+      }
+    },
+    "verifier": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "required_before_goal_achieved",
+        "command",
+        "output_schema"
+      ],
+      "properties": {
+        "required_before_goal_achieved": {
+          "type": "boolean"
+        },
+        "command": {
+          "type": "string",
+          "minLength": 1
+        },
+        "output_schema": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    }
+  }
+}

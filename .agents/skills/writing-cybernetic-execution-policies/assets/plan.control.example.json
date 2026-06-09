@@ -1,0 +1,70 @@
+{
+  "artifact_type": "plan.control",
+  "schema_version": "1",
+  "status": "approved",
+  "source_contracts": {
+    "requirements": "requirements.control.json",
+    "design": "design.control.json",
+    "goal": "goal.control.json"
+  },
+  "approved_control": {
+    "work_coverage": "Replace official Markdown control templates with JSON examples and verify the hard cut.",
+    "action_that_can_make_it_done": "Run the focused template hard-cut test and repository manifest check."
+  },
+  "registry_bindings": {
+    "selected_agent_workflow": "superpowers-dispatching-parallel-agents",
+    "allowed_work_assignment": "Parallel subagent-driven",
+    "answer_method_key": "implementation-spine"
+  },
+  "required_steps": [
+    {
+      "step_id": "S8",
+      "transition": "official Markdown template surface is deauthorized",
+      "evidence": [
+        "tests.skills.test_json_control_template_hard_cut"
+      ]
+    }
+  ],
+  "work_packages": [
+    {
+      "work_package_id": "WP4",
+      "required_steps": [
+        "S8"
+      ],
+      "allowed_write_paths": [
+        ".agents/skills/*/assets",
+        "tests/skills/test_json_control_template_hard_cut.py",
+        "MANIFEST.txt"
+      ],
+      "forbidden_write_paths": [
+        "guard scripts",
+        "compiler scripts",
+        "verifier scripts",
+        "schemas/control-json"
+      ],
+      "required_tests": [
+        "python3 -m unittest tests.skills.test_json_control_template_hard_cut"
+      ]
+    }
+  ],
+  "runtime": {
+    "readonly_files": [
+      "requirements.control.json",
+      "design.control.json",
+      "goal.control.json"
+    ],
+    "writable_files": [
+      "progress.jsonl",
+      "runtime-status.json",
+      "final-report.json"
+    ]
+  },
+  "progress": {
+    "event_schema": "progress-event.schema.json",
+    "append_only": true
+  },
+  "verifier": {
+    "required_before_goal_achieved": true,
+    "output_schema": "final-report.schema.json"
+  }
+}

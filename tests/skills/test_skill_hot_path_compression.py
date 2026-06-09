@@ -76,15 +76,19 @@ class SkillHotPathCompressionTest(unittest.TestCase):
                 text,
                 path,
             )
+            self.assertNotIn(".goal.md", text, path)
+            self.assertNotIn("runtime-goals/", text, path)
 
         orchestrator_checks = read(
             ".agents/skills/orchestrating-cybernetic-pregoal/references/output-and-final-checks.md"
         )
         self.assertIn("User-entered short `/goal` pointer", orchestrator_checks)
-        self.assertIn("Runtime goal file", orchestrator_checks)
+        self.assertIn("runtime.control.json", orchestrator_checks)
+        self.assertIn("using-control-json", orchestrator_checks)
 
         control_rules = read(".agents/skills/writing-cybernetic-goals/references/control-contract-rules.md")
-        self.assertIn("/goal Execute the runtime goal file at", control_rules)
+        self.assertIn("/goal Execute the runtime control JSON at", control_rules)
+        self.assertIn("using-control-json", control_rules)
 
     def test_skill_descriptions_are_trigger_only_and_compact(self):
         for path in sorted((ROOT / ".agents/skills").glob("*/SKILL.md")):

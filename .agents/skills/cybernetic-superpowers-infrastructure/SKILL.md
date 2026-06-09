@@ -48,7 +48,7 @@ Pre-goal review subagents require explicit authorization in the orchestration re
 
 This skill does not:
 
-- write goal files;
+- write goal control JSON;
 - write execution policies;
 - perform review;
 - compile runtime `/goal` commands;

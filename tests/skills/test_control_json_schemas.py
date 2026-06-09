@@ -1,0 +1,367 @@
+import copy
+import json
+import unittest
+from pathlib import Path
+
+
+ROOT = Path(__file__).resolve().parents[2]
+SCHEMA_DIR = ROOT / "schemas/control-json"
+ANSWER_METHOD_REGISTRY = ROOT / ".agents/skills/references/answer-method-registry.json"
+DELEGATION_WORKFLOW_REGISTRY = ROOT / ".agents/skills/references/delegation-workflow-registry.json"
+
+
+SCHEMA_FIXTURES = {
+    "requirements.control.schema.json": {
+        "artifact_type": "requirements.control",
+        "schema_version": "1.0.0",
+        "status": "approved",
+        "approved_control": {
+            "human_purpose": "move official control facts to JSON",
+            "primary_object": "cybernetic control chain",
+            "requested_transformation": "replace Markdown authority with strict JSON control files",
+            "non_goals": ["long-term Markdown compatibility"],
+            "how_we_know_purpose_was_met": "JSON guard/compiler/runtime path operates without Markdown control inputs",
+            "where_result_must_show_up": ["schemas", "registries", "guards"],
+            "what_counts_as_done": "official JSON path passes and Markdown control input fails",
+            "final_answer_format": {
+                "medium": "chat summary",
+                "required_structure": ["changed files", "verification commands"],
+            },
+        },
+        "registry_bindings": {
+            "answer_method_key": "implementation-spine",
+            "forbidden_substitute_key": "component-inventory-completion",
+        },
+    },
+    "design.control.schema.json": {
+        "artifact_type": "design.control",
+        "schema_version": "1.0.0",
+        "status": "approved",
+        "source_contracts": {
+            "requirements": "requirements.control.json",
+            "requirements_registry_sidecar": "requirements.control.json",
+        },
+        "approved_control": {
+            "confirmed_meaning": "JSON is the only official persistent control fact",
+            "required_answer_path": [
+                "initial state",
+                "state transition that makes the result true",
+                "observable target state",
+            ],
+            "what_is_not_enough_avoided": ["JSON sidecars with Markdown authority"],
+        },
+        "registry_bindings": {
+            "answer_method_key": "implementation-spine",
+            "forbidden_substitute_key": "component-inventory-completion",
+        },
+        "required_steps": [
+            {
+                "step_id": "S2",
+                "transition": "strict JSON schema set exists",
+                "evidence": ["schema validation tests"],
+            }
+        ],
+    },
+    "goal.control.schema.json": {
+        "artifact_type": "goal.control",
+        "schema_version": "1.0.0",
+        "status": "approved",
+        "source_contracts": {
+            "requirements": "requirements.control.json",
+            "design": "design.control.json",
+        },
+        "approved_control": {
+            "objective": "migrate official cybernetic control facts to JSON",
+            "success_condition": "JSON-only official path and verifier-gated completion are observed",
+            "what_counts_as_done": "schemas, registries, guard/compiler/runtime, progress, verifier, and regressions pass",
+            "rules_that_must_not_change": [
+                "approved JSON is runtime read-only",
+                "Markdown is not official control input",
+            ],
+        },
+        "registry_bindings": {
+            "answer_method_key": "implementation-spine",
+            "forbidden_substitute_key": "component-inventory-completion",
+        },
+        "required_steps": [
+            {
+                "step_id": "S1",
+                "transition": "Markdown dependencies inventoried",
+                "evidence": ["inventory and failing-input list"],
+            }
+        ],
+    },
+    "plan.control.schema.json": {
+        "artifact_type": "plan.control",
+        "schema_version": "1.0.0",
+        "status": "approved",
+        "source_contracts": {
+            "requirements": "requirements.control.json",
+            "design": "design.control.json",
+            "goal": "goal.control.json",
+        },
+        "registry_bindings": {
+            "selected_agent_workflow": "superpowers-dispatching-parallel-agents",
+            "allowed_work_assignment": "Parallel subagent-driven",
+            "answer_method_key": "implementation-spine",
+        },
+        "required_steps": [
+            {
+                "step_id": "S1",
+                "transition": "Markdown dependencies inventoried",
+                "evidence": ["inventory and failing-input list"],
+            }
+        ],
+        "work_packages": [
+            {
+                "work_package_id": "WP1",
+                "required_steps": ["S1", "S2", "S3"],
+                "allowed_write_paths": ["schemas/control-json", "tests/skills/test_control_json_schemas.py"],
+                "forbidden_write_paths": ["guard scripts", "compiler scripts"],
+                "required_tests": ["python3 -m unittest tests.skills.test_control_json_schemas"],
+            }
+        ],
+        "runtime": {
+            "readonly_files": ["requirements.control.json", "design.control.json", "goal.control.json", "plan.control.json", "review.control.json", "runtime.control.json"],
+            "writable_files": ["progress.jsonl", "runtime-status.json", "final-report.json"],
+        },
+        "progress": {
+            "event_schema": "progress-event.schema.json",
+            "append_only": True,
+        },
+        "verifier": {
+            "required_before_goal_achieved": True,
+            "output_schema": "final-report.schema.json",
+        },
+    },
+    "review.control.schema.json": {
+        "artifact_type": "review.control",
+        "schema_version": "1.0.0",
+        "status": "approved",
+        "source_contracts": {
+            "requirements": "requirements.control.json",
+            "design": "design.control.json",
+            "goal": "goal.control.json",
+            "plan": "plan.control.json",
+        },
+        "registry_bindings": {
+            "answer_method_key": "implementation-spine",
+            "selected_agent_workflow": "superpowers-dispatching-parallel-agents",
+        },
+        "review_checks": [
+            {
+                "check_id": "design-answer-method",
+                "status": "pass",
+                "evidence": ["required answer path preserved"],
+            },
+            {
+                "check_id": "work-assignment",
+                "status": "pass",
+                "evidence": ["parallel workflow registry binding present"],
+            },
+            {
+                "check_id": "required-answer-path",
+                "status": "pass",
+                "evidence": ["runtime required steps are covered"],
+            },
+            {
+                "check_id": "horizon-authority",
+                "status": "pass",
+                "evidence": ["covered work remains in this run"],
+            },
+            {
+                "check_id": "final-observer",
+                "status": "pass",
+                "evidence": ["approved JSON chain ready for runtime"],
+            },
+        ],
+    },
+    "runtime.control.schema.json": {
+        "artifact_type": "runtime.control",
+        "schema_version": "1.0.0",
+        "status": "compiled",
+        "control_chain": {
+            "requirements": "requirements.control.json",
+            "design": "design.control.json",
+            "goal": "goal.control.json",
+            "plan": "plan.control.json",
+            "review": "review.control.json",
+        },
+        "registry_bindings": {
+            "answer_method_key": "implementation-spine",
+            "selected_agent_workflow": "superpowers-dispatching-parallel-agents",
+        },
+        "runtime": {
+            "readonly_files": ["requirements.control.json", "design.control.json", "goal.control.json", "plan.control.json", "review.control.json", "runtime.control.json"],
+            "writable_files": ["progress.jsonl", "runtime-status.json", "final-report.json"],
+        },
+        "required_steps": [
+            {
+                "step_id": "S1",
+                "transition": "Markdown dependencies inventoried",
+                "evidence": ["inventory and failing-input list"],
+            }
+        ],
+        "progress": {
+            "event_schema": "progress-event.schema.json",
+            "append_only": True,
+        },
+        "verifier": {
+            "required_before_goal_achieved": True,
+            "command": "verify-control-run",
+            "output_schema": "final-report.schema.json",
+        },
+    },
+    "progress-event.schema.json": {
+        "event_type": "step.completed",
+        "schema_version": "1.0.0",
+        "occurred_at": "2026-06-09T00:00:00Z",
+        "work_package_id": "WP1",
+        "required_step": "S2",
+        "status": "pass",
+        "evidence": ["schema validation tests passed"],
+    },
+    "final-report.schema.json": {
+        "artifact_type": "final-report",
+        "schema_version": "1.0.0",
+        "goal_achieved": False,
+        "what_counts_as_done_met": False,
+        "evidence": ["focused schema test"],
+        "verification": {
+            "verifier_result": "not_run",
+            "verifier_permits_goal_achieved": False,
+        },
+        "work_coverage": {
+            "status": "partial",
+            "executed": ["WP1 schema foundation"],
+            "prepared_only": [],
+            "forbidden_not_executed": [],
+            "out_of_scope": ["external production systems"],
+        },
+        "remaining_gaps": ["guard/compiler/runtime conversion pending"],
+    },
+}
+
+
+class SchemaValidationError(AssertionError):
+    pass
+
+
+def load_json(path: Path) -> dict:
+    return json.loads(path.read_text(encoding="utf-8"))
+
+
+def validate(instance, schema, path="$"):
+    if "const" in schema and instance != schema["const"]:
+        raise SchemaValidationError(f"{path}: expected const {schema['const']!r}, got {instance!r}")
+    if "enum" in schema and instance not in schema["enum"]:
+        raise SchemaValidationError(f"{path}: expected one of {schema['enum']!r}, got {instance!r}")
+
+    expected_type = schema.get("type")
+    if expected_type == "object":
+        if not isinstance(instance, dict):
+            raise SchemaValidationError(f"{path}: expected object")
+        required = schema.get("required", [])
+        for key in required:
+            if key not in instance:
+                raise SchemaValidationError(f"{path}: missing required key {key!r}")
+        properties = schema.get("properties", {})
+        if schema.get("additionalProperties") is False:
+            extra = sorted(set(instance) - set(properties))
+            if extra:
+                raise SchemaValidationError(f"{path}: unknown keys {extra!r}")
+        for key, subschema in properties.items():
+            if key in instance:
+                validate(instance[key], subschema, f"{path}.{key}")
+    elif expected_type == "array":
+        if not isinstance(instance, list):
+            raise SchemaValidationError(f"{path}: expected array")
+        if "minItems" in schema and len(instance) < schema["minItems"]:
+            raise SchemaValidationError(f"{path}: expected at least {schema['minItems']} items")
+        for index, item in enumerate(instance):
+            validate(item, schema.get("items", {}), f"{path}[{index}]")
+    elif expected_type == "string":
+        if not isinstance(instance, str):
+            raise SchemaValidationError(f"{path}: expected string")
+        if schema.get("minLength", 0) and len(instance) < schema["minLength"]:
+            raise SchemaValidationError(f"{path}: expected non-empty string")
+    elif expected_type == "boolean":
+        if not isinstance(instance, bool):
+            raise SchemaValidationError(f"{path}: expected boolean")
+    elif expected_type == "integer":
+        if not isinstance(instance, int) or isinstance(instance, bool):
+            raise SchemaValidationError(f"{path}: expected integer")
+    elif expected_type == "number":
+        if not isinstance(instance, (int, float)) or isinstance(instance, bool):
+            raise SchemaValidationError(f"{path}: expected number")
+
+
+def assert_all_object_schemas_are_strict(testcase: unittest.TestCase, schema: dict, path: str = "$"):
+    if schema.get("type") == "object":
+        testcase.assertFalse(schema.get("additionalProperties"), f"{path} must reject unknown fields")
+        for key, subschema in schema.get("properties", {}).items():
+            assert_all_object_schemas_are_strict(testcase, subschema, f"{path}.{key}")
+    elif schema.get("type") == "array":
+        assert_all_object_schemas_are_strict(testcase, schema.get("items", {}), f"{path}[]")
+
+
+class ControlJsonSchemaTest(unittest.TestCase):
+    def test_every_schema_loads_and_accepts_minimal_fixture(self):
+        for schema_name, fixture in SCHEMA_FIXTURES.items():
+            with self.subTest(schema=schema_name):
+                schema = load_json(SCHEMA_DIR / schema_name)
+                assert_all_object_schemas_are_strict(self, schema)
+                validate(fixture, schema)
+
+    def test_schemas_reject_unknown_top_level_fields(self):
+        for schema_name, fixture in SCHEMA_FIXTURES.items():
+            with self.subTest(schema=schema_name):
+                schema = load_json(SCHEMA_DIR / schema_name)
+                invalid = copy.deepcopy(fixture)
+                invalid["unexpected_field"] = "must be rejected"
+                with self.assertRaises(SchemaValidationError):
+                    validate(invalid, schema)
+
+    def test_schema_set_represents_control_chain_foundations(self):
+        for schema_name in (
+            "requirements.control.schema.json",
+            "design.control.schema.json",
+            "goal.control.schema.json",
+            "plan.control.schema.json",
+            "review.control.schema.json",
+            "runtime.control.schema.json",
+        ):
+            with self.subTest(schema=schema_name):
+                schema = load_json(SCHEMA_DIR / schema_name)
+                properties = schema["properties"]
+                self.assertIn("registry_bindings", properties)
+                if schema_name != "review.control.schema.json":
+                    self.assertIn("approved_control", properties)
+
+        plan = load_json(SCHEMA_DIR / "plan.control.schema.json")
+        self.assertIn("work_packages", plan["properties"])
+        self.assertIn("runtime", plan["properties"])
+        self.assertIn("progress", plan["properties"])
+        self.assertIn("verifier", plan["properties"])
+
+        review = load_json(SCHEMA_DIR / "review.control.schema.json")
+        self.assertIn("review_checks", review["properties"])
+
+    def test_registry_binding_keys_exist_for_answer_method_and_delegation_workflow(self):
+        answer_registry = load_json(ANSWER_METHOD_REGISTRY)
+        delegation_registry = load_json(DELEGATION_WORKFLOW_REGISTRY)
+
+        self.assertIn("implementation-spine", answer_registry)
+        self.assertIn("mandatory_nodes", answer_registry["implementation-spine"])
+        self.assertIn("forbidden_substitutions", answer_registry["implementation-spine"])
+
+        self.assertIn("superpowers-dispatching-parallel-agents", delegation_registry)
+        workflow = delegation_registry["superpowers-dispatching-parallel-agents"]
+        self.assertIn("allowed_work_assignment", workflow)
+        self.assertNotIn("allowed_work assignment", workflow)
+        self.assertIn("Parallel subagent-driven", workflow["allowed_work_assignment"])
+        self.assertIn("parallel-max-safe", workflow["allowed_mode"])
+
+
+if __name__ == "__main__":
+    unittest.main()

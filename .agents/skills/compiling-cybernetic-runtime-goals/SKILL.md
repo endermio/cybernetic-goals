@@ -1,24 +1,26 @@
 ---
 name: compiling-cybernetic-runtime-goals
-description: 'Use when requirements, any required design, goal file, execution policy, and approved review exist, and a runtime goal file plus short /goal pointer must be checked or emitted before execution.'
+description: 'Use when requirements, any required design, goal control, execution policy, and approved review exist, and runtime.control.json plus a short /goal pointer must be checked or emitted before execution.'
 ---
 
 # Compiling Cybernetic Runtime Goals
 
 ## Overview
 
-Produce a runtime goal file artifact and a short executable `/goal` pointer from approved approved files.
+Produce `runtime.control.json` and a short executable `/goal` pointer from approved JSON control files.
 
 Inputs:
 
-- requirements analysis brief with status Complete
+- `requirements.control.json` with status Complete
 - What the User Approved: Approved in the requirements analysis
-- solution design, when required design was required or a design exists
-- goal file
-- execution policy / plan
-- review with status Approved
+- `design.control.json`, when required design was required or a design exists
+- `goal.control.json`
+- `plan.control.json`
+- `review.control.json` with status Approved
 
 This skill is a thin compiler. It must not rewrite the approved work chain or inline control discipline into the user-entered `/goal`.
+
+Official persistent control facts are JSON only. Historical Markdown may be read as non-authoritative background, but do not create or compile Markdown as official guard, compiler, runtime, or long-term dual-path control input.
 
 Use `scripts/control_chain_guard.py` and `scripts/compile_runtime_goal.py` when available.
 
@@ -28,7 +30,7 @@ Follow `$cybernetic-superpowers-infrastructure`.
 
 This skill does not invoke runtime execution.
 
-The user-entered `/goal` must be pointer-only and length-bounded. It points to a runtime goal file artifact, and the contract indexes the approved control chain and required sections to read. Do not inline What the User Approved, user-purpose evidence, result-placement, what-counts-as-done, work assignment, evidence check governance, review discipline, or subagent protocol prose into the `/goal` hot path.
+The user-entered `/goal` must be pointer-only and length-bounded. It points to `runtime.control.json` and names `.agents/skills/using-control-json`; the JSON contract indexes the approved control chain and required sections to read. Do not inline What the User Approved, user-purpose evidence, result-placement, what-counts-as-done, work assignment, evidence check governance, review discipline, or subagent protocol prose into the `/goal` hot path.
 
 ## Preconditions
 
@@ -36,7 +38,7 @@ Do not output `/goal` unless:
 
 - requirements analysis status is Complete;
 - requirements analysis includes `What the User Approved: Approved`;
-- goal file exists;
+- `goal.control.json` exists;
 - solution design exists when required design was required or a design artifact exists;
 - execution policy exists;
 - review status is Approved;
@@ -77,9 +79,9 @@ Do not output `/goal` unless:
 - runtime `/goal` will not need to invent or replace the final output contract.
 - runtime `/goal` will not need to invent or replace work assignment.
 
-## Runtime Goal
+## Runtime Control JSON
 
-The contract artifact must be an index-style goal file, not a long copied prompt. It must include:
+The contract artifact must be `docs/cybernetics/runs/<slug>/runtime.control.json`, not a long copied prompt. It must include:
 
 - approved control chain paths for requirements, design when present, goal, execution policy, and review;
 - a runtime execution rule that forbids reinterpreting the what the user approved, answering method, answer method, what counts as done, output contract, work assignment, evidence checks, or control strategy;
@@ -88,7 +90,7 @@ The contract artifact must be an index-style goal file, not a long copied prompt
 - final report fields: `goal achieved: yes/no`, `what counts as done met: yes/no`, evidence needed to call it done, required answer path coverage and step evidence, answer method completion evidence when requirements/design define how this should be answered, not done reason when no, action that can make it done attempted or proof of impossibility when no, smallest next action that can make it done when no, work covered in this run, work coverage, executed, prepared-only, forbidden-not-executed, explicitly out-of-scope by what the user approved, user purpose evidence status and highest purpose-relevant evidence observed, and result places covered, actions completed or justified, old behavior checked, and pending or unknown places when result-placement applies;
 - a stop rule for missing, unapproved, inconsistent, or insufficient referenced artifacts.
 
-The final `/goal` command must only point to this runtime goal file and tell runtime Codex to read it first.
+The final `/goal` command must only point to `runtime.control.json` and tell runtime Codex to use `.agents/skills/using-control-json`.
 
 ## Scripted Compilation
 
@@ -96,32 +98,27 @@ Preferred:
 
 ```bash
 python3 .agents/skills/compiling-cybernetic-runtime-goals/scripts/compile_runtime_goal.py \
-  --requirements docs/cybernetics/requirements/YYYY-MM-DD-feature.md \
-  --design docs/cybernetics/designs/YYYY-MM-DD-feature.md \
-  --goal docs/cybernetics/goals/YYYY-MM-DD-feature.md \
-  --plan docs/cybernetics/plans/YYYY-MM-DD-feature.md \
-  --review docs/cybernetics/control-reviews/YYYY-MM-DD-feature.md \
-  --out docs/cybernetics/runtime-goals/YYYY-MM-DD-feature.goal.md
+  --run-dir docs/cybernetics/runs/YYYY-MM-DD-feature
 ```
 
-The `--out` path must end with `.goal.md`; the output file is a runtime goal file, not a copyable command transcript.
+The official compiler input is the JSON run directory. Do not combine Markdown artifact inputs or legacy Markdown runtime output with official runtime compilation.
 
 Do not use `--skip-guard` for official runtime `/goal` compilation. It is only for internal validation and requires the explicit `--i-understand-this-bypasses-phase-checks` acknowledgement.
 
 ## Output Format
 
-These output formats are response-only. Do not write `$skill ...` commands, runtime `/goal` prompts, or conversational next-step prompts into requirements, design, goal, plan, or review artifacts.
+These output formats are response-only. Do not write `$skill ...` commands, runtime `/goal` prompts, or conversational next-step prompts into requirements, design, goal, plan, review, or runtime control JSON.
 
-### Approved runtime contract and command
+### Approved runtime control and command
 
 ```markdown
-Runtime goal file written:
-`docs/cybernetics/runtime-goals/YYYY-MM-DD-feature.goal.md`
+Runtime control JSON written:
+`docs/cybernetics/runs/YYYY-MM-DD-feature/runtime.control.json`
 
 Use this /goal:
 
 ```text
-/goal Execute the runtime goal file at docs/cybernetics/runtime-goals/YYYY-MM-DD-feature.goal.md. Read it first and follow it exactly. If any referenced artifact is missing, not approved, or inconsistent, stop and report the smallest required human decision.
+/goal Use .agents/skills/using-control-json and execute docs/cybernetics/runs/YYYY-MM-DD-feature/runtime.control.json. If the JSON is missing, invalid, inconsistent, or insufficient, stop and report the smallest required human decision.
 ```
 
 Preflight:
@@ -168,17 +165,17 @@ Do not create or modify target-work artifacts.
 - [ ] Selected Superpowers workflow supports the approved subagent execution mode.
 - [ ] Subagent-driven work assignment has `Parallel Agent Safety Check` review evidence.
 - [ ] Final Independent Check is present and allows approval.
-- [ ] Runtime goal file references all approved files.
-- [ ] Runtime goal file indexes the goal's Final Output Contract when present or required.
-- [ ] Runtime goal file preserves the approved work assignment through the plan section index.
-- [ ] Runtime goal file preserves the What the User Approved through the requirements section index.
-- [ ] Runtime goal file indexes design `Answer Method Check` and review `Design Answer Method Check` when design exists.
-- [ ] Runtime goal file includes final report fields for work coverage and action limits, user-purpose evidence, result-placement, and what-counts-as-done claim calibration.
-- [ ] Runtime goal file indexes the approved Steps That Make The Result True and review check section.
+- [ ] `runtime.control.json` references all approved control JSON files.
+- [ ] `runtime.control.json` indexes the goal's Final Output Contract when present or required.
+- [ ] `runtime.control.json` preserves the approved work assignment through the plan section index.
+- [ ] `runtime.control.json` preserves the What the User Approved through the requirements section index.
+- [ ] `runtime.control.json` indexes design `Answer Method Check` and review `Design Answer Method Check` when design exists.
+- [ ] `runtime.control.json` includes final report fields for work coverage and action limits, user-purpose evidence, result-placement, and what-counts-as-done claim calibration.
+- [ ] `runtime.control.json` indexes the approved Steps That Make The Result True and review check section.
 - [ ] The user-entered `/goal` is pointer-only and length-bounded.
 - [ ] The user-entered `/goal` does not inline What the User Approved, user-purpose evidence, result-placement, what-counts-as-done, work assignment, evidence check-governance, review, or subagent protocol prose.
 - [ ] The final `/goal` does not ask runtime Codex to write a new plan.
 - [ ] The final `/goal` does not ask runtime Codex to create or revise solution design.
-- [ ] Runtime goal file includes executing, debugging, and completion-verification discipline.
+- [ ] `runtime.control.json` includes executing, debugging, and completion-verification discipline.
 - [ ] If guard or preconditions fail, the response includes a response-only next step and no final `/goal`.
 - [ ] The skill did not execute target work.

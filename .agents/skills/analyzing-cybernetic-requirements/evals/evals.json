@@ -23,17 +23,17 @@
     },
     {
       "id": "complete-analysis-emits-queue-friendly-commands",
-      "prompt": "需求分析已完成，brief 是 docs/cybernetics/requirements/2026-05-22-control-relationship.md，没有开放阻塞问题，并且 What the User Approved: Approved。",
+      "prompt": "需求分析已完成，requirements control JSON 是 docs/cybernetics/runs/2026-05-22-control-relationship/requirements.control.json，没有开放阻塞问题，并且 What the User Approved: Approved。",
       "expected_output": "Emit a pre-goal orchestration command, predicted same-slug downstream artifact paths, the predicted runtime contract path, and a pointer-only /goal shape with a precondition that stops if artifacts are missing, not approved, or inconsistent.",
       "assertions": [
-        "Outputs a command invoking $orchestrating-cybernetic-pregoal with docs/cybernetics/requirements/2026-05-22-control-relationship.md.",
+        "Outputs a command invoking $orchestrating-cybernetic-pregoal with docs/cybernetics/runs/2026-05-22-control-relationship/requirements.control.json.",
         "Requires What the User Approved: Approved before emitting the orchestration command.",
         "Uses predict_pregoal_handoff.py or equivalent scripted predictor output instead of hand-writing divergent paths.",
         "Outputs a predicted pointer-only /goal shape, not a final approved /goal.",
-        "The predicted downstream paths include docs/cybernetics/goals/2026-05-22-control-relationship.md.",
-        "The predicted downstream paths include docs/cybernetics/plans/2026-05-22-control-relationship.md.",
-        "The predicted downstream paths include docs/cybernetics/control-reviews/2026-05-22-control-relationship.md.",
-        "The predicted runtime contract path is docs/cybernetics/runtime-goals/2026-05-22-control-relationship.goal.md.",
+        "The predicted downstream paths include docs/cybernetics/runs/2026-05-22-control-relationship/goal.control.json.",
+        "The predicted downstream paths include docs/cybernetics/runs/2026-05-22-control-relationship/plan.control.json.",
+        "The predicted downstream paths include docs/cybernetics/runs/2026-05-22-control-relationship/review.control.json.",
+        "The predicted runtime contract path is docs/cybernetics/runs/2026-05-22-control-relationship/runtime.control.json.",
         "The pointer-only /goal says to stop if any referenced artifact is missing, not approved, or inconsistent."
       ]
     },
@@ -64,7 +64,7 @@
     },
     {
       "id": "complete-rubric-analysis-routes-to-bounded-goal",
-      "prompt": "Level 2 且 Required checks: rubric check required 的评价口径需求分析已完成，brief 是 docs/cybernetics/requirements/2026-05-26-completion-rubric.md，已确认已闭环/部分闭环/未闭环/不可判定的状态定义和证据等级。",
+      "prompt": "Level 2 且 Required checks: rubric check required 的评价口径需求分析已完成，requirements control JSON 是 docs/cybernetics/runs/2026-05-26-completion-rubric/requirements.control.json，已确认已闭环/部分闭环/未闭环/不可判定的状态定义和证据等级。",
       "expected_output": "Mark rubric analysis complete and recommend writing-cybernetic-goals for a bounded audit goal, not orchestrating-cybernetic-pregoal.",
       "assertions": [
         "Outputs that rubric analysis is complete.",
@@ -89,12 +89,12 @@
     },
     {
       "id": "complete-level-3-analysis-routes-to-orchestrator-not-manual-design",
-      "prompt": "Level 3 full pre-goal requirements analysis is complete. Requirements brief is docs/cybernetics/requirements/2026-05-31-complex-training.md. Required checks include required design: required, there are no open blocking requirement questions, and What the User Approved: Approved.",
-      "expected_output": "Emit a pre-goal orchestration command, predicted runtime contract path, and pointer-only /goal shape using the concrete requirements path, not a standalone solution-design command before orchestration. Explain that the orchestrator owns design dispatch when required design is required, but the required design dispatch note must not replace the predicted pointer-only /goal.",
+      "prompt": "Level 3 full pre-goal requirements analysis is complete. Requirements control JSON is docs/cybernetics/runs/2026-05-31-complex-training/requirements.control.json. Required checks include required design: required, there are no open blocking requirement questions, and What the User Approved: Approved.",
+      "expected_output": "Emit a pre-goal orchestration command, predicted runtime.control.json path, and pointer-only /goal shape using the concrete requirements control path, not a standalone solution-design command before orchestration. Explain that the orchestrator owns design dispatch when required design is required, but the required design dispatch note must not replace the predicted pointer-only /goal.",
       "assertions": [
-        "Outputs a command invoking $orchestrating-cybernetic-pregoal with docs/cybernetics/requirements/2026-05-31-complex-training.md.",
+        "Outputs a command invoking $orchestrating-cybernetic-pregoal with docs/cybernetics/runs/2026-05-31-complex-training/requirements.control.json.",
         "Requires What the User Approved: Approved before handoff.",
-        "Outputs predicted downstream artifact paths that include docs/cybernetics/designs/2026-05-31-complex-training.md as the expected design path.",
+        "Outputs predicted downstream artifact paths that include docs/cybernetics/runs/2026-05-31-complex-training/design.control.json as the expected design path.",
         "States that the required design dispatch note does not replace the predicted pointer-only /goal.",
         "Does not output a standalone $designing-cybernetic-solutions command as a separate next step before orchestration.",
         "States that the orchestrator must invoke or request $designing-cybernetic-solutions before goal writing because required design is required.",

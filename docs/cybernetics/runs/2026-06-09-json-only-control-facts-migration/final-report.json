@@ -1,0 +1,36 @@
+{
+  "artifact_type": "final-report",
+  "schema_version": "1.0.0",
+  "goal_achieved": true,
+  "what_counts_as_done_met": true,
+  "evidence": [
+    "focused JSON tests pass",
+    "full unittest suite passes",
+    "runtime progress verifier permits goal_achieved true",
+    "compiler emits short runtime.control.json pointer"
+  ],
+  "verification": {
+    "verifier_result": "pass",
+    "verifier_permits_goal_achieved": true
+  },
+  "work_coverage": {
+    "status": "complete",
+    "executed": [
+      "schema registry foundation",
+      "using-control-json skill and scripts",
+      "JSON-only guard/compiler/orchestration/predictor",
+      "template hard-cut and JSON examples",
+      "JSON regression inventory",
+      "hot-path doc cleanup",
+      "actual JSON control run validation"
+    ],
+    "prepared_only": [],
+    "forbidden_not_executed": [
+      "long-term Markdown/JSON compatibility"
+    ],
+    "out_of_scope": [
+      "external production rollout outside this repository"
+    ]
+  },
+  "remaining_gaps": []
+}

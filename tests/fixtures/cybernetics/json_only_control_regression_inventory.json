@@ -1,0 +1,338 @@
+{
+  "schema_version": 1,
+  "inventory_status": "legacy_accident_inventory_for_json_regressions",
+  "json_regression_port_status": "implemented_in_json_regression_tests",
+  "does_not_claim_full_goal_complete": true,
+  "retired_legacy_control_artifacts": [
+    "pre-json runtime goal Markdown artifact",
+    "pre-json execution policy Markdown artifact"
+  ],
+  "scope_boundary": {
+    "owned_by": "WP5a",
+    "allowed_now": "Inventory old accident regression classes and verifier requirements before schema/protocol barriers.",
+    "not_allowed_now": "Do not implement guard conversion, compiler conversion, runtime verifier, schemas, registries, or using-control-json."
+  },
+  "old_accident_surfaces": [
+    {
+      "id": "design_answer_method",
+      "retired_source_test_file": "tests/skills/test_design_answer_method.py",
+      "representative_tests": [
+        "test_orchestration_guard_requires_answer_method_sidecar_before_goal",
+        "test_orchestration_guard_rejects_run_validation_substitution_before_goal",
+        "test_control_chain_guard_requires_review_design_answer_path_check",
+        "test_runtime_contract_indexes_design_answer_path_check"
+      ],
+      "json_replacement_tests": [
+        {
+          "file": "tests/skills/test_runtime_json_progress_verifier.py",
+          "tests": [
+            "test_validate_control_chain_rejects_weaker_answer_method_and_missing_mandatory_nodes"
+          ]
+        },
+        {
+          "file": "tests/skills/test_json_official_guard_compiler_path.py",
+          "tests": [
+            "test_control_chain_guard_accepts_complete_json_run_directory"
+          ]
+        }
+      ],
+      "current_markdown_surface": "Markdown requirements/design/goal/plan/review fixtures plus a small requirements.control.json sidecar.",
+      "json_port_groundwork": "Port the approved answer method, forbidden substitute key, required path coverage, and design-answer-method review check into first-class JSON fields instead of Markdown section text."
+    },
+    {
+      "id": "work_assignment_context",
+      "retired_source_test_file": "tests/skills/test_work_assignment_context.py",
+      "representative_tests": [
+        "test_execution_policy_requires_context_work_assignment",
+        "test_control_chain_guard_requires_review_of_context_work_assignment",
+        "test_parallel_subagent_work_assignment_requires_wave_locks_and_failure_policy",
+        "test_guard_accepts_parallel_mode_with_dispatching_parallel_agents_workflow"
+      ],
+      "json_replacement_tests": [
+        {
+          "file": "tests/skills/test_control_json_schemas.py",
+          "tests": [
+            "test_registry_binding_keys_exist_for_answer_method_and_delegation_workflow"
+          ]
+        },
+        {
+          "file": "tests/skills/test_json_official_guard_compiler_path.py",
+          "tests": [
+            "test_control_chain_guard_accepts_complete_json_run_directory"
+          ]
+        }
+      ],
+      "current_markdown_surface": "Markdown execution policy fixtures encode task level, work assignment, selected workflow, wave matrix, locks, context pack, return format, and integration checks.",
+      "json_port_groundwork": "Represent work assignment, selected workflow, subagent execution mode, wave barriers, lock ownership, context pack, return format, and integration checks as JSON contract fields."
+    },
+    {
+      "id": "required_answer_path",
+      "retired_source_test_file": "tests/skills/test_required_answer_path.py",
+      "representative_tests": [
+        "test_guard_rejects_plan_missing_required_answer_path",
+        "test_guard_rejects_candidate_task_without_required_answer_path_nodes",
+        "test_progress_log_rules_track_required_answer_path_node_status"
+      ],
+      "json_replacement_tests": [
+        {
+          "file": "tests/skills/test_runtime_json_progress_verifier.py",
+          "tests": [
+            "test_validate_control_chain_rejects_weaker_answer_method_and_missing_mandatory_nodes",
+            "test_verify_runtime_progress_rejects_verifier_bypass_supporting_only_and_not_done_success"
+          ]
+        }
+      ],
+      "current_markdown_surface": "Markdown goal and plan fixtures carry Steps That Make The Result True, required step ids, transition evidence, and supporting-only progress rules.",
+      "json_port_groundwork": "Make required steps, state transitions, transition evidence, mainline/supporting-only role, and progress classification machine-checkable JSON fields."
+    },
+    {
+      "id": "what_counts_as_done",
+      "retired_source_test_file": "tests/skills/test_what_counts_as_done.py",
+      "representative_tests": [
+        "test_guard_rejects_success_condition_with_non_achieved_status",
+        "test_guard_rejects_target_contract_with_non_achieved_terminal_report_statuses",
+        "test_runtime_compiler_uses_non_achieved_reason_not_fallback_reason"
+      ],
+      "json_replacement_tests": [
+        {
+          "file": "tests/skills/test_runtime_json_progress_verifier.py",
+          "tests": [
+            "test_verify_runtime_progress_rejects_verifier_bypass_supporting_only_and_not_done_success",
+            "test_verify_runtime_progress_permits_complete_mainline_verified_report"
+          ]
+        }
+      ],
+      "current_markdown_surface": "Markdown goal and plan fixtures separate the single done condition from not-done terminal reports and action-that-can-make-it-done evidence.",
+      "json_port_groundwork": "Encode one done condition, allowed achieved claim, non-achieved report protocol, action attempted/proof-of-impossibility, and final report fields in JSON."
+    },
+    {
+      "id": "execution_horizon_authority",
+      "retired_source_test_file": "tests/skills/test_execution_horizon_authority.py",
+      "representative_tests": [
+        "test_guard_rejects_future_roadmap_inside_approved_horizon_matrix",
+        "test_runtime_contract_requires_horizon_coverage_report_fields",
+        "test_guard_rejects_review_missing_horizon_authority_check"
+      ],
+      "json_replacement_tests": [
+        {
+          "file": "tests/skills/test_runtime_json_progress_verifier.py",
+          "tests": [
+            "test_validate_control_chain_rejects_missing_review_checks",
+            "test_verify_runtime_progress_rejects_verifier_bypass_supporting_only_and_not_done_success"
+          ]
+        },
+        {
+          "file": "tests/skills/test_control_json_schemas.py",
+          "tests": [
+            "test_schema_set_represents_control_chain_foundations"
+          ]
+        }
+      ],
+      "current_markdown_surface": "Markdown requirements/goal/plan fixtures encode work covered in this run, action limits, prepare-only handling, forbidden-not-executed handling, and review checks.",
+      "json_port_groundwork": "Represent approved horizon, action authority, runtime handling, counts-as-achieved classification, and horizon review status as strict JSON fields."
+    },
+    {
+      "id": "artifact_hygiene",
+      "retired_source_test_file": "tests/skills/test_artifact_hygiene.py",
+      "representative_tests": [
+        "test_hygiene_lint_fails_objective_generated_artifact_pollution",
+        "test_control_chain_guard_rejects_goal_hygiene_pollution",
+        "test_invariant_matrix_records_artifact_hygiene"
+      ],
+      "json_replacement_tests": [
+        {
+          "file": "tests/skills/test_json_control_template_hard_cut.py",
+          "tests": [
+            "test_markdown_assets_are_deauthorized_as_control_fact_templates",
+            "test_json_examples_exist_for_each_control_fact_stage"
+          ]
+        },
+        {
+          "file": "tests/skills/test_control_json_schemas.py",
+          "tests": [
+            "test_schemas_reject_unknown_top_level_fields"
+          ]
+        }
+      ],
+      "current_markdown_surface": "Markdown artifact fixtures and templates are linted for placeholder pollution, duplicate content, response-only prompts, jargon leakage, and size-budget issues.",
+      "json_port_groundwork": "Keep JSON artifacts concise, schema-owned, free of response-only prompt text, and tied to retained reviewable evidence rather than raw output dumps."
+    }
+  ],
+  "failure_modes": [
+    {
+      "id": "markdown_official_input_accepted",
+      "failure_class": "Markdown accepted as official guard/compiler/runtime control input.",
+      "required_step": "S8",
+      "legacy_sources": [
+        "tests/skills/test_what_counts_as_done.py::test_runtime_compiler_emits_short_pointer_to_runtime_contract",
+        "tests/skills/test_required_answer_path.py::test_runtime_contract_indexes_required_answer_path",
+        "tests/skills/test_design_answer_method.py::test_runtime_contract_indexes_design_answer_path_check"
+      ],
+      "control_sources": [
+        "retired design control note for S8",
+        "retired goal control note for what counts as done"
+      ],
+      "json_regression_requirement": "Future JSON guard/compiler/runtime tests must prove that official requirements.md/design.md/goal.md/plan.md/review.md inputs are refused as control inputs while historical Markdown remains non-authoritative documentation.",
+      "future_assertions": [
+        "Passing path: complete run-directory JSON control chain is accepted.",
+        "Failing path: Markdown control artifact passed as official input is rejected with a hard-cut diagnostic."
+      ]
+    },
+    {
+      "id": "json_sidecar_accepted_while_markdown_authoritative",
+      "failure_class": "A JSON sidecar is accepted while Markdown remains the authoritative control source.",
+      "required_step": "S5",
+      "legacy_sources": [
+        "tests/skills/test_design_answer_method.py::test_orchestration_guard_requires_answer_method_sidecar_before_goal",
+        "tests/skills/test_design_answer_method.py::test_control_chain_guard_requires_answer_method_sidecar"
+      ],
+      "control_sources": [
+        "retired design answer-method note",
+        "retired requirements result-placement note"
+      ],
+      "json_regression_requirement": "Future tests must reject a partial sidecar migration where machine keys exist in JSON but semantic control facts are still read from Markdown.",
+      "future_assertions": [
+        "Failing path: sidecar-only requirements.control.json plus Markdown semantics is not a valid official JSON chain.",
+        "Passing path: semantic fields and registry bindings are both present in the JSON control files."
+      ]
+    },
+    {
+      "id": "approved_json_mutated_at_runtime",
+      "failure_class": "Runtime mutates approved requirements/design/goal/plan/review/runtime JSON instead of writing progress/status/report files only.",
+      "required_step": "S7",
+      "legacy_sources": [
+        "tests/skills/test_execution_horizon_authority.py::test_runtime_contract_requires_horizon_coverage_report_fields",
+        "tests/skills/test_artifact_hygiene.py::test_control_chain_guard_rejects_goal_hygiene_pollution"
+      ],
+      "control_sources": [
+        "retired design interfaces note",
+        "retired plan rule-that-cannot-change note"
+      ],
+      "json_regression_requirement": "Future runtime/verifier tests must detect any write attempt or content drift in approved control JSON and allow writes only to progress.jsonl, runtime-status.json, and final-report.json.",
+      "future_assertions": [
+        "Failing path: approved control JSON changes after runtime start.",
+        "Passing path: progress/status/final-report files change while approved JSON hashes remain stable."
+      ]
+    },
+    {
+      "id": "goal_achieved_verifier_bypass",
+      "failure_class": "goal_achieved true is accepted without verifier permission.",
+      "required_step": "S7",
+      "legacy_sources": [
+        "tests/skills/test_what_counts_as_done.py::test_guard_rejects_success_condition_with_non_achieved_status",
+        "tests/skills/test_what_counts_as_done.py::test_runtime_compiler_uses_non_achieved_reason_not_fallback_reason"
+      ],
+      "control_sources": [
+        "retired design control note for S7",
+        "retired goal success-condition note"
+      ],
+      "json_regression_requirement": "Future verifier tests must reject final-report.json with goal_achieved true unless verifier output explicitly permits the completion claim for the approved JSON chain.",
+      "future_assertions": [
+        "Failing path: final report sets goal_achieved true with missing, stale, or negative verifier result.",
+        "Passing path: final report can claim achieved only when verifier result permits it."
+      ]
+    },
+    {
+      "id": "forbidden_weaker_answer_method",
+      "failure_class": "A weaker answer method or forbidden substitute replaces the approved answer method.",
+      "required_step": "S9",
+      "legacy_sources": [
+        "tests/skills/test_design_answer_method.py::test_orchestration_guard_rejects_run_validation_substitution_before_goal",
+        "tests/skills/test_design_answer_method.py::test_orchestration_guard_rejects_missing_registry_mandatory_step",
+        "tests/skills/test_design_answer_method.py::test_control_chain_guard_requires_review_design_answer_path_check"
+      ],
+      "control_sources": [
+        "retired design control note for S9"
+      ],
+      "json_regression_requirement": "Future JSON regressions must validate answer_method_key, forbidden_substitute_key, mandatory answer-path nodes, and design-answer-method review status from JSON.",
+      "future_assertions": [
+        "Failing path: JSON chain chooses a forbidden weaker method or omits mandatory answer-path nodes.",
+        "Passing path: approved method key, mandatory nodes, and review check are present and coherent."
+      ]
+    },
+    {
+      "id": "supporting_only_counted_as_progress",
+      "failure_class": "Supporting-only work is counted as goal progress or required-step completion.",
+      "required_step": "S9",
+      "legacy_sources": [
+        "tests/skills/test_required_answer_path.py::test_guard_rejects_candidate_task_without_required_answer_path_nodes",
+        "tests/skills/test_required_answer_path.py::test_guard_rejects_candidate_task_with_only_required_answer_path_label",
+        "tests/skills/test_required_answer_path.py::test_progress_log_rules_track_required_answer_path_node_status"
+      ],
+      "control_sources": [
+        "retired plan progress-log note"
+      ],
+      "json_regression_requirement": "Future JSON progress tests must require explicit mainline/supporting-only roles and reject progress records that satisfy required steps using supporting-only work alone.",
+      "future_assertions": [
+        "Failing path: supporting-only task is marked as counts_as_goal_progress true.",
+        "Passing path: required-step status changes only through mainline transition evidence."
+      ]
+    },
+    {
+      "id": "not_done_report_treated_as_success",
+      "failure_class": "A partial, blocked, diagnostic, unavailable, invalid, fallback, or not-done report is treated as success.",
+      "required_step": "S9",
+      "legacy_sources": [
+        "tests/skills/test_what_counts_as_done.py::test_guard_rejects_target_contract_with_non_achieved_terminal_report_statuses",
+        "tests/skills/test_what_counts_as_done.py::test_guard_rejects_multiple_target_achieved_conditions",
+        "tests/skills/test_what_counts_as_done.py::test_runtime_compiler_uses_non_achieved_reason_not_fallback_reason"
+      ],
+      "control_sources": [
+        "retired goal final-report-fields note"
+      ],
+      "json_regression_requirement": "Future final-report schema and verifier tests must separate goal_achieved false reporting from the single achieved condition and reject alternate success statuses.",
+      "future_assertions": [
+        "Failing path: not-done report status is accepted as achieved.",
+        "Passing path: not-done report remains goal_achieved false with reason and smallest next action."
+      ]
+    },
+    {
+      "id": "authority_shrink",
+      "failure_class": "Approved work coverage is silently shrunk into a future roadmap, handoff, or out-of-scope item because direct execution authority is limited.",
+      "required_step": "S9",
+      "legacy_sources": [
+        "tests/skills/test_execution_horizon_authority.py::test_guard_rejects_future_roadmap_inside_approved_horizon_matrix",
+        "tests/skills/test_execution_horizon_authority.py::test_runtime_contract_requires_horizon_coverage_report_fields",
+        "tests/skills/test_execution_horizon_authority.py::test_guard_rejects_review_missing_horizon_authority_check"
+      ],
+      "control_sources": [
+        "retired plan work-coverage note"
+      ],
+      "json_regression_requirement": "Future JSON plan/final-report tests must account for each approved horizon item as executed, prepared-only, forbidden-not-executed, unavailable, or explicitly out-of-scope by what the user approved.",
+      "future_assertions": [
+        "Failing path: a covered item is moved to future roadmap or handoff without explicit approved exclusion.",
+        "Passing path: every covered item has a runtime handling classification and final report accounting."
+      ]
+    },
+    {
+      "id": "missing_review_checks",
+      "failure_class": "Required independent review checks are missing, failed, stale, or not rerun after substantive artifact changes.",
+      "required_step": "S9",
+      "legacy_sources": [
+        "tests/skills/test_design_answer_method.py::test_control_chain_guard_rejects_approved_review_with_failed_required_check",
+        "tests/skills/test_required_answer_path.py::test_guard_rejects_review_missing_required_answer_path_check",
+        "tests/skills/test_work_assignment_context.py::test_control_chain_guard_requires_review_of_context_work_assignment",
+        "tests/skills/test_execution_horizon_authority.py::test_guard_rejects_review_missing_horizon_authority_check"
+      ],
+      "control_sources": [
+        "retired review final-observer note"
+      ],
+      "json_regression_requirement": "Future JSON review tests must validate required review check results, independence flags, post-review mutation status, and final observer approval before runtime compilation or achieved reporting.",
+      "future_assertions": [
+        "Failing path: review status says approved while a required check is absent, failed, stale, or not rerun after mutation.",
+        "Passing path: review JSON records all required checks and final observer state as approved."
+      ]
+    }
+  ],
+  "s9_s10_support": {
+    "supports_s9_by": "Listing the exact old accident classes and future JSON assertions that must be ported once schema/protocol/verifier implementation exists.",
+    "supports_s10_by": "Providing a stable manifest that final integration can inspect as regression-inventory evidence.",
+    "does_not_establish": [
+      "S9 complete",
+      "S10 complete",
+      "JSON guard/compiler conversion complete",
+      "runtime verifier implemented",
+      "Markdown official input rejected today"
+    ]
+  }
+}

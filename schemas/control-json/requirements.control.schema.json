@@ -1,0 +1,120 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://cybernetic-goals.local/schemas/control-json/requirements.control.schema.json",
+  "title": "Cybernetic Requirements Control",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "artifact_type",
+    "schema_version",
+    "status",
+    "approved_control",
+    "registry_bindings"
+  ],
+  "properties": {
+    "artifact_type": {
+      "const": "requirements.control"
+    },
+    "schema_version": {
+      "type": "string",
+      "minLength": 1
+    },
+    "status": {
+      "enum": [
+        "approved"
+      ]
+    },
+    "approved_control": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "human_purpose",
+        "primary_object",
+        "requested_transformation",
+        "non_goals",
+        "how_we_know_purpose_was_met",
+        "where_result_must_show_up",
+        "what_counts_as_done",
+        "final_answer_format"
+      ],
+      "properties": {
+        "human_purpose": {
+          "type": "string",
+          "minLength": 1
+        },
+        "primary_object": {
+          "type": "string",
+          "minLength": 1
+        },
+        "requested_transformation": {
+          "type": "string",
+          "minLength": 1
+        },
+        "non_goals": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "how_we_know_purpose_was_met": {
+          "type": "string",
+          "minLength": 1
+        },
+        "where_result_must_show_up": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "what_counts_as_done": {
+          "type": "string",
+          "minLength": 1
+        },
+        "final_answer_format": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "medium",
+            "required_structure"
+          ],
+          "properties": {
+            "medium": {
+              "type": "string",
+              "minLength": 1
+            },
+            "required_structure": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          }
+        }
+      }
+    },
+    "registry_bindings": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "answer_method_key",
+        "forbidden_substitute_key"
+      ],
+      "properties": {
+        "answer_method_key": {
+          "type": "string",
+          "minLength": 1
+        },
+        "forbidden_substitute_key": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    }
+  }
+}

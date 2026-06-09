@@ -21,7 +21,7 @@ It decides whether the task needs:
 
 - no cybernetic workflow
 - an inline `/goal`
-- a bounded file-based goal
+- a bounded JSON-backed goal
 - rubric analysis before a bounded/evaluation goal
 - solution design before goal writing
 - the full pre-goal pipeline
@@ -36,7 +36,7 @@ Does this task mention complex concepts?
 The key routing question is:
 
 ```text
-Would the execution agent otherwise need to invent or revise goal files, requirement meaning, solution structure, evidence checks, execution policy, or phase checks during runtime?
+Would the execution agent otherwise need to invent or revise goal control JSON, requirement meaning, solution structure, evidence checks, execution policy, or phase checks during runtime?
 ```
 
 For evaluation tasks, also ask:
@@ -85,7 +85,7 @@ Every routing response must include:
 7. `Recommended next step`
 8. `Rejected workflow, if any`
 
-Do not create files. Do not run target execution. Do not write a goal file. Do not write an execution policy.
+Do not create files. Do not run target execution. Do not write goal control JSON. Do not write an execution policy.
 
 Routing recommendations and handoff prompts are response-only. Do not write them into requirements, design, goal, plan, review, progress, or orchestration-status artifacts.
 
@@ -230,7 +230,7 @@ Signals:
 - clear success condition
 - one or two verification places
 - no unresolved requirement meaning
-- no need for a persistent goal file
+- no need for persistent goal control JSON
 
 Recommended next step:
 
@@ -238,7 +238,7 @@ Recommended next step:
 $writing-cybernetic-goals 为这个明确小任务写 inline /goal：<需求>
 ```
 
-### Level 2: Bounded File Goal or Bounded Repair Goal
+### Level 2: Bounded JSON Goal or Bounded Repair Goal
 
 Use when the task is multi-file or has moderate verification needs, but the control meaning are already fixed.
 
@@ -251,7 +251,7 @@ Signals:
 - localized correction across observer output, source fixture, evidence channel, documentation, or one bounded workflow
 - wide read-only audit with fixed classification meaning, an explicit evaluation rubric, and a fixed report artifact
 - moderate verification needs
-- a persistent small goal file may help, but a full pre-goal pipeline would be too heavy
+- persistent `goal.control.json` and `runtime.control.json` may help, but a full pre-goal pipeline would be too heavy
 
 Recommended next step options:
 
@@ -262,12 +262,12 @@ Use a bounded repair prompt.
 or:
 
 ```text
-$writing-cybernetic-goals 为这个有界修正创建小型文件 goal：<需求>
+$writing-cybernetic-goals 为这个有界修正创建 goal.control.json 和 runtime.control.json：<需求>
 ```
 
-For Level 2 bounded file goals, the expected next step after goal creation is a direct `/goal` execution command against that small goal file. Do not recommend `$writing-cybernetic-execution-policies` by default unless the user explicitly asks for it or the task exposes unresolved control decisions.
+For Level 2 bounded JSON goals, the expected next step after goal creation is a short `/goal` pointer to `runtime.control.json` using `.agents/skills/using-control-json`. Do not recommend `$writing-cybernetic-execution-policies` by default unless the user explicitly asks for it or the task exposes unresolved control decisions.
 
-If an audit/evaluation/status-classification task names labels such as `已闭环`, `部分闭环`, `未闭环`, or `不可判定` but does not define the evidence rubric for those labels, keep the route at Level 2 and mark `rubric check: required` before creating the bounded file goal.
+If an audit/evaluation/status-classification task names labels such as `已闭环`, `部分闭环`, `未闭环`, or `不可判定` but does not define the evidence rubric for those labels, keep the route at Level 2 and mark `rubric check: required` before creating the bounded JSON goal.
 
 If an existing feature has approved artifacts, reference them:
 
@@ -295,7 +295,7 @@ $analyzing-cybernetic-requirements 分析这个 bounded audit/evaluation 的评�
 After rubric analysis is complete:
 
 ```text
-$writing-cybernetic-goals 为这个 Level 2 有界任务创建小型文件 goal，并在完成后给出直接 /goal 执行命令，不要默认建议 execution policy：<任务 + confirmed rubric>
+$writing-cybernetic-goals 为这个 Level 2 有界任务创建 goal.control.json 和 runtime.control.json，并在完成后给出指向 runtime.control.json 的短 /goal，不要默认建议 execution policy：<任务 + confirmed rubric>
 ```
 
 ### Level 3: Full Pre-goal Pipeline
