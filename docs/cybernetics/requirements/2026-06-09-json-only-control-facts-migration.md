@@ -6,7 +6,7 @@ Status: `Complete`
 
 ## What the User Approved
 
-Status: `Pending`
+Status: `Approved`
 
 Allowed values: `Pending / Approved / Rejected / Needs Revision / Not required`
 
@@ -42,9 +42,9 @@ Approval applies only to this compact control commitment.
 
 Approval record:
 
-- Approved by: `not approved`
-- Approval phrase or source: `not approved`
-- Approval time/context: `2026-06-09 requirements analysis`
+- Approved by: `human`
+- Approval phrase or source: `批准这个 What the User Approved,给出orchestration的推荐prompt`
+- Approval time/context: `2026-06-09 current chat message`
 
 If Status is not `Approved`, downstream full pre-goal orchestration must not start.
 
