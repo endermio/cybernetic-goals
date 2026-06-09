@@ -60,6 +60,14 @@ def outcome_covered_control_run_files() -> dict[str, dict]:
     return fixture_by_file
 
 
+def candidate_design_plan_control_run_files() -> dict[str, dict]:
+    fixture_by_file = copy.deepcopy(control_run_files())
+    fixture_by_file["design.control.json"]["status"] = "candidate"
+    fixture_by_file["plan.control.json"]["status"] = "candidate"
+    apply_integrity_metadata(fixture_by_file)
+    return fixture_by_file
+
+
 def write_control_run(run_dir: Path, include_runtime: bool = True, fixture_by_file: dict[str, dict] | None = None) -> None:
     if fixture_by_file is None:
         fixture_by_file = control_run_files()
@@ -108,6 +116,41 @@ class JsonOfficialGuardCompilerPathTest(unittest.TestCase):
             payload = json.loads(result.stdout)
             self.assertTrue(payload["ok"])
             self.assertEqual(payload["next_allowed_action"], "RunRuntimeCompile")
+
+    def test_control_chain_guard_rejects_candidate_design_or_plan_before_runtime_compile(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            run_dir = Path(tmpdir)
+            write_control_run(run_dir, fixture_by_file=candidate_design_plan_control_run_files())
+
+            result = subprocess.run(
+                ["python3", str(CONTROL_GUARD), "--run-dir", str(run_dir)],
+                text=True,
+                capture_output=True,
+            )
+
+            self.assertNotEqual(result.returncode, 0, result.stdout + result.stderr)
+            self.assertIn("design.control.json status must be approved", result.stdout + result.stderr)
+            self.assertIn("plan.control.json status must be approved", result.stdout + result.stderr)
+
+    def test_compile_runtime_goal_rejects_candidate_design_or_plan_without_writing_runtime(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            run_dir = Path(tmpdir)
+            write_control_run(
+                run_dir,
+                include_runtime=False,
+                fixture_by_file=candidate_design_plan_control_run_files(),
+            )
+
+            result = subprocess.run(
+                ["python3", str(COMPILER), "--run-dir", str(run_dir)],
+                text=True,
+                capture_output=True,
+            )
+
+            self.assertNotEqual(result.returncode, 0, result.stdout + result.stderr)
+            self.assertIn("design.control.json status must be approved", result.stdout + result.stderr)
+            self.assertIn("plan.control.json status must be approved", result.stdout + result.stderr)
+            self.assertFalse((run_dir / "runtime.control.json").exists())
 
     def test_compile_runtime_goal_reads_json_run_dir_writes_runtime_control_and_prints_short_goal_pointer(self):
         with tempfile.TemporaryDirectory() as tmpdir:

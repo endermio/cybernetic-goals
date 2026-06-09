@@ -12,6 +12,7 @@ from control_chain_guard import (
     control_file_hash,
     read_json_object,
     reject_markdown_control_artifacts,
+    require_approved_control_inputs,
     validate_json_control_run,
 )
 
@@ -47,6 +48,15 @@ def compile_runtime_control(run_dir: Path) -> Path:
         goal = read_json_object(run_dir / "goal.control.json")
         plan = read_json_object(run_dir / "plan.control.json")
         review = read_json_object(run_dir / "review.control.json")
+        require_approved_control_inputs(
+            {
+                "requirements.control.json": requirements,
+                "design.control.json": design,
+                "goal.control.json": goal,
+                "plan.control.json": plan,
+                "review.control.json": review,
+            }
+        )
 
         plan_bindings = plan.get("registry_bindings", {})
         required_outcomes = plan.get("verifier", {}).get("required_outcomes")

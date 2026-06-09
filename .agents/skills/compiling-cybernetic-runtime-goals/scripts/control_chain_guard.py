@@ -48,6 +48,17 @@ REVIEW_HASH_FILES = [
     "goal.control.json",
     "plan.control.json",
 ]
+APPROVED_INPUT_STATUSES = {
+    "requirements.control.json": "approved",
+    "design.control.json": "approved",
+    "goal.control.json": "approved",
+    "plan.control.json": "approved",
+    "review.control.json": "approved",
+}
+COMPILED_RUN_STATUSES = {
+    **APPROVED_INPUT_STATUSES,
+    "runtime.control.json": "compiled",
+}
 
 
 class ControlJsonValidationError(Exception):
@@ -86,6 +97,20 @@ def require_hashes(label: str, actual: Any, expected: dict[str, str]) -> None:
     for filename, expected_hash in expected.items():
         if actual.get(filename) != expected_hash:
             raise ControlJsonValidationError(f"{label}: approved_control_hashes mismatch for {filename}")
+
+
+def require_control_statuses(artifacts: dict[str, dict[str, Any]], expected_statuses: dict[str, str]) -> None:
+    errors = [
+        f"{filename} status must be {expected}"
+        for filename, expected in expected_statuses.items()
+        if artifacts.get(filename, {}).get("status") != expected
+    ]
+    if errors:
+        raise ControlJsonValidationError("; ".join(errors))
+
+
+def require_approved_control_inputs(artifacts: dict[str, dict[str, Any]]) -> None:
+    require_control_statuses(artifacts, APPROVED_INPUT_STATUSES)
 
 
 def read_json_object(path: Path) -> dict[str, Any]:
@@ -219,6 +244,8 @@ def validate_json_control_run(run_dir: Path) -> dict[str, dict[str, Any]]:
         schema = read_json_object(SCHEMA_DIR / schema_name)
         validate_json_schema(artifact, schema, f"${filename}")
         artifacts[filename] = artifact
+
+    require_control_statuses(artifacts, COMPILED_RUN_STATUSES)
 
     runtime = artifacts["runtime.control.json"]
     semantic_base = artifacts["requirements.control.json"].get("approved_control", {}).get("semantic_base")
