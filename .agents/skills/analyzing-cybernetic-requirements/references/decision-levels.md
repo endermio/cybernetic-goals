@@ -19,9 +19,9 @@ Do not ask by default. Record the assumption and allow override.
 
 Examples:
 
-- partial results are surfaced with failed source markers
+- partial results are placed with failed source markers
 - multiple source results are sorted by a confirmed ordering rule
-- unreachable sources are surfaced as observer-visible warnings
+- unreachable sources are placed as observer-visible warnings
 - existing excluded capabilities remain out of scope unless reopened
 
 ## Level 3: Deferred Design / Planning / Execution Detail

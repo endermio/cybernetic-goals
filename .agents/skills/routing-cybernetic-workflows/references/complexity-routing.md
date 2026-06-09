@@ -35,7 +35,7 @@ Level 3:
 - Decide what the controlled relationship means for the first time.
 - Decide direct observation vs intermediary reporting.
 - Decide entity mapping and authorization model.
-- Decide objects, relationships, boundaries, information flow, or evidence model for a new solution.
+- Decide objects, relationships, limits, information flow, or evidence model for a new solution.
 - Execute new multi-subsystem work without approved approved files.
 
 Level 4:

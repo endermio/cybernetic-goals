@@ -31,9 +31,6 @@ STATUS_ALIASES = {
     "已审查": "Reviewed",
 }
 
-LEGACY_SENSOR_GOVERNANCE = "Sensor / " + "T" + "est Governance"
-LEGACY_SENSOR_RETIREMENT = "Old " + "T" + "est Retirement and Rewrite Policy"
-
 
 def read(path: str) -> str:
     p = Path(path)
@@ -90,11 +87,11 @@ def first_section_status(text: str, *headings: str) -> str | None:
     return None
 
 
-def design_gate_required(*texts: str) -> bool:
+def design_check_required(*texts: str) -> bool:
     combined = "\n".join(texts)
     for line in combined.splitlines():
         lowered = line.casefold()
-        if "design gate" not in lowered:
+        if "design check" not in lowered:
             continue
         if re.search(r"not\s+required|not\s+applicable|satisfied", lowered):
             continue
@@ -150,7 +147,7 @@ def main() -> int:
             ("Current Understanding", ["Current Understanding"]),
             ("Confirmed Requirement Decisions", ["Confirmed Requirement Decisions", "Confirmed Decisions From Human"]),
             ("Non-Goals", ["Non-Goals"]),
-            ("Candidate Sensors / Evidence Needs", ["Candidate Sensors / Evidence Needs", "Candidate Verification Concerns", "Draft Verification Strategy"]),
+            ("Candidate Evidence checks / Evidence Needs", ["Candidate Evidence checks / Evidence Needs"]),
         ], errors)
         st = first_section_status(requirements, "Requirements Analysis Status", "Clarification Status")
         if st != "Complete":
@@ -158,8 +155,9 @@ def main() -> int:
 
     if design:
         check_required_sections("design", design, [
-            "Design Status", "Source Contracts", "Human Purpose", "Confirmed Semantics",
-            "Design Substrate", "Conceptual Design", "Detailed Design",
+            "Design Status", "Source Contracts", "Human Purpose", "Confirmed Meaning",
+            "Design Workflow", "Answer Method Check", "Required Answer Path",
+            "What Supports Each Required Step", "Design Details Tied To Required Steps",
             "Design-to-Goal Mapping", "Design-to-Execution Mapping",
             "Open Design Questions", "Design Review Requirements"
         ], errors)
@@ -168,13 +166,13 @@ def main() -> int:
             warnings.append(f"design: expected Status under ## Design Status to be Candidate, Reviewed, or Approved, got {st!r}")
         if args.requirements not in design:
             warnings.append("design: does not reference requirements path literally")
-    elif design_gate_required(requirements, goal, plan, review or ""):
-        errors.append("design: Design Gate required but --design was not provided")
+    elif design_check_required(requirements, goal, plan, review or ""):
+        errors.append("design: Design Check required but --design was not provided")
 
     if goal:
         check_required_sections("goal", goal, [
             "Human Purpose", "Objective", "Success Condition", "Source of Truth",
-            "Scope and Boundaries", "Invariants", "Verification Surface",
+            "Scope and Limits", "Rules That Cannot Change", "Verification Place",
             "Stop Conditions", "Blocked Report Format", "Final Report Format"
         ], errors)
         if args.requirements not in goal:
@@ -194,18 +192,18 @@ def main() -> int:
         check_required_section_groups("plan", plan, [
             ("Execution Policy Status", ["Execution Policy Status"]),
             ("Source Contracts", ["Source Contracts"]),
-            ("Superpowers Planning Substrate", ["Superpowers Planning Substrate"]),
-            ("Confirmed Semantic Invariants", ["Confirmed Semantic Invariants"]),
+            ("Superpowers Planning Workflow", ["Superpowers Planning Workflow"]),
+            ("Rules That Cannot Change", ["Rules That Cannot Change"]),
             ("Tactical Degrees of Freedom", ["Tactical Degrees of Freedom"]),
             ("Dependency Matrix", ["Dependency Matrix"]),
-            ("Execution Granularity and Sensor Budget", ["Execution Granularity and Sensor Budget"]),
+            ("Work Size And Evidence Check Budget", ["Work Size And Evidence Check Budget"]),
             ("Batch Cadence", ["Batch Cadence"]),
             ("Destructive Intermediate-State Policy", ["Destructive Intermediate-State Policy"]),
             ("Output Material / Evidence Collection", ["Output Material / Evidence Collection"]),
             ("Evidence Lifecycle / Evidence Budget", ["Evidence Lifecycle / Evidence Budget"]),
-            ("Sensor / Evidence Governance", ["Sensor / Evidence Governance", LEGACY_SENSOR_GOVERNANCE]),
-            ("Stale Sensor Retirement and Rewrite Policy", ["Stale Sensor Retirement and Rewrite Policy", LEGACY_SENSOR_RETIREMENT]),
-            ("Phase Gates", ["Phase Gates"]),
+            ("Evidence check / Evidence Governance", ["Evidence check / Evidence Governance"]),
+            ("Stale Evidence check Retirement and Rewrite Policy", ["Stale Evidence check Retirement and Rewrite Policy"]),
+            ("Phase Checks", ["Phase Checks"]),
             ("Execution Rhythm", ["Execution Rhythm"]),
             ("Stop Conditions", ["Stop Conditions"]),
             ("Progress Log Rules", ["Progress Log Rules"]),
@@ -227,13 +225,13 @@ def main() -> int:
             ("Review Independence", ["Review Independence"]),
             ("Final Observer Check", ["Final Observer Check"]),
             ("Requirement Traceability", ["Requirement Traceability"]),
-            ("Goal Fidelity", ["Goal Fidelity"]),
-            ("Design Fidelity", ["Design Fidelity"]),
-            ("Output Contract Fidelity", ["Output Contract Fidelity"]),
-            ("Control Law Quality", ["Control Law Quality"]),
-            ("Execution Granularity / Sensor Load", ["Execution Granularity / Sensor Load"]),
+            ("Goal Check", ["Goal Check"]),
+            ("Design Check", ["Design Check"]),
+            ("Output Contract Check", ["Output Contract Check"]),
+            ("Is The Plan Controllable", ["Is The Plan Controllable"]),
+            ("Is The Work Split At The Right Size", ["Is The Work Split At The Right Size"]),
             ("Evidence Lifecycle / Evidence Budget", ["Evidence Lifecycle / Evidence Budget"]),
-            ("Sensor / Evidence Governance", ["Sensor / Evidence Governance", LEGACY_SENSOR_GOVERNANCE]),
+            ("Evidence check / Evidence Governance", ["Evidence check / Evidence Governance"]),
             ("Batch Rhythm", ["Batch Rhythm"]),
             ("Runtime Suitability", ["Runtime Suitability"]),
             ("Final Decision", ["Final Decision"]),

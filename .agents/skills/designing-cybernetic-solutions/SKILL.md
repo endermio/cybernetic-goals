@@ -41,7 +41,7 @@ Owned design:
 Routed elsewhere:
 
 - unresolved requirement meaning return to `$analyzing-cybernetic-requirements`;
-- goal contracts go to `$writing-cybernetic-goals`;
+- goal files go to `$writing-cybernetic-goals`;
 - execution policies go to `$writing-cybernetic-execution-policies`;
 - whole-chain review goes to `$reviewing-cybernetic-control-structures`;
 - runtime `/goal` compilation goes to `$compiling-cybernetic-runtime-goals`;
@@ -139,7 +139,7 @@ When What the User Approved records `How this should be answered` or `What is no
 
 The design must not replace the approved answering method with a weaker answer path because it is easier to execute or verify. If the approved answer method is insufficient, infeasible, or unsuitable, stop and return to `$analyzing-cybernetic-requirements` for What the User Approved revision instead of substituting another answer path.
 
-Use `.agents/skills/references/task-skeleton-registry.json` internally for required-step sets, forbidden substitutions, minimum evidence, and review red flags. Do not expose the internal registry label in the user-visible design. If the approved answer method is missing from the registry, record the gap and return to requirements approval or design-maintenance work rather than inventing an unreviewed family.
+Use `.agents/skills/references/answer-method-registry.json` internally for required-step sets, forbidden substitutions, minimum evidence, and review red flags. Do not expose the internal registry label in the user-visible design. If the approved answer method is missing from the registry, record the gap and return to requirements approval or design-maintenance work rather than inventing an unreviewed family.
 
 For `coverage-ceiling-measurement`, the design must instantiate a coverage answer path with these mandatory nodes:
 
@@ -164,7 +164,7 @@ The design artifact must include:
 6. Answer Method Check, when What the User Approved records an answering method or what is not enough
 7. Required Answer Path
 8. What Supports Each Required Step
-9. Detailed Design
+9. Design Details Tied To Required Steps
 10. Final Answer Format Design, when Final Answer Format Check requires structure synthesis
 11. Design-to-Goal Mapping
 12. Design-to-Execution Mapping
@@ -176,7 +176,7 @@ The design artifact must include:
 Use one of:
 
 - `Candidate`: created by this skill and not independently reviewed or explicitly approved.
-- `Reviewed`: independent design/control review was performed but the full approved work chain is not approved yet.
+- `Reviewed`: independent design/review was performed but the full approved work chain is not approved yet.
 - `Approved`: explicit human approval or independent review allows this design to be treated as approved input.
 
 Do not mark self-authored design `Approved` solely because it looks consistent.
@@ -188,13 +188,13 @@ Open design questions that affect requirement meaning, controlled relationships,
 1. Read the completed requirements analysis brief.
 2. For Level 3/4 or full pre-goal work, verify `What the User Approved: Approved` before deriving or writing the design.
 3. Derive the design path from the requirements path.
-4. Inspect the routing context from the user request, router output, and requirements gates.
+4. Inspect the routing context from the user request, router output, and requirements checks.
 5. Inspect only enough context to avoid generic design.
 6. Identify whether `$superpowers:brainstorming` is required, used, blocked, or not required.
 7. If What the User Approved records an answering method or what is not enough, instantiate that answer path and record Answer Method Check before deriving any model.
 8. Build the target answer path instance: answer path nodes, answer/state transitions, required evidence, and completion conditions.
 9. Derive the what supports each required step from answer path nodes: support objects, mechanisms, relationships, flows, inside/outside choices, alternatives, and rules that cannot change.
-10. Build the detailed model from the support mapping: mechanisms, interfaces/contracts, state/lifecycle, failure model, evidence/evidence check model, compatibility/integration, decisions.
+10. Write design details only as required-step mappings: mechanisms, interfaces/contracts, state/lifecycle, failure model, evidence/evidence check model, compatibility/integration, and decisions must each name the required step they support or be marked supporting-only.
 11. If Final Answer Format Check requires structure synthesis, design the output structure and evidence-reference rules.
 12. Separate design rules that cannot change from tactical degrees of freedom.
 13. Map answer path and support model elements to goal implications and execution-policy implications.
@@ -207,7 +207,7 @@ Do not write handoff prompts into the design artifact.
 
 After design is sufficient, choose the response-only handoff from routing context:
 
-- If the task is Level 3, Level 4, full pre-goal work, or the requirements gates show `execution-plan check: required` or `review check: required`, hand off to `$orchestrating-cybernetic-pregoal`.
+- If the task is Level 3, Level 4, full pre-goal work, or the requirements checks show `execution-plan check: required` or `review check: required`, hand off to `$orchestrating-cybernetic-pregoal`.
 - If the task is Level 2 bounded work and no execution-policy or control-review check is required, hand off to `$writing-cybernetic-goals`.
 - If routing context is absent or contradictory, do not default to `$writing-cybernetic-goals`; report that the original routing decision is needed.
 
@@ -253,12 +253,12 @@ Smallest input needed:
 
 Response-only next step:
 - If requirements analysis is incomplete or has blocking human decisions: return to `$analyzing-cybernetic-requirements` with the missing decision.
-- If Level 3/4 or full pre-goal work lacks `What the User Approved: Approved`: return to `$analyzing-cybernetic-requirements` for setpoint approval or revision.
+- If Level 3/4 or full pre-goal work lacks `What the User Approved: Approved`: return to `$analyzing-cybernetic-requirements` for approved target approval or revision.
 - If a design decision is missing: answer the smallest design question, then rerun `$designing-cybernetic-solutions`.
-- For Level 3/4 or full pre-goal work: return this blocked status to `$orchestrating-cybernetic-pregoal`; do not write the goal contract.
+- For Level 3/4 or full pre-goal work: return this blocked status to `$orchestrating-cybernetic-pregoal`; do not write the goal file.
 - If the human explicitly says required design is unnecessary: return to the route-appropriate next stage.
 
-Do not write the goal contract until this design decision is resolved or the human explicitly says the required design is unnecessary.
+Do not write the goal file until this design decision is resolved or the human explicitly says the required design is unnecessary.
 ```
 
 ## Validation Checklist
@@ -280,4 +280,4 @@ Do not write the goal contract until this design decision is resolved or the hum
 - [ ] The design artifact does not contain a next-step prompt.
 - [ ] If blocked, the assistant response includes a response-only next step.
 - [ ] Level 3/4 or full pre-goal work hands off to `$orchestrating-cybernetic-pregoal`, not directly to `$writing-cybernetic-goals`.
-- [ ] No goal, execution policy, control review, runtime `/goal`, or target-work artifact was created.
+- [ ] No goal, execution policy, review, runtime `/goal`, or target-work artifact was created.

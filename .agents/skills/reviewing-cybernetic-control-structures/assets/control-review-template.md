@@ -1,4 +1,4 @@
-# Control Structure Review: [Name]
+# Review: [Name]
 
 ## Review Status
 
@@ -27,8 +27,8 @@ Status: `Needs Revision`
   - What counts as done check: `yes/no`
   - answer path check: `yes/no`
   - Work covered in this run and authority check: `yes/no`
-  - Subagent concurrency check: `yes/no`
-  - Execution granularity / evidence check load: `yes/no`
+  - Parallel agent safety check: `yes/no`
+  - Work size / evidence check load: `yes/no`
   - Evidence check governance: `yes/no`
   - Execution cadence: `yes/no`
   - Runtime safety: `yes/no`
@@ -90,7 +90,7 @@ Check:
 
 - requirements analysis contains `What the User Approved: Approved` when full pre-goal orchestration is used;
 - goal preserves the approved compact control commitment;
-- design, goal, and execution policy do not reinterpret human purpose, input role binding, primary object, requested transformation, non-goals, How We Know The User Purpose Was Met, Where The Result Must Show Up, Final Answer Format, workflow fit, or known assumptions;
+- design, goal, and execution policy do not reinterpret human purpose, input role binding, primary object, requested transformation, non-goals, How We Know The User Purpose Was Met, Where The Result Must Show Up, Final Answer Format, why this process is needed, or known assumptions;
 - downstream artifacts do not expand or change the what the user approved without explicit human reapproval.
 
 Findings:
@@ -135,7 +135,7 @@ Findings:
 
 - [finding]
 
-## Control Law Quality
+## Is The Plan Controllable
 
 Findings:
 
@@ -147,12 +147,12 @@ Check:
 
 - selected work assignment is explicit;
 - Level 3/4 main-only execution has a context-load justification;
-- delegated work packages define Context pack, Allowed actions, Return format, and Integration check;
+- delecheckd work packages define Context pack, Allowed actions, Return format, and Integration check;
 - context packs include relevant control excerpts, current batch objective, allowed artifacts/places, forbidden changes, required evidence checks/evidence, stop conditions, and expected return format;
 - parallel subagent-driven execution has explicit human approval, dependency independence, and control-review approval;
-- subagents cannot modify approved files, widen scope, replace work assignment, or bypass integration gates;
+- subagents cannot modify approved files, widen scope, replace work assignment, or bypass integration checks;
 - main agent owns dispatch, integration, progress log, and stop-condition detection;
-- context compression is defined for batch boundaries;
+- context compression is defined for batch limits;
 - subagent outputs remain candidate results until main-agent integration;
 - context overload is not assigned to the main agent.
 
@@ -160,13 +160,13 @@ Findings:
 
 - [finding]
 
-## Execution Granularity / Evidence check Load
+## Is The Work Split At The Right Size
 
 Check:
 
 - batches are coherent intended-result slices, not mechanical micro-steps;
 - the plan chooses the largest coherent batch that remains diagnosable;
-- broad verification is assigned to integration or final gates unless justified;
+- broad verification is assigned to integration or final checks unless justified;
 - evidence check cost does not dominate execution cost;
 - stale evidence checks cannot block approved structural change without evidence check-governance review.
 
@@ -222,7 +222,7 @@ Findings:
 Check:
 
 - there is exactly one what counts as done;
-- no partial, diagnostic, blocked, invalid, unavailable, fallback, or report when not done appears in Success Condition;
+- no partial, diagnostic, blocked, invalid, unavailable, fallback, or not done report appears in Success Condition;
 - no report-when-not-done status is listed under done states;
 - execution policy includes a target-producing action or proof-of-impossibility path;
 - the plan cannot terminate with `goal achieved: yes` without satisfying the what counts as done;
@@ -263,7 +263,7 @@ Findings:
 
 - [finding]
 
-## Subagent Concurrency Check
+## Parallel Agent Safety Check
 
 Check:
 
@@ -276,7 +276,7 @@ Check:
 - parallel subagent-driven execution has dependency independence, concurrency frontier, wave matrix, conflict / lock model, integration barriers, and failure policy;
 - no parallel work package can modify the same place without a lock rule or barrier;
 - subagent outputs remain candidate results until main-agent integration;
-- selected agent workflow fits the approved work packages.
+- selected agent workflow matches the approved work packages.
 
 Findings:
 
@@ -346,14 +346,14 @@ The approved work chain may be approved only if:
 - any upstream output contract is preserved in the goal and supported by the execution policy;
 - execution policy preserves goal and requirements analysis;
 - execution work assignment is explicit and does not create main-agent context overload;
-- execution granularity and evidence check load do not create micro-step overcontrol or evidence check overcoupling;
+- work size and evidence check load do not create micro-step overcontrol or evidence check overcoupling;
 - evidence lifecycle keeps tracked evidence reviewable and prevents raw evidence check output explosion;
 - purpose feedback adequacy supports the permitted completion wording and does not confuse internal progress evidence with purpose achievement;
 - realization place result placement adequacy supports result claim wording and does not confuse local action with global realization;
 - target achievement what counts as done check preserves a what counts as done;
 - required answer path check preserves an actor-centered state-transition path and work-package mapping;
 - work covered in this run and authority check preserves the approved horizon and does not convert authority limits into out-of-scope roadmap items;
-- subagent concurrency check preserves the approved execution mode, wave/barrier model, and main-agent integration rule;
+- parallel agent safety check preserves the approved execution mode, wave/barrier model, and main-agent integration rule;
 - evidence check/evidence governance is explicit;
 - batch cadence is explicit;
 - runtime execution does not need to synthesize a new plan.

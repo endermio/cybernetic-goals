@@ -27,7 +27,7 @@ Status: `Approved`
 | How We Know The User Purpose Was Met | final approval remains downstream |
 | Where The Result Must Show Up | not applicable to predictor fixture |
 | Final Answer Format | response-only handoff text |
-| Workflow fit | full pre-goal orchestration |
+| Why this process is needed | full pre-goal orchestration |
 | Known assumptions | fixture-only |
 """
 
@@ -76,7 +76,7 @@ class PregoalHandoffPredictorTest(unittest.TestCase):
             capture_output=True,
         )
 
-    def test_generates_queue_friendly_handoff_for_approved_setpoint(self):
+    def test_generates_queue_friendly_handoff_for_approved_target(self):
         with tempfile.TemporaryDirectory() as tmpdir:
             requirements = self.write_requirements(Path(tmpdir))
             result = self.run_script(requirements)
@@ -85,7 +85,7 @@ class PregoalHandoffPredictorTest(unittest.TestCase):
         self.assertIn("$orchestrating-cybernetic-pregoal", result.stdout)
         self.assertIn(str(requirements), result.stdout)
         self.assertIn("Predicted runtime contract path:", result.stdout)
-        self.assertIn("/goal Execute the runtime goal contract at", result.stdout)
+        self.assertIn("/goal Execute the runtime goal file at", result.stdout)
         self.assertNotIn("/goal Execute the approved execution policy", result.stdout)
         self.assertIn("docs/cybernetics/runtime-goals/2026-06-06-predictor.goal.md", result.stdout)
         self.assertIn("docs/cybernetics/goals/2026-06-06-predictor.md", result.stdout)
@@ -96,7 +96,7 @@ class PregoalHandoffPredictorTest(unittest.TestCase):
         self.assertIn("compile_runtime_goal.py", result.stdout)
         self.assertIn("Predicted", result.stdout)
 
-    def test_blocks_when_human_setpoint_is_not_approved(self):
+    def test_blocks_when_user_approval_is_not_approved(self):
         with tempfile.TemporaryDirectory() as tmpdir:
             requirements = self.write_requirements(
                 Path(tmpdir),

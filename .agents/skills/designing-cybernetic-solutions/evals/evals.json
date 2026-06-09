@@ -4,13 +4,14 @@
     {
       "id": "creates-general-solution-design-from-requirements-analysis",
       "prompt": "使用 $designing-cybernetic-solutions 根据 docs/cybernetics/requirements/2026-05-22-control-relationship.md 创建 solution design。需求语义已经确认，但 Actor A、Group B、Entity C、identifier、记录观测和观察表面概念需要形成解决方案模型。",
-      "expected_output": "Create docs/cybernetics/designs/2026-05-22-control-relationship.md with conceptual and detailed design sections, without creating a goal, plan, control review, or runtime /goal.",
+      "expected_output": "Create docs/cybernetics/designs/2026-05-22-control-relationship.md with required answer path, support mapping, and design details tied to required steps, without creating a goal, plan, review, or runtime /goal.",
       "assertions": [
         "Creates or references docs/cybernetics/designs/2026-05-22-control-relationship.md.",
-        "Includes Conceptual Design with core objects/actors/roles, relationships, information/state flow, boundaries, alternatives, and conceptual invariants.",
-        "Includes Detailed Design with components/mechanisms, interfaces/contracts, lifecycle/state model, error/failure model, evidence/evidence check model, compatibility/integration, and design decisions.",
+        "Includes Required Answer Path before support objects or mechanisms.",
+        "Includes What Supports Each Required Step.",
+        "Includes Design Details Tied To Required Steps where mechanisms, interfaces/contracts, lifecycle/state model, error/failure model, evidence/evidence check model, compatibility/integration, and design decisions each map to a required step or supporting-only role.",
         "Includes Design-to-Goal Mapping and Design-to-Execution Mapping.",
-        "Does not write a goal contract.",
+        "Does not write a goal file.",
         "Does not write an execution policy.",
         "Does not output a runtime /goal."
       ]
@@ -33,7 +34,7 @@
       "prompt": "使用 $designing-cybernetic-solutions 创建 solution design，但设计过程中发现一个 blocking open design question：Evidence Channel C 到 Controlled Object A 的关系无法从 requirements 推断。",
       "expected_output": "Report Solution design blocked with the smallest input needed and a response-only next step that resolves the design decision before rerunning design or returning to orchestration.",
       "assertions": [
-        "Does not create a goal contract or execution policy.",
+        "Does not create a goal file or execution policy.",
         "Reports the blocking open design question.",
         "Includes the smallest input needed.",
         "Includes a response-only next step to answer the design decision and rerun $designing-cybernetic-solutions, or return the blocked status to $orchestrating-cybernetic-pregoal for full pre-goal work.",
@@ -66,7 +67,7 @@
       "expected_output": "Create the solution design artifact, then in the response hand off to $orchestrating-cybernetic-pregoal rather than directly to $writing-cybernetic-goals.",
       "assertions": [
         "Creates or references docs/cybernetics/designs/2026-05-31-complex-control.md.",
-        "Does not write a goal contract.",
+        "Does not write a goal file.",
         "Does not write an execution policy.",
         "Does not include a Next Step or handoff prompt in the design artifact.",
         "Response-only handoff recommends $orchestrating-cybernetic-pregoal.",

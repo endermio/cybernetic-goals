@@ -40,7 +40,7 @@
     },
     {
       "id": "authorized-independent-review-passes",
-      "prompt": "审查 requirements analysis、goal、plan，用户明确允许 subagents 做独立 control review。",
+      "prompt": "审查 requirements analysis、goal、plan，用户明确允许 subagents 做独立 review。",
       "expected_output": "The review uses independent reviewer passes for requirement traceability, goal match, evidence check governance, execution cadence, and runtime safety before Approved status is allowed.",
       "assertions": [
         "Mentions independent review passes.",
@@ -131,7 +131,7 @@
         "Includes Who Does The Work / Context Use as a review dimension.",
         "Flags missing selected work assignment.",
         "Flags Level 3 main-agent context overload.",
-        "Requires Context pack, Return format, and Integration check for delegated work.",
+        "Requires Context pack, Return format, and Integration check for delecheckd work.",
         "Requires revising the execution policy.",
         "Does not approve runtime /goal compilation.",
         "Does not decide the execution work assignment inside the orchestrator."
@@ -139,16 +139,16 @@
     },
     {
       "id": "flags-weak-context-pack",
-      "prompt": "Review a Serial subagent-driven execution policy whose delegation matrix says Context pack: requirements, goal, plan; Return format: summary; Integration check: review, but lacks relevant control excerpts, current batch objective, allowed artifacts/surfaces, forbidden changes, required evidence checks/evidence, stop conditions, expected return format, and context compression.",
+      "prompt": "Review a Serial subagent-driven execution policy whose delegation matrix says Context pack: requirements, goal, plan; Return format: summary; Integration check: review, but lacks relevant control excerpts, current batch objective, allowed artifacts/places, forbidden changes, required evidence checks/evidence, stop conditions, expected return format, and context compression.",
       "expected_output": "The review flags Who Does The Work / Context Use as Needs Revision because the context pack is not a bounded operating context and batch-limit context compression is missing.",
       "assertions": [
         "Flags that context pack is only an artifact path list.",
         "Requires relevant control excerpts.",
         "Requires current batch objective.",
-        "Requires allowed artifacts/surfaces and forbidden changes.",
+        "Requires allowed artifacts/places and forbidden changes.",
         "Requires required evidence checks/evidence and stop conditions.",
         "Requires expected return format.",
-        "Requires context compression at batch boundaries.",
+        "Requires context compression at batch limits.",
         "Does not mark Approved."
       ]
     },
@@ -199,19 +199,19 @@
         "Identifies the what counts as done.",
         "Flags partial, diagnostic, blocked, unavailable, or invalid being treated as goal achieved.",
         "Requires a target-producing action or proof-of-impossibility path.",
-        "Allows honest report when not doneing only as goal achieved: no.",
+        "Allows honest reporting not done only as goal achieved: no.",
         "Does not let valid final status replace the what counts as done."
       ]
     },
     {
       "id": "target-contract-cannot-contain-alternate-report-statuses",
       "prompt": "A goal's Target Achievement Contract includes a target done rule, then also lists valid final status values such as ready, partial, diagnostic, blocked, and invalid.",
-      "expected_output": "The review rejects the target contract because alternate report statuses are being placed inside the target-achievement structure instead of the report when not done protocol.",
+      "expected_output": "The review rejects the target contract because alternate report statuses are being placed inside the target-achievement structure instead of the not done report protocol.",
       "assertions": [
         "Requires exactly one what counts as done.",
         "Says reports when not done are not intended results.",
         "Flags valid final status values inside the target contract.",
-        "Requires report when not dones to remain goal achieved: no.",
+        "Requires not done reports to remain goal achieved: no.",
         "Keeps Target Achievement Done Rule Match separate from user-purpose evidence and result placement."
       ]
     },
@@ -229,10 +229,10 @@
     },
     {
       "id": "local-action-cannot-claim-result-without-placement",
-      "prompt": "A goal changes a intended result carried by multiple controlled-object surfaces. The plan changes one local artifact and then claims the intended result is fully realized without a place model or residual reconciliation.",
+      "prompt": "A goal changes a intended result carried by multiple controlled-object places. The plan changes one local artifact and then claims the intended result is fully realized without a place model or residual reconciliation.",
       "expected_output": "The review marks Where The Result Must Show Up as missing or inadequate, treats local action as insufficient for intended-result realization, and requires a place model plus residual reconciliation before strongest positive wording.",
       "assertions": [
-        "Identifies the intended result and controlled-object realization surfaces.",
+        "Identifies the intended result and controlled-object realization places.",
         "Distinguishes local action from global intended-result realization.",
         "Requires place/action/residual/reconciliation structure.",
         "Says strongest positive result claim requires result-placement adequate.",
@@ -241,7 +241,7 @@
     },
     {
       "id": "result-placement-not-applicable-requires-justification",
-      "prompt": "A plan labels Where The Result Must Show Up as not applicable without explaining why the task has no intended-result realization across controlled-object surfaces.",
+      "prompt": "A plan labels Where The Result Must Show Up as not applicable without explaining why the task has no intended-result realization across controlled-object places.",
       "expected_output": "The review does not accept bare result placement not applicable wording; it requires justification or downgrades the result placement status.",
       "assertions": [
         "Requires result placement not applicable with justification.",

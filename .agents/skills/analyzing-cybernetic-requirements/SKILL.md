@@ -1,6 +1,6 @@
 ---
 name: analyzing-cybernetic-requirements
-description: 'Use when a formed task or task candidate has ambiguous requirement meaning, acceptance criteria, output shape, constraints, non-goals, risk, or required control gates. Use framing-cybernetic-intent first for pre-task intent.'
+description: 'Use when a formed task or task candidate has ambiguous requirement meaning, acceptance criteria, output shape, constraints, non-goals, risk, or required control checks. Use framing-cybernetic-intent first for pre-task intent.'
 ---
 
 # Analyzing Cybernetic Requirements
@@ -15,7 +15,7 @@ This skill is a pre-goal control loop:
 formed task -> AI context scan -> requirement meaning -> rubric/output/check analysis -> human decisions/defaults -> goal-ready requirements brief
 ```
 
-Requirements analysis is broader than asking clarifying questions. Clarifying questions are one tool inside this skill. The output is not just answers to questions; it is the analyzed approved target, constraints, evaluation function, and required gates.
+Requirements analysis is broader than asking clarifying questions. Clarifying questions are one tool inside this skill. The output is not just answers to questions; it is the analyzed approved target, constraints, evaluation function, and required checks.
 
 Output:
 
@@ -34,17 +34,17 @@ preference, or process distrust.
 Owned analysis:
 
 - extract human purpose;
-- identify requirement objects, actors, terms, boundaries, and non-goals;
-- classify success, failure, completion, closure, usability, readiness, or pass/fail meaning;
+- identify requirement objects, actors, terms, limits, and non-goals;
+- classify success, failure, completion, completion, usability, readiness, or pass/fail meaning;
 - identify the final output audience, purpose, medium, required structure level, detail level, evidence-reference needs, machine-readable needs, destination path, and acceptance condition;
 - identify how we know the user's purpose was met: who can observe purpose realization, what outcome realizes the human purpose, what feedback can judge it, and what internal checks can or cannot prove;
 - identify where the result must show up when intended result must be realized across a controlled object: intended result, required result places, required action, old behavior check, and result-placement status;
 - identify the work covered and allowed actions limit for full-route or multi-batch work: work covered in this run, what the agent may do, forbidden actions, unauthorized-action handling, and explicitly out-of-scope items;
 - identify the target-producing path for target-achieving implementation work: one actor-centered path from initial state to the what counts as done;
 - identify the approved answering method for tasks where merely running a plausible path would not answer the question, including what is not enough;
-- prepare the What the User Approved compact control commitment for Level 3/4 or full pre-goal work: Human purpose, Input role binding, Primary object, Requested transformation, Non-goals, how we know the user's purpose was met, where the result must show up, What counts as done, Evidence needed to call it done, report when not done handling, Required answer path, How this should be answered, What is not enough, Work covered in this run, What the agent may do, Forbidden live / irreversible actions, Required handling for unauthorized actions, Explicitly out-of-scope items, Agent delegation preference, Agent workflow preference, Parallel execution authority, Parallelism cap, Final answer format, Workflow fit, and Known assumptions;
-- identify constraints, invariants, assumptions, and stop conditions;
-- decide whether Meaning, Rubric, Output Contract, Design, Goal Contract, Execution Policy, Control Review, or Risk gates are required;
+- prepare the What the User Approved compact control commitment for Level 3/4 or full pre-goal work: Human purpose, Input role binding, Primary object, Requested transformation, Non-goals, how we know the user's purpose was met, where the result must show up, What counts as done, Evidence needed to call it done, If it is not done, what should be reported, Required answer path, How this should be answered, What is not enough, Work covered in this run, What the agent may do, Forbidden live / irreversible actions, Required handling for unauthorized actions, Explicitly out-of-scope items, Agent delegation preference, Agent workflow preference, Parallel execution authority, Maximum parallel agents, Final answer format, Why this process is needed, and Known assumptions;
+- identify constraints, rules that cannot change, assumptions, and stop conditions;
+- decide whether Meaning, Rubric, Output Contract, Design, Goal, Execution Plan, Review, or Risk checks are required;
 - ask high-value human questions;
 - record obvious defaults without blocking progress;
 - recommend the appropriate handoff for design check: direct `$designing-cybernetic-solutions` for bounded/manual chains, or `$orchestrating-cybernetic-pregoal` for Level 3/4 full pre-goal work.
@@ -52,7 +52,7 @@ Owned analysis:
 Routed elsewhere:
 
 - solution structure, interfaces, object structures, mechanism architecture, flows, report structures, output schemas, and lifecycle models go to `$designing-cybernetic-solutions`;
-- goal contracts go to `$writing-cybernetic-goals`;
+- goal files go to `$writing-cybernetic-goals`;
 - execution policies go to `$writing-cybernetic-execution-policies`;
 - whole-chain review goes to `$reviewing-cybernetic-control-structures`;
 - runtime `/goal` compilation goes to `$compiling-cybernetic-runtime-goals`;
@@ -70,7 +70,7 @@ Execution complexity may be recorded as execution risk, planning concern, eviden
 
 Ask the human a question only if all are true:
 
-1. The answer materially changes any What the User Approved compact control commitment field, including how we know the user's purpose was met, beneficiary/observer, sufficient evidence level, feedback-unavailable handling, where the result must show up, intended result, required result places, required action, old behavior check, preserved/excluded places, what counts as done, required answer path, answering method, what is not enough, work covered in this run, what the agent may do, forbidden actions, unauthorized-action handling, explicit out-of-scope items, runtime delegation preference, agent workflow preference, parallel execution authority, or parallelism cap; or changes requirement meaning, evaluation rubric, output contract, visibility limit, authorization model, external contract meaning, observer-visible behavior, downstream consumption, acceptance condition, or control boundaries.
+1. The answer materially changes any What the User Approved compact control commitment field, including how we know the user's purpose was met, beneficiary/observer, sufficient evidence level, feedback-unavailable handling, where the result must show up, intended result, required result places, required action, old behavior check, preserved/excluded places, what counts as done, required answer path, answering method, what is not enough, work covered in this run, what the agent may do, forbidden actions, unauthorized-action handling, explicit out-of-scope items, runtime delegation preference, agent workflow preference, parallel execution authority, or maximum parallel agents; or changes requirement meaning, evaluation rubric, output contract, visibility limit, authorization model, external contract meaning, observer-visible behavior, downstream consumption, acceptance condition, or control limits.
 2. There are at least two plausible business choices.
 3. The correct answer cannot be safely inferred from the user request, existing source artifacts, or common requirement conventions.
 4. A wrong default would be costly to reverse or would cause serious misalignment.
@@ -106,7 +106,7 @@ Before handoff to `$orchestrating-cybernetic-pregoal`, present a compact control
 - Where the result must show up;
 - What counts as done;
 - Evidence needed to call it done;
-- report when not done handling;
+- If it is not done, what should be reported;
 - Required answer path;
 - How this should be answered;
 - What is not enough;
@@ -118,9 +118,9 @@ Before handoff to `$orchestrating-cybernetic-pregoal`, present a compact control
 - Agent delegation preference;
 - Agent workflow preference;
 - Parallel execution authority;
-- Parallelism cap;
+- Maximum parallel agents;
 - Output Contract;
-- Workflow fit;
+- Why this process is needed;
 - Known assumptions.
 
 If the commitment is `Pending`, `Rejected`, or `Needs Revision`, keep the workflow at requirements analysis and ask the user to approve or revise the compact commitment. Do not route the user into design review, plan review, or artifact-by-artifact approval as a substitute for approved target approval.
@@ -171,9 +171,9 @@ Requirements analysis may record that structured output is needed. It must not d
 
 ## Evaluation Function Check
 
-For audit, evaluation, readiness, closure, completeness, usability, safety, stability, coverage, correctness, or status-classification tasks, treat the rubric as requirement meaning.
+For audit, evaluation, readiness, completion, completeness, usability, safety, stability, coverage, correctness, or status-classification tasks, treat the rubric as requirement meaning.
 
-Evaluation predicates include terms such as:
+Evaluation conditions include terms such as:
 
 ```text
 闭环, 完成, 可用, 通过, 达标, 就绪, 用户视角, 质量好, 稳定, 安全, 合理, 充分, 覆盖, 一致, 正确, 可交付, 生产可用, 验收通过
@@ -231,7 +231,7 @@ Requirements analysis must define:
 - Required action: change, inspect, preserve, exclude, or discover;
 - Old behavior check: how old state, unknown places, exclusions,
   preserved behavior, and remaining mismatches will be accounted for;
-- Result-placement status: `adequate`, `partial`, `missing`,
+- Result placement status: `adequate`, `partial`, `missing`,
   `unavailable`, or `not applicable with justification`.
 
 result-placement is distinct from How We Know The User Purpose Was Met.
@@ -246,13 +246,13 @@ Mark `design check: required` when:
 
 - multiple reasonable solution structures exist;
 - controlled objects, actors, roles, or relationships are not explicit enough for goal writing;
-- system/process/organizational boundaries are unclear;
+- system/process/organizational limits are unclear;
 - information flow, state flow, evidence flow, or decision flow is unclear;
 - interfaces, contracts, procedures, reports, events, or user interactions are unclear;
 - a new abstraction must be introduced;
 - an old concept must be replaced without letting old realization details define the requirement;
 - several subsystems or roles must coordinate around one model;
-- runtime execution would otherwise invent objects, boundaries, evidence checks, or flow.
+- runtime execution would otherwise invent objects, limits, evidence checks, or flow.
 
 When design check is required, record the missing solution-model questions. Do not answer those questions inside the requirements analysis unless they are already confirmed human meaning.
 
@@ -264,19 +264,19 @@ For Level 3/4 or full pre-goal work, pass design check to `$orchestrating-cybern
 
 1. Inspect just enough context to avoid generic questions.
 2. Restate the human purpose in task language.
-3. Extract confirmed requirement meaning, terms, objects, boundaries, constraints, and non-goals.
+3. Extract confirmed requirement meaning, terms, objects, limits, constraints, and non-goals.
 4. Build a requirements control map: objective, controlled object, candidate evidence checks, actuators, constraints, disturbances, stop conditions.
 5. If the task is evaluative, identify the rubric/error function and classify missing rubric elements as decisions.
 6. Identify how we know the user's purpose was met and whether internal checks are sufficient or only supporting evidence.
 7. Identify where the result must show up when intended-result realization spans places.
 8. Identify output-contract needs and whether a safe default is sufficient.
 9. For Level 3/4 or full pre-goal work, build or update the What the User Approved compact control commitment.
-10. Identify required gates: Meaning, Rubric, Output Contract, Design, Goal Contract, Execution Policy, Control Review, Risk.
+10. Identify required checks: Meaning, Rubric, Output Contract, Design, Goal, Execution Plan, Review, Risk.
 11. Classify uncertainty as blocking human decision, safe default assumption, or deferred design/planning/execution detail.
 12. Ask 3-7 high-value questions, preferably no more than 5.
 13. Create or update the requirements analysis brief.
 14. If the human answers, update `Confirmed Requirement Decisions`, `Requirements Analysis Status`, and the What the User Approved record without treating answers as approval.
-15. Do not create a solution design, goal, plan, control review, runtime `/goal`, or target-work artifacts.
+15. Do not create a solution design, goal, plan, review, runtime `/goal`, or target-work artifacts.
 16. If analysis is complete and the brief path deterministically identifies a date/slug, output the approval request or queue-friendly next commands as described below.
 
 ## Queue-Friendly Next Commands
@@ -294,7 +294,7 @@ What the User Approved is Pending. Please approve or revise the compact control 
 For Level 3/4 or full pre-goal work, when `What the User Approved: Approved` is recorded and the requirements path is deterministic, output:
 
 1. A pre-goal orchestration command using the concrete requirements path.
-2. The predicted runtime goal contract path and pointer-only `/goal` shape using the expected artifact paths for the same date/slug.
+2. The predicted runtime goal file path and pointer-only `/goal` shape using the expected artifact paths for the same date/slug.
 
 When available, generate both with:
 
@@ -307,7 +307,7 @@ Use the script output instead of hand-writing predicted runtime commands. The sc
 
 If `design check: required`, still output the predicted runtime contract path and pointer-only `/goal` shape. State that `$orchestrating-cybernetic-pregoal` must invoke or request `$designing-cybernetic-solutions` before goal writing, and make the predicted downstream artifact paths include the expected solution design path. design check dispatch note must not replace the predicted pointer-only `/goal`. Do not output `$designing-cybernetic-solutions` as a standalone command before orchestration for Level 3/4 or full pre-goal work.
 
-The predicted pointer-only `/goal` is not the final approved runtime command. Label it as predicted or queue-friendly, and make it point to the runtime goal contract that the pre-goal compiler must create after downstream artifacts are approved.
+The predicted pointer-only `/goal` is not the final approved runtime command. Label it as predicted or queue-friendly, and make it point to the runtime goal file that the pre-goal compiler must create after downstream artifacts are approved.
 
 Derive expected paths from:
 
@@ -352,7 +352,7 @@ Mark `Complete` only when:
 - all blocking human decisions are resolved;
 - confirmed requirement decisions are recorded;
 - remaining assumptions are low-risk and explicit;
-- the next step can safely create a solution design or goal contract.
+- the next step can safely create a solution design or goal file.
 
 For Level 3/4 or full pre-goal work, `Complete` only means requirement meaning are sufficiently analyzed. Downstream orchestration still requires `What the User Approved: Approved`.
 
@@ -368,7 +368,7 @@ Return a compact chat summary with:
 - requirement status;
 - blocking human decisions, if any;
 - default assumptions;
-- required gates;
+- required checks;
 - What the User Approved status for Level 3/4 or full pre-goal work;
 - response-only next action.
 
@@ -406,7 +406,7 @@ For Level 1/2 work with `rubric check: required`, summarize the confirmed rubric
 ## Validation Checklist
 
 - [ ] Requirement meaning are separated from solution design and execution-policy writing.
-- [ ] Evaluation predicates are treated as rubric/error-function meaning.
+- [ ] Evaluation conditions are treated as rubric/error-function meaning.
 - [ ] Evaluation tasks define or ask for status meanings, evidence strength, strongest-positive threshold, downgrade rules, and external/unobservable handling.
 - [ ] design check is recorded as required, satisfied, or not applicable when solution structure matters.
 - [ ] The response did not downscope because execution is hard.
@@ -417,7 +417,7 @@ For Level 1/2 work with `rubric check: required`, summarize the confirmed rubric
 - [ ] Level 3/4 or full pre-goal work includes `What the User Approved`.
 - [ ] Human answers to clarification questions are not treated as approval.
 - [ ] If What the User Approved is not `Approved`, the response asks for approval or revision and does not output the orchestration command or predicted `/goal`.
-- [ ] No solution design, goal, plan, control review, or approved runtime `/goal` was created.
+- [ ] No solution design, goal, plan, review, or approved runtime `/goal` was created.
 - [ ] Level 1/2 work with `rubric check: required` routes to `$writing-cybernetic-goals`, not full pre-goal orchestration by default.
 - [ ] When the predictor script is available, Level 3/4 queue-friendly commands are generated with `.agents/skills/analyzing-cybernetic-requirements/scripts/predict_pregoal_handoff.py`.
 - [ ] Any predicted queue-friendly `/goal` is clearly labeled as predicted and includes the missing/not-approved/inconsistent artifact precondition.

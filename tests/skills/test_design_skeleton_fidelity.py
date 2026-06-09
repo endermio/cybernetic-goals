@@ -23,10 +23,10 @@ Status: `Approved`
 | Requested transformation | full workflow scope and bottleneck inventory into a ceiling measurement |
 | Non-goals | do not validate only one full-workflow candidate path |
 | How We Know The User Purpose Was Met | purpose is realized only when the full workflow ceiling is answered |
-| Where The Result Must Show Up | measurement result places must cover the workflow evidence bundle |
-| What counts as done | full workflow ceiling coverage skeleton is satisfied |
+| Where The Result Must Show Up | measurement result_places must cover the workflow evidence bundle |
+| What counts as done | full workflow ceiling coverage answer path is satisfied |
 | Evidence needed to call it done | scope inventory, removable-source inventory, coverage criterion, coverage matrix, full workflow run, and interpretation against coverage |
-| Non-achieved terminal report handling | report goal achieved: no when coverage skeleton is unsatisfied |
+| Non-achieved terminal report handling | report goal achieved: no when coverage answer path is unsatisfied |
 | Required answer path | coverage inventory -> coverage criterion -> candidate coverage matrix -> same-workload run -> interpretation |
 | How this should be answered | list full workflow scope, identify major removable sources, define ceiling coverage, prove candidate coverage, run full workflow, and interpret against coverage |
 | What is not enough | full-workflow-run-validation |
@@ -39,9 +39,9 @@ Status: `Approved`
 | Agent delegation preference | no preference |
 | Agent workflow preference | no preference |
 | Parallel execution authority | not applicable |
-| Parallelism cap | not specified |
+| Maximum parallel agents | not specified |
 | Final Answer Format | guard output |
-| Workflow fit | full pre-goal orchestration required |
+| Why this process is needed | full pre-goal orchestration required |
 | Known assumptions | fixture assumptions only |
 
 Approval record:
@@ -62,11 +62,11 @@ def write_requirements(tmp: Path) -> Path:
                 "",
                 "Status: `Complete`",
                 "",
-                "## Required Gates",
+                "## Required Checks",
                 "",
-                "| Gate | Status | Reason |",
+                "| Check | Status | Reason |",
                 "|---|---|---|",
-                "| required design | required | coverage skeleton must be designed |",
+                "| required design | required | coverage answer path must be designed |",
                 "",
                 USER_APPROVAL_WITH_COVERAGE_PATH,
                 "",
@@ -77,7 +77,7 @@ def write_requirements(tmp: Path) -> Path:
     return requirements
 
 
-def write_design(tmp: Path, requirements: Path, *, skeleton: str, mandatory_nodes: list[str], substitution_avoided: str) -> Path:
+def write_design(tmp: Path, requirements: Path, *, answer_path: str, mandatory_nodes: list[str], substitution_avoided: str) -> Path:
     design = tmp / "design.md"
     design.write_text(
         "\n".join(
@@ -96,7 +96,7 @@ def write_design(tmp: Path, requirements: Path, *, skeleton: str, mandatory_node
                 "",
                 "Measure the complete workflow ceiling.",
                 "",
-                "## Confirmed Semantics",
+                "## Confirmed Meaning",
                 "",
                 "Preserve the approved answering method.",
                 "",
@@ -105,18 +105,29 @@ def write_design(tmp: Path, requirements: Path, *, skeleton: str, mandatory_node
                 "| Element | Design |",
                 "|---|---|",
                 "| Approved answer method | list full workflow scope, identify major removable sources, define ceiling coverage, prove candidate coverage, run full workflow, and interpret against coverage |",
-                "| Approved answer method | coverage-ceiling-measurement |",
-                f"| Required answer path | {skeleton} |",
+                f"| Required answer path | {answer_path} |",
                 f"| Required steps covered | {', '.join(mandatory_nodes)} |",
                 f"| What is not enough avoided | {substitution_avoided} |",
                 "",
-                "## Conceptual Design",
+                "## Required Answer Path",
                 "",
-                "The design follows the skeleton above.",
+                "| Required step | Required change or answer step | Required evidence | Completion condition |",
+                "|---|---|---|---|",
+                "| S1 | scope -> covered | evidence | complete |",
                 "",
-                "## Detailed Design",
+                "## What Supports Each Required Step",
                 "",
-                "Implementation details are fixture-only.",
+                "| Required step | Required support object/component/mechanism | Why needed | Evidence produced |",
+                "|---|---|---|---|",
+                "| S1 | fixture mechanism | fixture reason | fixture evidence |",
+                "",
+                "## Design Details Tied To Required Steps",
+                "",
+                "### Components / Mechanisms",
+                "",
+                "| Component / Mechanism | Required answer step supported | Mainline or supporting-only | Responsibility | Inputs | Outputs | Evidence produced |",
+                "|---|---|---|---|---|---|---|",
+                "| fixture mechanism | S1 | mainline | fixture | input | output | evidence |",
                 "",
                 "## Open Design Questions",
                 "",
@@ -132,14 +143,14 @@ def write_design(tmp: Path, requirements: Path, *, skeleton: str, mandatory_node
 def write_runtime_chain(
     tmp: Path,
     *,
-    include_review_design_skeleton: bool = True,
-    review_design_skeleton_independence: str = "yes",
+    include_review_design_answer_path: bool = True,
+    review_design_answer_path_independence: str = "yes",
 ) -> tuple[Path, Path, Path, Path, Path]:
     requirements = write_requirements(tmp)
     design = write_design(
         tmp,
         requirements,
-        skeleton="coverage-ceiling-measurement",
+        answer_path="coverage-ceiling-measurement",
         mandatory_nodes=[
             "full workflow scope inventory",
             "major removable source inventory",
@@ -177,7 +188,7 @@ def write_runtime_chain(
                 "| Supporting Evidence | internal checks support progress only |",
                 "| Sufficient evidence level | user-purpose |",
                 "| If user-purpose evidence unavailable | report pending and next observation |",
-                "| Allowed completion wording | achieved only when the coverage skeleton is satisfied |",
+                "| Allowed completion wording | achieved only when the coverage answer path is satisfied |",
                 "",
                 "## Where The Result Must Show Up",
                 "",
@@ -186,10 +197,10 @@ def write_runtime_chain(
                 "| Target state | measurement answer state |",
                 "| Required result places | scope inventory, source inventory, coverage criterion, coverage matrix, run, interpretation |",
                 "| Place actions | act / inspect / preserve / exclude / discover |",
-                "| Residual reconciliation | account for old state, unknown result places, exclusions, preserved result places, and remaining mismatches |",
+                "| Residual reconciliation | account for old state, unknown result_places, exclusions, preserved result_places, and remaining mismatches |",
                 "| Result-placement wording | strongest result claim claim requires result-placement adequate |",
                 "| Partial/unavailable handling | report goal achieved: no without result claim claim |",
-                "| Distinction from user-purpose evidence | result placement calibrates answer-result place closure while user-purpose evidence calibrates human-purpose realization |",
+                "| Distinction from user-purpose evidence | result placement calibrates answer-result_place completion while user-purpose evidence calibrates human-purpose realization |",
                 "",
                 "## What Counts As Done",
                 "",
@@ -229,7 +240,7 @@ def write_runtime_chain(
                 "",
                 f"- Requirements analysis: `{requirements}`",
                 f"- Solution design: `{design}`",
-                f"- Goal contract: `{goal}`",
+                f"- Goal file: `{goal}`",
                 "",
                 "## Work Coverage And Action Limits Matrix",
                 "",
@@ -260,11 +271,11 @@ def write_runtime_chain(
                 "",
                 "Non-achieved terminal report rule:",
                 "",
-                "- A report when not done may be produced only after the transition is attempted and fails, or impossibility is proven.",
+                "- If it is not done, the report may be produced only after the transition is attempted and fails, or impossibility is proven.",
                 "",
                 "## Where The Result Must Show Up",
                 "",
-                "- Result-placement status: `not applicable with justification`",
+                "- Result placement status: `not applicable with justification`",
                 "- Why no intended-result result placement is required: this fixture only checks required answer path structure.",
                 "- Why no place discovery / residual reconciliation is needed: no target code state is changed.",
                 "- Allowed result claim wording: do not claim intended-result realization.",
@@ -324,7 +335,7 @@ def write_runtime_chain(
                 "",
                 "- Drive the fixture through the approved coverage-ceiling answer path.",
                 "",
-                "Batch-end gate:",
+                "Batch-end check:",
                 "",
                 "- S1 through S6 evidence recorded.",
                 "",
@@ -345,7 +356,7 @@ def write_runtime_chain(
         "## Review Independence",
         "",
         "- Who does the work / context use: `yes`",
-        f"- Design answer method check: `{review_design_skeleton_independence}`",
+        f"- Design answer method check: `{review_design_answer_path_independence}`",
         "- User purpose evidence check: `yes`",
         "- Result placement check: `yes`",
         "- What counts as done check: `yes`",
@@ -353,7 +364,7 @@ def write_runtime_chain(
         "- Work covered in this run and authority check: `yes`",
         "",
     ]
-    if include_review_design_skeleton:
+    if include_review_design_answer_path:
         review_parts.extend(
             [
                 "## Design Answer Method Check",
@@ -383,7 +394,7 @@ def write_runtime_chain(
             "## What Counts As Done Check",
             "",
             "Findings:",
-            "- The single what counts as done is separated from report when not dones.",
+            "- The single what counts as done is separated from not done reports.",
             "",
             "## Answer Path Check",
             "",
@@ -413,8 +424,8 @@ def write_runtime_chain(
     return requirements, design, goal, plan, review
 
 
-class DesignSkeletonFidelityTest(unittest.TestCase):
-    def test_templates_expose_answering_method_and_design_skeleton_fidelity(self):
+class DesignAnswerPathCheckTest(unittest.TestCase):
+    def test_templates_expose_answering_method_and_design_answer_path_check(self):
         requirements_template = (
             ROOT / ".agents/skills/analyzing-cybernetic-requirements/assets/requirements-analysis-template.md"
         ).read_text(encoding="utf-8")
@@ -442,28 +453,28 @@ class DesignSkeletonFidelityTest(unittest.TestCase):
             "Evidence produced",
         ):
             self.assertIn(expected, design_template)
-        for forbidden in ("Approved answer type", "Target Skeleton Instance", "Skeleton node", "Support Model Mapping"):
+        for forbidden in ("Approved answer type", "Target Answer Path Instance", "Answer Path node", "Support Model Mapping"):
             self.assertNotIn(forbidden, design_template)
 
         self.assertIn("Design Answer Method Check", review_template)
 
-    def test_design_template_is_skeleton_first_not_model_first(self):
+    def test_design_template_is_answer_path_first_not_model_first(self):
         design_template_path = ROOT / ".agents/skills/designing-cybernetic-solutions/assets/solution-design-template.md"
         design_skill_path = ROOT / ".agents/skills/designing-cybernetic-solutions/SKILL.md"
         design_template = design_template_path.read_text(encoding="utf-8")
         design_skill = design_skill_path.read_text(encoding="utf-8")
 
-        skeleton_index = design_template.index("## Answer Method Check")
+        answer_path_index = design_template.index("## Answer Method Check")
         support_index = design_template.index("## What Supports Each Required Step")
-        self.assertLess(skeleton_index, support_index)
+        self.assertLess(answer_path_index, support_index)
         self.assertNotIn("## Conceptual Design", design_template)
         self.assertIn("Required step", design_template)
         self.assertIn("Required support object/component/mechanism", design_template)
         self.assertIn("required answer path first", design_skill)
         self.assertNotIn("solution model synthesis", design_skill.casefold())
 
-    def test_task_skeleton_registry_drives_coverage_ceiling_guard(self):
-        registry = ROOT / ".agents/skills/references/task-skeleton-registry.json"
+    def test_answer_method_registry_drives_coverage_ceiling_guard(self):
+        registry = ROOT / ".agents/skills/references/answer-method-registry.json"
         self.assertTrue(registry.exists())
         registry_text = registry.read_text(encoding="utf-8")
         orchestration_guard = ORCHESTRATION_GUARD.read_text(encoding="utf-8")
@@ -471,8 +482,8 @@ class DesignSkeletonFidelityTest(unittest.TestCase):
 
         self.assertIn("coverage-ceiling-measurement", registry_text)
         self.assertIn("full-workflow-run-validation", registry_text)
-        self.assertIn("task-skeleton-registry.json", orchestration_guard)
-        self.assertIn("task-skeleton-registry.json", control_guard)
+        self.assertIn("answer-method-registry.json", orchestration_guard)
+        self.assertIn("answer-method-registry.json", control_guard)
         self.assertNotIn("COVERAGE_CEILING_REQUIRED_NODES", orchestration_guard)
         self.assertNotIn("COVERAGE_CEILING_REQUIRED_NODES", control_guard)
 
@@ -483,9 +494,9 @@ class DesignSkeletonFidelityTest(unittest.TestCase):
             design = write_design(
                 tmp,
                 requirements,
-                skeleton="full-workflow-run-validation",
+                answer_path="full-workflow-run-validation",
                 mandatory_nodes=["same-workload full workflow run"],
-                substitution_avoided="no, this substitutes the forbidden run-validation skeleton",
+                substitution_avoided="no, this substitutes the forbidden run-validation answer",
             )
 
             result = subprocess.run(
@@ -510,14 +521,14 @@ class DesignSkeletonFidelityTest(unittest.TestCase):
         self.assertIn("Answer Method Check", output)
         self.assertIn("full-workflow-run-validation", output)
 
-    def test_orchestration_guard_accepts_coverage_ceiling_skeleton_before_goal(self):
+    def test_orchestration_guard_accepts_coverage_ceiling_answer_path_before_goal(self):
         with tempfile.TemporaryDirectory() as tmpdir:
             tmp = Path(tmpdir)
             requirements = write_requirements(tmp)
             design = write_design(
                 tmp,
                 requirements,
-                skeleton="coverage-ceiling-measurement",
+                answer_path="coverage-ceiling-measurement",
                 mandatory_nodes=[
                     "full workflow scope inventory",
                     "major removable source inventory",
@@ -547,12 +558,12 @@ class DesignSkeletonFidelityTest(unittest.TestCase):
 
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
 
-    def test_control_chain_guard_requires_review_design_skeleton_fidelity(self):
+    def test_control_chain_guard_requires_review_design_answer_path_check(self):
         with tempfile.TemporaryDirectory() as tmpdir:
             requirements, design, goal, plan, review = write_runtime_chain(
                 Path(tmpdir),
-                include_review_design_skeleton=False,
-                review_design_skeleton_independence="no",
+                include_review_design_answer_path=False,
+                review_design_answer_path_independence="no",
             )
             result = subprocess.run(
                 [
@@ -580,7 +591,7 @@ class DesignSkeletonFidelityTest(unittest.TestCase):
         self.assertIn("Design Answer Method Check", output)
         self.assertIn("Design answer method check: yes", output)
 
-    def test_runtime_contract_indexes_design_skeleton_fidelity(self):
+    def test_runtime_contract_indexes_design_answer_path_check(self):
         with tempfile.TemporaryDirectory() as tmpdir:
             tmp = Path(tmpdir)
             requirements, design, goal, plan, review = write_runtime_chain(tmp)

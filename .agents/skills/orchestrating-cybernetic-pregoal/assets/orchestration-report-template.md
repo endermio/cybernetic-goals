@@ -8,15 +8,15 @@ Status: `Approved` / `Blocked` / `Needs Independent Review`
 
 - Requirements analysis: `[path]`
 - Solution design: `[path or not required]`
-- Goal contract: `[path]`
+- Goal file: `[path]`
 - Execution policy: `[path]`
-- Control review: `[path]`
+- Review: `[path]`
 
 ## Control Summary
 
 - What the user approved:
 - Solution model:
-- Meaning invariants:
+- Meaning rules that cannot change:
 - Tactical degrees of freedom:
 - Evidence checks:
 - Runtime limit:

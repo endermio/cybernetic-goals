@@ -20,4 +20,4 @@ A check that contradicts confirmed meaning or blocks necessary structural change
 
 If a evidence check conflicts with confirmed meaning, do not blindly satisfy it. Either replace it with a intended-result evidence channel or stop and ask for a decision if the conflict is meaning.
 
-Use the smallest evidence check set that can detect meaning or structural drift at each batch check. Expensive broad checks should usually be deferred to integration or final gates. Do not let evidence check cost dominate execution cost.
+Use the smallest evidence check set that can detect meaning or structural drift at each batch check. Expensive broad checks should usually be deferred to integration or final checks. Do not let evidence check cost dominate execution cost.

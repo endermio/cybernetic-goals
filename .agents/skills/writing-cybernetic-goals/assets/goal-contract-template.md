@@ -1,4 +1,4 @@
-# Goal Contract: [Name]
+# Goal: [Name]
 
 ## Human Purpose
 
@@ -54,7 +54,7 @@ Use this section when the task changes or realizes intended result across contro
 | Allowed achieved claim | [exact wording allowed only when the what counts as done is met] |
 | Steps that make the result true | [state-transition path or execution-policy required answer path that produces the what counts as done] |
 
-report when not done are not intended results and must not be listed here.
+Not done reports are not intended results and must not be listed here.
 
 The achieved claim must match what counts as done. User-purpose evidence and result-placement evidence are separate checks.
 
@@ -154,7 +154,7 @@ For each checkpoint:
 3. Run focused verification.
 4. If verification fails, inspect evidence and repair.
 5. Update progress log.
-6. Run broader verification only at integration gates or final check.
+6. Run broader verification only at integration checks or final check.
 
 ## Repair Policy
 
@@ -218,7 +218,7 @@ When complete, report:
 - explicitly out-of-scope by requirements approval
 - user purpose evidence status: achieved / partially observed / pending / unavailable / not required with justification
 - highest purpose-relevant evidence observed
-- Result-placement status: adequate / partial / missing / unavailable / not applicable with justification
+- Result placement status: adequate / partial / missing / unavailable / not applicable with justification
 - highest result claim evidence observed
 - residuals, unknown result places, and smallest next reconciliation
 - supporting internal/integration evidence

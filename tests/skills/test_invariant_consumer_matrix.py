@@ -13,7 +13,7 @@ class InvariantConsumerMatrixTest(unittest.TestCase):
         header_index = next(
             index
             for index, line in enumerate(lines)
-            if line.startswith("| ID | Invariant |")
+            if line.startswith("| ID | Rule That Cannot Change |")
         )
         headers = [cell.strip() for cell in lines[header_index].strip("|").split("|")]
         rows = []
@@ -32,7 +32,7 @@ class InvariantConsumerMatrixTest(unittest.TestCase):
             headers,
             [
                 "ID",
-                "Invariant",
+                "Rule That Cannot Change",
                 "Source skill",
                 "Artifact field/template",
                 "Guard",

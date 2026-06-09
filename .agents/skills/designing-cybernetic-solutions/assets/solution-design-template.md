@@ -1,4 +1,4 @@
-# Cybernetic Solution Design: [Name]
+# Design: [Name]
 
 ## Design Status
 
@@ -78,7 +78,11 @@ Outside scope:
 
 - [rule]
 
-## Detailed Design
+## Design Details Tied To Required Steps
+
+Every design detail below must either support a required step or be marked
+supporting-only. Do not introduce free-floating components, agreements, state,
+failure handling, evidence, compatibility work, or decisions.
 
 ### Components / Mechanisms
 
@@ -88,19 +92,27 @@ Outside scope:
 
 ### Interfaces / Agreements
 
-[External agreements, documents, events, forms, reports, procedures, or equivalent dependencies.]
+| Interface / agreement | Required answer step supported | Mainline or supporting-only | Why needed | Evidence produced |
+|---|---|---|---|---|
+| [agreement] | [required step] | [mainline/supporting-only] | [reason] | [evidence] |
 
 ### State Model / Lifecycle
 
-[State transitions, lifecycle, cadence, or decision progression.]
+| State / lifecycle item | Required answer step supported | Mainline or supporting-only | Transition or cadence | Evidence produced |
+|---|---|---|---|---|
+| [state item] | [required step] | [mainline/supporting-only] | [transition/cadence] | [evidence] |
 
 ### Error / Failure / Exception Model
 
-[How failure is surfaced, contained, retried, downgraded, or escalated.]
+| Failure case | Required answer step supported | Mainline or supporting-only | Handling | Evidence produced |
+|---|---|---|---|---|
+| [failure] | [required step] | [mainline/supporting-only] | [handling] | [evidence] |
 
 ### Evidence / Checks
 
-[What observations prove the design works and how weak/stale/unobservable evidence is handled.]
+| Check / evidence | Required answer step supported | Mainline or supporting-only | What it proves | Weak/stale/unobservable handling |
+|---|---|---|---|---|
+| [check/evidence] | [required step] | [mainline/supporting-only] | [proof] | [handling] |
 
 ### Final Answer Format Design
 
@@ -119,13 +131,15 @@ Use when final answer format requires structure synthesis. Otherwise record `Not
 
 ### Compatibility / Migration / Integration
 
-[Compatibility, migration, rollout, integration, or coexistence concerns.]
+| Compatibility / migration / integration item | Required answer step supported | Mainline or supporting-only | Handling | Evidence produced |
+|---|---|---|---|---|
+| [item] | [required step] | [mainline/supporting-only] | [handling] | [evidence] |
 
 ### Design Decisions
 
-| Decision | Rationale | Risk | Reversible? |
-|---|---|---|---|
-| [decision] | [rationale] | [risk] | [yes/no] |
+| Decision | Required answer step supported | Mainline or supporting-only | Rationale | Risk | Reversible? |
+|---|---|---|---|---|---|
+| [decision] | [required step] | [mainline/supporting-only] | [rationale] | [risk] | [yes/no] |
 
 ## Design-to-Goal Mapping
 

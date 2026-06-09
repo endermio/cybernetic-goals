@@ -1,6 +1,6 @@
 ---
 name: writing-cybernetic-execution-policies
-description: 'Use when requirements, any required design, and a goal contract exist before executable /goal work, and the task needs a bounded execution policy, phase checks, evidence handling, work assignment, batch rhythm, or stop conditions.'
+description: 'Use when requirements, any required design, and a goal file exist before executable /goal work, and the task needs a bounded execution policy, phase checks, evidence handling, work assignment, batch rhythm, or stop conditions.'
 ---
 
 # Writing Cybernetic Execution Policies
@@ -13,7 +13,7 @@ This skill converts:
 
 - requirements analysis brief
 - solution design, when required design is required or a design exists
-- goal contract
+- goal file
 
 into:
 
@@ -25,11 +25,11 @@ Use `assets/execution-policy-template.md`.
 
 ## What This Skill Owns
 
-This skill does not analyze requirements, does not write the goal contract, does not review its own policy, and does not execute target work.
+This skill does not analyze requirements, does not write the goal file, does not review its own policy, and does not execute target work.
 
 ## Required Input
 
-Use a completed requirements analysis brief and a goal contract, plus solution design when required design was required or a design artifact exists.
+Use a completed requirements analysis brief and a goal file, plus solution design when required design was required or a design artifact exists.
 
 For Level 3, Level 4, or full pre-goal work, do not create an execution policy unless the requirements analysis contains `What the User Approved: Approved`, or the current user message explicitly approves the compact control commitment. Level 1/2 bounded work does not require What the User Approved unless the requirements analysis records it as required.
 
@@ -45,15 +45,15 @@ For non-trivial execution policies, invoke `$superpowers:writing-plans` or load 
 
 This skill supplies the cybernetic constraints that the planning workflow must preserve:
 
-- confirmed meaning invariants;
-- solution-design invariants and interfaces/contracts;
+- confirmed meaning rules that cannot change;
+- solution-design rules that cannot change and interfaces/contracts;
 - tactical degrees of freedom;
 - dependency matrix requirement;
 - who does the work / context use;
 - work coverage and action limits matrix for separating work covered in this run from what the agent may do limits;
 - where the result must show up for intended-result place coverage and residual reconciliation;
 - action that can make it done for satisfying the what counts as done;
-- execution granularity and evidence check budget;
+- work size and evidence check budget;
 - batch cadence;
 - destructive intermediate-state policy;
 - output material/evidence collection for the final output contract;
@@ -72,7 +72,7 @@ The execution policy must include:
 
 1. Source Contracts
 2. Superpowers Planning Workflow
-3. Confirmed Meaning Invariants
+3. Rules That Cannot Change
 4. Tactical Degrees of Freedom
 5. Dependency Matrix
 6. Who Does The Work / Context Use
@@ -80,7 +80,7 @@ The execution policy must include:
 8. Where The Result Must Show Up
 9. Steps That Make The Result True
 10. Action That Can Make It Done
-11. Execution Granularity and Evidence check Budget
+11. Work Size And Evidence Check Budget
 12. Batch Cadence
 13. Destructive Intermediate-State Policy
 14. Output Material / Evidence Collection
@@ -104,7 +104,7 @@ The execution policy must choose one approved work assignment:
 
 The execution policy must record `Task level`, `Selected agent workflow`, `Subagent execution mode`, and `Max concurrent subagents` next to the who does the work.
 
-Use `.agents/skills/references/delegation-workflow-registry.json` as the source of workflow capability boundaries.
+Use `.agents/skills/references/delegation-workflow-registry.json` as the source of workflow capability limits.
 
 Allowed `Selected agent workflow` values:
 
@@ -137,13 +137,13 @@ Workflow capability matrix:
 | `adapter-specific` | `Serial subagent-driven / Parallel subagent-driven` | `serial-single-active / parallel-max-safe` |
 | `none` | `Main-only` | `none` |
 
-When What the User Approved records `Agent delegation preference: max-safe-parallel`, preserve that preference as the runtime work assignment target. Do not silently downgrade to `Serial subagent-driven` unless the dependency matrix has no independent frontier, shared surfaces cannot be safely locked, subagent context packs cannot be bounded, or review rejects parallelism. If safe frontier is effectively one, record the reason in `Concurrency selection rationale`.
+When What the User Approved records `Agent delegation preference: max-safe-parallel`, preserve that preference as the runtime work assignment target. Do not silently downgrade to `Serial subagent-driven` unless the dependency matrix has no independent frontier, shared places cannot be safely locked, subagent context packs cannot be bounded, or review rejects parallelism. If safe frontier is effectively one, record the reason in `Concurrency selection rationale`.
 
 When What the User Approved records `Agent workflow preference`, preserve that workflow unless it conflicts with the approved work assignment/mode capability matrix. If the requested workflow is incompatible, return to What the User Approved for conflict resolution or record a concrete `Agent workflow compatibility rationale`; do not silently substitute a different workflow.
 
 If What the User Approved records both `Agent delegation preference: max-safe-parallel` and `Agent workflow preference: superpowers-subagent-driven-development`, treat this as a approved target conflict. `$superpowers:subagent-driven-development` is serial-single-active only. Use `superpowers-dispatching-parallel-agents`, `bounded-protocol`, or `adapter-specific` for max-safe parallel execution.
 
-For every delegated work package, define:
+For every delecheckd work package, define:
 
 - Work package
 - Executor
@@ -154,7 +154,7 @@ For every delegated work package, define:
 - Context Pack Requirements:
   - Relevant control excerpts
   - Current batch objective
-  - Allowed artifacts/surfaces
+  - Allowed artifacts/places
   - Forbidden changes
   - Required evidence checks/evidence
   - Stop conditions
@@ -162,7 +162,7 @@ For every delegated work package, define:
 
 The main agent owns approved approved files, current batch state, dispatch, integration, progress log, and stop-condition detection.
 
-A subagent owns one bounded work package, bounded investigation, or bounded verification pass. A subagent must not change approved files, widen scope, replace the work assignment, or bypass integration gates.
+A subagent owns one bounded work package, bounded investigation, or bounded verification pass. A subagent must not change approved files, widen scope, replace the work assignment, or bypass integration checks.
 
 For serial or parallel subagent-driven work assignment, `Selected agent workflow` must be `bounded-protocol`, `superpowers-subagent-driven-development`, `superpowers-dispatching-parallel-agents`, or `adapter-specific`; it must not be `none`. Record the matching approved bounded subagent delegation protocol under `Subagent workflow`. Do not treat `$superpowers:subagent-driven-development` as the generic agent workflow. Use it only with `Serial subagent-driven`, `serial-single-active`, and `Max concurrent subagents: 1`. Use `$superpowers:dispatching-parallel-agents` only with `Parallel subagent-driven`, `parallel-max-safe`, and the approved wave/lock/barrier/integration structure.
 
@@ -212,7 +212,7 @@ If the task changes or realizes a intended result across controlled-object place
 
 If result placement is not applicable, include a compact entry that records:
 
-- Result-placement status: `not applicable with justification`;
+- Result placement status: `not applicable with justification`;
 - Why no intended-result result placement is required;
 - Why no place discovery / residual reconciliation is needed;
 - Allowed result claim wording.
@@ -239,9 +239,9 @@ The execution policy must define:
 
 - Target-producing action required: the action, probe, experiment, change, or observation that must be attempted to satisfy the what counts as done;
 - Proof of impossibility, if any: what would prove the target-producing action cannot be attempted in this environment;
-- report when not done rule: a report when not done may be produced only after the target-producing action is attempted and fails, or after impossibility is proven.
+- If it is not done, what should be reported: a not done report may be produced only after the target-producing action is attempted and fails, or after impossibility is proven.
 
-## Execution Granularity and Evidence check Budget
+## Work Size And Evidence Check Budget
 
 The execution policy must choose the largest coherent batch that remains diagnosable.
 
@@ -255,7 +255,7 @@ For each batch, define:
 - what intermediate breakage is allowed inside the batch;
 - what batch-end state is openable or meaningfully verifiable;
 - the smallest necessary evidence check set for that batch;
-- which broad checks are deferred to integration or final gates.
+- which broad checks are deferred to integration or final checks.
 
 Evidence check budget rules:
 
@@ -357,7 +357,7 @@ The policy may choose tactical execution details, batch cadence, and workstream 
 - information/state/evidence flow;
 - interfaces/contracts;
 - lifecycle or failure model;
-- design invariants.
+- design rules that cannot change.
 
 If the design includes `Answer Method Check`, decompose work against that approved answer path. Do not replace the design answer path with a component-first or weaker validation answer path.
 
@@ -388,7 +388,7 @@ Created candidate execution policy:
 
 Control-law summary:
 - Planning workflow: ...
-- Meaning invariants: ...
+- Meaning rules that cannot change: ...
 - Design source: ...
 - Batch cadence: ...
 - Work assignment: ...
@@ -396,7 +396,7 @@ Control-law summary:
 - User purpose evidence: ...
 - Evidence lifecycle: ...
 - Evidence check governance: ...
-- Phase gates: ...
+- Phase checks: ...
 
 Response-only handoff:
 - For Level 3/4 or full pre-goal work: return to `$orchestrating-cybernetic-pregoal` with this execution policy path.
@@ -417,7 +417,7 @@ Smallest input or dependency needed:
 Response-only next step:
 - If required planning workflow is missing: load/use `$superpowers:writing-plans`, or return blocked status to `$orchestrating-cybernetic-pregoal`.
 - If the solution design is missing or insufficient: return to `$designing-cybernetic-solutions` for an explicit manual chain, or return blocked status to `$orchestrating-cybernetic-pregoal` for Level 3/4 or full pre-goal work.
-- Do not run control review or runtime `/goal` until a candidate execution policy exists.
+- Do not run review or runtime `/goal` until a candidate execution policy exists.
 ```
 
 ## Validation Checklist
@@ -427,7 +427,7 @@ Response-only next step:
 - [ ] The plan records planning workflow status.
 - [ ] The plan does not self-substitute for a missing required planning workflow.
 - [ ] If blocked, the assistant response includes a response-only next step.
-- [ ] The plan distinguishes meaning invariants from tactical degrees of freedom.
+- [ ] The plan distinguishes meaning rules that cannot change from tactical degrees of freedom.
 - [ ] If required design is required, the plan references the solution design.
 - [ ] The plan does not invent or revise the solution model.
 - [ ] The plan has dependency matrix.
@@ -441,9 +441,9 @@ Response-only next step:
 - [ ] The plan records `Selected agent workflow`.
 - [ ] The plan records `Subagent execution mode` and `Max concurrent subagents`.
 - [ ] Level 3/4 main-only execution has an explicit context-load justification.
-- [ ] Delegated work packages define Context pack, Return format, and Integration check.
-- [ ] Delegated work packages define Context Pack Requirements with relevant control excerpts, batch objective, allowed artifacts/surfaces, forbidden changes, required evidence checks/evidence, stop conditions, and expected return format.
-- [ ] The plan defines a Context Compression Rule for batch boundaries.
+- [ ] Delecheckd work packages define Context pack, Return format, and Integration check.
+- [ ] Delecheckd work packages define Context Pack Requirements with relevant control excerpts, batch objective, allowed artifacts/places, forbidden changes, required evidence checks/evidence, stop conditions, and expected return format.
+- [ ] The plan defines a Context Compression Rule for batch limits.
 - [ ] Serial or parallel subagent-driven work assignment records an approved bounded subagent agent workflow.
 - [ ] Serial or parallel subagent-driven work assignment does not use `Selected agent workflow: none`.
 - [ ] Serial subagent-driven work assignment uses `serial-single-active`, max concurrency `1`, ordered sequence, and per-package integration.
@@ -452,13 +452,13 @@ Response-only next step:
 - [ ] `$superpowers:subagent-driven-development` is used only with `serial-single-active` and max concurrency `1`.
 - [ ] `$superpowers:dispatching-parallel-agents` is used only with `parallel-max-safe` and approved wave/lock/barrier/integration rules.
 - [ ] Parallel subagent-driven execution records human approval, dependency independence, and review approval as explicitly `yes` or `approved`.
-- [ ] The plan includes Execution Granularity and Evidence check Budget.
+- [ ] The plan includes Work Size And Evidence Check Budget.
 - [ ] Batches are coherent intended-result slices, not mechanical micro-steps.
 - [ ] The plan chooses the largest coherent batch that remains diagnosable.
 - [ ] The plan has batch cadence.
 - [ ] The plan allows destructive intermediate states only within approved batches.
 - [ ] Each batch ends in an openable/verifiable state.
-- [ ] Broad verification is assigned to integration/final gates unless justified per batch.
+- [ ] Broad verification is assigned to integration/final checks unless justified per batch.
 - [ ] The plan defines output material/evidence collection when the final output contract requires structured output.
 - [ ] The plan includes User Purpose Strategy.
 - [ ] The plan keeps result placement intended-result claims distinct from user-purpose evidence human-purpose claims.

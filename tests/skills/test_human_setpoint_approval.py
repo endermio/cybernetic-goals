@@ -17,13 +17,13 @@ Approval applies only to this compact control commitment.
 
 | Element | Commitment |
 |---|---|
-| Human purpose | keep the control chain from executing an unapproved setpoint |
+| Human purpose | keep the control chain from executing an unapproved approved target |
 | Input role binding | source material, current state, requested transformation, method preference |
-| Primary object | human-approved setpoint guard fixture |
+| Primary object | human-approved approved target guard fixture |
 | Requested transformation | requirements brief to approved pre-goal chain |
-| Non-goals | do not reinterpret the setpoint downstream |
+| Non-goals | do not reinterpret the approved target downstream |
 | How We Know The User Purpose Was Met | user-purpose evidence remains separately calibrated |
-| Where The Result Must Show Up | intended-result surfaces remain separately calibrated |
+| Where The Result Must Show Up | intended-result_places remain separately calibrated |
 | What counts as done | approved What the User Approved guard target is observed |
 | Evidence needed to call it done | target-producing evidence is observed |
 | Non-achieved terminal report handling | report goal achieved: no |
@@ -34,18 +34,18 @@ Approval applies only to this compact control commitment.
 | Required handling for unauthorized actions | none |
 | Explicitly out-of-scope items | none |
 | Final Answer Format | final runtime command preserves approved artifacts |
-| Workflow fit | full pre-goal orchestration is required for this fixture |
+| Why this process is needed | full pre-goal orchestration is required for this fixture |
 | Known assumptions | test fixture assumptions only |
 
 Approval record:
 
 - Approved by: `human`
-- Approval phrase or source: `批准这个 setpoint，进入 orchestration`
+- Approval phrase or source: `批准这个 approved target，进入 orchestration`
 - Approval time/context: `test`
 """
 
 
-class HumanSetpointApprovalTest(unittest.TestCase):
+class HumanApprovalTest(unittest.TestCase):
     def read(self, path: str) -> str:
         return (ROOT / path).read_text(encoding="utf-8")
 
@@ -96,7 +96,7 @@ class HumanSetpointApprovalTest(unittest.TestCase):
                     "| Beneficiary / observer | operator |",
                     "| Purpose-realizing outcome observed | operator can observe the intended result |",
                     "| Supporting Evidence | internal checks support progress only |",
-                    "| Sufficient evidence level | purpose-boundary |",
+                    "| Sufficient evidence level | purpose-limit |",
                     "| If user-purpose evidence unavailable | report pending and next observation |",
                     "| Allowed completion wording | pending until user-purpose evidence is observed |",
                     "",
@@ -104,10 +104,10 @@ class HumanSetpointApprovalTest(unittest.TestCase):
                     "",
                     "| Element | Requirement |",
                     "|---|---|",
-                    "| Target state | target semantics are represented across realization surfaces |",
-                    "| Required result places | surface model, action classification, residual reconciliation |",
+                    "| Target state | target semantics are represented across realization places |",
+                    "| Required result places | place model, action classification, residual reconciliation |",
                     "| Place actions | act / inspect / preserve / exclude / discover |",
-                    "| Residual reconciliation | account for old state, unknown surfaces, exclusions, preserved surfaces, and remaining mismatches |",
+                    "| Residual reconciliation | account for old state, unknown places, exclusions, preserved places, and remaining mismatches |",
                     "| Result-placement wording | strongest result claim claim requires result-placement adequate |",
                     "| Partial/unavailable handling | report partial, missing, unavailable, or not applicable with justification |",
                     "| Distinction from user-purpose evidence | result-placement is distinct from How We Know The User Purpose Was Met |",
@@ -163,7 +163,7 @@ class HumanSetpointApprovalTest(unittest.TestCase):
                     "## Source Contracts",
                     "",
                     f"- Requirements analysis: `{requirements}`",
-                    f"- Goal contract: `{goal}`",
+                    f"- Goal file: `{goal}`",
                     "",
                     "## Work Coverage And Action Limits Matrix",
                     "",
@@ -189,11 +189,11 @@ class HumanSetpointApprovalTest(unittest.TestCase):
                     "",
                     "Non-achieved terminal report rule:",
                     "",
-                    "- A report when not done may be produced only after the action is attempted and fails, or impossibility is proven.",
+                    "- If it is not done, the report may be produced only after the action is attempted and fails, or impossibility is proven.",
                     "",
                     "## Where The Result Must Show Up",
                     "",
-                    "- Result-placement status: `not applicable with justification`",
+                    "- Result placement status: `not applicable with justification`",
                     "- Why no intended-result result placement is required: this fixture only checks What the User Approved structure.",
                     "- Why no place discovery / residual reconciliation is needed: no controlled-object intended result is changed.",
                     "- Allowed result claim wording: do not claim intended-result realization.",
@@ -267,8 +267,8 @@ class HumanSetpointApprovalTest(unittest.TestCase):
                     "## Review Independence",
                     "",
                     "- Requirements analysis: `yes`",
-                    "- Human setpoint fidelity: `yes`",
-                    "- Goal contract: `yes`",
+                    "- Human approved target check: `yes`",
+                    "- Goal file: `yes`",
                     "- Execution policy: `yes`",
                     "- Who does the work / context use: `yes`",
                     "- User purpose evidence check: `yes`",
@@ -293,7 +293,7 @@ class HumanSetpointApprovalTest(unittest.TestCase):
                     "- Internally verified, user purpose evidence pending",
                     "",
                     "Findings:",
-                    "- Internal checks are progress evidence; purpose achievement waits for purpose-boundary feedback.",
+                    "- Internal checks are progress evidence; purpose achievement waits for purpose-limit feedback.",
                     "",
                     "## Result Placement Check",
                     "",
@@ -306,7 +306,7 @@ class HumanSetpointApprovalTest(unittest.TestCase):
                     "## What Counts As Done Check",
                     "",
                     "Findings:",
-                    "- The single what counts as done is separated from report when not dones.",
+                    "- The single what counts as done is separated from not done reports.",
                     "",
                     "## Answer Path Check",
                     "",
@@ -336,7 +336,7 @@ class HumanSetpointApprovalTest(unittest.TestCase):
         )
         return requirements, goal, plan, review
 
-    def test_requirements_skill_and_template_define_human_setpoint_approval(self):
+    def test_requirements_skill_and_template_define_user_approval(self):
         skill = self.read(".agents/skills/analyzing-cybernetic-requirements/SKILL.md")
         template = self.read(
             ".agents/skills/analyzing-cybernetic-requirements/assets/requirements-analysis-template.md"
@@ -348,12 +348,12 @@ class HumanSetpointApprovalTest(unittest.TestCase):
             self.assertIn("Input role binding", text)
             self.assertIn("Primary object", text)
             self.assertIn("Requested transformation", text)
-            self.assertIn("Workflow fit", text)
+            self.assertIn("Why this process is needed", text)
 
         self.assertIn("Human answers to clarification questions are inputs, not approval", skill)
         self.assertIn("do not output the orchestration command or predicted `/goal`", skill)
 
-    def test_orchestration_guard_rejects_missing_human_setpoint_approval_before_design(self):
+    def test_orchestration_guard_rejects_missing_user_approval_before_design(self):
         with tempfile.TemporaryDirectory() as tmpdir:
             requirements = self.write_requirements(Path(tmpdir), hsa=None)
             result = subprocess.run(
@@ -375,7 +375,7 @@ class HumanSetpointApprovalTest(unittest.TestCase):
         self.assertIn("NEXT: ReturnToRequirementsAnalysis", output)
         self.assertIn("What the User Approved", output)
 
-    def test_control_chain_guard_rejects_missing_human_setpoint_approval(self):
+    def test_control_chain_guard_rejects_missing_user_approval(self):
         with tempfile.TemporaryDirectory() as tmpdir:
             requirements, goal, plan, review = self.write_control_chain(Path(tmpdir), hsa=None)
             result = subprocess.run(
@@ -401,7 +401,7 @@ class HumanSetpointApprovalTest(unittest.TestCase):
         self.assertIn("NEXT: ReturnToRequirementsAnalysis", output)
         self.assertIn("What the User Approved", output)
 
-    def test_control_chain_guard_accepts_approved_human_setpoint(self):
+    def test_control_chain_guard_accepts_approved_user_approval(self):
         with tempfile.TemporaryDirectory() as tmpdir:
             requirements, goal, plan, review = self.write_control_chain(Path(tmpdir))
             result = subprocess.run(
@@ -425,7 +425,7 @@ class HumanSetpointApprovalTest(unittest.TestCase):
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
         self.assertIn("PASS", result.stdout)
 
-    def test_downstream_skills_and_review_define_hsa_fidelity(self):
+    def test_downstream_skills_and_review_define_hsa_check(self):
         for path in (
             ".agents/skills/designing-cybernetic-solutions/SKILL.md",
             ".agents/skills/writing-cybernetic-goals/SKILL.md",
@@ -444,7 +444,7 @@ class HumanSetpointApprovalTest(unittest.TestCase):
             self.assertIn("What The User Approved Check", text)
             self.assertIn("approved compact control commitment", text)
 
-    def test_runtime_compiler_preserves_approved_setpoint(self):
+    def test_runtime_compiler_preserves_approved_target(self):
         skill = self.read(".agents/skills/compiling-cybernetic-runtime-goals/SKILL.md")
         compiler = self.read(".agents/skills/compiling-cybernetic-runtime-goals/scripts/compile_runtime_goal.py")
         template = self.read(
@@ -455,9 +455,9 @@ class HumanSetpointApprovalTest(unittest.TestCase):
             self.assertIn("What the User Approved", text)
             self.assertIn("primary object", text)
             self.assertIn("requested transformation", text)
-            self.assertIn("workflow fit", text)
+            self.assertIn("why this process is needed", text)
 
-    def test_invariant_matrix_tracks_human_setpoint_approval(self):
+    def test_invariant_matrix_tracks_human_approved_target_approval(self):
         matrix = self.read("docs/cybernetic-framework/invariant-artifact-consumer-matrix.md")
 
         self.assertIn("INV-What the User Approved-001", matrix)
@@ -486,7 +486,7 @@ class HumanSetpointApprovalTest(unittest.TestCase):
             "orchestrator-blocks-when-design-skill-unavailable",
             "existing-design-artifact-propagates-downstream",
             "orchestrator-cannot-compile-before-review",
-            "orchestrator-propagates-execution-work assignment-without-deciding-it",
+            "orchestrator-propagates-execution-work-assignment-without-deciding-it",
         ]
         for eval_id in hsa_required_ids:
             self.assertIn(eval_id, eval_by_id)
@@ -517,7 +517,7 @@ class HumanSetpointApprovalTest(unittest.TestCase):
         skill = self.read(".agents/skills/writing-cybernetic-goals/SKILL.md")
         frontmatter = skill.split("---", 2)[1]
 
-        self.assertIn("goal contract must be written", frontmatter)
+        self.assertIn("goal file must be written", frontmatter)
         self.assertIn("Level 3/4 full pre-goal orchestration", frontmatter)
         self.assertIn("What the User Approved", frontmatter)
 

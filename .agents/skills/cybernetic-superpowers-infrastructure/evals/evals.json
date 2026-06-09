@@ -4,17 +4,17 @@
     {
       "id": "maps-superpowers-stage-dependencies",
       "prompt": "说明 cybernetic pre-goal pipeline 中 Superpowers 应该如何作为基础设施使用。",
-      "expected_output": "The response identifies stage-specific Superpowers substrates, distinguishes required and optional substrates, and states the non-substitution rule.",
+      "expected_output": "The response identifies stage-specific Superpowers workflows, distinguishes required and optional workflows, and states the non-substitution rule.",
       "assertions": [
         "Mentions $superpowers:writing-plans as required for non-trivial execution policy generation.",
         "Mentions $superpowers:brainstorming as optional for exploratory solution design.",
-        "Mentions independent subagent review discipline as required for Approved control review unless explicit human approval exists.",
+        "Mentions independent subagent review discipline as required for Approved review unless explicit human approval exists.",
         "Mentions $superpowers:executing-plans, $superpowers:systematic-debugging, and $superpowers:verification-before-completion for runtime.",
-        "Mentions an approved bounded subagent delegation protocol for runtime target-work delegation when the approved execution policy selects serial or parallel subagent-driven topology.",
-        "Mentions $superpowers:subagent-driven-development only as a serial-single-active substrate when the execution policy records Selected agent workflow: superpowers-subagent-driven-development.",
-        "Mentions $superpowers:dispatching-parallel-agents only as a parallel-max-safe substrate when the execution policy records Selected agent workflow: superpowers-dispatching-parallel-agents.",
+        "Mentions an approved bounded subagent delegation protocol for runtime target-work delegation when the approved execution policy selects serial or parallel subagent-driven work assignment.",
+        "Mentions $superpowers:subagent-driven-development only as a serial-single-active workflow when the execution policy records Selected agent workflow: superpowers-subagent-driven-development.",
+        "Mentions $superpowers:dispatching-parallel-agents only as a parallel-max-safe workflow when the execution policy records Selected agent workflow: superpowers-dispatching-parallel-agents.",
         "Distinguishes pre-goal review subagent authorization from runtime target-work subagent authorization.",
-        "States that unavailable required substrates cause a stop/report instead of self-substitution.",
+        "States that unavailable required workflows cause a stop/report instead of self-substitution.",
         "States that merely mentioning a Superpowers skill or imitating generic behavior is not sufficient.",
         "States that approval requires a final observer pass after the last substantive mutation to reviewed approved files.",
         "Does not say every cybernetic skill must invoke every Superpowers skill."

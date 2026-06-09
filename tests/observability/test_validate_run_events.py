@@ -549,7 +549,7 @@ class ValidateRunEventsTest(unittest.TestCase):
             "artifact_count": 1,
             "blocked_reason": "waiting_for_review",
             "final_state": "recorded",
-            "required_gates": ["compile", "unit"],
+            "required_checks": ["compile", "unit"],
             "impromptu_status": "not a prompt",
             "task_hash_alias": "sha256:" + "7" * 64,
             "machine_id_alias": "anon-machine",

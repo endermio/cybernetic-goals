@@ -33,7 +33,7 @@ Status: `Approved`
 | Required handling for unauthorized actions | none |
 | Explicitly out-of-scope items | none |
 | Final Answer Format | guard output |
-| Workflow fit | full pre-goal guard fixture |
+| Why this process is needed | full pre-goal guard fixture |
 | Known assumptions | fixture-only assumptions |
 
 Approval record:
@@ -96,7 +96,7 @@ class TargetProducingSpineTest(unittest.TestCase):
                     "| Beneficiary / observer | operator |",
                     "| Purpose-realizing outcome observed | operator observes the target-producing path completed |",
                     "| Supporting Evidence | internal checks support progress only |",
-                    "| Sufficient evidence level | purpose-boundary |",
+                    "| Sufficient evidence level | purpose-limit |",
                     "| If user-purpose evidence unavailable | report pending and next observation |",
                     "| Allowed completion wording | achieved only when required steps are satisfied |",
                     "",
@@ -105,9 +105,9 @@ class TargetProducingSpineTest(unittest.TestCase):
                     "| Element | Requirement |",
                     "|---|---|",
                     "| Target state | guard fixture intended result |",
-                    "| Required result places | guard fixture surface model |",
+                    "| Required result places | guard fixture place model |",
                     "| Place actions | act / inspect / preserve / exclude / discover |",
-                    "| Residual reconciliation | account for old state, unknown surfaces, exclusions, preserved surfaces, and remaining mismatches |",
+                    "| Residual reconciliation | account for old state, unknown places, exclusions, preserved places, and remaining mismatches |",
                     "| Result-placement wording | strongest result claim claim requires result-placement adequate |",
                     "| Partial/unavailable handling | report not done terminal status without result claim claim |",
                     "| Distinction from user-purpose evidence | result-placement is distinct from How We Know The User Purpose Was Met |",
@@ -144,7 +144,7 @@ class TargetProducingSpineTest(unittest.TestCase):
             "## Source Contracts",
             "",
             f"- Requirements analysis: `{requirements}`",
-            f"- Goal contract: `{goal}`",
+            f"- Goal file: `{goal}`",
             "",
             "## Work Coverage And Action Limits Matrix",
             "",
@@ -179,11 +179,11 @@ class TargetProducingSpineTest(unittest.TestCase):
                 "",
                 "Non-achieved terminal report rule:",
                 "",
-                "- A report when not done may be produced only after the transition is attempted and fails, or impossibility is proven.",
+                "- If it is not done, the report may be produced only after the transition is attempted and fails, or impossibility is proven.",
                 "",
                     "## Where The Result Must Show Up",
                 "",
-                "- Result-placement status: `not applicable with justification`",
+                "- Result placement status: `not applicable with justification`",
                 "- Why no intended-result result placement is required: this fixture only checks TPS structure.",
                 "- Why no place discovery / residual reconciliation is needed: no controlled-object intended result is changed.",
                 "- Allowed result claim wording: do not claim intended-result realization.",
@@ -253,7 +253,7 @@ class TargetProducingSpineTest(unittest.TestCase):
                 "",
                 "- Drive the fixture through the approved target-producing required answer path.",
                 "",
-                "Batch-end gate:",
+                "Batch-end check:",
                 "",
                 "- S1 and S2 evidence recorded.",
                 "",
@@ -279,7 +279,7 @@ class TargetProducingSpineTest(unittest.TestCase):
             "",
             "- Requirements analysis: `yes`",
             "- What the user approved check: `yes`",
-            "- Goal contract: `yes`",
+            "- Goal file: `yes`",
             "- Execution policy: `yes`",
             "- Who does the work / context use: `yes`",
             "- User purpose evidence check: `yes`",
@@ -296,7 +296,7 @@ class TargetProducingSpineTest(unittest.TestCase):
             "## User Purpose Evidence Check",
             "",
             "Findings:",
-            "- Purpose feedback waits for purpose-boundary evidence.",
+            "- Purpose feedback waits for purpose-limit evidence.",
             "",
                 "## Result Placement Check",
             "",
@@ -306,7 +306,7 @@ class TargetProducingSpineTest(unittest.TestCase):
             "## What Counts As Done Check",
             "",
             "Findings:",
-            "- The single what counts as done is separated from report when not dones.",
+            "- The single what counts as done is separated from not done reports.",
             "",
         ]
         if include_review_required_answer_path:

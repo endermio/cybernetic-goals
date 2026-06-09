@@ -21,4 +21,4 @@ Recommended rule:
 - intermediate states inside a batch may be broken when necessary;
 - batch end must be openable or verifiable;
 - every batch should prove a meaningful intended-result slice, not a micro execution detail.
-- broad verification belongs at integration or final gates unless it is the only reliable drift evidence check.
+- broad verification belongs at integration or final checks unless it is the only reliable drift evidence check.

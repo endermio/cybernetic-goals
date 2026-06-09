@@ -135,7 +135,7 @@ class IntentFramingSkillTest(unittest.TestCase):
         self.assertIn("Does not classify as Level 3", target_text)
         self.assertIn("Does not recommend orchestrating-cybernetic-pregoal yet", target_text)
 
-    def test_integration_surfaces_reference_pre_task_handoff(self):
+    def test_integration_places_reference_pre_task_handoff(self):
         readme = self.read("README.md")
         router = self.read(".agents/skills/routing-cybernetic-workflows/SKILL.md")
         requirements = self.read(
@@ -154,13 +154,13 @@ class IntentFramingSkillTest(unittest.TestCase):
         self.assertIn("INV-INT-001", matrix)
         self.assertIn("framing-cybernetic-intent", matrix)
 
-    def test_orchestrator_requires_workflow_fit_before_pregoal_artifacts(self):
+    def test_orchestrator_requires_process_need_before_pregoal_artifacts(self):
         orchestrator = self.read(
             ".agents/skills/orchestrating-cybernetic-pregoal/SKILL.md"
         )
         folded = orchestrator.casefold()
 
-        self.assertIn("Workflow Fit Check", orchestrator)
+        self.assertIn("Process Need Check", orchestrator)
         self.assertIn(
             "A user request to use full pre-goal compilation is not sufficient by itself.",
             orchestrator,

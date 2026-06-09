@@ -14,26 +14,26 @@ Pre-goal compilation complete.
 Artifacts:
 - Requirements analysis: `...`
 - Solution design: `...` or `not required`
-- Goal contract: `...`
+- Goal file: `...`
 - Execution policy: `...`
-- Control review: `...` (`Approved`)
+- Review: `...` (`Approved`)
 
 Control summary:
 - Approved target: ...
 - Solution model: ...
-- Invariants: ...
+- Rules That Cannot Change: ...
 - Execution policy: ...
 - Evidence checks: ...
 - Runtime limit: ...
 
-Runtime goal contract:
+Runtime goal file:
 
 `docs/cybernetics/runtime-goals/YYYY-MM-DD-slug.goal.md`
 
 User-entered short `/goal` pointer:
 
 ```text
-/goal Execute the runtime goal contract at docs/cybernetics/runtime-goals/YYYY-MM-DD-slug.goal.md. Read it first and follow it exactly. If any referenced artifact is missing, not approved, or inconsistent, stop and report the smallest required human decision.
+/goal Execute the runtime goal file at docs/cybernetics/runtime-goals/YYYY-MM-DD-slug.goal.md. Read it first and follow it exactly. If any referenced artifact is missing, not approved, or inconsistent, stop and report the smallest required human decision.
 ```
 
 Do not start the goal until you are ready for runtime execution.
@@ -79,11 +79,11 @@ Before responding, verify:
 - [ ] No required solution design synthesis was emulated inside the orchestrator.
 - [ ] Requirements analysis was complete before creating downstream artifacts.
 - [ ] Required solution design was created by `$designing-cybernetic-solutions` or explicitly provided before goal writing, otherwise blocked.
-- [ ] Existing design artifact paths were propagated to goal, execution policy, review, and runtime compilation.
-- [ ] Output contract presence was propagated and validated; no output contract was synthesized by the orchestrator.
-- [ ] Goal contract preserved confirmed human decisions.
+- [ ] Existing design artifact paths were propacheckd to goal, execution policy, review, and runtime compilation.
+- [ ] Output contract presence was propacheckd and validated; no output contract was synthesized by the orchestrator.
+- [ ] Goal file preserved confirmed human decisions.
 - [ ] Goal and execution policy preserved required solution design.
-- [ ] Execution policy preserved the goal contract.
+- [ ] Execution policy preserved the goal file.
 - [ ] Execution policy uses `$superpowers:writing-plans` for non-trivial execution policies or blocks.
 - [ ] Review checked the whole approved work chain, including design when required, not only the plan.
 - [ ] Review does not mark self-review as `Approved`.
@@ -92,11 +92,11 @@ Before responding, verify:
 - [ ] Review status is `Approved` before final runtime `/goal` is emitted.
 - [ ] If not approved, the response is blocked and asks for the smallest necessary decision.
 - [ ] If blocked, the response includes `Next allowed action` and a response-only next step.
-- [ ] Runtime goal contract references requirements analysis, required design, goal, plan, and review files.
+- [ ] Runtime goal file references requirements analysis, required design, goal, plan, and review files.
 - [ ] User-entered `/goal` is pointer-only and length-bounded.
 - [ ] User-entered `/goal` does not inline What the User Approved, user-purpose evidence, result placement, what-counts-as-done, work coverage and action limits, work assignment, evidence check governance, or review discipline prose.
-- [ ] Runtime goal contract includes the missing/not-approved/inconsistent artifact precondition.
-- [ ] Runtime goal contract includes executing, debugging, and completion-verification discipline.
+- [ ] Runtime goal file includes the missing/not-approved/inconsistent artifact precondition.
+- [ ] Runtime goal file includes executing, debugging, and completion-verification discipline.
 - [ ] User-entered `/goal` does not tell Codex to write or approve a new plan.
 
 ## Common Mistakes
@@ -108,7 +108,7 @@ Before responding, verify:
 | Creating a final `/goal` from an incomplete requirements analysis | Stop and return to requirements analysis |
 | Skipping design when required design is required | Run `$designing-cybernetic-solutions` before goal writing |
 | Synthesizing solution design inside the orchestrator | Stop; invoke/request `$designing-cybernetic-solutions` or block |
-| Dropping an existing design artifact because required design is satisfied | Propagate the design path downstream |
+| Dropping an existing design artifact because required design is satisfied | Propacheck the design path downstream |
 | Reviewing only the plan | Review requirements analysis, design when required, goal, and runtime limit |
 | Replacing missing `$superpowers:writing-plans` with an ad hoc approved plan | Stop and report missing planning infrastructure |
 | Marking Approved after fixing reviewer blockers without final re-review | Mark artifacts Dirty / Needs Re-review and run final independent re-review |

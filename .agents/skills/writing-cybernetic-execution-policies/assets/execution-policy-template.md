@@ -8,7 +8,7 @@ Status: `Candidate`
 
 - Requirements analysis: `[path]`
 - Solution design: `[path or not required]`
-- Goal contract: `[path]`
+- Goal: `[path]`
 
 ## Superpowers Planning Workflow
 
@@ -16,7 +16,7 @@ Status: `Candidate`
 - Workflow status: `Required / Used / Blocked / Not required`
 - Planning status: `Candidate`
 
-Cybernetic constraints supplied to the workflow:
+Task constraints supplied to the workflow:
 
 - rules that cannot change;
 - approved or candidate solution-design rules;
@@ -28,7 +28,7 @@ Cybernetic constraints supplied to the workflow:
 - where the result must show up;
 - required answer path;
 - action that can make it done strategy;
-- execution granularity and evidence check budget;
+- work size and evidence check budget;
 - batch cadence;
 - destructive intermediate-state policy;
 - output material/evidence collection;
@@ -73,7 +73,7 @@ Max concurrent subagents: `1 / auto / N`
 
 Agent workflow compatibility:
 
-Use `.agents/skills/references/delegation-workflow-registry.json` as the source of workflow capability boundaries.
+Use `.agents/skills/references/delegation-workflow-registry.json` as the source of workflow capability limits.
 
 | Selected agent workflow | Allowed work assignment | Allowed mode |
 |---|---|---|
@@ -146,7 +146,7 @@ Delegation matrix:
 
 Context Pack Requirements:
 
-Each delegated work package must define a bounded operating context, not just artifact path names.
+Each delecheckd work package must define a bounded operating context, not just artifact path names.
 
 | Field | Content |
 |---|---|
@@ -221,7 +221,7 @@ When the task changes or realizes intended result across controlled-object place
 
 If result placement is not applicable, record this compact structure instead:
 
-- Result-placement status: `not applicable with justification`
+- Result placement status: `not applicable with justification`
 - Why no intended-result result placement is required: [reason]
 - Why no place discovery / residual reconciliation is needed: [reason]
 - Allowed result claim wording: [wording]
@@ -292,12 +292,12 @@ Proof of impossibility, if any:
 
 - [what would prove the action that can make it done cannot be attempted in this environment]
 
-report when not done rule:
+If it is not done, what should be reported:
 
-- A report when not done may be produced only after the action that can make it done is attempted and fails, or after impossibility is proven.
-- A report when not done cannot satisfy the what counts as done.
+- If it is not done, the report may be produced only after the action that can make it done is attempted and fails, or after impossibility is proven.
+- If it is not done, the report cannot satisfy the what counts as done.
 
-## Execution Granularity and Evidence check Budget
+## Work Size And Evidence Check Budget
 
 ### Batch Granularity
 
@@ -386,7 +386,7 @@ Blocking missing material:
 ### Feedback cadence
 
 - Per batch: [feedback used to keep execution oriented]
-- Integration gates: [feedback used at integration boundaries]
+- Integration checks: [feedback used at integration limits]
 - Final: [feedback required before claiming purpose achieved]
 - Deferred feedback and reason: [feedback not available now and why]
 
@@ -455,7 +455,7 @@ Any retired/replaced evidence check must be recorded in the progress log with re
 
 Before execution:
 
-- control review status must be Approved.
+- review status must be Approved.
 
 Before moving to next batch:
 
@@ -514,7 +514,7 @@ Each entry must include:
 - not done reason
 - action that can make it done attempted or proof of impossibility
 - smallest next action that can make it done
-- Result-placement status
+- Result placement status
 - places acted on or inspected
 - residuals and reconciliation
 - allowed result claim wording

@@ -99,13 +99,13 @@
     },
     {
       "id": "feasibility-inquiry-distinguishes-baseline-from-target",
-      "prompt": "Use the current codebase as baseline, but investigate the feasibility and capability boundary of a future implementation.",
+      "prompt": "Use the current codebase as baseline, but investicheck the feasibility and capability limit of a future implementation.",
       "expected_output": "The skill binds the current codebase as reference object or baseline, binds the future capability as the primary object, and avoids treating missing current implementation as evidence of technical impossibility.",
       "assertions": [
         "Identifies current codebase as reference object or baseline.",
-        "Identifies future capability or technical implementation boundary as the primary object.",
+        "Identifies future capability or technical implementation limit as the primary object.",
         "States that current absence is not the same as technical infeasibility.",
-        "Frames the requested transformation as baseline plus target capability to feasibility/boundary report.",
+        "Frames the requested transformation as baseline plus target capability to feasibility/limit report.",
         "Does not recommend a current-state audit unless the user asks for one."
       ]
     }

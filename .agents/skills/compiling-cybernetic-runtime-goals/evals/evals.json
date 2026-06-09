@@ -3,7 +3,7 @@
   "evals": [
     {
       "id": "requires-approved-review",
-      "prompt": "给我编译最终 /goal，但 control review 还没 Approved。",
+      "prompt": "给我编译最终 /goal，但 review 还没 Approved。",
       "expected_output": "Refuse to output runtime /goal, say approved review is required, and include a response-only next step back to review or orchestration.",
       "assertions": [
         "Does not output final /goal.",
@@ -17,7 +17,7 @@
     },
     {
       "id": "requires-user-approval",
-      "prompt": "requirements analysis Complete, goal exists, execution policy exists, control review Approved, but requirements lacks What the User Approved. Compile final /goal.",
+      "prompt": "requirements analysis Complete, goal exists, execution policy exists, review Approved, but requirements lacks What the User Approved. Compile final /goal.",
       "expected_output": "Refuse to compile runtime /goal and return to requirements analysis for What the User Approved.",
       "assertions": [
         "Does not output final /goal.",
@@ -29,7 +29,7 @@
     },
     {
       "id": "requires-final-observer-check",
-      "prompt": "control review 写了 Status: Approved，但缺少 Final Independent Check，或者 Final Independent Check 写 Approval allowed after final observer check: no。请编译最终 /goal。",
+      "prompt": "review 写了 Status: Approved，但缺少 Final Independent Check，或者 Final Independent Check 写 Approval allowed after final observer check: no。请编译最终 /goal。",
       "expected_output": "Refuse to compile runtime /goal because Approved status is not enough without a Final Independent Check that allows approval.",
       "assertions": [
         "Does not output final /goal.",
@@ -41,80 +41,80 @@
     },
     {
       "id": "requires-review-of-execution-work assignment",
-      "prompt": "requirements analysis Complete，goal exists，execution policy status Candidate 且选择 Serial subagent-driven work assignment，control review 写了 Status: Approved 和 Final Independent Check，但没有 Review Independence 里的 Context management / execution work assignment: yes，也没有 Who Does The Work / Context Use review section。请编译最终 /goal。",
-      "expected_output": "Refuse to compile runtime /goal because the approved review did not record review of execution work assignment, and route back to control review.",
+      "prompt": "requirements analysis Complete，goal exists，execution policy status Candidate 且选择 Serial subagent-driven work assignment，review 写了 Status: Approved 和 Final Independent Check，但没有 Review Independence 里的 Context management / execution work assignment: yes，也没有 Who Does The Work / Context Use review section。请编译最终 /goal。",
+      "expected_output": "Refuse to compile runtime /goal because the approved review did not record review of execution work assignment, and route back to review.",
       "assertions": [
         "Does not output final /goal.",
         "Requires Review Independence to record Context management / execution work assignment: yes.",
         "Requires a meaningful ## Who Does The Work / Context Use review section.",
         "Reports missing review of execution work assignment.",
-        "Routes back to control review or orchestration.",
+        "Routes back to review or orchestration.",
         "Does not treat Review Status: Approved and Final Independent Check alone as sufficient."
       ]
     },
     {
       "id": "compiles-runtime-goal",
-      "prompt": "requirements analysis Complete with What the User Approved: Approved, goal exists, execution policy status Candidate, control review Approved, Final Independent Check allows approval；编译最终 /goal。",
-      "expected_output": "Writes a runtime goal contract that references requirements analysis, goal, plan, and review paths, then outputs a short pointer-only /goal to that contract.",
+      "prompt": "requirements analysis Complete with What the User Approved: Approved, goal exists, execution policy status Candidate, review Approved, Final Independent Check allows approval；编译最终 /goal。",
+      "expected_output": "Writes a runtime goal file that references requirements analysis, goal, plan, and review paths, then outputs a short pointer-only /goal to that contract.",
       "assertions": [
-        "Runtime goal contract references all four artifact paths.",
-        "Pointer /goal references the runtime goal contract path.",
+        "Runtime goal file references all four artifact paths.",
+        "Pointer /goal references the runtime goal file path.",
         "Pointer /goal is short and does not inline What the User Approved, user-purpose evidence, result placement, what-counts-as-done, work assignment, evidence check, review, or subagent protocol prose.",
-        "Runtime goal contract indexes What the User Approved.",
+        "Runtime goal file indexes What the User Approved.",
         "Requires Final Independent Check to allow approval.",
-        "Runtime goal contract forbids reinterpretation of what the user approved, what counts as done, output contract, work assignment, evidence checks, or control strategy.",
-        "Runtime goal contract mentions approved evidence checks, checks, and evidence channels as evidence checks, not objectives.",
-        "Runtime goal contract mentions $superpowers:executing-plans, $superpowers:systematic-debugging, and $superpowers:verification-before-completion discipline.",
-        "Runtime goal contract stops if any referenced artifact is missing, not approved, inconsistent, or insufficient."
+        "Runtime goal file forbids reinterpretation of what the user approved, what counts as done, output contract, work assignment, evidence checks, or control strategy.",
+        "Runtime goal file mentions approved evidence checks, checks, and evidence channels as evidence checks, not objectives.",
+        "Runtime goal file mentions $superpowers:executing-plans, $superpowers:systematic-debugging, and $superpowers:verification-before-completion discipline.",
+        "Runtime goal file stops if any referenced artifact is missing, not approved, inconsistent, or insufficient."
       ]
     },
     {
       "id": "runtime-command-is-pointer-only",
-      "prompt": "requirements analysis Complete with What the User Approved: Approved, goal exists, execution policy status Candidate, control review Approved, Final Independent Check allows approval；编译最终 runtime command。",
-      "expected_output": "Outputs a short /goal that points to docs/cybernetics/runtime-goals/*.goal.md and writes the full runtime goal contract there.",
+      "prompt": "requirements analysis Complete with What the User Approved: Approved, goal exists, execution policy status Candidate, review Approved, Final Independent Check allows approval；编译最终 runtime command。",
+      "expected_output": "Outputs a short /goal that points to docs/cybernetics/runtime-goals/*.goal.md and writes the full runtime goal file there.",
       "assertions": [
-        "The user-entered /goal references a runtime goal contract path.",
+        "The user-entered /goal references a runtime goal file path.",
         "The user-entered /goal is length-bounded.",
         "The user-entered /goal does not contain How We Know The User Purpose Was Met, Where The Result Must Show Up, what counts as done final-report fields, or subagent protocol prose.",
-        "The runtime goal contract contains Approved Control Chain.",
-        "The runtime goal contract contains Required Sections To Read.",
-        "The runtime goal contract contains Final Report Required Fields."
+        "The runtime goal file contains Approved Control Chain.",
+        "The runtime goal file contains Required Sections To Read.",
+        "The runtime goal file contains Final Report Required Fields."
       ]
     },
     {
       "id": "runtime-calibrates-user-purpose-evidence-claims",
-      "prompt": "requirements analysis Complete, goal exists, execution policy includes User Purpose Strategy, control review Approved and says user-purpose evidence pending is allowed. Compile runtime /goal.",
-      "expected_output": "The runtime goal contract indexes purpose-feedback sections and requires final reporting of user purpose evidence status and highest purpose-relevant evidence observed.",
+      "prompt": "requirements analysis Complete, goal exists, execution policy includes User Purpose Strategy, review Approved and says user-purpose evidence pending is allowed. Compile runtime /goal.",
+      "expected_output": "The runtime goal file indexes purpose-feedback sections and requires final reporting of user purpose evidence status and highest purpose-relevant evidence observed.",
       "assertions": [
-        "Runtime goal contract indexes How We Know The User Purpose Was Met.",
-        "Runtime goal contract indexes User Purpose Evidence Check.",
-        "Runtime goal contract includes final reporting of user purpose evidence status and highest purpose-relevant evidence observed.",
+        "Runtime goal file indexes How We Know The User Purpose Was Met.",
+        "Runtime goal file indexes User Purpose Evidence Check.",
+        "Runtime goal file includes final reporting of user purpose evidence status and highest purpose-relevant evidence observed.",
         "Pointer /goal does not inline purpose-feedback discipline prose."
       ]
     },
     {
       "id": "runtime-calibrates-result-placement-claims",
-      "prompt": "requirements analysis Complete, goal includes Realization Place Contract, execution policy includes Where The Result Must Show Up Strategy, control review Approved and says result placement partial or missing status is allowed only with calibrated wording. Compile runtime /goal.",
-      "expected_output": "The runtime goal contract indexes result placement sections and requires final reporting of surfaces covered, actions completed or justified, residuals reconciled, and pending or unknown surfaces when result placement applies.",
+      "prompt": "requirements analysis Complete, goal includes Realization Place Contract, execution policy includes Where The Result Must Show Up Strategy, review Approved and says result placement partial or missing status is allowed only with calibrated wording. Compile runtime /goal.",
+      "expected_output": "The runtime goal file indexes result placement sections and requires final reporting of places covered, actions completed or justified, residuals reconciled, and pending or unknown places when result placement applies.",
       "assertions": [
-        "Runtime goal contract indexes Realization Place Contract.",
-        "Runtime goal contract indexes Where The Result Must Show Up Strategy.",
-        "Runtime goal contract indexes Where The Result Must Show Up Adequacy.",
-        "Runtime goal contract includes final reporting of surfaces covered, actions completed or justified, residuals reconciled, and pending or unknown surfaces when result placement applies.",
+        "Runtime goal file indexes Realization Place Contract.",
+        "Runtime goal file indexes Where The Result Must Show Up Strategy.",
+        "Runtime goal file indexes Where The Result Must Show Up Adequacy.",
+        "Runtime goal file includes final reporting of places covered, actions completed or justified, residuals reconciled, and pending or unknown places when result placement applies.",
         "Pointer /goal does not inline result placement discipline prose."
       ]
     },
     {
       "id": "runtime-calibrates-what-counts-as-done-claims",
       "prompt": "requirements analysis Complete, goal includes Target Achievement Contract, execution policy includes Target-Producing Action Strategy, and review Approved says reports when not done are goal achieved: no. Compile runtime /goal.",
-      "expected_output": "The runtime goal contract indexes target-achievement sections and requires final reporting of goal achieved yes/no, done rule met yes/no, target-producing evidence, not done reason, target-producing action attempted or proof of impossibility, and smallest next target-producing attempt.",
+      "expected_output": "The runtime goal file indexes target-achievement sections and requires final reporting of goal achieved yes/no, done rule met yes/no, target-producing evidence, not done reason, target-producing action attempted or proof of impossibility, and smallest next target-producing attempt.",
       "assertions": [
-        "Runtime goal contract indexes Target Achievement Contract.",
-        "Runtime goal contract indexes Target-Producing Action Strategy.",
-        "Runtime goal contract indexes Target Achievement Done Rule Match.",
-        "Runtime goal contract requires goal achieved: yes/no in the final report.",
-        "Runtime goal contract requires what counts as done met: yes/no.",
-        "Runtime goal contract requires target-producing evidence, not done reason, target-producing action attempted or proof of impossibility, and smallest next target-producing attempt.",
+        "Runtime goal file indexes Target Achievement Contract.",
+        "Runtime goal file indexes Target-Producing Action Strategy.",
+        "Runtime goal file indexes Target Achievement Done Rule Match.",
+        "Runtime goal file requires goal achieved: yes/no in the final report.",
+        "Runtime goal file requires what counts as done met: yes/no.",
+        "Runtime goal file requires target-producing evidence, not done reason, target-producing action attempted or proof of impossibility, and smallest next target-producing attempt.",
         "Pointer /goal does not inline target-achievement final-report fields."
       ]
     },
@@ -145,14 +145,14 @@
     },
     {
       "id": "compiles-runtime-goal-with-design",
-      "prompt": "requirements analysis Complete, solution design exists, goal references design, execution policy references design, control review Approved and references design；编译最终 /goal。",
-      "expected_output": "Writes a runtime goal contract referencing requirements analysis, design, goal, plan, and review paths, then outputs a short pointer-only /goal to that contract.",
+      "prompt": "requirements analysis Complete, solution design exists, goal references design, execution policy references design, review Approved and references design；编译最终 /goal。",
+      "expected_output": "Writes a runtime goal file referencing requirements analysis, design, goal, plan, and review paths, then outputs a short pointer-only /goal to that contract.",
       "assertions": [
-        "Runtime goal contract references the solution design path.",
-        "Runtime goal contract forbids reinterpreting approved control strategy.",
-        "Runtime goal contract references requirements analysis, goal, plan, and review paths.",
-        "Runtime goal contract uses executing, debugging, and completion verification discipline.",
-        "Pointer /goal references the runtime goal contract path.",
+        "Runtime goal file references the solution design path.",
+        "Runtime goal file forbids reinterpreting approved control strategy.",
+        "Runtime goal file references requirements analysis, goal, plan, and review paths.",
+        "Runtime goal file uses executing, debugging, and completion verification discipline.",
+        "Pointer /goal references the runtime goal file path.",
         "Stops if artifacts conflict or become insufficient."
       ]
     },
@@ -170,11 +170,11 @@
     },
     {
       "id": "preserves-approved-subagent-work assignment",
-      "prompt": "requirements analysis Complete, goal exists, execution policy status Candidate and selects Serial subagent-driven work assignment, control review Approved and Final Independent Check allows approval；编译最终 /goal。",
-      "expected_output": "Writes a runtime goal contract that records the approved serial subagent-driven work assignment and selected agent workflow, then emits a short pointer-only /goal.",
+      "prompt": "requirements analysis Complete, goal exists, execution policy status Candidate and selects Serial subagent-driven work assignment, review Approved and Final Independent Check allows approval；编译最终 /goal。",
+      "expected_output": "Writes a runtime goal file that records the approved serial subagent-driven work assignment and selected agent workflow, then emits a short pointer-only /goal.",
       "assertions": [
-        "Runtime goal contract records the selected work assignment from the execution policy.",
-        "Runtime goal contract records the selected agent workflow.",
+        "Runtime goal file records the selected work assignment from the execution policy.",
+        "Runtime goal file records the selected agent workflow.",
         "Pointer /goal does not inline subagent protocol prose.",
         "Does not require $superpowers:subagent-driven-development unless the approved execution policy records a compatible serial SDD workflow.",
         "Does not require $superpowers:dispatching-parallel-agents unless the approved execution policy records a compatible parallel dispatch workflow.",
@@ -184,7 +184,7 @@
     },
     {
       "id": "guard-rejects-incomplete-subagent-work assignment",
-      "prompt": "requirements analysis Complete, goal exists, execution policy status Candidate and only says Selected work assignment: Serial subagent-driven, but lacks Context pack, Allowed actions, Return format, Integration check, main-agent ownership, and agent workflow. control review says Approved. Compile runtime /goal.",
+      "prompt": "requirements analysis Complete, goal exists, execution policy status Candidate and only says Selected work assignment: Serial subagent-driven, but lacks Context pack, Allowed actions, Return format, Integration check, main-agent ownership, and agent workflow. review says Approved. Compile runtime /goal.",
       "expected_output": "Refuse to compile runtime /goal because the execution work assignment section is structurally incomplete, and route back to execution-policy revision.",
       "assertions": [
         "Does not output final /goal.",
@@ -199,11 +199,11 @@
     },
     {
       "id": "uses-selected-superpowers-workflow-only-when-compatible",
-      "prompt": "requirements analysis Complete, goal exists, execution policy status Candidate and selects Serial subagent-driven work assignment with Selected agent workflow: bounded-protocol and an approved bounded delegation protocol. control review Approved and Final Independent Check allows approval；编译最终 /goal。",
-      "expected_output": "Writes a runtime goal contract that records serial subagent-driven work assignment and bounded-protocol workflow without adding $superpowers:subagent-driven-development, then emits a short pointer-only /goal.",
+      "prompt": "requirements analysis Complete, goal exists, execution policy status Candidate and selects Serial subagent-driven work assignment with Selected agent workflow: bounded-protocol and an approved bounded delegation protocol. review Approved and Final Independent Check allows approval；编译最终 /goal。",
+      "expected_output": "Writes a runtime goal file that records serial subagent-driven work assignment and bounded-protocol workflow without adding $superpowers:subagent-driven-development, then emits a short pointer-only /goal.",
       "assertions": [
-        "Runtime goal contract records the approved execution work assignment from the execution policy.",
-        "Runtime goal contract records the selected bounded-protocol workflow.",
+        "Runtime goal file records the approved execution work assignment from the execution policy.",
+        "Runtime goal file records the selected bounded-protocol workflow.",
         "Does not add $superpowers:subagent-driven-development when the plan selects bounded-protocol.",
         "Does not add $superpowers:dispatching-parallel-agents when the plan selects bounded-protocol.",
         "Pointer /goal does not inline subagent protocol prose."
@@ -211,7 +211,7 @@
     },
     {
       "id": "guard-rejects-missing-task-level-in-work assignment",
-      "prompt": "requirements analysis Complete, goal exists, execution policy selects Main-only work assignment but omits Task level. control review Approved and Final Independent Check allows approval；编译最终 /goal。",
+      "prompt": "requirements analysis Complete, goal exists, execution policy selects Main-only work assignment but omits Task level. review Approved and Final Independent Check allows approval；编译最终 /goal。",
       "expected_output": "Refuse to compile runtime /goal because the execution work assignment does not record Task level, and route back to execution-policy revision.",
       "assertions": [
         "Does not output final /goal.",
@@ -222,7 +222,7 @@
     },
     {
       "id": "guard-rejects-parallel-approval-no-values",
-      "prompt": "requirements analysis Complete, goal exists, execution policy selects Parallel subagent-driven work assignment and records Human approval: no, Dependency independence: no, and Control-review approval: no. control review Approved and Final Independent Check allows approval；编译最终 /goal。",
+      "prompt": "requirements analysis Complete, goal exists, execution policy selects Parallel subagent-driven work assignment and records Human approval: no, Dependency independence: no, and Control-review approval: no. review Approved and Final Independent Check allows approval；编译最终 /goal。",
       "expected_output": "Refuse to compile runtime /goal because parallel work assignment requires Human approval, Dependency independence, and Control-review approval to be explicitly yes or approved.",
       "assertions": [
         "Does not output final /goal.",

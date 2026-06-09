@@ -1,4 +1,4 @@
-# Cybernetic Requirements Analysis: [Name]
+# Requirements: [Name]
 
 ## Requirements Analysis Status
 
@@ -23,7 +23,7 @@ Approval applies only to this compact control commitment.
 | Where the result must show up | [places, interfaces, records, behavior, docs, or outputs that must carry the result, plus old behavior to check] |
 | What counts as done | [the only condition that allows "goal achieved: yes"] |
 | Evidence needed to call it done | [evidence/action/observation required before claiming done] |
-| report when not done handling | [how to report "goal achieved: no" without making it an alternate goal] |
+| If it is not done, what should be reported | [how to report "goal achieved: no" without making it an alternate goal] |
 | Required answer path | [one actor-centered path from initial state to done] |
 | How this should be answered | [what method/evidence structure is required for this question to count as answered] |
 | What is not enough | [plausible weaker answer that must not be substituted for the approved answering method] |
@@ -35,9 +35,9 @@ Approval applies only to this compact control commitment.
 | Agent delegation preference | [serial / max-safe-parallel / no preference] |
 | Agent workflow preference | [superpowers-subagent-driven-development / superpowers-dispatching-parallel-agents / bounded-protocol / adapter-specific / no preference] |
 | Parallel execution authority | [approved / not approved / not applicable] |
-| Parallelism cap | [auto / N / not specified] |
+| Maximum parallel agents | [auto / N / not specified] |
 | Final answer format | [audience, purpose, medium, structure, destination, acceptance] |
-| Workflow fit | [why full pre-goal orchestration is required / or why it is not] |
+| Why this process is needed | [why full pre-goal orchestration is required / or why it is not] |
 | Known assumptions | [safe defaults and assumptions] |
 
 Approval record:
@@ -115,7 +115,7 @@ Outside scope:
 | Places the result must appear | [behavior, interface, record, report, policy, compatibility point, or other place that must carry the intended result] |
 | Required action | [change / inspect / preserve / exclude / discover] |
 | Old behavior check | [old state, unknown places, exclusions, preserved behavior, remaining mismatches, and accounting method] |
-| Result-placement status | `adequate / partial / missing / unavailable / not applicable with justification` |
+| Result placement status | `adequate / partial / missing / unavailable / not applicable with justification` |
 | Distinction from user-purpose evidence | result-placement is distinct from How We Know The User Purpose Was Met. Result-placement claims are about where the intended result appears; user-purpose claims are about whether the human's purpose was met. |
 
 ## Blocking Human Decisions

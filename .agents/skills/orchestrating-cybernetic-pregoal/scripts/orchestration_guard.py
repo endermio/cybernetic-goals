@@ -62,18 +62,18 @@ def blocked_next_action(errors: list[str]) -> str:
         or "answer method check" in joined
     ):
         return "RunDesign"
-    if "output contract gate" in joined and "design lacks" in joined:
+    if "output contract check" in joined and "design lacks" in joined:
         return "RunDesign"
-    if "output contract gate" in joined and "goal lacks" in joined:
+    if "output contract check" in joined and "goal lacks" in joined:
         return "RunGoalWriting"
     if "output contract is required" in joined and "goal lacks" in joined:
         return "RunGoalWriting"
-    if "goal contract is required" in joined or "goal does not reference" in joined:
+    if "goal file is required" in joined or "goal does not reference" in joined:
         return "RunGoalWriting"
     if (
         "execution policy is required" in joined
         or "execution policy status" in joined
-        or "execution topology" in joined
+        or "execution work assignment" in joined
         or "plan does not reference" in joined
         or "subagent execution mode" in joined
         or "max concurrent subagents" in joined
@@ -99,7 +99,7 @@ def blocked_next_action(errors: list[str]) -> str:
     ):
         return "RunExecutionPolicy"
     if (
-        "control review" in joined
+        "review" in joined
         or "final observer" in joined
         or "review does not reference" in joined
         or "post-review" in joined
@@ -110,7 +110,7 @@ def blocked_next_action(errors: list[str]) -> str:
 
 def ok_next_action(state: str, requirements: str | None, design_path: str | None) -> str:
     if state == "before-design":
-        if design_gate_required(requirements) and not design_path:
+        if design_check_required(requirements) and not design_path:
             return "RunDesign"
         return "RunGoalWriting"
     return NEXT_ACTION[state]
@@ -164,11 +164,11 @@ def first_section_status(text: str, *headings: str) -> str | None:
     return None
 
 
-def design_gate_required(*texts: str | None) -> bool:
+def design_check_required(*texts: str | None) -> bool:
     combined = "\n".join(text for text in texts if text)
     for line in combined.splitlines():
         lowered = line.casefold()
-        if "design gate" not in lowered:
+        if "design check" not in lowered:
             continue
         if re.search(r"not\s+required|not\s+applicable|satisfied", lowered):
             continue
@@ -177,11 +177,11 @@ def design_gate_required(*texts: str | None) -> bool:
     return False
 
 
-def output_contract_gate_required(*texts: str | None) -> bool:
+def output_contract_check_required(*texts: str | None) -> bool:
     combined = "\n".join(text for text in texts if text)
     for line in combined.splitlines():
         lowered = line.casefold()
-        if "output contract gate" not in lowered:
+        if "output contract check" not in lowered:
             continue
         if re.search(r"not\s+required|not\s+applicable|satisfied", lowered):
             continue
@@ -234,10 +234,10 @@ def output_contract_present_upstream(requirements: str | None = None, design: st
 
 
 def output_contract_required(requirements: str | None, design: str | None, goal: str | None) -> bool:
-    return output_contract_gate_required(requirements, design, goal) or output_contract_present_upstream(requirements, design, goal)
+    return output_contract_check_required(requirements, design, goal) or output_contract_present_upstream(requirements, design, goal)
 
 
-def selected_execution_topology(plan: str | None) -> str | None:
+def selected_execution_work_assignment(plan: str | None) -> str | None:
     if not plan:
         return None
     body = section_body(plan, "Who Does The Work / Context Use")
@@ -294,15 +294,15 @@ def normalize_agent_workflow(value: str | None) -> str | None:
 DELEGATION_WORKFLOW_REGISTRY_PATH = Path(__file__).resolve().parents[2] / "references/delegation-workflow-registry.json"
 
 
-def delegation_substrate_registry() -> dict[str, object]:
+def delegation_workflow_registry() -> dict[str, object]:
     try:
         return json.loads(DELEGATION_WORKFLOW_REGISTRY_PATH.read_text(encoding="utf-8"))
     except (FileNotFoundError, json.JSONDecodeError):
         return {}
 
 
-def delegation_substrate_definition(substrate: str | None) -> dict[str, object]:
-    value = delegation_substrate_registry().get(substrate or "", {})
+def delegation_workflow_definition(workflow: str | None) -> dict[str, object]:
+    value = delegation_workflow_registry().get(workflow or "", {})
     return value if isinstance(value, dict) else {}
 
 
@@ -486,7 +486,7 @@ def has_table_with_data_row(body: str, required_columns: list[str]) -> bool:
 CONTEXT_PACK_FIELDS = [
     "Relevant control excerpts",
     "Current batch objective",
-    "Allowed artifacts/surfaces",
+    "Allowed artifacts/places",
     "Forbidden changes",
     "Required evidence checks/evidence",
     "Stop conditions",
@@ -507,64 +507,64 @@ CONTEXT_COMPRESSION_FIELDS = [
 
 def check_labeled_requirements(body: str, heading: str, labels: list[str], errors: list[str]) -> None:
     if heading.casefold() not in body.casefold():
-        errors.append(f"execution topology missing {heading}: {', '.join(labels)}")
+        errors.append(f"execution work assignment missing {heading}: {', '.join(labels)}")
         return
     for label in labels:
         if not labeled_or_table_field_has_content(body, label):
-            errors.append(f"execution topology {heading} missing {label}")
+            errors.append(f"execution work assignment {heading} missing {label}")
 
 
-def check_execution_topology(plan: str | None, errors: list[str]) -> None:
+def check_execution_work_assignment(plan: str | None, errors: list[str]) -> None:
     body = section_body(plan or "", "Who Does The Work / Context Use")
     if body is None:
         errors.append("execution policy missing ## Who Does The Work / Context Use")
         return
 
-    topology = selected_execution_topology(plan)
-    if topology is None:
+    work_assignment = selected_execution_work_assignment(plan)
+    if work_assignment is None:
         errors.append("execution policy is required to define a selected Who Does The Work / Context Use")
         return
 
     if not labeled_block_has_content(body, "Work Assignment rationale"):
-        errors.append("execution topology missing Work Assignment rationale")
+        errors.append("execution work assignment missing Work Assignment rationale")
     if not labeled_block_has_content(body, "Main agent owns"):
-        errors.append("execution topology missing main-agent ownership")
+        errors.append("execution work assignment missing main-agent ownership")
 
     level = task_level(plan)
     if level is None:
-        errors.append("execution topology missing Task level")
-    if topology == "Main-only" and level in {3, 4} and not labeled_block_has_content(body, "Main-only context-load justification"):
-        errors.append("Level 3/4 Main-only execution topology missing Main-only context-load justification")
+        errors.append("execution work assignment missing Task level")
+    if work_assignment == "Main-only" and level in {3, 4} and not labeled_block_has_content(body, "Main-only context-load justification"):
+        errors.append("Level 3/4 Main-only execution work assignment missing Main-only context-load justification")
 
-    if topology in {"Serial subagent-driven", "Parallel subagent-driven"}:
+    if work_assignment in {"Serial subagent-driven", "Parallel subagent-driven"}:
         if not has_meaningful_delegation_matrix(body):
-            errors.append("execution topology missing meaningful delegation matrix with Context pack, Allowed actions, Return format, and Integration check")
+            errors.append("execution work assignment missing meaningful delegation matrix with Context pack, Allowed actions, Return format, and Integration check")
         check_labeled_requirements(body, "Context Pack Requirements", CONTEXT_PACK_FIELDS, errors)
-        substrate = selected_agent_workflow(plan)
-        if substrate is None:
-            errors.append("subagent-driven topology missing valid Selected agent workflow")
-        elif substrate == "none":
-            errors.append("subagent-driven topology cannot use Selected agent workflow: none")
+        workflow = selected_agent_workflow(plan)
+        if workflow is None:
+            errors.append("subagent-driven work assignment missing valid Selected agent workflow")
+        elif workflow == "none":
+            errors.append("subagent-driven work assignment cannot use Selected agent workflow: none")
         if not labeled_block_has_content(body, "Subagent workflow"):
-            errors.append("subagent-driven topology missing approved bounded subagent workflow")
+            errors.append("subagent-driven work assignment missing approved bounded subagent workflow")
 
         mode = selected_subagent_execution_mode(plan)
         max_concurrent = max_concurrent_subagents(plan)
-        check_substrate_mode_compatibility(topology, substrate, mode, max_concurrent, errors)
-        if topology == "Serial subagent-driven":
+        check_workflow_mode_compatibility(work_assignment, workflow, mode, max_concurrent, errors)
+        if work_assignment == "Serial subagent-driven":
             if mode != "serial-single-active":
-                errors.append("Serial subagent-driven topology requires Subagent execution mode: serial-single-active")
+                errors.append("Serial subagent-driven work assignment requires Subagent execution mode: serial-single-active")
             if max_concurrent != "1":
-                errors.append("Serial subagent-driven topology requires Max concurrent subagents: 1")
+                errors.append("Serial subagent-driven work assignment requires Max concurrent subagents: 1")
             if not labeled_block_has_content(body, "Ordered work package sequence"):
-                errors.append("Serial subagent-driven topology missing Ordered work package sequence")
+                errors.append("Serial subagent-driven work assignment missing Ordered work package sequence")
             if not labeled_block_has_content(body, "Integration check after each package"):
-                errors.append("Serial subagent-driven topology missing Integration check after each package")
-        elif topology == "Parallel subagent-driven":
+                errors.append("Serial subagent-driven work assignment missing Integration check after each package")
+        elif work_assignment == "Parallel subagent-driven":
             if mode != "parallel-max-safe":
-                errors.append("Parallel subagent-driven topology requires Subagent execution mode: parallel-max-safe")
+                errors.append("Parallel subagent-driven work assignment requires Subagent execution mode: parallel-max-safe")
             if max_concurrent is None or not (max_concurrent.casefold() == "auto" or re.fullmatch(r"[1-9][0-9]*", max_concurrent)):
-                errors.append("Parallel subagent-driven topology requires Max concurrent subagents: auto or N")
+                errors.append("Parallel subagent-driven work assignment requires Max concurrent subagents: auto or N")
             for label in (
                 "Concurrency selection rationale",
                 "Concurrency frontier rule",
@@ -572,51 +572,51 @@ def check_execution_topology(plan: str | None, errors: list[str]) -> None:
                 "Main-agent integration rule",
             ):
                 if not labeled_block_has_content(body, label):
-                    errors.append(f"Parallel subagent-driven topology missing {label}")
+                    errors.append(f"Parallel subagent-driven work assignment missing {label}")
             if not has_table_with_data_row(body, ["Artifact / state / shared place", "Lock owner", "Conflict rule"]):
-                errors.append("Parallel subagent-driven topology missing meaningful Conflict / lock model")
+                errors.append("Parallel subagent-driven work assignment missing meaningful Conflict / lock model")
             if not has_table_with_data_row(body, ["Wave", "Required-step frontier", "Work packages", "Independence proof", "Shared places / locks", "Integration barrier"]):
-                errors.append("Parallel subagent-driven topology missing meaningful Parallel wave matrix with Required-step frontier")
+                errors.append("Parallel subagent-driven work assignment missing meaningful Parallel wave matrix with Required-step frontier")
 
-    if topology in {"Serial subagent-driven", "Parallel subagent-driven"} or level in {3, 4}:
+    if work_assignment in {"Serial subagent-driven", "Parallel subagent-driven"} or level in {3, 4}:
         check_labeled_requirements(body, "Context Compression Rule", CONTEXT_COMPRESSION_FIELDS, errors)
 
-    if topology == "Parallel subagent-driven":
+    if work_assignment == "Parallel subagent-driven":
         for label in ("Human approval", "Dependency independence", "Control-review approval"):
             if not approval_value_is_yes(body, label):
-                errors.append(f"parallel execution topology requires {label}: yes/approved")
+                errors.append(f"parallel execution work assignment requires {label}: yes/approved")
 
 
-def check_substrate_mode_compatibility(
-    topology: str,
-    substrate: str | None,
+def check_workflow_mode_compatibility(
+    work_assignment: str,
+    workflow: str | None,
     mode: str | None,
     max_concurrent: str | None,
     errors: list[str],
 ) -> None:
-    definition = delegation_substrate_definition(substrate)
+    definition = delegation_workflow_definition(workflow)
     if definition:
-        allowed_topology = registry_list_field(definition, "allowed_topology")
+        allowed_work_assignment = registry_list_field(definition, "allowed_work_assignment")
         allowed_mode = registry_list_field(definition, "allowed_mode")
         max_rule = str(definition.get("max_concurrent", "")).strip()
-        if allowed_topology and topology not in allowed_topology:
-            errors.append(f"Selected agent workflow {substrate} is not compatible with topology {topology}")
+        if allowed_work_assignment and work_assignment not in allowed_work_assignment:
+            errors.append(f"Selected agent workflow {workflow} is not compatible with work assignment {work_assignment}")
         if allowed_mode and mode not in allowed_mode:
-            errors.append(f"Selected agent workflow {substrate} is not compatible with Subagent execution mode: {mode}")
+            errors.append(f"Selected agent workflow {workflow} is not compatible with Subagent execution mode: {mode}")
         if max_rule == "1" and max_concurrent != "1":
-            errors.append(f"Selected agent workflow {substrate} requires Max concurrent subagents: 1")
+            errors.append(f"Selected agent workflow {workflow} requires Max concurrent subagents: 1")
 
-    if substrate == "superpowers-subagent-driven-development":
-        if topology != "Serial subagent-driven" or mode != "serial-single-active" or max_concurrent != "1":
+    if workflow == "superpowers-subagent-driven-development":
+        if work_assignment != "Serial subagent-driven" or mode != "serial-single-active" or max_concurrent != "1":
             errors.append(
                 "Selected agent workflow superpowers-subagent-driven-development supports only Serial subagent-driven, Subagent execution mode: serial-single-active, Max concurrent subagents: 1; it cannot be used with parallel-max-safe"
             )
-    if substrate == "superpowers-dispatching-parallel-agents":
-        if topology != "Parallel subagent-driven" or mode != "parallel-max-safe":
+    if workflow == "superpowers-dispatching-parallel-agents":
+        if work_assignment != "Parallel subagent-driven" or mode != "parallel-max-safe":
             errors.append(
                 "Selected agent workflow superpowers-dispatching-parallel-agents supports only Parallel subagent-driven with Subagent execution mode: parallel-max-safe"
             )
-    if mode == "parallel-max-safe" and substrate == "superpowers-subagent-driven-development":
+    if mode == "parallel-max-safe" and workflow == "superpowers-subagent-driven-development":
         errors.append("parallel-max-safe cannot use Selected agent workflow: superpowers-subagent-driven-development")
 
 
@@ -733,7 +733,7 @@ def bullet_has_content(text: str, label: str) -> bool:
 def check_final_observer(review: str, errors: list[str]) -> None:
     body = section_body(review, "Final Observer Check")
     if body is None:
-        errors.append("control review missing ## Final Observer Check")
+        errors.append("review missing ## Final Observer Check")
         return
 
     approval_allowed = yes_no_value(body, "Approval allowed after final observer check")
@@ -778,29 +778,29 @@ def check_max_safe_parallel_preference(requirements: str | None, plan: str | Non
     if preference is None or preference.casefold() != "max-safe-parallel":
         return
 
-    topology = selected_execution_topology(plan)
-    if topology == "Parallel subagent-driven":
+    work_assignment = selected_execution_work_assignment(plan)
+    if work_assignment == "Parallel subagent-driven":
         return
 
-    topology_body = section_body(plan, "Who Does The Work / Context Use") or ""
-    rationale = field_value(topology_body, "Concurrency selection rationale")
+    work_assignment_body = section_body(plan, "Who Does The Work / Context Use") or ""
+    rationale = field_value(work_assignment_body, "Concurrency selection rationale")
     if rationale is None or "safe frontier" not in rationale.casefold():
         errors.append(
             "What the User Approved records Agent delegation preference as max-safe-parallel but execution policy is not Parallel subagent-driven; Concurrency selection rationale must mention safe frontier"
         )
 
 
-def check_delegation_substrate_preference(requirements: str | None, plan: str | None, errors: list[str]) -> None:
+def check_delegation_workflow_preference(requirements: str | None, plan: str | None, errors: list[str]) -> None:
     hsa = section_body(requirements or "", "What the User Approved")
     if hsa is None:
         return
 
-    substrate_preference = normalize_agent_workflow(field_value(hsa, "Agent workflow preference"))
-    if substrate_preference in {None, "no preference"}:
+    workflow_preference = normalize_agent_workflow(field_value(hsa, "Agent workflow preference"))
+    if workflow_preference in {None, "no preference"}:
         return
 
     runtime_preference = (field_value(hsa, "Agent delegation preference") or "").casefold()
-    if runtime_preference == "max-safe-parallel" and substrate_preference == "superpowers-subagent-driven-development":
+    if runtime_preference == "max-safe-parallel" and workflow_preference == "superpowers-subagent-driven-development":
         errors.append(
             "What the User Approved records conflicting Agent workflow preference and Agent delegation preference: max-safe-parallel; superpowers-subagent-driven-development is serial-single-active only"
         )
@@ -810,19 +810,19 @@ def check_delegation_substrate_preference(requirements: str | None, plan: str | 
         return
 
     selected = selected_agent_workflow(plan)
-    if selected == substrate_preference:
+    if selected == workflow_preference:
         return
 
-    topology_body = section_body(plan, "Who Does The Work / Context Use") or ""
+    work_assignment_body = section_body(plan, "Who Does The Work / Context Use") or ""
     rationale = (
-        field_value(topology_body, "Agent workflow compatibility rationale")
-        or field_value(topology_body, "Agent workflow compatibility rationale")
+        field_value(work_assignment_body, "Agent workflow compatibility rationale")
+        or field_value(work_assignment_body, "Agent workflow compatibility rationale")
         or ""
     )
     lowered = rationale.casefold()
-    if not any(term in lowered for term in ("incompatible", "not compatible", "capability boundary", "unsupported")):
+    if not any(term in lowered for term in ("incompatible", "not compatible", "capability limit", "unsupported")):
         errors.append(
-            f"What the User Approved records Agent workflow preference as {substrate_preference}, but execution policy selected {selected}; record an agent workflow compatibility rationale before changing it"
+            f"What the User Approved records Agent workflow preference as {workflow_preference}, but execution policy selected {selected}; record an agent workflow compatibility rationale before changing it"
         )
 
 
@@ -835,36 +835,36 @@ def check_design_ready(
     errors: list[str],
 ) -> None:
     if not design_path or not design:
-        if design_gate_required(requirements):
+        if design_check_required(requirements):
             if not Path(design_skill_path).exists():
-                errors.append(f"Design Gate required but $designing-cybernetic-solutions is unavailable at {design_skill_path}")
+                errors.append(f"Design Check required but $designing-cybernetic-solutions is unavailable at {design_skill_path}")
             else:
-                errors.append("Design Gate required but design artifact is missing; next allowed action is RunDesign")
+                errors.append("Design Check required but design artifact is missing; next allowed action is RunDesign")
         return
 
     status = section_status(design, "Design Status")
     if status not in {"Candidate", "Reviewed", "Approved"}:
         errors.append(f"design status must be Candidate, Reviewed, or Approved: {status!r}")
     require_reference(design, requirements_path, "design", errors)
-    if output_contract_gate_required(requirements, design) and not output_contract_present_upstream(requirements, design):
-        errors.append("Final Answer Format Gate is required but no upstream output contract is present")
-    check_design_skeleton_fidelity(requirements, design, errors)
+    if output_contract_check_required(requirements, design) and not output_contract_present_upstream(requirements, design):
+        errors.append("Final Answer Format Check is required but no upstream output contract is present")
+    check_design_answer_path_check(requirements, design, errors)
     if has_blocking_design_questions(design):
         errors.append("design has blocking open design questions")
 
 
-TASK_SKELETON_REGISTRY_PATH = Path(__file__).resolve().parents[2] / "references/task-skeleton-registry.json"
+ANSWER_METHOD_REGISTRY_PATH = Path(__file__).resolve().parents[2] / "references/answer-method-registry.json"
 
 
-def task_skeleton_registry() -> dict[str, object]:
+def answer_method_registry() -> dict[str, object]:
     try:
-        return json.loads(TASK_SKELETON_REGISTRY_PATH.read_text(encoding="utf-8"))
+        return json.loads(ANSWER_METHOD_REGISTRY_PATH.read_text(encoding="utf-8"))
     except (FileNotFoundError, json.JSONDecodeError):
         return {}
 
 
-def task_skeleton_definition(family: str) -> dict[str, object]:
-    value = task_skeleton_registry().get(family, {})
+def answer_method_definition(family: str) -> dict[str, object]:
+    value = answer_method_registry().get(family, {})
     return value if isinstance(value, dict) else {}
 
 
@@ -875,7 +875,7 @@ def registry_string_list(definition: dict[str, object], key: str) -> list[str]:
     return [item for item in value if isinstance(item, str)]
 
 
-def check_design_skeleton_fidelity(requirements: str | None, design: str | None, errors: list[str]) -> None:
+def check_design_answer_path_check(requirements: str | None, design: str | None, errors: list[str]) -> None:
     hsa = section_body(requirements or "", "What the User Approved")
     if hsa is None or design is None:
         return
@@ -924,12 +924,12 @@ def check_goal_ready(
     errors: list[str],
 ) -> None:
     if not goal_path or not goal:
-        errors.append("goal contract is required")
+        errors.append("goal file is required")
         return
     require_reference(goal, requirements_path, "goal", errors)
     require_reference(goal, design_path, "goal", errors)
     if output_contract_required(requirements, design, goal) and not section_has_meaningful_content(goal, "Final Final Answer Format"):
-        errors.append("Output contract is required by gate or upstream artifact, but goal lacks meaningful ## Final Final Answer Format")
+        errors.append("Output contract is required by check or upstream artifact, but goal lacks meaningful ## Final Final Answer Format")
 
 
 def check_plan_ready(
@@ -950,9 +950,9 @@ def check_plan_ready(
     require_reference(plan, requirements_path, "plan", errors)
     require_reference(plan, design_path, "plan", errors)
     require_reference(plan, goal_path, "plan", errors)
-    check_execution_topology(plan, errors)
+    check_execution_work_assignment(plan, errors)
     check_max_safe_parallel_preference(requirements, plan, errors)
-    check_delegation_substrate_preference(requirements, plan, errors)
+    check_delegation_workflow_preference(requirements, plan, errors)
     check_plan_target_producing_strategy(plan, errors)
     check_plan_target_producing_spine(plan, errors)
     check_candidate_plan_tasks_spine_nodes(plan, errors)
@@ -969,7 +969,7 @@ def check_review_ready(
     errors: list[str],
 ) -> None:
     if not review_path or not review:
-        errors.append("control review is required")
+        errors.append("review is required")
         return
     require_reference(review, requirements_path, "review", errors)
     require_reference(review, design_path, "review", errors)
@@ -1007,8 +1007,8 @@ def main() -> int:
     check_requirements(requirements, errors)
 
     if args.state in {"before-design", "before-goal", "before-policy", "before-review", "before-runtime-compile"}:
-        if args.state == "before-design" and design_gate_required(requirements) and not Path(args.design_skill_path).exists():
-            errors.append(f"Design Gate required but $designing-cybernetic-solutions is unavailable at {args.design_skill_path}")
+        if args.state == "before-design" and design_check_required(requirements) and not Path(args.design_skill_path).exists():
+            errors.append(f"Design Check required but $designing-cybernetic-solutions is unavailable at {args.design_skill_path}")
 
     if args.state in {"before-goal", "before-policy", "before-review", "before-runtime-compile"}:
         check_design_ready(args.requirements, requirements, args.design, design, args.design_skill_path, errors)
@@ -1024,7 +1024,7 @@ def main() -> int:
         if review:
             status = section_status(review, "Review Status")
             if status != "Approved":
-                errors.append(f"control review status under ## Review Status is not Approved: {status!r}")
+                errors.append(f"review status under ## Review Status is not Approved: {status!r}")
             check_final_observer(review, errors)
 
     ok = not errors

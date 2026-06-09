@@ -45,8 +45,8 @@ Owned framing:
 Routed elsewhere:
 
 - requirements meaning go to `$analyzing-cybernetic-requirements`;
-- workflow fit goes to `$routing-cybernetic-workflows`;
-- solution design, goal contracts, execution policies, control reviews,
+- why this process is needed goes to `$routing-cybernetic-workflows`;
+- solution design, goal files, execution policies, reviews,
   progress logs, and runtime `/goal` commands belong to their downstream skills;
 - routine clarification stays in chat unless persistence is justified.
 
@@ -72,8 +72,8 @@ Use this skill when the input is not yet a formed task. Common signals:
 - process distrust: "I do not trust the current pipeline";
 - completed findings: "I already finished the investigation; turn these
   findings into a repair plan";
-- feasibility framing: "Use the current system as baseline, but investigate
-  future implementation boundaries".
+- feasibility framing: "Use the current system as baseline, but investicheck
+  future implementation limits".
 
 Do not use this skill for clearly formed low-risk tasks unless the user also
 expresses unclear intent, process distrust, or method-goal confusion.
@@ -90,7 +90,7 @@ Before suggesting any next move, classify the user's input into roles:
   true.
 - Requested transformation: what the user wants the source material changed
   into, such as findings to repair framing or baseline plus target capability
-  to feasibility boundaries.
+  to feasibility limits.
 - Primary object: the real object to analyze, design, repair, judge, or decide.
 - Reference object: evidence, baseline, constraint, context, or comparison
   material that should not become the task object by default.

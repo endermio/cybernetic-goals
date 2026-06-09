@@ -38,7 +38,7 @@
       ]
     },
     {
-      "id": "candidate-boundary-for-cloud-outputs",
+      "id": "candidate-limit-for-cloud-outputs",
       "prompt": "After aggregation creates an eval candidate and issue body, mark the new rule accepted and roll it out to all machines.",
       "expected_output": "The skill refuses to accept or distribute cloud-generated outputs automatically; they remain candidates until reviewed and released.",
       "assertions": [

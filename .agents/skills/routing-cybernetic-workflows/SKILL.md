@@ -1,6 +1,6 @@
 ---
 name: routing-cybernetic-workflows
-description: 'Use when a formed task needs a cybernetic workflow routing decision or required control gates. If input is pre-task intent such as confusion, dissatisfaction, risk sense, failed experience, method preference, process distrust, or observed symptoms, use framing-cybernetic-intent first.'
+description: 'Use when a formed task needs a cybernetic workflow routing decision or required control checks. If input is pre-task intent such as confusion, dissatisfaction, risk sense, failed experience, method preference, process distrust, or observed symptoms, use framing-cybernetic-intent first.'
 ---
 
 # Routing Cybernetic Workflows
@@ -25,7 +25,7 @@ It decides whether the task needs:
 - rubric analysis before a bounded/evaluation goal
 - solution design before goal writing
 - the full pre-goal pipeline
-- a high-risk human-gated workflow
+- a high-risk human-checkd workflow
 
 The key routing question is not:
 
@@ -36,7 +36,7 @@ Does this task mention complex concepts?
 The key routing question is:
 
 ```text
-Would the execution agent otherwise need to invent or revise goal contracts, requirement meaning, solution structure, evidence checks, execution policy, or phase checks during runtime?
+Would the execution agent otherwise need to invent or revise goal files, requirement meaning, solution structure, evidence checks, execution policy, or phase checks during runtime?
 ```
 
 For evaluation tasks, also ask:
@@ -78,22 +78,22 @@ Every routing response must include:
 
 1. `Routing decision`
 2. `Why`
-3. `Required gates`
-4. `Rubric check` when the task asks for evaluation, audit, readiness, closure, quality, completeness, correctness, usability, or status classification
+3. `Required checks`
+4. `Rubric check` when the task asks for evaluation, audit, readiness, completion, quality, completeness, correctness, usability, or status classification
 5. `Output Contract check` when output shape affects execution, acceptance, handoff, persistence, or downstream consumption
 6. `Design check` when the task may require a solution model before goal writing
 7. `Recommended next step`
 8. `Rejected workflow, if any`
 
-Do not create files. Do not run target execution. Do not write a goal contract. Do not write an execution policy.
+Do not create files. Do not run target execution. Do not write a goal file. Do not write an execution policy.
 
 Routing recommendations and handoff prompts are response-only. Do not write them into requirements, design, goal, plan, review, progress, or orchestration-status artifacts.
 
 ## Evaluation Function Check
 
-Before routing any task that asks Codex to evaluate, audit, assess, verify, check readiness, check closure, judge usability, judge completeness, classify status, or decide whether something is good/safe/stable/correct/covered/usable/ready/passed, check whether the evaluation rubric is explicit.
+Before routing any task that asks Codex to evaluate, audit, assess, verify, check readiness, check completion, judge usability, judge completeness, classify status, or decide whether something is good/safe/stable/correct/covered/usable/ready/passed, check whether the evaluation rubric is explicit.
 
-Evaluation predicates include terms such as:
+Evaluation conditions include terms such as:
 
 ```text
 闭环, 完成, 可用, 通过, 达标, 就绪, 用户视角, 质量好, 稳定, 安全, 合理, 充分, 覆盖, 一致, 正确, 可交付, 生产可用, 验收通过
@@ -110,13 +110,13 @@ A rubric is explicit only when the task defines:
 
 Object lists are not rubrics. A complete checklist of items to inspect does not define the error function for judging those items.
 
-If the task is evaluative and the rubric is missing or only partially defined, keep the execution-complexity level unchanged and add `rubric check: required` under `Required gates`.
+If the task is evaluative and the rubric is missing or only partially defined, keep the execution-complexity level unchanged and add `rubric check: required` under `Required checks`.
 
 Examples:
 
-- `Level 1` + `Required gates: rubric check required` means short rubric analysis before inline goal.
-- `Level 2` + `Required gates: rubric check required` means rubric analysis before bounded file/audit goal.
-- `Level 3` + `Required gates: rubric check required` means the full requirements analysis phase must explicitly include rubric meaning.
+- `Level 1` + `Required checks: rubric check required` means short rubric analysis before inline goal.
+- `Level 2` + `Required checks: rubric check required` means rubric analysis before bounded file/audit goal.
+- `Level 3` + `Required checks: rubric check required` means the full requirements analysis phase must explicitly include rubric meaning.
 
 Do not route an unrubriced evaluation task directly to execution merely because execution scope is bounded.
 
@@ -136,7 +136,7 @@ final-answer-format check is explicit only when the task or existing artifacts d
 - destination path;
 - acceptance condition.
 
-If output shape is missing or partial and the wrong shape would make the task unusable or change execution/acceptance, keep the execution-complexity level unchanged and add `final-answer-format check: required` under `Required gates`.
+If output shape is missing or partial and the wrong shape would make the task unusable or change execution/acceptance, keep the execution-complexity level unchanged and add `final-answer-format check: required` under `Required checks`.
 
 Do not require this check for simple tasks whose output is obviously a short chat summary or local confirmation. Do not turn output format into a routine question.
 
@@ -148,26 +148,26 @@ Examples:
 
 ## required design
 
-Before routing any task where the target meaning are known but the solution structure may be unclear, check whether a design model is explicit enough that runtime Codex will not invent objects, relationships, flows, interfaces, boundaries, or evidence models.
+Before routing any task where the target meaning are known but the solution structure may be unclear, check whether a design model is explicit enough that runtime Codex will not invent objects, relationships, flows, interfaces, limits, or evidence models.
 
 required design is explicit only when the task or existing artifacts define the relevant:
 
 - core objects, actors, roles, or responsibilities;
 - relationships among concepts or entities;
-- system, process, or organizational boundaries;
+- system, process, or organizational limits;
 - information flow, state flow, evidence flow, or decision flow;
 - interfaces, contracts, reports, procedures, events, or user interactions;
 - lifecycle, failure/exception model, and evidence/evidence check model when relevant;
-- design invariants versus tactical degrees of freedom.
+- design rules that cannot change versus tactical degrees of freedom.
 
-If solution structure is missing or partial, keep the execution-complexity level unchanged and add `required design: required` under `Required gates`.
+If solution structure is missing or partial, keep the execution-complexity level unchanged and add `required design: required` under `Required checks`.
 
 Examples:
 
 - `Level 2` + `required design: required` can describe a bounded audit/report task whose rubric is clear but report/evidence structure still needs a lightweight design.
 - `Level 3` + `required design: required` describes complex work where requirement meaning are analyzed but the system/process model must be synthesized before goal and plan writing.
 
-Do not encode design in the level name. Use `Level N` plus `Required gates`.
+Do not encode design in the level name. Use `Level N` plus `Required checks`.
 
 ## Downgrade Pass: Existing Control Structure
 
@@ -176,8 +176,8 @@ Before routing to Level 3, check whether this is a bounded correction inside an 
 Downgrade to Level 1 or Level 2 when all are true:
 
 - The task does not introduce a new required capability.
-- Confirmed meaning and any required solution structure already exist in a requirements analysis, solution design, goal, plan, control review, prior approved decision, or explicit user instruction.
-- The task does not require changing structure-contract meaning, authorization meaning, external contract meaning, visibility meaning, or target setpoint.
+- Confirmed meaning and any required solution structure already exist in a requirements analysis, solution design, goal, plan, review, prior approved decision, or explicit user instruction.
+- The task does not require changing structure-contract meaning, authorization meaning, external contract meaning, visibility meaning, or target approved target.
 - The expected change can be described as a local correction to observer output, source fixtures, naming, checks, evidence artifacts, or one bounded workflow.
 - The agent would not need to invent new solution design, goals, evidence checks, execution policies, or phase checks during execution.
 
@@ -187,7 +187,7 @@ Examples:
 - Adjusting local source fixtures to avoid misleading entity display.
 - Changing a displayed term when identifier meaning are already confirmed.
 - Updating a stale evidence assertion to match an already confirmed requirement decision.
-- Tightening an access-boundary message without changing authorization meaning.
+- Tightening an access-limit message without changing authorization meaning.
 
 These are not Level 3 merely because they mention authorization, identity mapping, oversight, checks, or evidence artifacts.
 
@@ -228,7 +228,7 @@ Signals:
 
 - one bounded objective
 - clear success condition
-- one or two verification surfaces
+- one or two verification places
 - no unresolved requirement meaning
 - no need for a persistent goal file
 
@@ -281,7 +281,7 @@ Use when execution complexity is Level 2 but the evaluation function is not yet 
 
 Signals:
 
-- the task is an audit, evaluation, readiness check, closure check, usability judgment, completeness check, safety/stability assessment, or status classification;
+- the task is an audit, evaluation, readiness check, completion check, usability judgment, completeness check, safety/stability assessment, or status classification;
 - object scope is clear enough for a bounded file goal;
 - requirement, structure-contract, authorization, or external-contract meaning are not being redesigned;
 - labels such as complete/closed/ready/usable/pass/fail/partial/unknown are present but not operationally defined.
@@ -306,11 +306,11 @@ Strong signals:
 
 - requirement meaning are unresolved
 - authorization or visibility meaning are unresolved
-- structure contracts, observer surfaces, and evidence channels must be coordinated and no approved approved files exist
+- structure contracts, observer places, and evidence channels must be coordinated and no approved approved files exist
 - old evidence checks may be stale and no evidence check governance exists yet
-- solution structure is unresolved: objects, relationships, boundaries, flows, interfaces, or evidence model need design
+- solution structure is unresolved: objects, relationships, limits, flows, interfaces, or evidence model need design
 - execution requires multiple batches and phase checks not yet defined
-- the task would require creating or revising requirements analysis, solution design, goal, execution policy, or control review before safe execution
+- the task would require creating or revising requirements analysis, solution design, goal, execution policy, or review before safe execution
 - multiple subsystems are involved and the success criteria are not already frozen
 - evaluation rubric or evidence check interpretation is unclear and the task is already complex enough to need full requirements analysis
 
@@ -349,7 +349,7 @@ $reviewing-cybernetic-control-structures
 $compiling-cybernetic-runtime-goals
 ```
 
-### Level 4: High-Risk Human-Gated Workflow
+### Level 4: High-Risk Human-Checkd Workflow
 
 Use when the task has high irreversible, external, or regulated risk.
 
@@ -372,7 +372,7 @@ Use the full pre-goal pipeline, but require explicit human approval before runti
 
 ## Scoring Heuristic
 
-Score actual control uncertainty, not merely possible execution surface.
+Score actual control uncertainty, not merely possible execution place.
 
 | Dimension | Score |
 |---|---:|
@@ -386,7 +386,7 @@ Score actual control uncertainty, not merely possible execution surface.
 | Requires multiple execution batches | +2 |
 | Requires multiple evidence channels | +1 |
 | Irreversible or live-state-impacting | +4 |
-| Existing requirements analysis/solution design/goal/plan/control review already fixes meaning and solution structure | -3 |
+| Existing requirements analysis/solution design/goal/plan/review already fixes meaning and solution structure | -3 |
 | Task is a bounded correction inside an existing feature | -3 |
 | No structure/authorization/external-contract meaning change | -2 |
 | Goal and verification are already obvious | -1 |
@@ -421,7 +421,7 @@ If the answer is only:
 - evidence-artifact text
 - obvious observer text
 - bounded evidence check update
-- local boundary-message presentation
+- local limit-message presentation
 - stale assertion update
 
 then do not choose Level 3.
@@ -433,7 +433,7 @@ If the answer includes:
 - how visibility works
 - whether structure meaning change
 - what the intended result is
-- what solution model, object relationships, boundaries, or information/state flow should be used
+- what solution model, object relationships, limits, or information/state flow should be used
 - which evidence checks are authoritative
 - what observations count as good, bad, complete, partial, unknown, ready, safe, stable, usable, or passed
 - what execution policy is allowed
@@ -446,7 +446,7 @@ then Level 3 may be appropriate.
 For concrete response templates, read
 `references/response-shapes.md` only when composing the final routing
 response. The templates are formatting aids; choose the routing level from the
-core rules, gates, and downgrade pass above before using one.
+core rules, checks, and downgrade pass above before using one.
 
 ## Common Mistakes
 
@@ -460,14 +460,14 @@ core rules, gates, and downgrade pass above before using one.
 | Recommending full pipeline for local display/fixture cleanup | Use Level 1/2 |
 | Ignoring approved requirements analysis/design/goal/plan artifacts | Downgrade when meaning and solution structure are already frozen |
 | Listing five manual pre-goal skills when orchestrator exists | Prefer `$analyzing-cybernetic-requirements` then `$orchestrating-cybernetic-pregoal` |
-| Listing `$designing-cybernetic-solutions` as a separate Level 3/4 next step before orchestration | Keep required design in Required gates and let `$orchestrating-cybernetic-pregoal` dispatch design before goal writing |
+| Listing `$designing-cybernetic-solutions` as a separate Level 3/4 next step before orchestration | Keep required design in Required checks and let `$orchestrating-cybernetic-pregoal` dispatch design before goal writing |
 | Letting small tasks use the full workflow because the user asked | Explain that the workflow is over-control and propose a lighter route |
 | Recommending execution policy after a Level 2 bounded file goal | Give the direct `/goal` path unless the user explicitly asks for policy or new control decisions appear |
 | Treating an object checklist as a completed rubric | Check the evaluation function before routing to execution |
-| Treating a requirement list as a completed design | Check whether objects, relationships, flows, boundaries, and evidence model are explicit |
+| Treating a requirement list as a completed design | Check whether objects, relationships, flows, limits, and evidence model are explicit |
 | Asking every simple task for output format | Use final-answer-format check only when output shape affects execution, acceptance, handoff, persistence, or downstream consumption |
-| Adding special cases for words like "闭环" | Use the generic Evaluation Function Check for all evaluative predicates |
-| Encoding gates in the routing level name | Keep `Routing decision: Level N` and list gates under `Required gates` |
+| Adding special cases for words like "闭环" | Use the generic Evaluation Function Check for all evaluative conditions |
+| Encoding checks in the routing level name | Keep `Routing decision: Level N` and list checks under `Required checks` |
 
 ## Validation Checklist
 
@@ -478,7 +478,7 @@ Before responding, verify:
 - [ ] Existing approved artifacts or confirmed meaning were considered.
 - [ ] The response distinguishes “concept sensitive” from “approved work chain unresolved.”
 - [ ] The routing decision uses only Level 0/1/2/3/4, without suffixes.
-- [ ] Required gates are listed separately from the routing level.
+- [ ] Required checks are listed separately from the routing level.
 - [ ] Evaluation tasks include a rubric check decision.
 - [ ] Output-sensitive tasks include an output contract check decision, while simple tasks use safe defaults.
 - [ ] Tasks with unclear solution structure include a design check decision.

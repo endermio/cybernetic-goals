@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Emit queue-friendly pre-goal handoff text from a requirements artifact.
 
-This script predicts the orchestration command and the runtime goal contract
+This script predicts the orchestration command and the runtime goal file
 path. It does not compile the final runtime goal and does not approve
 downstream artifacts.
 """
@@ -145,7 +145,7 @@ def main() -> int:
         print("Design: not required")
     print(f"Goal: {paths['goal']}")
     print(f"Execution policy: {paths['plan']}")
-    print(f"Control review: {paths['review']}")
+    print(f"Review: {paths['review']}")
     print("```")
     print()
     print("Predicted runtime contract path:")
@@ -158,7 +158,7 @@ def main() -> int:
     print()
     print("```text")
     print(
-        f"/goal Execute the runtime goal contract at {paths['runtime_contract']}. "
+        f"/goal Execute the runtime goal file at {paths['runtime_contract']}. "
         "Read it first and follow it exactly. "
         "If any referenced artifact is missing, not approved, or inconsistent, "
         "stop and report the smallest required human decision."

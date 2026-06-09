@@ -18,7 +18,7 @@ Status: `Approved`
 |---|---|
 | Human purpose | complete the work covered in this run without shrinking it to the first safe segment |
 | Input role binding | fixture source material is approved background |
-| Primary object | horizon and authority fidelity fixture |
+| Primary object | horizon and authority check fixture |
 | Requested transformation | approved full horizon into bounded runtime execution |
 | Non-goals | do not execute forbidden live actions |
 | How We Know The User Purpose Was Met | user-purpose evidence remains separately calibrated |
@@ -33,7 +33,7 @@ Status: `Approved`
 | Required handling for unauthorized actions | prepare runbook / rollback / evidence checklist and report not executed |
 | Explicitly out-of-scope items | none |
 | Final Answer Format | guard output |
-| Workflow fit | full pre-goal guard fixture |
+| Why this process is needed | full pre-goal guard fixture |
 | Known assumptions | fixture-only assumptions |
 
 Approval record:
@@ -85,7 +85,7 @@ class ExecutionHorizonAuthorityTest(unittest.TestCase):
             "| Beneficiary / observer | operator |",
             "| Purpose-realizing outcome observed | operator observes work covered in this run coverage |",
             "| Supporting Evidence | internal checks support progress only |",
-            "| Sufficient evidence level | purpose-boundary |",
+            "| Sufficient evidence level | purpose-limit |",
             "| If user-purpose evidence unavailable | report pending and next observation |",
             "| Allowed completion wording | achieved only when work covered in this run coverage is accounted for |",
             "",
@@ -94,9 +94,9 @@ class ExecutionHorizonAuthorityTest(unittest.TestCase):
             "| Element | Requirement |",
             "|---|---|",
             "| Target state | guard fixture intended result |",
-            "| Required result places | guard fixture surface model |",
+            "| Required result places | guard fixture place model |",
             "| Place actions | act / inspect / preserve / exclude / discover |",
-            "| Residual reconciliation | account for old state, unknown surfaces, exclusions, preserved surfaces, and remaining mismatches |",
+            "| Residual reconciliation | account for old state, unknown places, exclusions, preserved places, and remaining mismatches |",
             "| Result-placement wording | strongest result claim claim requires result-placement adequate |",
             "| Partial/unavailable handling | report not done terminal status without result claim claim |",
             "| Distinction from user-purpose evidence | result-placement is distinct from How We Know The User Purpose Was Met |",
@@ -139,7 +139,7 @@ class ExecutionHorizonAuthorityTest(unittest.TestCase):
             "## Source Contracts",
             "",
             f"- Requirements analysis: `{requirements}`",
-            f"- Goal contract: `{goal}`",
+            f"- Goal file: `{goal}`",
             "",
         ]
         if include_plan_eha:
@@ -176,11 +176,11 @@ class ExecutionHorizonAuthorityTest(unittest.TestCase):
                 "",
                 "Non-achieved terminal report rule:",
                 "",
-                "- A report when not done may be produced only after work coverage is accounted for or impossibility is proven.",
+                "- If it is not done, the report may be produced only after work coverage is accounted for or impossibility is proven.",
                 "",
                 "## Where The Result Must Show Up",
                 "",
-                "- Result-placement status: `not applicable with justification`",
+                "- Result placement status: `not applicable with justification`",
                 "- Why no intended-result result placement is required: this fixture only checks work coverage and action limits structure.",
                 "- Why no place discovery / residual reconciliation is needed: no controlled-object intended result is changed.",
                 "- Allowed result claim wording: do not claim intended-result realization.",
@@ -251,8 +251,8 @@ class ExecutionHorizonAuthorityTest(unittest.TestCase):
             "## Review Independence",
             "",
             "- Requirements analysis: `yes`",
-            "- Human setpoint fidelity: `yes`",
-            "- Goal contract: `yes`",
+            "- Human approved target check: `yes`",
+            "- Goal file: `yes`",
             "- Execution policy: `yes`",
             "- Who does the work / context use: `yes`",
             "- User purpose evidence check: `yes`",
@@ -269,7 +269,7 @@ class ExecutionHorizonAuthorityTest(unittest.TestCase):
             "## User Purpose Evidence Check",
             "",
             "Findings:",
-            "- Purpose feedback waits for purpose-boundary evidence.",
+            "- Purpose feedback waits for purpose-limit evidence.",
             "",
             "## Result Placement Check",
             "",
@@ -279,7 +279,7 @@ class ExecutionHorizonAuthorityTest(unittest.TestCase):
             "## What Counts As Done Check",
             "",
             "Findings:",
-            "- The single what counts as done is separated from report when not dones.",
+            "- The single what counts as done is separated from not done reports.",
             "",
             "## Answer Path Check",
             "",
@@ -390,7 +390,7 @@ class ExecutionHorizonAuthorityTest(unittest.TestCase):
         self.assertIn("NEXT: RunExecutionPolicy", output)
         self.assertIn("Work Coverage And Action Limits Matrix", output)
 
-    def test_guard_rejects_review_missing_horizon_authority_fidelity(self):
+    def test_guard_rejects_review_missing_horizon_authority_check(self):
         with tempfile.TemporaryDirectory() as tmpdir:
             requirements, goal, plan, review = self.write_chain(
                 Path(tmpdir),

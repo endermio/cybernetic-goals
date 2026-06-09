@@ -8,7 +8,7 @@ required design is required when any of these are unresolved:
 
 - core objects, actors, roles, or responsibilities;
 - relationships among concepts or entities;
-- system, process, or organizational boundaries;
+- system, process, or organizational limits;
 - information flow, state flow, evidence flow, or decision flow;
 - interfaces, contracts, reports, procedures, events, or interactions;
 - lifecycle, state model, failure model, or exception handling;
@@ -23,7 +23,7 @@ required design is satisfied when an existing design, spec, requirements analysi
 - objects/actors/roles;
 - relationships;
 - flows;
-- boundaries;
+- limits;
 - interfaces/contracts;
 - failure and evidence model, when relevant.
 
@@ -39,11 +39,11 @@ required design is usually not applicable for:
 
 ## Routing Rule
 
-Keep the routing level separate from gates:
+Keep the routing level separate from checks:
 
 ```text
 Routing decision: Level N
-Required gates:
+Required checks:
 - required design: required/satisfied/not applicable
 ```
 

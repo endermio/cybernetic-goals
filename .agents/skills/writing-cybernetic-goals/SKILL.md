@@ -1,15 +1,15 @@
 ---
 name: writing-cybernetic-goals
-description: 'Use when confirmed requirements and any required design exist and a goal contract must be written for a Level 2 bounded goal or Level 3/4 full pre-goal orchestration. For Level 3/4, What the User Approved is required.'
+description: 'Use when confirmed requirements and any required design exist and a goal file must be written for a Level 2 bounded goal or Level 3/4 full pre-goal orchestration. For Level 3/4, What the User Approved is required.'
 ---
 
 # Writing Cybernetic Goals
 
 ## Overview
 
-Create a goal contract from confirmed meaning and any required solution design.
+Create a goal file from confirmed meaning and any required solution design.
 
-This skill writes the goal contract. It does not analyze requirements, write execution policies, review approved work chains, or execute target work.
+This skill writes the goal file. It does not analyze requirements, write execution policies, review approved work chains, or execute target work.
 
 For complex work, the output is:
 
@@ -21,21 +21,21 @@ Use `assets/goal-contract-template.md`.
 
 ## Runtime Limit
 
-For complex controlled work, this skill must not produce an executable `/goal` command unless any required solution design exists and an approved execution policy and approved control review already exist.
+For complex controlled work, this skill must not produce an executable `/goal` command unless any required solution design exists and an approved execution policy and approved review already exist.
 
-If `required design: required`, do not create the final complex goal contract until a solution design exists or the human explicitly says the required design is unnecessary.
+If `required design: required`, do not create the final complex goal file until a solution design exists or the human explicitly says the required design is unnecessary.
 
-For Level 3, Level 4, or full pre-goal work, stop after creating the goal contract and hand off back to `$orchestrating-cybernetic-pregoal` when it is available or already owns the chain.
+For Level 3, Level 4, or full pre-goal work, stop after creating the goal file and hand off back to `$orchestrating-cybernetic-pregoal` when it is available or already owns the chain.
 
 Recommend `$writing-cybernetic-execution-policies` or `$reviewing-cybernetic-control-structures` directly only when the user explicitly chose a manual pre-goal chain or `$orchestrating-cybernetic-pregoal` is unavailable.
 
-For Level 3, Level 4, or full pre-goal work, do not create the goal contract unless the requirements analysis contains `What the User Approved: Approved`, or the current user message explicitly approves the compact control commitment. Human answers to requirements questions are inputs, not approval.
+For Level 3, Level 4, or full pre-goal work, do not create the goal file unless the requirements analysis contains `What the User Approved: Approved`, or the current user message explicitly approves the compact control commitment. Human answers to requirements questions are inputs, not approval.
 
 If the current user message approves the compact control commitment, update the requirements analysis `What the User Approved` section first, quoting or referencing that approval, then continue. Do not rely on in-memory approval to pass orchestration or runtime guards.
 
 Do not put “first write a plan, then execute it” inside an execution `/goal` for complex work.
 
-For Level 2 bounded file goals, output a direct `/goal` command after creating the small goal file only when the task boundaries and any required evaluation rubric are explicit. Do not recommend `$writing-cybernetic-execution-policies` or `$reviewing-cybernetic-control-structures` by default unless the user explicitly requests them or the task reveals unresolved control decisions.
+For Level 2 bounded file goals, output a direct `/goal` command after creating the small goal file only when the task limits and any required evaluation rubric are explicit. Do not recommend `$writing-cybernetic-execution-policies` or `$reviewing-cybernetic-control-structures` by default unless the user explicitly requests them or the task reveals unresolved control decisions.
 
 ## Evaluation Function Check
 
@@ -140,7 +140,7 @@ The goal must preserve or define:
 - Allowed achieved claim: wording allowed only when the what counts as done is met;
 - Steps that make the result true: the state-transition path or execution-policy required answer path that produces the condition.
 
-report when not done are stop/report protocol, not alternate goals,
+not done report are stop/report protocol, not alternate goals,
 what-counts-as-done conditions, or success states.
 
 ## Work Covered And Allowed Actions Contract
@@ -170,8 +170,8 @@ Behavior:
 
 1. Check whether `required design: required`.
 2. If required, confirm `docs/cybernetics/designs/YYYY-MM-DD-<slug>.md` or an explicit design source exists.
-3. Create the goal contract under `docs/cybernetics/goals/YYYY-MM-DD-<slug>.md`.
-4. Do not output an executable `/goal` unless an approved execution policy and approved control review already exist.
+3. Create the goal file under `docs/cybernetics/goals/YYYY-MM-DD-<slug>.md`.
+4. Do not output an executable `/goal` unless an approved execution policy and approved review already exist.
 5. Use the route-appropriate response-only handoff: return to `$orchestrating-cybernetic-pregoal` for full pre-goal work, or recommend `$writing-cybernetic-execution-policies` only for an explicit manual chain.
 
 ### Mode B: Bounded File Goal / Audit Goal
@@ -195,12 +195,12 @@ Behavior:
 4. Make the goal file self-contained enough to execute directly.
 5. Preserve the rubric inside the goal when the task is evaluative.
 6. Output a direct executable `/goal` command that references the small goal file.
-7. Do not recommend execution policy or control review by default.
+7. Do not recommend execution policy or review by default.
 8. If the bounded goal proves insufficient, ambiguous, or dependent on new requirement/control decisions, instruct runtime Codex to stop and report the smallest required human decision.
 
 ## Preconditions
 
-Before creating a goal contract for complex work, check:
+Before creating a goal file for complex work, check:
 
 - a requirements analysis brief exists;
 - `Requirements Analysis Status` is `Complete` or the user explicitly states the meaning are confirmed;
@@ -213,9 +213,9 @@ If the requirements analysis is missing or incomplete, route back to `$analyzing
 
 If required design is required and no design exists, route to `$designing-cybernetic-solutions`.
 
-For bounded file goals, a completed requirements analysis brief is optional when the user request or router decision already fixes the meaning, boundaries, output path, stop conditions, and any evaluation rubric. Record the user request or router decision as the source of truth.
+For bounded file goals, a completed requirements analysis brief is optional when the user request or router decision already fixes the meaning, limits, output path, stop conditions, and any evaluation rubric. Record the user request or router decision as the source of truth.
 
-## Goal Contract Requirements
+## Goal File Requirements
 
 The goal file must include:
 
@@ -240,11 +240,11 @@ The goal file must include:
 
 The goal must preserve confirmed meaning. It must not reinterpret or downscope them.
 
-For Level 3/4 or full pre-goal work, the goal must preserve the approved compact control commitment from `What the User Approved`: human purpose, input role binding, primary object, requested transformation, non-goals, How We Know The User Purpose Was Met, result placement, What counts as done, Evidence needed to call it done, report when not done handling, Required answer path, How this should be answered, What is not enough, How this should be answered, Work covered in this run, What the agent may do, Forbidden live / irreversible actions, Required handling for unauthorized actions, Explicitly out-of-scope items, Final Answer Format, workflow fit, and known assumptions.
+For Level 3/4 or full pre-goal work, the goal must preserve the approved compact control commitment from `What the User Approved`: human purpose, input role binding, primary object, requested transformation, non-goals, How We Know The User Purpose Was Met, result placement, What counts as done, Evidence needed to call it done, If it is not done, what should be reported, Required answer path, How this should be answered, What is not enough, Work covered in this run, What the agent may do, Forbidden live / irreversible actions, Required handling for unauthorized actions, Explicitly out-of-scope items, Final Answer Format, why this process is needed, and known assumptions.
 
 If a design includes `Answer Method Check`, the goal must not weaken the approved answering method or substitute a different how this should be answered. Bind the what counts as done and required answer path to the required answer path.
 
-When a solution design is present, the goal must reference it under `Source of Truth`, preserve design invariants, and avoid freezing tactical design details as meaning invariants unless the design explicitly marks them as rule.
+When a solution design is present, the goal must reference it under `Source of Truth`, preserve design rules that cannot change, and avoid freezing tactical design details as meaning rules that cannot change unless the design explicitly marks them as rule.
 
 When a requirements analysis or solution design contains an final answer format, the goal must preserve it under `Final Final Answer Format` and prevent runtime from substituting another output shape.
 
@@ -261,19 +261,19 @@ Map requirements analysis to:
 - What counts as done: what counts as done, evidence needed to call it done, and allowed achieved claim
 - Error function: rubric for interpreting evidence check output when the task is evaluative
 - Output contract: final audience, purpose, medium, structure, detail level, evidence references, destination, and acceptance condition
-- Constraints: invariants and non-goals
+- Constraints: rules that cannot change and non-goals
 - Stop conditions: when Codex must stop and report the missing decision
 
 ## Output Format
 
 These output formats are response-only. The direct `/goal` command must be returned to the user in the assistant response, not written into the goal file. Goal files must not contain conversational next-step prompts.
 
-### Complex goal contract
+### Complex goal file
 
 After creating a complex goal file:
 
 ```markdown
-Created goal contract:
+Created goal file:
 
 `docs/cybernetics/goals/YYYY-MM-DD-slug.md`
 
@@ -309,7 +309,7 @@ Control map:
 Response-only `/goal` command:
 
 ```text
-/goal Execute the bounded file goal in docs/cybernetics/goals/YYYY-MM-DD-slug.md as the controlling contract. Do not create an execution policy or control review unless explicitly instructed. Do not reinterpret scope, expand requirements, or modify files outside the goal boundaries. If the goal is insufficient, ambiguous, or requires new requirement/control decisions, stop and report the smallest required human decision.
+/goal Execute the bounded file goal in docs/cybernetics/goals/YYYY-MM-DD-slug.md as the controlling contract. Do not create an execution policy or review unless explicitly instructed. Do not reinterpret scope, expand requirements, or modify files outside the goal limits. If the goal is insufficient, ambiguous, or requires new requirement/control decisions, stop and report the smallest required human decision.
 ```
 ````
 
@@ -339,7 +339,7 @@ $analyzing-cybernetic-requirements 分析这个审计/评估任务的评价口�
 If complex goal writing is blocked because required design is missing:
 
 ````markdown
-Goal contract blocked: solution design required.
+Goal file blocked: solution design required.
 
 Reason:
 - required design is required, but no solution design artifact or explicit design source was provided.
@@ -357,10 +357,10 @@ If the user explicitly requests a small inline `/goal` and the task is low-risk,
 
 - [ ] Confirmed meaning are preserved.
 - [ ] No unresolved human decisions are silently assumed.
-- [ ] The goal contract does not contain instructions to write and approve a plan during runtime.
+- [ ] The goal file does not contain instructions to write and approve a plan during runtime.
 - [ ] The goal file references the requirements analysis brief.
 - [ ] If required design is required, the goal file references the solution design or blocks before creating the final goal.
-- [ ] The goal preserves design invariants without freezing tactical design details.
+- [ ] The goal preserves design rules that cannot change without freezing tactical design details.
 - [ ] Success conditions and stop conditions are explicit.
 - [ ] The goal includes How We Know The User Purpose Was Met when requirements define How We Know The User Purpose Was Met or purpose-achievement evidence is non-obvious.
 - [ ] The goal includes Where The Result Must Show Up for compiled runtime goals; direct bounded goals include it when requirements define result placement or intended-result realization spans places.

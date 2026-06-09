@@ -7,10 +7,10 @@ This orchestrator is a pre-goal compiler, not a runtime controller.
 | Artifact | Control role |
 |---|---|
 | Requirements analysis brief | Approved target synthesis: confirmed human meaning |
-| Solution design | System/regulator model: objects, relationships, flows, boundaries, interfaces, evidence model |
-| Goal contract | Control contract: target, boundaries, evidence checks, stop conditions |
+| Solution design | System/regulator model: objects, relationships, flows, limits, interfaces, evidence model |
+| Goal file | Control contract: target, limits, evidence checks, stop conditions |
 | Execution policy | Control law: batch cadence, dependency matrix, evidence check governance |
-| Control review | Meta-control: independent review of the whole approved work chain |
+| Review | Meta-control: independent review of the whole approved work chain |
 | Runtime /goal | Execution runtime: closed-loop execution under approved artifacts |
 
 ## Non-Negotiable Limit

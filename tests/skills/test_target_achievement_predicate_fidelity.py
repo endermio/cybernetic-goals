@@ -19,7 +19,7 @@ Status: `Approved`
 |---|---|
 | Human purpose | produce done-making evidence, not an alternate report status |
 | Input role binding | fixture source material is approved background |
-| Primary object | target achievement predicate fixture |
+| Primary object | target achievement condition fixture |
 | Requested transformation | approved chain to what-counts-as-done guard checks |
 | Non-goals | do not create alternate success states |
 | How We Know The User Purpose Was Met | user-purpose evidence remains separately calibrated |
@@ -34,17 +34,17 @@ Status: `Approved`
 | Required handling for unauthorized actions | none |
 | Explicitly out-of-scope items | none |
 | Final Answer Format | guard output |
-| Workflow fit | full pre-goal guard fixture |
+| Why this process is needed | full pre-goal guard fixture |
 | Known assumptions | fixture-only assumptions |
 
 Approval record:
 
 - Approved by: `test fixture`
-- Approval phrase or source: `approved target predicate`
+- Approval phrase or source: `approved target condition`
 """
 
 
-class TargetAchievementPredicateFidelityTest(unittest.TestCase):
+class TargetAchievementConditionCheckTest(unittest.TestCase):
     def read(self, path: str) -> str:
         return (ROOT / path).read_text(encoding="utf-8")
 
@@ -79,7 +79,7 @@ class TargetAchievementPredicateFidelityTest(unittest.TestCase):
         target_rows = [
             "| What counts as done | evidence needed to call it done is observed |",
             "| Required evidence needed to call it done | action that can make it done runs or observation exists |",
-            "| Allowed achieved claim | `goal achieved: yes` only when the single predicate is met |",
+            "| Allowed achieved claim | `goal achieved: yes` only when the single condition is met |",
             "| Steps that make the result true | what-counts-as-done guard fixture required answer path |",
         ]
         target_rows.extend(target_contract_extra or [])
@@ -103,7 +103,7 @@ class TargetAchievementPredicateFidelityTest(unittest.TestCase):
                     "| Beneficiary / observer | operator |",
                     "| Purpose-realizing outcome observed | operator observes the done-making result |",
                     "| Supporting Evidence | internal checks support progress only |",
-                    "| Sufficient evidence level | purpose-boundary |",
+                    "| Sufficient evidence level | purpose-limit |",
                     "| If user-purpose evidence unavailable | report pending and next observation |",
                     "| Allowed completion wording | achieved only with approved target evidence |",
                     "",
@@ -112,9 +112,9 @@ class TargetAchievementPredicateFidelityTest(unittest.TestCase):
                     "| Element | Requirement |",
                     "|---|---|",
                     "| Target state | guard fixture intended result |",
-                    "| Required result places | guard fixture surface model |",
+                    "| Required result places | guard fixture place model |",
                     "| Place actions | act / inspect / preserve / exclude / discover |",
-                    "| Residual reconciliation | account for old state, unknown surfaces, exclusions, preserved surfaces, and remaining mismatches |",
+                    "| Residual reconciliation | account for old state, unknown places, exclusions, preserved places, and remaining mismatches |",
                     "| Result-placement wording | strongest result claim claim requires result-placement adequate |",
                     "| Partial/unavailable handling | report not done terminal status without result claim claim |",
                     "| Distinction from user-purpose evidence | result-placement is distinct from How We Know The User Purpose Was Met |",
@@ -151,7 +151,7 @@ class TargetAchievementPredicateFidelityTest(unittest.TestCase):
             "## Source Contracts",
             "",
             f"- Requirements analysis: `{requirements}`",
-            f"- Goal contract: `{goal}`",
+            f"- Goal file: `{goal}`",
             "",
             "## Work Coverage And Action Limits Matrix",
             "",
@@ -181,7 +181,7 @@ class TargetAchievementPredicateFidelityTest(unittest.TestCase):
                     "",
                     "Non-achieved terminal report rule:",
                     "",
-                    "- A report when not done may be produced only after the action is attempted and fails, or impossibility is proven.",
+                    "- If it is not done, the report may be produced only after the action is attempted and fails, or impossibility is proven.",
                     "",
                 ]
             )
@@ -189,7 +189,7 @@ class TargetAchievementPredicateFidelityTest(unittest.TestCase):
             [
                 "## Where The Result Must Show Up",
                 "",
-                "- Result-placement status: `not applicable with justification`",
+                "- Result placement status: `not applicable with justification`",
                 "- Why no intended-result result placement is required: this fixture only checks what-counts-as-done structure.",
                 "- Why no place discovery / residual reconciliation is needed: no controlled-object intended result is changed.",
                 "- Allowed result claim wording: do not claim intended-result realization.",
@@ -260,8 +260,8 @@ class TargetAchievementPredicateFidelityTest(unittest.TestCase):
             "## Review Independence",
             "",
             "- Requirements analysis: `yes`",
-            "- Human setpoint fidelity: `yes`",
-            "- Goal contract: `yes`",
+            "- Human approved target check: `yes`",
+            "- Goal file: `yes`",
             "- Execution policy: `yes`",
             "- Who does the work / context use: `yes`",
             "- User purpose evidence check: `yes`",
@@ -278,7 +278,7 @@ class TargetAchievementPredicateFidelityTest(unittest.TestCase):
             "## User Purpose Evidence Check",
             "",
             "Findings:",
-            "- Purpose feedback waits for purpose-boundary evidence.",
+            "- Purpose feedback waits for purpose-limit evidence.",
             "",
             "## Result Placement Check",
             "",
@@ -292,7 +292,7 @@ class TargetAchievementPredicateFidelityTest(unittest.TestCase):
                     "## What Counts As Done Check",
                     "",
                     "Findings:",
-                    "- The single what counts as done is separated from report when not dones.",
+                    "- The single what counts as done is separated from not done reports.",
                     "",
                 ]
             )
@@ -365,8 +365,7 @@ class TargetAchievementPredicateFidelityTest(unittest.TestCase):
         for removed in (
             "What Counts As Done Contract",
             "What Counts As Done Strategy",
-            "What Counts As Done Fidelity",
-            "Valid report when not done statuses",
+            "Valid not done report statuses",
             "Fallback report handling",
             "Fallback report statuses",
             "fallback reason",
@@ -393,7 +392,7 @@ class TargetAchievementPredicateFidelityTest(unittest.TestCase):
         self.assertEqual(2, result.returncode, output)
         self.assertIn("NEXT: RunGoalWriting", output)
         self.assertIn("Success Condition", output)
-        self.assertIn("report when not done term", output)
+        self.assertIn("not done report term", output)
 
     def test_guard_rejects_target_contract_with_fallback_or_valid_final_status(self):
         with tempfile.TemporaryDirectory() as tmpdir:
@@ -428,7 +427,7 @@ class TargetAchievementPredicateFidelityTest(unittest.TestCase):
         self.assertIn("What Counts As Done", output)
         self.assertIn("not done or fallback term", output)
 
-    def test_guard_rejects_multiple_target_achieved_predicates(self):
+    def test_guard_rejects_multiple_target_achieved_conditions(self):
         with tempfile.TemporaryDirectory() as tmpdir:
             requirements, goal, plan, review = self.write_chain(
                 Path(tmpdir),
@@ -453,7 +452,7 @@ class TargetAchievementPredicateFidelityTest(unittest.TestCase):
         self.assertIn("NEXT: RunExecutionPolicy", output)
         self.assertIn("Action That Can Make It Done", output)
 
-    def test_guard_rejects_review_missing_target_achievement_predicate_fidelity(self):
+    def test_guard_rejects_review_missing_target_achievement_condition_check(self):
         with tempfile.TemporaryDirectory() as tmpdir:
             requirements, goal, plan, review = self.write_chain(
                 Path(tmpdir),
@@ -569,12 +568,12 @@ class TargetAchievementPredicateFidelityTest(unittest.TestCase):
             contract_text = runtime_contract.read_text(encoding="utf-8") if runtime_contract.exists() else ""
 
         self.assertEqual(0, result.returncode, result.stdout + result.stderr)
-        self.assertIn("Runtime goal contract written:", result.stdout)
+        self.assertIn("Runtime goal file written:", result.stdout)
         self.assertIn("Use this /goal:", result.stdout)
 
         pointer = next(line for line in result.stdout.splitlines() if line.startswith("/goal "))
         self.assertLessEqual(len(pointer), 800, pointer)
-        self.assertIn("Execute the runtime goal contract at", pointer)
+        self.assertIn("Execute the runtime goal file at", pointer)
         self.assertIn("docs/cybernetics/runtime-goals/fixture.goal.md", pointer)
         self.assertNotIn("How We Know The User Purpose Was Met", pointer)
         self.assertNotIn("Where The Result Must Show Up", pointer)

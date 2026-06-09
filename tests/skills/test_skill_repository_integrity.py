@@ -9,7 +9,7 @@ ROOT = Path(__file__).resolve().parents[2]
 
 
 class SkillRepositoryIntegrityTest(unittest.TestCase):
-    def test_manifest_includes_release_surface_files(self):
+    def test_manifest_includes_release_place_files(self):
         manifest_paths = set(
             line.strip()
             for line in (ROOT / "MANIFEST.txt").read_text(encoding="utf-8").splitlines()
@@ -80,7 +80,7 @@ class SkillRepositoryIntegrityTest(unittest.TestCase):
                 for phrase in forbidden_process_summaries:
                     self.assertNotIn(phrase, description)
 
-    def test_skill_boundaries_are_positive_first(self):
+    def test_skill_limits_are_positive_first(self):
         defensive_openers = (
             "This skill must not:",
             "It must not:",

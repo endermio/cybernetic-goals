@@ -21,7 +21,7 @@
     ],
     "review_red_flags": [
       "candidate path run is treated as ceiling coverage",
-      "same-workload gates pass without source coverage",
+      "same-workload checks pass without source coverage",
       "single bottleneck result is reported as whole-workflow ceiling"
     ]
   },

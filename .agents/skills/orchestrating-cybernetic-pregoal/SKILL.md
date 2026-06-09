@@ -14,7 +14,7 @@ It turns a completed requirements analysis brief into approved approved files:
 ```text
 requirements analysis brief
   -> solution design, when required design is required
-  → goal contract
+  → goal file
   → execution policy / plan
   → control-structure review
   → final runtime /goal command
@@ -25,7 +25,7 @@ This skill is a thin orchestrator. It does not replace the other cybernetic skil
 ## What This Skill Owns
 
 This skill owns pre-goal artifact orchestration. It coordinates existing
-cybernetic skills and preserves their ownership boundaries.
+cybernetic skills and preserves their ownership limits.
 
 Owned orchestration:
 
@@ -34,7 +34,7 @@ Owned orchestration:
 - emulate narrow cybernetic formatting only when a downstream cybernetic skill is unavailable and that fallback is explicitly allowed
 - create or update approved files under `docs/cybernetics/`
 - invoke, request, or validate a solution design when required design is required
-- propagate and validate output contract presence across downstream artifacts
+- propacheck and validate output contract presence across downstream artifacts
 - use explicitly authorized subagents as independent reviewers
 - iterate review and revision up to the configured limit
 - compile the final `/goal` command after approval
@@ -62,11 +62,11 @@ It must not emulate solution design synthesis. Solution design is a substantive 
 
 It must not synthesize output contracts. Output contract identification belongs to requirements analysis; complex output-structure synthesis belongs to solution design; final output contract preservation belongs to goal writing.
 
-Required infrastructure boundaries:
+Required infrastructure limits:
 
 - non-trivial execution policy generation requires `$superpowers:writing-plans` as planning workflow;
-- control review `Approved` requires independent review discipline or explicit human approval;
-- control review `Approved` requires a final observer pass after the last substantive artifact mutation;
+- review `Approved` requires independent review discipline or explicit human approval;
+- review `Approved` requires a final observer pass after the last substantive artifact mutation;
 - runtime `/goal` compilation must include `$superpowers:executing-plans`, `$superpowers:systematic-debugging`, and `$superpowers:verification-before-completion` discipline.
 
 If a required workflow is unavailable, stop and report the missing infrastructure. Do not self-substitute and do not mark the approved work chain `Approved`.
@@ -101,14 +101,14 @@ This skill orchestrates:
 
 It should not duplicate their templates or rules unless they are unavailable. If a downstream cybernetic skill is available, prefer using it. If a downstream cybernetic skill is unavailable, emulate only its narrow cybernetic responsibility and state that the fallback was used.
 
-Never emulate required Superpowers substrates. In particular:
+Never emulate required Superpowers workflows. In particular:
 
 - do not replace `$designing-cybernetic-solutions` with orchestrator-authored solution design when required design is required;
 - do not replace `$superpowers:writing-plans` with ad hoc internal planning for non-trivial execution policies;
 - do not replace independent review discipline with self-review;
 - do not compile a runtime `/goal` that omits required runtime execution, debugging, and verification discipline.
 
-## Workflow Fit Check
+## Process Need Check
 
 Before creating downstream artifacts, confirm full pre-goal orchestration is
 still the lightest workflow that controls the task.
@@ -125,7 +125,7 @@ Reject or downgrade when:
 ## User Approval Check
 
 Before invoking or validating solution design, goal writing, execution-policy
-writing, control review, or runtime compilation, verify What the User Approved
+writing, review, or runtime compilation, verify What the User Approved
 Approval.
 
 If missing or not `Approved`, stop before design and output:
@@ -165,7 +165,7 @@ Pre-goal review subagents require explicit authorization in the same orchestrati
 
 Runtime target-work subagents are authorized only when the final `/goal` explicitly contains the approved subagent-driven execution work assignment and the user launches that `/goal`. Compiling or displaying the final `/goal` does not itself start runtime target-work subagents.
 
-Parallel runtime subagents require explicit human approval recorded in the execution policy and control review before the final `/goal` is compiled.
+Parallel runtime subagents require explicit human approval recorded in the execution policy and review before the final `/goal` is compiled.
 
 Phrases that count as authorization include:
 
@@ -178,7 +178,7 @@ Phrases that count as authorization include:
 If pre-goal review subagents are not authorized:
 
 - You may create candidate design, goal, and execution policy files.
-- You may create a draft control review marked `Needs Independent Review`.
+- You may create a draft review marked `Needs Independent Review`.
 - You must not claim independent review or mark the approved work chain `Approved` unless a separate reviewer, explicit human approval, or an authorized subagent review exists.
 - Ask the user to authorize pre-goal review subagents or provide explicit control-review approval of the review findings before compiling a final runtime `/goal`.
 
@@ -192,10 +192,10 @@ Behavior:
 
 1. Check the requirements analysis brief.
 2. Create or validate solution design if required design is required.
-3. Create or update goal contract.
+3. Create or update goal file.
 4. Create or update execution policy only if required planning workflow is satisfied or not required.
-5. Create a control review draft marked `Needs Independent Review`.
-6. Do not compile final runtime `/goal` unless the control review has independent approval or the user gives explicit control-review approval of the review findings. Do not ask for artifact-by-artifact review as a substitute for What the User Approved.
+5. Create a review draft marked `Needs Independent Review`.
+6. Do not compile final runtime `/goal` unless the review has independent approval or the user gives explicit control-review approval of the review findings. Do not ask for artifact-by-artifact review as a substitute for What the User Approved.
 
 ### Mode B: Subagent-Reviewed Compilation Mode
 
@@ -205,12 +205,12 @@ Behavior:
 
 1. Check the requirements analysis brief.
 2. Create or validate solution design if required design is required.
-3. Create or update goal contract.
+3. Create or update goal file.
 4. Create or update execution policy only if required planning workflow is satisfied or not required.
 5. Run independent subagent review passes without running target execution or dispatching execution agents.
 6. Revise artifacts based on review findings.
 7. Re-review until approval or stop after the maximum review cycles.
-8. Create an approved control review if findings converge.
+8. Create an approved review if findings converge.
 9. Compile final runtime `/goal` command.
 10. Do not start `/goal`.
 
@@ -267,7 +267,7 @@ docs/cybernetics/progress/YYYY-MM-DD-<slug>.md
 docs/cybernetics/orchestrations/YYYY-MM-DD-<slug>.md
 ```
 
-The design, goal, plan, control review, and progress log must use the same derived date/slug. This keeps queue-friendly `/goal` commands emitted by `$analyzing-cybernetic-requirements` stable. If the requested path is ambiguous or lacks a deterministic date/slug, stop and ask for the smallest path decision; keep the slug unresolved until the decision exists.
+The design, goal, plan, review, and progress log must use the same derived date/slug. This keeps queue-friendly `/goal` commands emitted by `$analyzing-cybernetic-requirements` stable. If the requested path is ambiguous or lacks a deterministic date/slug, stop and ask for the smallest path decision; keep the slug unresolved until the decision exists.
 
 Use `assets/pregoal-orchestration-status-template.md` for the orchestration status artifact.
 
@@ -299,9 +299,9 @@ Design artifacts with status `Candidate`, `Reviewed`, or `Approved` may enter do
 - it references the requirements analysis in `Source Contracts`;
 - it has no blocking open design questions;
 - if What the User Approved records `How this should be answered`, `What is not enough`, or `How this should be answered`, the design includes `Answer Method Check` that preserves the approved answer method and how this should be answered;
-- final control review will check Design Match and Design Answer Method Check when What the User Approved records an answer method or how this should be answered.
+- final review will check Design Match and Design Answer Method Check when What the User Approved records an answer method or how this should be answered.
 
-If any design artifact exists, propagate its path to goal writing, execution-policy writing, control review, and runtime compilation, even when required design is satisfied or no longer required.
+If any design artifact exists, propacheck its path to goal writing, execution-policy writing, review, and runtime compilation, even when required design is satisfied or no longer required.
 
 ## Design Answer Method Check
 

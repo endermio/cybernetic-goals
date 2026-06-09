@@ -4,7 +4,7 @@ Use these roles only when the user explicitly authorizes subagents.
 
 ## Requirement Traceability Reviewer
 
-Input: requirements analysis brief, solution design when present, goal contract, execution policy.
+Input: requirements analysis brief, solution design when present, goal file, execution policy.
 
 Check:
 
@@ -15,43 +15,43 @@ Check:
 
 ## Solution Design Match Reviewer
 
-Input: requirements analysis brief, solution design, goal contract, execution policy.
+Input: requirements analysis brief, solution design, goal file, execution policy.
 
 Check:
 
 - Design preserves requirements analysis meaning.
-- Design defines objects/actors/roles, relationships, flows, boundaries, interfaces/contracts, failure model, and evidence model when relevant.
-- Goal preserves design invariants.
+- Design defines objects/actors/roles, relationships, flows, limits, interfaces/contracts, failure model, and evidence model when relevant.
+- Goal preserves design rules that cannot change.
 - Plan does not redesign the solution model.
-- Tactical degrees of freedom are not frozen as meaning invariants unless the design explicitly says so.
+- Tactical degrees of freedom are not frozen as meaning rules that cannot change unless the design explicitly says so.
 
 ## Control Contract Reviewer
 
-Input: requirements analysis brief, solution design when present, and goal contract.
+Input: requirements analysis brief, solution design when present, and goal file.
 
 Check:
 
-- Goal has success conditions, boundaries, invariants, verification surfaces, stop conditions, and source of truth.
+- Goal has success conditions, limits, rules that cannot change, verification places, stop conditions, and source of truth.
 - Goal does not ask runtime `/goal` to generate or approve its own plan.
 - Goal separates requirement meaning from execution tactics.
 
 ## Execution Policy / Cadence Reviewer
 
-Input: solution design when present, goal contract, and execution policy.
+Input: solution design when present, goal file, and execution policy.
 
 Check:
 
 - Plan contains dependency matrix.
-- Plan defines execution granularity and evidence check budget.
+- Plan defines work size and evidence check budget.
 - Plan defines batch cadence.
 - Plan defines destructive intermediate-state policy.
 - Plan defines batch-end openable or verifiable state.
 - Plan avoids both tiny evidence check-bound steps and huge unobservable batches.
-- Broad verification is assigned to integration or final gates unless justified.
+- Broad verification is assigned to integration or final checks unless justified.
 
 ## Evidence check / Evidence Governance Reviewer
 
-Input: solution design when present, goal contract, and execution policy.
+Input: solution design when present, goal file, and execution policy.
 
 Check:
 

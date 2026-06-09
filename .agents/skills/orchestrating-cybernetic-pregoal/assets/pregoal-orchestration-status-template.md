@@ -13,7 +13,7 @@ State: `RequirementsMissing` / `RequirementsComplete` / `DesignReady` / `GoalRea
 | Final Answer Format | `yes/no` | `[requirements/design/goal section or none]` | `present / missing / not required` | `passed / blocked` |
 | Goal | yes | `[path or none]` | `present / missing` | `passed / blocked` |
 | Execution Policy | yes | `[path or none]` | `Candidate / Approved / missing` | `passed / blocked` |
-| Control Review | yes | `[path or none]` | `Approved / Needs Revision / Needs Independent Review / Dirty / Needs Re-review / missing` | `passed / blocked` |
+| Review | yes | `[path or none]` | `Approved / Needs Revision / Needs Independent Review / Dirty / Needs Re-review / missing` | `passed / blocked` |
 | Runtime Goal | yes | `[path or inline command / none]` | `compiled / not compiled` | `passed / blocked` |
 
 ## Next Allowed Action

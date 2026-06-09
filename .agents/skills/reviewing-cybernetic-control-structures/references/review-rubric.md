@@ -1,4 +1,4 @@
-# Control Structure Review Rubric
+# Review Rubric
 
 ## Fail the review if
 
@@ -15,7 +15,7 @@
 - no stale-evidence check policy exists;
 - batch cadence is missing;
 - destructive intermediate-state policy is missing;
-- meaning invariants and tactical details are mixed;
+- meaning rules that cannot change and tactical details are mixed;
 - unresolved human or design decisions remain.
 
 ## Approve only when

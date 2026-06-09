@@ -1,6 +1,6 @@
 ---
 name: reviewing-cybernetic-control-structures
-description: 'Use when requirements analysis, any required design, goal contract, and execution policy exist before runtime /goal, and the cybernetic approved work chain needs independent approval, blocker review, or risk review.'
+description: 'Use when requirements analysis, any required design, goal file, and execution policy exist before runtime /goal, and the cybernetic approved work chain needs independent approval, blocker review, or risk review.'
 ---
 
 # Reviewing Cybernetic Control Structures
@@ -13,7 +13,7 @@ Inputs:
 
 - requirements analysis brief
 - solution design, when required design is required or a design exists
-- goal contract
+- goal file
 - execution policy / plan
 
 Output:
@@ -32,7 +32,7 @@ Follow `$cybernetic-superpowers-infrastructure`.
 
 This skill requires independent review discipline before it may mark a approved work chain `Approved`.
 
-Do not self-review and mark `Approved`. Do not run target execution. Do not dispatch execution agents during pre-goal control review.
+Do not self-review and mark `Approved`. Do not run target execution. Do not dispatch execution agents during pre-goal review.
 
 If pre-goal review subagents are explicitly authorized, use independent reviewer passes for the approved work chain. This is not the full `$superpowers:subagent-driven-development` execution workflow; it is independent review discipline only.
 
@@ -46,21 +46,21 @@ A approved work chain may be marked `Approved` only when the last substantive ch
 
 If any approved file changes after the latest independent review, the review state becomes `Dirty` / `Needs Re-review` and cannot be `Approved`.
 
-Substantive changes to the control review's final decision, reviewer findings, approval rationale, or Final Independent Check after approval also require re-review or explicit human approval. Mechanical recording of already-reviewed findings into the review file does not itself create a new review cycle.
+Substantive changes to the review's final decision, reviewer findings, approval rationale, or Final Independent Check after approval also require re-review or explicit human approval. Mechanical recording of already-reviewed findings into the review file does not itself create a new review cycle.
 
 Deterministic-only changes may skip subagent re-review only when all of the following are true:
 
 - the change is explicitly listed as deterministic-only;
 - a deterministic guard covers the changed condition and passes;
-- the control review records that no meaning or control-policy content changed.
+- the review records that no meaning or control-policy content changed.
 
 Substantive changes include changes to:
 
 - confirmed meaning;
 - What the User Approved or the approved compact control commitment;
-- solution design objects, relationships, flows, boundaries, interfaces/contracts, evidence model, or design invariants;
+- solution design objects, relationships, flows, limits, interfaces/contracts, evidence model, or design rules that cannot change;
 - goal success conditions;
-- scope, boundaries, or invariants;
+- scope, limits, or rules that cannot change;
 - execution policy or batch cadence;
 - who does the work / context use;
 - evidence check or evidence structure;
@@ -118,7 +118,7 @@ Check that design, goal, and execution policy preserve the approved compact cont
 - Where The Result Must Show Up;
 - What counts as done;
 - Evidence needed to call it done;
-- report when not done handling;
+- If it is not done, what should be reported;
 - How this should be answered;
 - What is not enough;
 - How this should be answered;
@@ -131,11 +131,11 @@ Check that design, goal, and execution policy preserve the approved compact cont
 - Agent delegation preference;
 - Agent workflow preference;
 - Parallel execution authority;
-- Parallelism cap;
-- workflow fit;
+- Maximum parallel agents;
+- why this process is needed;
 - known assumptions.
 
-Flag as Major or Blocking when downstream artifacts reinterpret, expand, remove, or contradict the approved compact control commitment. If a downstream artifact changes the primary object, requested transformation, non-goals, user-purpose evidence, result-placement, what-counts-as-done condition, final answer format, or workflow fit, require what the user approved revision or explicit human reapproval before approval.
+Flag as Major or Blocking when downstream artifacts reinterpret, expand, remove, or contradict the approved compact control commitment. If a downstream artifact changes the primary object, requested transformation, non-goals, user-purpose evidence, result-placement, what-counts-as-done condition, final answer format, or why this process is needed, require what the user approved revision or explicit human reapproval before approval.
 
 ### 3. Goal Check
 
@@ -146,9 +146,9 @@ The goal must not add, remove, downscope, or reinterpret requirement meaning.
 When a solution design exists or required design was required:
 
 - the design must preserve requirements analysis meaning;
-- the goal must preserve design invariants;
-- the plan must preserve design objects, relationships, boundaries, flows, interfaces/contracts, lifecycle/failure model, and evidence model;
-- tactical degrees of freedom must not be frozen as meaning invariants unless the design explicitly says so;
+- the goal must preserve design rules that cannot change;
+- the plan must preserve design objects, relationships, limits, flows, interfaces/contracts, lifecycle/failure model, and evidence model;
+- tactical degrees of freedom must not be frozen as meaning rules that cannot change unless the design explicitly says so;
 - the plan must not redesign the solution model.
 
 ### 5. Design Answer Method Check
@@ -176,14 +176,14 @@ When requirements analysis, solution design, or goal includes an final answer fo
 - evidence-reference, destination, machine-readable, and acceptance-condition requirements must not be weakened;
 - runtime `/goal` must not be able to replace the audience, purpose, medium, structure, detail level, destination, or machine-readable shape.
 
-### 7. Control Law Quality
+### 7. Is The Plan Controllable
 
 The execution policy must define a sane execution rule:
 
 - dependency matrix
 - who does the work / context use
 - context budget
-- execution granularity
+- work size
 - evidence check budget
 - evidence lifecycle / evidence budget
 - batch cadence
@@ -267,7 +267,7 @@ places or residuals remain unresolved.
 Flag as Major or Blocking when:
 
 - there is more than one what counts as done;
-- any partial, diagnostic, blocked, invalid, unavailable, fallback, or report when not done appears in Success Condition;
+- any partial, diagnostic, blocked, invalid, unavailable, fallback, or not done report appears in Success Condition;
 - any report-when-not-done status is listed under target-achieved states;
 - the execution policy lacks a target-producing action or proof-of-impossibility path;
 - the plan can terminate with `goal achieved: yes` without satisfying the what counts as done;
@@ -303,17 +303,17 @@ Flag as Major or Blocking when:
 - no who does the work exists;
 - Level 3/4 work assigns all target work to the main agent without a context-load justification;
 - the plan creates context overload by making the main agent coordinator, worker, integrator, and verifier for context-heavy work;
-- delegated work packages lack Context pack, Allowed actions, Return format, or Integration check;
+- delecheckd work packages lack Context pack, Allowed actions, Return format, or Integration check;
 - context packs contain only artifact path lists; bounded operating context requires relevant control excerpts, current batch objective, allowed artifacts/places, forbidden changes, required evidence checks/evidence, stop conditions, and expected return format;
 - parallel subagent-driven execution lacks explicit human approval, dependency independence, or control-review approval;
-- a subagent may modify approved files, widen scope, replace work assignment, or bypass integration gates;
+- a subagent may modify approved files, widen scope, replace work assignment, or bypass integration checks;
 - progress-log ownership or stop-condition detection is unclear;
-- context compression or bounded return material is missing for delegated work;
+- context compression or bounded return material is missing for delecheckd work;
 - subagent outputs can be treated as final completion before main-agent integration.
 
-Use `Major` when execution-policy revision can repair work assignment. Use `Blocking` when context overload would likely make runtime lose requirements, design invariants, final answer format, stop conditions, or approval boundaries.
+Use `Major` when execution-policy revision can repair work assignment. Use `Blocking` when context overload would likely make runtime lose requirements, design rules that cannot change, final answer format, stop conditions, or approval limits.
 
-### 16. Subagent Concurrency Check
+### 16. Parallel Agent Safety Check
 
 Flag as Major or Blocking when:
 
@@ -329,7 +329,7 @@ Flag as Major or Blocking when:
 - subagent outputs can become final without main-agent integration;
 - selected agent workflow does not fit the approved work packages.
 
-### 17. Execution Granularity / Evidence check Load
+### 17. Is The Work Split At The Right Size
 
 Flag as Major or Blocking when:
 
@@ -338,8 +338,8 @@ Flag as Major or Blocking when:
 - evidence check cost dominates execution cost;
 - broad verification is required after every small edit;
 - stale evidence checks can block approved structural change;
-- batch-end gates are too weak to detect drift;
-- batch-end gates are so heavy that they prevent progress;
+- batch-end checks are too weak to detect drift;
+- batch-end checks are so heavy that they prevent progress;
 - the plan does not explain why batch size is diagnosable.
 
 Use `Major` when execution-policy revision can repair the execution rule. Use `Blocking` when the granularity or evidence check load would prevent runtime completion or let evidence checks override confirmed meaning.
@@ -355,7 +355,7 @@ Flag:
 
 ### 19. Meaning vs Tactical Limit
 
-Meaning invariants must be frozen. Tactical execution details must remain adjustable.
+Meaning rules that cannot change must be frozen. Tactical execution details must remain adjustable.
 
 ### 20. Runtime Suitability
 
@@ -368,7 +368,7 @@ Placement status. Do not claim intended-result realization from local action alo
 when Where The Result Must Show Up is required. Strongest positive
 result claims require result-placement adequate.
 
-Runtime what-counts-as-done claims must be calibrated to the what counts as done. report when not done may stop execution honestly, but they do not support `goal achieved: yes`.
+Runtime what-counts-as-done claims must be calibrated to the what counts as done. not done report may stop execution honestly, but they do not support `goal achieved: yes`.
 
 ### 21. Review Independence
 
@@ -418,7 +418,7 @@ Only mark `Approved` when:
 - no unresolved meaning decision remains;
 - execution policy does not self-authorize uncontrolled changes;
 - work assignment is explicit and does not create main-agent context overload;
-- execution granularity and evidence check load do not create micro-step overcontrol or evidence check overcoupling;
+- work size and evidence check load do not create micro-step overcontrol or evidence check overcoupling;
 - user purpose evidence check supports the permitted completion wording and does not confuse internal progress evidence with purpose achievement;
 - result placement check supports result claim wording and does not confuse local action with global realization;
 - what counts as done check preserves the what counts as done;
@@ -445,7 +445,7 @@ After review status is set:
 This output format is response-only. Do not write `$skill ...` commands, runtime `/goal` prompts, or conversational next-step prompts into the review artifact.
 
 ```markdown
-Created or updated control review:
+Created or updated review:
 
 `docs/cybernetics/control-reviews/YYYY-MM-DD-slug.md`
 
@@ -482,8 +482,8 @@ Response-only next step:
 - [ ] What Counts As Done Check was checked.
 - [ ] Answer Path Check was checked.
 - [ ] Work Covered And Allowed Actions Check was checked.
-- [ ] Subagent Concurrency Check was checked.
-- [ ] Execution granularity and evidence check load were checked.
+- [ ] Parallel Agent Safety Check was checked.
+- [ ] Work size and evidence check load were checked.
 - [ ] Required revisions are actionable.
 - [ ] Response-only handoff matches the review status and does not bypass `$orchestrating-cybernetic-pregoal` when full pre-goal orchestration owns the chain.
 - [ ] The assistant response includes a response-only next step for every review status.

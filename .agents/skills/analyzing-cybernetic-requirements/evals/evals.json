@@ -16,7 +16,7 @@
       "prompt": "分析一个跨多个下级来源观测记录的需求。",
       "expected_output": "Default to partial results with failed nodes marked, not as a blocking question.",
       "assertions": [
-        "Does not ask whether the whole observer surface should fail as a blocker.",
+        "Does not ask whether the whole observer place should fail as a blocker.",
         "Records partial results with failed node marking as a default assumption.",
         "Asks only high-level requirement meaning questions."
       ]
@@ -38,7 +38,7 @@
       ]
     },
     {
-      "id": "requirements-complete-but-human-setpoint-pending-does-not-handoff",
+      "id": "requirements-complete-but-human-approved target-pending-does-not-handoff",
       "prompt": "Create requirements analysis for a Level 3 task. The user answered clarification questions, but has not explicitly approved the compact control commitment.",
       "expected_output": "Requirements may be Complete, but What the User Approved remains Pending and no orchestration command or predicted /goal is emitted.",
       "assertions": [
@@ -64,7 +64,7 @@
     },
     {
       "id": "complete-rubric-analysis-routes-to-bounded-goal",
-      "prompt": "Level 2 且 Required gates: rubric check required 的评价口径需求分析已完成，brief 是 docs/cybernetics/requirements/2026-05-26-closure-rubric.md，已确认已闭环/部分闭环/未闭环/不可判定的状态定义和证据等级。",
+      "prompt": "Level 2 且 Required checks: rubric check required 的评价口径需求分析已完成，brief 是 docs/cybernetics/requirements/2026-05-26-completion-rubric.md，已确认已闭环/部分闭环/未闭环/不可判定的状态定义和证据等级。",
       "expected_output": "Mark rubric analysis complete and recommend writing-cybernetic-goals for a bounded audit goal, not orchestrating-cybernetic-pregoal.",
       "assertions": [
         "Outputs that rubric analysis is complete.",
@@ -89,7 +89,7 @@
     },
     {
       "id": "complete-level-3-analysis-routes-to-orchestrator-not-manual-design",
-      "prompt": "Level 3 full pre-goal requirements analysis is complete. Requirements brief is docs/cybernetics/requirements/2026-05-31-complex-training.md. Required gates include required design: required, there are no open blocking requirement questions, and What the User Approved: Approved.",
+      "prompt": "Level 3 full pre-goal requirements analysis is complete. Requirements brief is docs/cybernetics/requirements/2026-05-31-complex-training.md. Required checks include required design: required, there are no open blocking requirement questions, and What the User Approved: Approved.",
       "expected_output": "Emit a pre-goal orchestration command, predicted runtime contract path, and pointer-only /goal shape using the concrete requirements path, not a standalone solution-design command before orchestration. Explain that the orchestrator owns design dispatch when required design is required, but the required design dispatch note must not replace the predicted pointer-only /goal.",
       "assertions": [
         "Outputs a command invoking $orchestrating-cybernetic-pregoal with docs/cybernetics/requirements/2026-05-31-complex-training.md.",
@@ -107,7 +107,7 @@
       "prompt": "分析需求：核对一组能力是否已闭环，结果要给管理者决策使用，需要证据引用和未决项。",
       "expected_output": "Identifies final-answer-format check and records audience, purpose, medium, structure needs, evidence references, and acceptance condition without designing the full report schema.",
       "assertions": [
-        "Includes final-answer-format check under Required Gates.",
+        "Includes final-answer-format check under Required Checks.",
         "Identifies audience and purpose.",
         "Records medium, detail level, evidence-reference needs, machine-readable needs, destination path, and acceptance condition when known or defaultable.",
         "Does not assume free-form chat is sufficient for a decision report.",

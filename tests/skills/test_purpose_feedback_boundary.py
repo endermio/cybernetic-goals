@@ -21,7 +21,7 @@ Status: `Approved`
 | Non-goals | do not test What the User Approved behavior in this fixture |
 | How We Know The User Purpose Was Met | dedicated test target |
 | Where The Result Must Show Up | covered by compact fixture |
-| What counts as done | purpose-boundary evidence is observed |
+| What counts as done | purpose-limit evidence is observed |
 | Evidence needed to call it done | target-producing evidence is observed |
 | Non-achieved terminal report handling | report goal achieved: no |
 | Required answer path | user-purpose evidence guard fixture required answer path |
@@ -31,17 +31,17 @@ Status: `Approved`
 | Required handling for unauthorized actions | none |
 | Explicitly out-of-scope items | none |
 | Final Answer Format | guard output |
-| Workflow fit | full pre-goal guard fixture |
+| Why this process is needed | full pre-goal guard fixture |
 | Known assumptions | fixture-only assumptions |
 
 Approval record:
 
 - Approved by: `test fixture`
-- Approval phrase or source: `approved fixture setpoint`
+- Approval phrase or source: `approved fixture approved target`
 """
 
 
-class PurposeFeedbackBoundaryTest(unittest.TestCase):
+class PurposeFeedbackLimitTest(unittest.TestCase):
     def read(self, path: str) -> str:
         return (ROOT / path).read_text(encoding="utf-8")
 
@@ -87,7 +87,7 @@ class PurposeFeedbackBoundaryTest(unittest.TestCase):
                     "| Beneficiary / observer | operator |",
                     "| Purpose-realizing outcome observed | operator can observe the intended result |",
                     "| Supporting Evidence | internal checks support progress only |",
-                    "| Sufficient evidence level | purpose-boundary |",
+                    "| Sufficient evidence level | purpose-limit |",
                     "| If user-purpose evidence unavailable | report pending and next observation |",
                     "| Allowed completion wording | pending until user purpose evidence is observed |",
                     "",
@@ -100,9 +100,9 @@ class PurposeFeedbackBoundaryTest(unittest.TestCase):
                 "| Element | Requirement |",
                 "|---|---|",
                 "| Target state | guard fixture intended result |",
-                "| Required result places | guard fixture surface model |",
+                "| Required result places | guard fixture place model |",
                 "| Place actions | act / inspect / preserve / exclude / discover |",
-                "| Residual reconciliation | account for old state, unknown surfaces, exclusions, preserved surfaces, and remaining mismatches |",
+                "| Residual reconciliation | account for old state, unknown places, exclusions, preserved places, and remaining mismatches |",
                 "| Result-placement wording | strongest result claim claim requires result-placement adequate |",
                 "| Partial/unavailable handling | report partial, missing, unavailable, or not applicable with justification |",
                 "| Distinction from user-purpose evidence | result-placement is distinct from How We Know The User Purpose Was Met |",
@@ -111,7 +111,7 @@ class PurposeFeedbackBoundaryTest(unittest.TestCase):
                 "",
                 "| Element | Requirement |",
                 "|---|---|",
-                "| What counts as done | purpose-boundary evidence is observed |",
+                "| What counts as done | purpose-limit evidence is observed |",
                     "| Evidence needed to call it done | target-producing evidence is observed |",
                 "| Allowed achieved claim | only what counts as done supports goal achieved: yes |",
                 "| Steps that make the result true | user-purpose evidence guard fixture required answer path |",
@@ -143,7 +143,7 @@ class PurposeFeedbackBoundaryTest(unittest.TestCase):
                     "## Source Contracts",
                     "",
                     f"- Requirements analysis: `{requirements}`",
-                    f"- Goal contract: `{goal}`",
+                    f"- Goal file: `{goal}`",
                     "",
                     "## Work Coverage And Action Limits Matrix",
                     "",
@@ -169,20 +169,20 @@ class PurposeFeedbackBoundaryTest(unittest.TestCase):
                     "",
                     "Non-achieved terminal report rule:",
                     "",
-                    "- A report when not done may be produced only after the action is attempted and fails, or impossibility is proven.",
+                    "- If it is not done, the report may be produced only after the action is attempted and fails, or impossibility is proven.",
                     "",
                     "## Where The Result Must Show Up",
                     "",
                     "### Places The Result Appears",
                     "",
-                    "| Surface | Role in target realization | Required action | Verification / reconciliation |",
+                    "| Place | Role in target realization | Required action | Verification / reconciliation |",
                     "|---|---|---|---|",
-                    "| guard fixture surface | carries fixture intended result | inspect | reconcile residuals in fixture scope |",
+                    "| guard fixture place | carries fixture intended result | inspect | reconcile residuals in fixture scope |",
                     "",
                     "### Place Classes",
                     "",
                     "- Must act: none for user-purpose evidence fixture.",
-                    "- Must inspect: guard fixture surface.",
+                    "- Must inspect: guard fixture place.",
                     "- Must preserve: user-purpose evidence semantics.",
                     "- Explicitly out of scope: target implementation.",
                     "- Unknown or requires discovery: none.",
@@ -258,7 +258,7 @@ class PurposeFeedbackBoundaryTest(unittest.TestCase):
             "## Review Independence",
             "",
             "- Requirements analysis: `yes`",
-            "- Goal contract: `yes`",
+            "- Goal file: `yes`",
             "- Execution policy: `yes`",
             "- Who does the work / context use: `yes`",
             f"- User purpose evidence check: `{review_independence_pfb}`",
@@ -283,7 +283,7 @@ class PurposeFeedbackBoundaryTest(unittest.TestCase):
                     "- Internally verified, user purpose evidence pending",
                     "",
                     "Findings:",
-                    "- Internal checks are progress evidence; purpose achievement claim waits for purpose-boundary feedback.",
+                    "- Internal checks are progress evidence; purpose achievement claim waits for purpose-limit feedback.",
                     "",
                 ]
             )
@@ -300,7 +300,7 @@ class PurposeFeedbackBoundaryTest(unittest.TestCase):
                 "## What Counts As Done Check",
                 "",
                 "Findings:",
-                "- Done status is separate from report when not done statuses.",
+                "- Done status is separate from not done report statuses.",
                 "",
                 "## Answer Path Check",
                 "",
@@ -333,7 +333,7 @@ class PurposeFeedbackBoundaryTest(unittest.TestCase):
         review.write_text("\n".join(review_parts), encoding="utf-8")
         return requirements, goal, plan, review
 
-    def test_requirements_define_purpose_feedback_boundary(self):
+    def test_requirements_define_purpose_feedback_limit(self):
         skill = self.read(".agents/skills/analyzing-cybernetic-requirements/SKILL.md")
         template = self.read(
             ".agents/skills/analyzing-cybernetic-requirements/assets/requirements-analysis-template.md"
@@ -348,7 +348,7 @@ class PurposeFeedbackBoundaryTest(unittest.TestCase):
             self.assertIn("Internal checks role", text)
             self.assertIn("Sufficient evidence level", text)
             self.assertIn("If feedback unavailable", text)
-        self.assertNotIn("user-purpose evidence boundary", skill.casefold())
+        self.assertNotIn("user-purpose evidence limit", skill.casefold())
         self.assertIn("beneficiary/observer", skill)
         self.assertIn("sufficient evidence level", skill)
         self.assertIn("If feedback unavailable", skill)
@@ -473,7 +473,7 @@ class PurposeFeedbackBoundaryTest(unittest.TestCase):
                     "--review",
                     str(review),
                     "--skip-guard",
-                    "--i-understand-this-bypasses-phase-gates",
+                    "--i-understand-this-bypasses-phase-checks",
                     "--out",
                     str(runtime_contract),
                 ],
@@ -485,7 +485,7 @@ class PurposeFeedbackBoundaryTest(unittest.TestCase):
 
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
         self.assertIn("Use this /goal:", result.stdout)
-        self.assertIn("Execute the runtime goal contract at", result.stdout)
+        self.assertIn("Execute the runtime goal file at", result.stdout)
         self.assertNotIn("highest purpose-relevant evidence actually observed", result.stdout)
         self.assertIn("How We Know The User Purpose Was Met", contract_text)
         self.assertIn("User Purpose Evidence Check", contract_text)
@@ -574,7 +574,7 @@ class PurposeFeedbackBoundaryTest(unittest.TestCase):
         self.assertIn("internal-purpose-can-use-internal-feedback", review_ids)
         self.assertIn("runtime-calibrates-user-purpose-evidence-claims", compiler_ids)
 
-    def test_invariant_matrix_tracks_purpose_feedback_boundary(self):
+    def test_invariant_matrix_tracks_purpose_feedback_limit(self):
         matrix = self.read("docs/cybernetic-framework/invariant-artifact-consumer-matrix.md")
 
         self.assertIn("INV-user-purpose evidence-001", matrix)

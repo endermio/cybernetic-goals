@@ -65,9 +65,9 @@
       "expected_output": "Route to Level 4 because the task is live-state-impacting, irreversible, and involves authorization/settlement/participant records.",
       "assertions": [
         "Classifies as Level 4.",
-        "Mentions human-gated workflow.",
+        "Mentions human-checkd workflow.",
         "Mentions live-state or irreversible record risk.",
-        "Does not allow ungated runtime /goal execution."
+        "Does not allow uncheckd runtime /goal execution."
       ]
     },
     {
@@ -94,7 +94,7 @@
     },
     {
       "id": "existing-artifacts-lower-score",
-      "prompt": "使用 $routing-cybernetic-workflows 分析任务：已有 requirements analysis、goal、plan、control review 都已 Approved。现在执行中发现某个观察表面字段名和已确认语义不一致，需要修正。",
+      "prompt": "使用 $routing-cybernetic-workflows 分析任务：已有 requirements analysis、goal、plan、review 都已 Approved。现在执行中发现某个观察表面字段名和已确认语义不一致，需要修正。",
       "expected_output": "Route to Level 1 or Level 2 because the approved approved files lower the routing level.",
       "assertions": [
         "Mentions existing approved artifacts.",
@@ -126,12 +126,12 @@
       ]
     },
     {
-      "id": "wide-user-closure-audit-needs-rubric-check",
+      "id": "wide-user-completion-audit-needs-rubric-check",
       "prompt": "使用 $routing-cybernetic-workflows 分析任务：从观察者使用层面逐项核对某组能力是否闭环，分类为已闭环、部分闭环、未闭环、不可判定。可以读源材料、文档、检查结果、记录、预览状态和证据 artifacts，只输出评估报告，不执行修复，不改变结构契约、授权、外部契约或需求语义。",
-      "expected_output": "Classify as Level 2 with Required gates: rubric check required, because execution complexity is bounded but the evaluation rubric for closure/completeness is not explicit. Recommend rubric analysis before creating the bounded audit goal.",
+      "expected_output": "Classify as Level 2 with Required checks: rubric check required, because execution complexity is bounded but the evaluation rubric for completion/completeness is not explicit. Recommend rubric analysis before creating the bounded audit goal.",
       "assertions": [
         "Classifies the task as Level 2.",
-        "Includes Required gates with rubric check required.",
+        "Includes Required checks with rubric check required.",
         "Does not encode the rubric check in the routing level name.",
         "Explains that broad scope is not the same as unresolved approved work chain.",
         "Explains that the evaluation function or rubric is not sufficiently defined.",
@@ -140,7 +140,7 @@
       ]
     },
     {
-      "id": "wide-user-closure-audit-with-rubric-is-level-2",
+      "id": "wide-user-completion-audit-with-rubric-is-level-2",
       "prompt": "使用 $routing-cybernetic-workflows 分析任务：从观察者使用层面逐项核对某组能力是否闭环。rubric 已定义：已闭环必须有实际操作流证据或已运行 runtime check；部分闭环是有 work artifact、文档或未运行传感器但没有实际路径证据；未闭环是只有占位/计划或没有可用入口；不可判定是需要外部凭证、外部环境、真实第三方服务或当前环境无法观测。只输出评估报告，不执行修复。",
       "expected_output": "Classify as Level 2 bounded file goal because scope is broad but meaning and evaluation rubric are explicit.",
       "assertions": [
@@ -157,7 +157,7 @@
       "expected_output": "Classify as Level 3 and list required design required. Recommend requirements analysis and then pre-goal orchestration; the orchestrator must invoke or request solution design before goal writing.",
       "assertions": [
         "Classifies the task as Level 3.",
-        "Includes Required gates with required design required.",
+        "Includes Required checks with required design required.",
         "Explains that the execution agent would otherwise need to invent the solution structure.",
         "Recommends $analyzing-cybernetic-requirements before pre-goal orchestration.",
         "Recommends $orchestrating-cybernetic-pregoal only after requirements analysis is complete and What the User Approved is Approved.",

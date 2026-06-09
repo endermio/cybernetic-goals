@@ -34,13 +34,13 @@ Status: `Approved`
 | Required handling for unauthorized actions | none |
 | Explicitly out-of-scope items | none |
 | Final Answer Format | guard output |
-| Workflow fit | full pre-goal guard fixture |
+| Why this process is needed | full pre-goal guard fixture |
 | Known assumptions | fixture-only assumptions |
 
 Approval record:
 
 - Approved by: `test fixture`
-- Approval phrase or source: `approved setpoint`
+- Approval phrase or source: `approved approved target`
 """
 
 
@@ -109,10 +109,10 @@ class ArtifactHygieneTest(unittest.TestCase):
                     "",
                     "| Element | Requirement |",
                     "|---|---|",
-                    "| Target state | target semantics are represented across result places |",
-                    "| Required result places | result place model, action classification, residual reconciliation |",
-                    "| Place actions | act, inspect, preserve, exclude, or discover result places |",
-                    "| Residual reconciliation | account for old state, unknown result places, exclusions, preserved result places, and remaining mismatches |",
+                    "| Target state | target semantics are represented across result_places |",
+                    "| Required result places | result_place model, action classification, residual reconciliation |",
+                    "| Place actions | act, inspect, preserve, exclude, or discover result_places |",
+                    "| Residual reconciliation | account for old state, unknown result_places, exclusions, preserved result_places, and remaining mismatches |",
                     "| Result-placement wording | strongest result claim claim requires result-placement adequate |",
                     "| Partial/unavailable handling | report partial, missing, unavailable, or not applicable with justification |",
                     "| Distinction from user-purpose evidence | result placement calibrates intended-result claims while user-purpose evidence calibrates human-purpose claims |",
@@ -170,7 +170,7 @@ class ArtifactHygieneTest(unittest.TestCase):
                     "## Source Contracts",
                     "",
                     f"- Requirements analysis: `{requirements}`",
-                    f"- Goal contract: `{goal}`",
+                    f"- Goal file: `{goal}`",
                     "",
                     "## Work Coverage And Action Limits Matrix",
                     "",
@@ -196,11 +196,11 @@ class ArtifactHygieneTest(unittest.TestCase):
                     "",
                     "Non-achieved terminal report rule:",
                     "",
-                    "- A report when not done may be produced only after the action is attempted and fails, or impossibility is proven.",
+                    "- If it is not done, the report may be produced only after the action is attempted and fails, or impossibility is proven.",
                     "",
                     "## Where The Result Must Show Up",
                     "",
-                    "- Result-placement status: `not applicable with justification`",
+                    "- Result placement status: `not applicable with justification`",
                     "- Why no intended-result result placement is required: this fixture only checks artifact hygiene.",
                     "- Why no place discovery / residual reconciliation is needed: no controlled-object intended result is changed.",
                     "- Allowed result claim wording: do not claim intended-result realization.",
@@ -274,8 +274,8 @@ class ArtifactHygieneTest(unittest.TestCase):
                     "## Review Independence",
                     "",
                     "- Requirements analysis: `yes`",
-                    "- Human setpoint fidelity: `yes`",
-                    "- Goal contract: `yes`",
+                    "- Human approved target check: `yes`",
+                    "- Goal file: `yes`",
                     "- Execution policy: `yes`",
                     "- Who does the work / context use: `yes`",
                     "- User purpose evidence check: `yes`",
@@ -287,7 +287,7 @@ class ArtifactHygieneTest(unittest.TestCase):
                     "## What The User Approved Check",
                     "",
                     "Findings:",
-                    "- Downstream artifacts preserve the approved setpoint.",
+                    "- Downstream artifacts preserve the approved approved target.",
                     "",
                     "## Who Does The Work / Context Use",
                     "",
@@ -307,7 +307,7 @@ class ArtifactHygieneTest(unittest.TestCase):
                     "## What Counts As Done Check",
                     "",
                     "Findings:",
-                    "- The single what counts as done is separated from report when not dones.",
+                    "- The single what counts as done is separated from not done reports.",
                     "",
                     "## Answer Path Check",
                     "",
@@ -422,11 +422,10 @@ class ArtifactHygieneTest(unittest.TestCase):
         self.assertIn("forbidden_in_user_artifacts", policy)
         self.assertIn("Task skeleton family", policy)
         self.assertIn("How this should be answered", policy)
-        self.assertIn("Target-achieved predicate", policy)
+        self.assertIn("target-achieved", policy)
         self.assertIn("What counts as done", policy)
         for term in (
             "Answer type",
-            "Skeleton",
             "Spine",
             "Predicate",
             "Fidelity",
@@ -437,6 +436,8 @@ class ArtifactHygieneTest(unittest.TestCase):
             "Topology",
             "Setpoint",
             "Invariant",
+            "Gate",
+            "Sensor",
         ):
             self.assertIn(f'term: "{term}"', policy)
         self.assertIn("allowed_internal_paths", policy)
@@ -454,7 +455,7 @@ class ArtifactHygieneTest(unittest.TestCase):
                         "| Element | Commitment |",
                         "|---|---|",
                         "| Task skeleton family | coverage-ceiling-measurement |",
-                        "| Done predicate | candidate report complete |",
+                        "| Done condition | candidate report complete |",
                         "",
                     ]
                 ),
@@ -496,7 +497,6 @@ class ArtifactHygieneTest(unittest.TestCase):
 
         forbidden = (
             "Answer type",
-            "Skeleton",
             "Spine",
             "Predicate",
             "Fidelity",
@@ -507,6 +507,8 @@ class ArtifactHygieneTest(unittest.TestCase):
             "Topology",
             "Setpoint",
             "Invariant",
+            "Gate",
+            "Sensor",
         )
         for path in template_paths:
             text = path.read_text(encoding="utf-8")

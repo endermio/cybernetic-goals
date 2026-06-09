@@ -2,7 +2,7 @@
 """Hygiene lint for generated task-control artifacts.
 
 The lint checks objective artifact noise only. It does not decide whether
-user-purpose evidence, result placement, approved-target meaning, plan
+user-purpose evidence, result_placement, approved-target meaning, plan
 granularity, or review adequacy are correct.
 """
 from __future__ import annotations
