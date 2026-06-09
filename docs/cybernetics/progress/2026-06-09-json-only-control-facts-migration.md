@@ -15,7 +15,7 @@
   - `python3 scripts/lint_cybernetic_artifact_hygiene.py ...`
   - `python3 -m pytest tests/skills -q`
   - `python3 -m py_compile ...`
-  - `python3 -m json.tool docs/cybernetics/requirements/2026-06-09-json-only-control-facts-migration.control.json`
+  - `python3 -m json.tool docs/cybernetics/runs/2026-06-09-json-only-control-facts-migration/requirements.control.json`
   - `git diff --check`
 - result:
   - orchestration guard: PASS
