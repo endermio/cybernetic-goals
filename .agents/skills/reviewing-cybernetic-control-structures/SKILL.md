@@ -108,7 +108,7 @@ The author of a post-review revision must not be the sole approver of that revis
 Record required check results before detailed findings:
 
 1. Required Answer Path Check
-2. Steps That Make The Result True Check
+2. Steps That Make The Result True / Producing Action Check
 3. Work Coverage / Action Limits Check
 4. what-counts-as-done / user-purpose evidence / result-placement Check
 5. Work Assignment / Subagent Check
@@ -338,6 +338,26 @@ Flag as Major or Blocking when:
 - component, module, or workflow evidence replaces required-step transition evidence;
 - failed, blocked, or unobserved required-step transitions are recorded only as residual risk while review remains Approved.
 
+### 13A. Producing Action Alignment Check
+
+Plan review must check that each blocking required step has a credible chain:
+
+```text
+required step -> what would make it true -> planned producing action -> mainline work package -> evidence after action
+```
+
+Flag as Major or Blocking when:
+
+- a required step needs a new state, artifact, implementation, experiment, or run result, but the plan only inspects existing artifacts, summarizes old evidence, checks available modes, or compares current results;
+- a mainline work package is verification-only, discovery-only, old-result comparison, or check-only while `Counts as goal progress` remains true;
+- "missing existing capability" is treated as runtime `blocked` without first planning an allowed producing action or proving that approved authority forbids producing it;
+- the plan's allowed write/run authority cannot execute the planned producing action;
+- the plan verifies that a required step is already true but never defines what work will make it true if it is currently false;
+- supporting-only discovery is used as the final mainline action for a generating target;
+- work packages can satisfy a blocking required outcome without showing the state change they produce.
+
+Use `NeedsRevision` when the plan can be repaired by adding producing actions, expanding allowed work within already approved authority, or returning to design for a clearer support path. Use `Blocked` only when the approved control facts forbid the necessary producing action, a required dependency is unavailable, or the review cannot identify a safe revision route without a human decision.
+
 ### 14. Work Covered And Allowed Actions Check
 
 Flag as Major or Blocking when:
@@ -551,6 +571,7 @@ Response-only next step:
 - [ ] Result placement check was checked.
 - [ ] What Counts As Done Check was checked.
 - [ ] Answer Path Check was checked.
+- [ ] Producing Action Alignment was checked for blocking required steps.
 - [ ] Work Covered And Allowed Actions Check was checked.
 - [ ] Parallel Agent Safety Check was checked.
 - [ ] Work size and evidence check load were checked.

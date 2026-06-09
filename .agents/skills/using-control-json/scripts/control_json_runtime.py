@@ -26,6 +26,7 @@ REQUIRED_REVIEW_CHECKS = {
     "intent-preservation",
     "obligation-preservation",
     "required-outcome-coverage",
+    "producing-action-alignment",
     "work-assignment",
     "horizon-authority",
     "final-observer",
@@ -300,6 +301,34 @@ def covered_outcomes_by_steps(step_map: dict[str, set[str]], steps: set[str] | N
     return covered
 
 
+def step_action_alignment_map(plan: dict[str, Any], errors: list[str]) -> dict[str, dict[str, Any]]:
+    alignments = plan.get("step_action_alignment")
+    if not isinstance(alignments, list):
+        errors.append("plan.control.json must declare step_action_alignment")
+        return {}
+    mapped: dict[str, dict[str, Any]] = {}
+    for alignment in alignments:
+        if not isinstance(alignment, dict):
+            errors.append("plan.control.json step_action_alignment entries must be objects")
+            continue
+        step_id = alignment.get("required_step_id")
+        if not isinstance(step_id, str) or not step_id:
+            errors.append("plan.control.json step_action_alignment entries must name required_step_id")
+            continue
+        if step_id in mapped:
+            errors.append(f"plan.control.json duplicate step_action_alignment for {step_id}")
+            continue
+        mapped[step_id] = alignment
+    return mapped
+
+
+def alignment_write_paths(alignment: dict[str, Any]) -> list[str]:
+    authority = alignment.get("allowed_authority_needed")
+    if not isinstance(authority, dict):
+        return []
+    return string_list(authority.get("write_paths"))
+
+
 def validate_event(event: dict[str, Any]) -> list[str]:
     errors: list[str] = []
     for field in (
@@ -524,6 +553,13 @@ def validate_control_chain(run_dir: Path) -> tuple[dict[str, dict[str, Any]] | N
         errors.append("runtime required_steps must be present in plan.control.json")
     if not runtime_steps <= goal_steps:
         errors.append("runtime required_steps must be present in goal.control.json")
+    plan_alignment = step_action_alignment_map(artifacts["plan"], errors)
+    missing_runtime_alignment = sorted(runtime_steps - set(plan_alignment))
+    if missing_runtime_alignment:
+        errors.append(
+            "plan.control.json step_action_alignment missing runtime required steps: "
+            + ", ".join(missing_runtime_alignment)
+        )
 
     all_required_outcomes, required_outcomes, outcome_errors = required_outcome_sets(artifacts["requirements"])
     errors.extend(outcome_errors)
@@ -572,13 +608,45 @@ def validate_control_chain(run_dir: Path) -> tuple[dict[str, dict[str, Any]] | N
         errors.append("plan.control.json must declare work_packages")
     else:
         covered_steps: set[str] = set()
+        mainline_producing_steps: set[str] = set()
         for package in work_packages:
             if not isinstance(package, dict):
                 errors.append("plan.control.json work_packages entries must be objects")
                 continue
             if not string_list(package.get("required_tests")):
                 errors.append("work package missing required checks")
-            covered_steps.update(string_list(package.get("required_steps")))
+            package_steps = set(string_list(package.get("required_steps")))
+            covered_steps.update(package_steps)
+            used_alignment = set(string_list(package.get("uses_step_action_alignment")))
+            if not package_steps <= used_alignment:
+                errors.append("plan.control.json work package missing producing action alignment for required steps")
+            unknown_alignment = sorted(used_alignment - set(plan_alignment))
+            if unknown_alignment:
+                errors.append(
+                    "plan.control.json work package references unknown producing action alignment: "
+                    + ", ".join(unknown_alignment)
+                )
+            for step_id in used_alignment:
+                alignment = plan_alignment.get(step_id)
+                if not alignment:
+                    continue
+                for write_path in alignment_write_paths(alignment):
+                    if not path_is_under(write_path, string_list(package.get("allowed_write_paths"))):
+                        errors.append(
+                            "plan.control.json producing action write authority is not covered by work package allowed_write_paths"
+                        )
+            package_outcomes = covered_outcomes_by_steps(step_outcomes_by_key.get("plan", {}), package_steps)
+            if package_outcomes & required_outcomes:
+                if (
+                    package.get("role") != "mainline"
+                    or package.get("counts_as_goal_progress") is not True
+                    or package.get("not_merely_verification") is not True
+                ):
+                    errors.append(
+                        "plan.control.json mainline work package required for blocking outcomes must use a producing action"
+                    )
+                else:
+                    mainline_producing_steps.update(package_steps)
         if not runtime_steps <= covered_steps:
             errors.append("runtime required_steps must be covered by work packages")
         if required_outcomes:
@@ -588,6 +656,16 @@ def validate_control_chain(run_dir: Path) -> tuple[dict[str, dict[str, Any]] | N
                 errors.append(
                     "plan.control.json work_packages do not cover blocking required outcomes: "
                     + ", ".join(missing_outcomes)
+                )
+            producing_outcomes = covered_outcomes_by_steps(
+                step_outcomes_by_key.get("plan", {}),
+                mainline_producing_steps,
+            )
+            missing_producing_outcomes = sorted(required_outcomes - producing_outcomes)
+            if missing_producing_outcomes:
+                errors.append(
+                    "plan.control.json mainline producing work packages do not cover blocking required outcomes: "
+                    + ", ".join(missing_producing_outcomes)
                 )
 
     return artifacts, errors

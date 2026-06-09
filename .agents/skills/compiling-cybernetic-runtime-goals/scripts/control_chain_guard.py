@@ -40,6 +40,7 @@ REQUIRED_REVIEW_CHECKS = {
     "intent-preservation",
     "obligation-preservation",
     "required-outcome-coverage",
+    "producing-action-alignment",
     "work-assignment",
     "horizon-authority",
     "final-observer",
@@ -258,6 +259,30 @@ def require_outcome_coverage(label: str, covered: set[str], required: set[str]) 
         raise ControlJsonValidationError(f"{label}: " + ", ".join(missing))
 
 
+def step_action_alignment_map(plan: dict[str, Any]) -> dict[str, dict[str, Any]]:
+    alignments = plan.get("step_action_alignment")
+    if not isinstance(alignments, list):
+        raise ControlJsonValidationError("plan.control.json must declare step_action_alignment")
+    mapped: dict[str, dict[str, Any]] = {}
+    for alignment in alignments:
+        if not isinstance(alignment, dict):
+            raise ControlJsonValidationError("plan.control.json step_action_alignment entries must be objects")
+        step_id = alignment.get("required_step_id")
+        if not isinstance(step_id, str) or not step_id:
+            raise ControlJsonValidationError("plan.control.json step_action_alignment entries must name required_step_id")
+        if step_id in mapped:
+            raise ControlJsonValidationError(f"plan.control.json duplicate step_action_alignment for {step_id}")
+        mapped[step_id] = alignment
+    return mapped
+
+
+def alignment_write_paths(alignment: dict[str, Any]) -> list[str]:
+    authority = alignment.get("allowed_authority_needed")
+    if not isinstance(authority, dict):
+        return []
+    return string_list(authority.get("write_paths"))
+
+
 def reject_markdown_control_artifacts(run_dir: Path) -> None:
     found = sorted(path.name for path in run_dir.iterdir() if path.name in MARKDOWN_CONTROL_FILENAMES or path.name.endswith(".goal.md"))
     if found:
@@ -384,12 +409,20 @@ def validate_json_control_run(run_dir: Path) -> dict[str, dict[str, Any]]:
     runtime_steps = step_ids(runtime)
     plan_steps = step_ids(artifacts["plan.control.json"])
     goal_steps = step_ids(artifacts["goal.control.json"])
+    plan_step_outcomes = step_outcome_map(artifacts["plan.control.json"])
+    plan_alignment = step_action_alignment_map(artifacts["plan.control.json"])
     if not runtime_steps:
         raise ControlJsonValidationError("runtime.control.json must declare required_steps")
     if not runtime_steps <= plan_steps:
         raise ControlJsonValidationError("runtime required_steps must be present in plan.control.json")
     if not runtime_steps <= goal_steps:
         raise ControlJsonValidationError("runtime required_steps must be present in goal.control.json")
+    missing_runtime_alignment = sorted(runtime_steps - set(plan_alignment))
+    if missing_runtime_alignment:
+        raise ControlJsonValidationError(
+            "plan.control.json step_action_alignment missing runtime required steps: "
+            + ", ".join(missing_runtime_alignment)
+        )
 
     required_outcomes = blocking_required_outcomes(artifacts["requirements.control.json"])
     if required_outcomes:
@@ -408,14 +441,48 @@ def validate_json_control_run(run_dir: Path) -> dict[str, dict[str, Any]]:
         )
 
     covered_steps: set[str] = set()
+    mainline_producing_steps: set[str] = set()
     for package in artifacts["plan.control.json"].get("work_packages", []):
-        covered_steps.update(string_list(package.get("required_steps")))
+        package_steps = set(string_list(package.get("required_steps")))
+        covered_steps.update(package_steps)
         if not string_list(package.get("required_tests")):
             raise ControlJsonValidationError("plan.control.json: work package missing required tests")
+        used_alignment = set(string_list(package.get("uses_step_action_alignment")))
+        if not package_steps <= used_alignment:
+            raise ControlJsonValidationError("plan.control.json work package missing producing action alignment for required steps")
+        unknown_alignment = sorted(used_alignment - set(plan_alignment))
+        if unknown_alignment:
+            raise ControlJsonValidationError(
+                "plan.control.json work package references unknown producing action alignment: "
+                + ", ".join(unknown_alignment)
+            )
+        for step_id in used_alignment:
+            alignment = plan_alignment[step_id]
+            for write_path in alignment_write_paths(alignment):
+                if not path_is_under(write_path, string_list(package.get("allowed_write_paths"))):
+                    raise ControlJsonValidationError(
+                        "plan.control.json producing action write authority is not covered by work package allowed_write_paths"
+                    )
+        package_outcomes = covered_outcomes_by_steps(plan_step_outcomes, package_steps)
+        if package_outcomes & required_outcomes:
+            if (
+                package.get("role") != "mainline"
+                or package.get("counts_as_goal_progress") is not True
+                or package.get("not_merely_verification") is not True
+            ):
+                raise ControlJsonValidationError(
+                    "plan.control.json mainline work package required for blocking outcomes must use a producing action"
+                )
+            mainline_producing_steps.update(package_steps)
     if required_outcomes:
         require_outcome_coverage(
             "plan.control.json work_packages do not cover blocking required outcomes",
-            covered_outcomes_by_steps(step_outcome_map(artifacts["plan.control.json"]), covered_steps),
+            covered_outcomes_by_steps(plan_step_outcomes, covered_steps),
+            required_outcomes,
+        )
+        require_outcome_coverage(
+            "plan.control.json mainline producing work packages do not cover blocking required outcomes",
+            covered_outcomes_by_steps(plan_step_outcomes, mainline_producing_steps),
             required_outcomes,
         )
     if not runtime_steps <= covered_steps:

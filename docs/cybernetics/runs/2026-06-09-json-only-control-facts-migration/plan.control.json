@@ -117,6 +117,236 @@
       ]
     }
   ],
+  "step_action_alignment": [
+    {
+      "required_step_id": "S1",
+      "what_would_make_it_true": "JSON schemas exist for every official control file and runtime report/event type is produced and its required evidence exists.",
+      "current_state": "S1 is not assumed satisfied before its producing work runs.",
+      "planned_producing_action": "Execute the work package actions that create evidence for S1, not just inspect old artifacts.",
+      "why_this_can_make_it_true": "The planned work writes or generates the evidence named by S1 and then verifies it.",
+      "allowed_authority_needed": {
+        "write_paths": [
+          "schemas/control-json",
+          ".agents/skills/references",
+          "tests/skills/test_control_json_schemas.py"
+        ],
+        "run_commands": [
+          "python3 -m unittest tests.skills.test_control_json_schemas"
+        ]
+      },
+      "evidence_after_action": [
+        "schema tests"
+      ],
+      "if_not_producible": "return_to_plan_or_design_with_missing_authority_reason"
+    },
+    {
+      "required_step_id": "S2",
+      "what_would_make_it_true": "using-control-json skill defines runtime JSON read/write and verifier discipline is produced and its required evidence exists.",
+      "current_state": "S2 is not assumed satisfied before its producing work runs.",
+      "planned_producing_action": "Execute the work package actions that create evidence for S2, not just inspect old artifacts.",
+      "why_this_can_make_it_true": "The planned work writes or generates the evidence named by S2 and then verifies it.",
+      "allowed_authority_needed": {
+        "write_paths": [
+          ".agents/skills/using-control-json",
+          "tests/skills/test_using_control_json_protocol.py",
+          "tests/skills/test_runtime_json_progress_verifier.py"
+        ],
+        "run_commands": [
+          "python3 -m unittest tests.skills.test_using_control_json_protocol tests.skills.test_runtime_json_progress_verifier"
+        ]
+      },
+      "evidence_after_action": [
+        "skill protocol tests"
+      ],
+      "if_not_producible": "return_to_plan_or_design_with_missing_authority_reason"
+    },
+    {
+      "required_step_id": "S3",
+      "what_would_make_it_true": "guard and compiler use JSON run directory as official input and reject Markdown official inputs is produced and its required evidence exists.",
+      "current_state": "S3 is not assumed satisfied before its producing work runs.",
+      "planned_producing_action": "Execute the work package actions that create evidence for S3, not just inspect old artifacts.",
+      "why_this_can_make_it_true": "The planned work writes or generates the evidence named by S3 and then verifies it.",
+      "allowed_authority_needed": {
+        "write_paths": [
+          ".agents/skills/compiling-cybernetic-runtime-goals/scripts",
+          ".agents/skills/orchestrating-cybernetic-pregoal/scripts",
+          ".agents/skills/analyzing-cybernetic-requirements/scripts",
+          "tests/skills/test_json_official_guard_compiler_path.py"
+        ],
+        "run_commands": [
+          "python3 -m unittest tests.skills.test_json_official_guard_compiler_path"
+        ]
+      },
+      "evidence_after_action": [
+        "guard/compiler tests"
+      ],
+      "if_not_producible": "return_to_plan_or_design_with_missing_authority_reason"
+    },
+    {
+      "required_step_id": "S4",
+      "what_would_make_it_true": "orchestration and handoff prediction point to runtime.control.json, not runtime Markdown is produced and its required evidence exists.",
+      "current_state": "S4 is not assumed satisfied before its producing work runs.",
+      "planned_producing_action": "Execute the work package actions that create evidence for S4, not just inspect old artifacts.",
+      "why_this_can_make_it_true": "The planned work writes or generates the evidence named by S4 and then verifies it.",
+      "allowed_authority_needed": {
+        "write_paths": [
+          ".agents/skills/compiling-cybernetic-runtime-goals/scripts",
+          ".agents/skills/orchestrating-cybernetic-pregoal/scripts",
+          ".agents/skills/analyzing-cybernetic-requirements/scripts",
+          "tests/skills/test_json_official_guard_compiler_path.py"
+        ],
+        "run_commands": [
+          "python3 -m unittest tests.skills.test_json_official_guard_compiler_path"
+        ]
+      },
+      "evidence_after_action": [
+        "orchestration/predictor tests"
+      ],
+      "if_not_producible": "return_to_plan_or_design_with_missing_authority_reason"
+    },
+    {
+      "required_step_id": "S5",
+      "what_would_make_it_true": "runtime verifier checks progress JSONL, mainline evidence, final report, and verifier permission before achieved claims is produced and its required evidence exists.",
+      "current_state": "S5 is not assumed satisfied before its producing work runs.",
+      "planned_producing_action": "Execute the work package actions that create evidence for S5, not just inspect old artifacts.",
+      "why_this_can_make_it_true": "The planned work writes or generates the evidence named by S5 and then verifies it.",
+      "allowed_authority_needed": {
+        "write_paths": [
+          ".agents/skills/using-control-json",
+          "tests/skills/test_using_control_json_protocol.py",
+          "tests/skills/test_runtime_json_progress_verifier.py"
+        ],
+        "run_commands": [
+          "python3 -m unittest tests.skills.test_using_control_json_protocol tests.skills.test_runtime_json_progress_verifier"
+        ]
+      },
+      "evidence_after_action": [
+        "runtime verifier tests"
+      ],
+      "if_not_producible": "return_to_plan_or_design_with_missing_authority_reason"
+    },
+    {
+      "required_step_id": "S6",
+      "what_would_make_it_true": "Markdown control templates are deauthorized as official control facts and replaced by JSON examples is produced and its required evidence exists.",
+      "current_state": "S6 is not assumed satisfied before its producing work runs.",
+      "planned_producing_action": "Execute the work package actions that create evidence for S6, not just inspect old artifacts.",
+      "why_this_can_make_it_true": "The planned work writes or generates the evidence named by S6 and then verifies it.",
+      "allowed_authority_needed": {
+        "write_paths": [
+          ".agents/skills/*/assets/*.control.example.json",
+          ".agents/skills/*/assets/*template*",
+          "tests/skills/test_json_control_template_hard_cut.py"
+        ],
+        "run_commands": [
+          "python3 -m unittest tests.skills.test_json_control_template_hard_cut"
+        ]
+      },
+      "evidence_after_action": [
+        "template hard-cut tests"
+      ],
+      "if_not_producible": "return_to_plan_or_design_with_missing_authority_reason"
+    },
+    {
+      "required_step_id": "S7",
+      "what_would_make_it_true": "old accident classes are represented as JSON regressions is produced and its required evidence exists.",
+      "current_state": "S7 is not assumed satisfied before its producing work runs.",
+      "planned_producing_action": "Execute the work package actions that create evidence for S7, not just inspect old artifacts.",
+      "why_this_can_make_it_true": "The planned work writes or generates the evidence named by S7 and then verifies it.",
+      "allowed_authority_needed": {
+        "write_paths": [
+          "tests/fixtures/cybernetics",
+          "tests/skills",
+          "README.md",
+          ".agents/skills",
+          "docs/cybernetic-framework",
+          "docs/cybernetics/runs/2026-06-09-json-only-control-facts-migration"
+        ],
+        "run_commands": [
+          "python3 -m unittest discover -s tests",
+          "python3 .agents/skills/using-control-json/scripts/verify_runtime_progress.py docs/cybernetics/runs/2026-06-09-json-only-control-facts-migration"
+        ]
+      },
+      "evidence_after_action": [
+        "regression inventory tests"
+      ],
+      "if_not_producible": "return_to_plan_or_design_with_missing_authority_reason"
+    },
+    {
+      "required_step_id": "S8",
+      "what_would_make_it_true": "hot-path docs and skill instructions no longer teach old runtime goal files as official control input is produced and its required evidence exists.",
+      "current_state": "S8 is not assumed satisfied before its producing work runs.",
+      "planned_producing_action": "Execute the work package actions that create evidence for S8, not just inspect old artifacts.",
+      "why_this_can_make_it_true": "The planned work writes or generates the evidence named by S8 and then verifies it.",
+      "allowed_authority_needed": {
+        "write_paths": [
+          "tests/fixtures/cybernetics",
+          "tests/skills",
+          "README.md",
+          ".agents/skills",
+          "docs/cybernetic-framework",
+          "docs/cybernetics/runs/2026-06-09-json-only-control-facts-migration"
+        ],
+        "run_commands": [
+          "python3 -m unittest discover -s tests",
+          "python3 .agents/skills/using-control-json/scripts/verify_runtime_progress.py docs/cybernetics/runs/2026-06-09-json-only-control-facts-migration"
+        ]
+      },
+      "evidence_after_action": [
+        "hot-path scan and tests"
+      ],
+      "if_not_producible": "return_to_plan_or_design_with_missing_authority_reason"
+    },
+    {
+      "required_step_id": "S9",
+      "what_would_make_it_true": "actual JSON run directory validates through guard, runtime operation scripts, verifier, and compiler is produced and its required evidence exists.",
+      "current_state": "S9 is not assumed satisfied before its producing work runs.",
+      "planned_producing_action": "Execute the work package actions that create evidence for S9, not just inspect old artifacts.",
+      "why_this_can_make_it_true": "The planned work writes or generates the evidence named by S9 and then verifies it.",
+      "allowed_authority_needed": {
+        "write_paths": [
+          "tests/fixtures/cybernetics",
+          "tests/skills",
+          "README.md",
+          ".agents/skills",
+          "docs/cybernetic-framework",
+          "docs/cybernetics/runs/2026-06-09-json-only-control-facts-migration"
+        ],
+        "run_commands": [
+          "python3 -m unittest discover -s tests",
+          "python3 .agents/skills/using-control-json/scripts/verify_runtime_progress.py docs/cybernetics/runs/2026-06-09-json-only-control-facts-migration"
+        ]
+      },
+      "evidence_after_action": [
+        "run directory validation"
+      ],
+      "if_not_producible": "return_to_plan_or_design_with_missing_authority_reason"
+    },
+    {
+      "required_step_id": "S10",
+      "what_would_make_it_true": "full repository verification passes after the JSON-only migration is produced and its required evidence exists.",
+      "current_state": "S10 is not assumed satisfied before its producing work runs.",
+      "planned_producing_action": "Execute the work package actions that create evidence for S10, not just inspect old artifacts.",
+      "why_this_can_make_it_true": "The planned work writes or generates the evidence named by S10 and then verifies it.",
+      "allowed_authority_needed": {
+        "write_paths": [
+          "tests/fixtures/cybernetics",
+          "tests/skills",
+          "README.md",
+          ".agents/skills",
+          "docs/cybernetic-framework",
+          "docs/cybernetics/runs/2026-06-09-json-only-control-facts-migration"
+        ],
+        "run_commands": [
+          "python3 -m unittest discover -s tests",
+          "python3 .agents/skills/using-control-json/scripts/verify_runtime_progress.py docs/cybernetics/runs/2026-06-09-json-only-control-facts-migration"
+        ]
+      },
+      "evidence_after_action": [
+        "full tests"
+      ],
+      "if_not_producible": "return_to_plan_or_design_with_missing_authority_reason"
+    }
+  ],
   "work_packages": [
     {
       "work_package_id": "WP1-schema-registry",
@@ -133,7 +363,14 @@
       ],
       "required_tests": [
         "python3 -m unittest tests.skills.test_control_json_schemas"
-      ]
+      ],
+      "role": "mainline",
+      "uses_step_action_alignment": [
+        "S1"
+      ],
+      "state_change_it_produces": "Required step state changes from unsatisfied to satisfied for S1",
+      "not_merely_verification": true,
+      "counts_as_goal_progress": true
     },
     {
       "work_package_id": "WP2-runtime-json-skill",
@@ -151,7 +388,15 @@
       ],
       "required_tests": [
         "python3 -m unittest tests.skills.test_using_control_json_protocol tests.skills.test_runtime_json_progress_verifier"
-      ]
+      ],
+      "role": "mainline",
+      "uses_step_action_alignment": [
+        "S2",
+        "S5"
+      ],
+      "state_change_it_produces": "Required step state changes from unsatisfied to satisfied for S2, S5",
+      "not_merely_verification": true,
+      "counts_as_goal_progress": true
     },
     {
       "work_package_id": "WP3-json-guard-compiler",
@@ -170,7 +415,15 @@
       ],
       "required_tests": [
         "python3 -m unittest tests.skills.test_json_official_guard_compiler_path"
-      ]
+      ],
+      "role": "mainline",
+      "uses_step_action_alignment": [
+        "S3",
+        "S4"
+      ],
+      "state_change_it_produces": "Required step state changes from unsatisfied to satisfied for S3, S4",
+      "not_merely_verification": true,
+      "counts_as_goal_progress": true
     },
     {
       "work_package_id": "WP4-template-hard-cut",
@@ -187,7 +440,14 @@
       ],
       "required_tests": [
         "python3 -m unittest tests.skills.test_json_control_template_hard_cut"
-      ]
+      ],
+      "role": "mainline",
+      "uses_step_action_alignment": [
+        "S6"
+      ],
+      "state_change_it_produces": "Required step state changes from unsatisfied to satisfied for S6",
+      "not_merely_verification": true,
+      "counts_as_goal_progress": true
     },
     {
       "work_package_id": "WP5-regressions-docs-integration",
@@ -211,7 +471,17 @@
       "required_tests": [
         "python3 -m unittest discover -s tests",
         "python3 .agents/skills/using-control-json/scripts/verify_runtime_progress.py docs/cybernetics/runs/2026-06-09-json-only-control-facts-migration"
-      ]
+      ],
+      "role": "mainline",
+      "uses_step_action_alignment": [
+        "S7",
+        "S8",
+        "S9",
+        "S10"
+      ],
+      "state_change_it_produces": "Required step state changes from unsatisfied to satisfied for S7, S8, S9, S10",
+      "not_merely_verification": true,
+      "counts_as_goal_progress": true
     }
   ],
   "runtime": {
@@ -245,7 +515,7 @@
     ]
   },
   "semantic_base_ref": {
-    "id": "semantic-base:2026-06-09-json-only-control-facts-migration",
+    "id": "semantic-base:test-fixture",
     "hash": "sha256:66e988b1542bfcf7ddc1869d9f8e0c5886ab4e55c1d866d7c6dd792dd712c0da"
   }
 }

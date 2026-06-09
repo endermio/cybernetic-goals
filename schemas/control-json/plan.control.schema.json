@@ -12,6 +12,7 @@
     "semantic_base_ref",
     "registry_bindings",
     "required_steps",
+    "step_action_alignment",
     "work_packages",
     "runtime",
     "progress",
@@ -156,7 +157,12 @@
         "additionalProperties": false,
         "required": [
           "work_package_id",
+          "role",
           "required_steps",
+          "uses_step_action_alignment",
+          "state_change_it_produces",
+          "not_merely_verification",
+          "counts_as_goal_progress",
           "allowed_write_paths",
           "forbidden_write_paths",
           "required_tests"
@@ -166,6 +172,12 @@
             "type": "string",
             "minLength": 1
           },
+          "role": {
+            "enum": [
+              "mainline",
+              "supporting-only"
+            ]
+          },
           "required_steps": {
             "type": "array",
             "minItems": 1,
@@ -173,6 +185,24 @@
               "type": "string",
               "minLength": 1
             }
+          },
+          "uses_step_action_alignment": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "state_change_it_produces": {
+            "type": "string",
+            "minLength": 1
+          },
+          "not_merely_verification": {
+            "type": "boolean"
+          },
+          "counts_as_goal_progress": {
+            "type": "boolean"
           },
           "allowed_write_paths": {
             "type": "array",
@@ -196,6 +226,84 @@
               "type": "string",
               "minLength": 1
             }
+          }
+        }
+      }
+    },
+    "step_action_alignment": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "required_step_id",
+          "what_would_make_it_true",
+          "current_state",
+          "planned_producing_action",
+          "why_this_can_make_it_true",
+          "allowed_authority_needed",
+          "evidence_after_action",
+          "if_not_producible"
+        ],
+        "properties": {
+          "required_step_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "what_would_make_it_true": {
+            "type": "string",
+            "minLength": 1
+          },
+          "current_state": {
+            "type": "string",
+            "minLength": 1
+          },
+          "planned_producing_action": {
+            "type": "string",
+            "minLength": 1
+          },
+          "why_this_can_make_it_true": {
+            "type": "string",
+            "minLength": 1
+          },
+          "allowed_authority_needed": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "write_paths",
+              "run_commands"
+            ],
+            "properties": {
+              "write_paths": {
+                "type": "array",
+                "minItems": 1,
+                "items": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "run_commands": {
+                "type": "array",
+                "minItems": 1,
+                "items": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              }
+            }
+          },
+          "evidence_after_action": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "if_not_producible": {
+            "type": "string",
+            "minLength": 1
           }
         }
       }

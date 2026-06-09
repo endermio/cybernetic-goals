@@ -191,6 +191,42 @@ class RuntimeJsonProgressVerifierTest(unittest.TestCase):
                 self.assertNotEqual(result.returncode, 0, result.stdout + result.stderr)
                 self.assertIn(expected, result.stdout + result.stderr)
 
+    def test_validate_control_chain_rejects_plan_without_producing_action_alignment(self):
+        supporting_package = outcome_covered_fixture()
+        package = supporting_package["control_files"]["plan.control.json"]["work_packages"][0]
+        package["role"] = "supporting-only"
+        package["not_merely_verification"] = False
+        package["counts_as_goal_progress"] = False
+        apply_integrity_metadata(supporting_package["control_files"])
+
+        missing_authority = outcome_covered_fixture()
+        missing_authority["control_files"]["plan.control.json"]["step_action_alignment"][0]["allowed_authority_needed"]["write_paths"] = [
+            "scripts/new-runner-mode.py"
+        ]
+        missing_authority["control_files"]["plan.control.json"]["work_packages"][0]["allowed_write_paths"] = [
+            "evidence/"
+        ]
+        apply_integrity_metadata(missing_authority["control_files"])
+
+        for fixture, expected in (
+            (
+                supporting_package,
+                "plan.control.json mainline work package required for blocking outcomes must use a producing action",
+            ),
+            (
+                missing_authority,
+                "plan.control.json producing action write authority is not covered by work package allowed_write_paths",
+            ),
+        ):
+            with self.subTest(expected=expected), tempfile.TemporaryDirectory() as tmpdir:
+                run_dir = Path(tmpdir)
+                write_run(run_dir, fixture)
+
+                result = run_script(VALIDATE, str(run_dir))
+
+                self.assertNotEqual(result.returncode, 0, result.stdout + result.stderr)
+                self.assertIn(expected, result.stdout + result.stderr)
+
     def test_append_progress_event_appends_jsonl_and_rejects_invalid_basics(self):
         event = {
             "event_type": "step.completed",

@@ -45,7 +45,7 @@
     }
   ],
   "semantic_base_ref": {
-    "id": "semantic-base:2026-06-09-json-only-control-facts-migration",
+    "id": "semantic-base:test-fixture",
     "hash": "sha256:66e988b1542bfcf7ddc1869d9f8e0c5886ab4e55c1d866d7c6dd792dd712c0da"
   }
 }

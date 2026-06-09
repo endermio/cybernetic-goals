@@ -81,6 +81,21 @@
       ]
     },
     {
+      "check_id": "producing-action-alignment",
+      "status": "pass",
+      "verdict": "approved",
+      "return_to_stage": null,
+      "evidence": [
+        "blocking required steps map to producing actions and mainline work packages"
+      ],
+      "findings": [],
+      "required_changes": [],
+      "checked_transformations": [
+        "goal->plan",
+        "plan->runtime"
+      ]
+    },
+    {
       "check_id": "work-assignment",
       "status": "pass",
       "evidence": [

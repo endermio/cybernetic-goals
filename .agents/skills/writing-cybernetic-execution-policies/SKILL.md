@@ -81,20 +81,21 @@ The execution policy must include:
 7. Work Coverage And Action Limits Matrix
 8. Where The Result Must Show Up
 9. Steps That Make The Result True
-10. Action That Can Make It Done
-11. Work Size And Evidence Check Budget
-12. Batch Cadence
-13. Destructive Intermediate-State Policy
-14. Output Material / Evidence Collection
-15. User Purpose Strategy
-16. Evidence Lifecycle / Evidence Budget
-17. Evidence check / Evidence Governance
-18. Stale Evidence check Retirement and Rewrite Policy
-19. Phase Checks
-20. Execution Rhythm
-21. Stop Conditions
-22. Progress Log Rules
-23. Candidate Plan Tasks
+10. Required Step To Producing Action Alignment
+11. Action That Can Make It Done
+12. Work Size And Evidence Check Budget
+13. Batch Cadence
+14. Destructive Intermediate-State Policy
+15. Output Material / Evidence Collection
+16. User Purpose Strategy
+17. Evidence Lifecycle / Evidence Budget
+18. Evidence check / Evidence Governance
+19. Stale Evidence check Retirement and Rewrite Policy
+20. Phase Checks
+21. Execution Rhythm
+22. Stop Conditions
+23. Progress Log Rules
+24. Candidate Plan Tasks
 
 ## Who Does The Work / Context Use
 
@@ -233,7 +234,31 @@ The execution policy must define:
 
 Every mainline work package must map to at least one required step. Supporting-only work may exist, but it must be marked `supporting-only` and cannot satisfy goal progress by itself.
 
-Each `Candidate Plan Task` must record `Required step(s)`, `Role`, `State transition advanced`, `Transition evidence produced`, `Integration check`, `Counts as goal progress`, and `Why this is not merely component completion`.
+## Required Step To Producing Action Alignment
+
+For every required step that supports a blocking required outcome, the execution policy must align:
+
+```text
+required step -> what would make it true -> planned producing action -> mainline work package -> evidence after action
+```
+
+The plan must record, in plain task language:
+
+- what would make the required step true;
+- the current known or unknown state;
+- the planned producing action that can change the state;
+- why that action can make the required step true;
+- the write/run authority needed for that action;
+- evidence expected after the action;
+- what would prove the step cannot be produced in the approved environment.
+
+A producing action is an action that can create the required state or evidence, not merely check whether it already exists. Inspection, summarization, old-result comparison, available-mode lookup, and check-only work are supporting-only unless the user-approved goal is explicitly an audit of existing evidence.
+
+Missing existing capability is not proof of impossibility. If a required step needs a capability that is absent, the plan must either include a producing action to build or enable that capability, or return to design/What the User Approved because the approved authority forbids producing it. Do not turn "not already available" into runtime `blocked`.
+
+Every mainline work package must bind to at least one planned producing action and state the result-producing change it will make. Verification-only or discovery-only work packages may precede a producing action, but they must be marked `supporting-only` and `Counts as goal progress: false` unless the approved task is only verification/discovery.
+
+Each `Candidate Plan Task` must record `Required step(s)`, `Role`, `State transition advanced`, `Transition evidence produced`, `Integration check`, `Counts as goal progress`, `Why this is not merely component completion`, and `Why this is not merely checking whether the step already exists`.
 
 ## Action That Can Make It Done
 
@@ -242,6 +267,8 @@ The execution policy must define:
 - Action that can make it done: the action, probe, experiment, change, or observation that must be attempted to satisfy the what counts as done;
 - Proof of impossibility, if any: what would prove the action that can make it done cannot be attempted in this environment;
 - If it is not done, what should be reported: a not done report may be produced only after the action that can make it done is attempted and fails, or after impossibility is proven.
+
+For generating tasks, the action that can make it done must include producing actions that create missing required capability or evidence when those are needed. Do not replace the action with a check that only determines whether existing artifacts already satisfy the goal.
 
 ## Work Size And Evidence Check Budget
 
@@ -437,7 +464,11 @@ Response-only next step:
 - [ ] The plan includes Where The Result Must Show Up for compiled runtime goals, with either full place/action/residual structure or `result placement not applicable with justification`.
 - [ ] The plan includes Work Coverage And Action Limits Matrix for full-route or multi-batch work.
 - [ ] The plan includes Steps That Make The Result True.
-- [ ] Each Candidate Plan Task records `Required step(s)`, `Role`, `State transition advanced`, `Transition evidence produced`, `Integration check`, `Counts as goal progress`, and why it is not merely component completion.
+- [ ] Every blocking required step has required step -> producing action -> mainline work package alignment.
+- [ ] Mainline work packages state what result-producing change they make, not only what existing material they inspect.
+- [ ] Check-only, summarize-only, old-result comparison, and discovery work is supporting-only unless the approved task is explicitly an audit/discovery task.
+- [ ] Missing existing capability is handled by a producing action, return to design/What the User Approved for authority repair, or proof of impossibility; it is not treated as runtime blocked by default.
+- [ ] Each Candidate Plan Task records `Required step(s)`, `Role`, `State transition advanced`, `Transition evidence produced`, `Integration check`, `Counts as goal progress`, why it is not merely component completion, and why it is not merely checking whether the step already exists.
 - [ ] The plan includes Action That Can Make It Done.
 - [ ] The plan selects `Main-only`, `Serial subagent-driven`, or `Parallel subagent-driven`.
 - [ ] The plan records `Selected agent workflow`.

@@ -81,6 +81,21 @@
       ]
     },
     {
+      "check_id": "producing-action-alignment",
+      "status": "pass",
+      "verdict": "approved",
+      "return_to_stage": null,
+      "evidence": [
+        "blocking required steps map to producing actions and mainline work packages"
+      ],
+      "findings": [],
+      "required_changes": [],
+      "checked_transformations": [
+        "goal->plan",
+        "plan->runtime"
+      ]
+    },
+    {
       "check_id": "work-assignment",
       "status": "pass",
       "evidence": [
@@ -133,13 +148,13 @@
     }
   ],
   "semantic_base_ref": {
-    "id": "semantic-base:2026-06-09-json-only-control-facts-migration",
+    "id": "semantic-base:test-fixture",
     "hash": "sha256:66e988b1542bfcf7ddc1869d9f8e0c5886ab4e55c1d866d7c6dd792dd712c0da"
   },
   "approved_control_hashes": {
-    "requirements.control.json": "sha256:01c507c8795b46692ff414afa7fed5754ce215348d684315c29edfc1750ad1ee",
-    "design.control.json": "sha256:c95d319256b559749adfdd61548852f2662e78a8682a6fd7511e25014d823ae4",
-    "goal.control.json": "sha256:695c40a7892e2baa1be0a35c8d56ac9d3e031bc6caea6028ee9c586479cfec6a",
-    "plan.control.json": "sha256:2297d99c4009e69b6a5428679ff0ad50816139583eb48d9b6c9fc0adec5766b6"
+    "requirements.control.json": "sha256:766768eab5d7ba3e7c7d7d7700a7a9c7ad58753a35d72658caec835580f7b21e",
+    "design.control.json": "sha256:12e86c05ebb339ad2d60f58206995d260fa9693778e8e9d631710ac50f10c05b",
+    "goal.control.json": "sha256:661e0f0c3d1d63d60e6894e0c8433a5c995b857157ff3efa7ce6c6faa4d76d85",
+    "plan.control.json": "sha256:f7ab74443d29b9bc83ff5636d0b90ac512067062ce90674cd637a06ac7aab075"
   }
 }

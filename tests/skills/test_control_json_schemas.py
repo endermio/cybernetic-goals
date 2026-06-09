@@ -130,10 +130,30 @@ SCHEMA_FIXTURES = {
                 "satisfies_outcomes": ["outcome.schema-validation"],
             }
         ],
+        "step_action_alignment": [
+            {
+                "required_step_id": "S1",
+                "what_would_make_it_true": "Markdown dependencies are inventoried and represented as JSON-only schema tests.",
+                "current_state": "Markdown control artifacts may still be accepted by old paths.",
+                "planned_producing_action": "Create schema coverage and tests that make Markdown official input fail.",
+                "why_this_can_make_it_true": "The action changes the validation state instead of only checking existing artifacts.",
+                "allowed_authority_needed": {
+                    "write_paths": ["schemas/control-json", "tests/skills/test_control_json_schemas.py"],
+                    "run_commands": ["python3 -m unittest tests.skills.test_control_json_schemas"],
+                },
+                "evidence_after_action": ["schema validation tests"],
+                "if_not_producible": "return_to_design_or_requirements_with_reason",
+            }
+        ],
         "work_packages": [
             {
                 "work_package_id": "WP1",
-                "required_steps": ["S1", "S2", "S3"],
+                "required_steps": ["S1"],
+                "role": "mainline",
+                "uses_step_action_alignment": ["S1"],
+                "state_change_it_produces": "JSON schema validation state changes from permissive to strict.",
+                "not_merely_verification": True,
+                "counts_as_goal_progress": True,
                 "allowed_write_paths": ["schemas/control-json", "tests/skills/test_control_json_schemas.py"],
                 "forbidden_write_paths": ["guard scripts", "compiler scripts"],
                 "required_tests": ["python3 -m unittest tests.skills.test_control_json_schemas"],
@@ -172,6 +192,7 @@ SCHEMA_FIXTURES = {
             review_check("intent-preservation", ["approved user intent is preserved across design, goal, and plan"]),
             review_check("obligation-preservation", ["required outcomes are not downgraded into permission, readiness, or future work"]),
             review_check("required-outcome-coverage", ["blocking required outcomes are mapped through required steps, work packages, and verifier"]),
+            review_check("producing-action-alignment", ["blocking required steps are mapped to producing actions and mainline work packages"]),
             review_check("work-assignment", ["parallel workflow registry binding present"]),
             review_check("horizon-authority", ["covered work remains in this run"]),
             review_check("final-observer", ["approved JSON chain ready for runtime"]),
@@ -410,6 +431,7 @@ class ControlJsonSchemaTest(unittest.TestCase):
                 self.assertIn("approved_control", schema["properties"])
 
         plan = load_json(SCHEMA_DIR / "plan.control.schema.json")
+        self.assertIn("step_action_alignment", plan["properties"])
         self.assertIn("work_packages", plan["properties"])
         self.assertIn("runtime", plan["properties"])
         self.assertIn("progress", plan["properties"])
@@ -496,6 +518,33 @@ class ControlJsonSchemaTest(unittest.TestCase):
                 self.assertIn("satisfies_outcomes", step_schema["properties"])
 
         plan = load_json(SCHEMA_DIR / "plan.control.schema.json")
+        self.assertIn("step_action_alignment", plan["required"])
+        alignment_schema = plan["properties"]["step_action_alignment"]["items"]
+        for field in (
+            "required_step_id",
+            "what_would_make_it_true",
+            "current_state",
+            "planned_producing_action",
+            "why_this_can_make_it_true",
+            "allowed_authority_needed",
+            "evidence_after_action",
+            "if_not_producible",
+        ):
+            with self.subTest(alignment_field=field):
+                self.assertIn(field, alignment_schema["required"])
+                self.assertIn(field, alignment_schema["properties"])
+        work_package_schema = plan["properties"]["work_packages"]["items"]
+        for field in (
+            "role",
+            "uses_step_action_alignment",
+            "state_change_it_produces",
+            "not_merely_verification",
+            "counts_as_goal_progress",
+        ):
+            with self.subTest(work_package_field=field):
+                self.assertIn(field, work_package_schema["required"])
+                self.assertIn(field, work_package_schema["properties"])
+
         runtime = load_json(SCHEMA_DIR / "runtime.control.schema.json")
         for schema in (plan, runtime):
             verifier = schema["properties"]["verifier"]

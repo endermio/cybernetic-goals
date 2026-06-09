@@ -27,6 +27,29 @@
       ]
     }
   ],
+  "step_action_alignment": [
+    {
+      "required_step_id": "S8",
+      "what_would_make_it_true": "official Markdown template surface is deauthorized is produced and its required evidence exists.",
+      "current_state": "S8 is not assumed satisfied before its producing work runs.",
+      "planned_producing_action": "Execute the work package actions that create evidence for S8, not just inspect old artifacts.",
+      "why_this_can_make_it_true": "The planned work writes or generates the evidence named by S8 and then verifies it.",
+      "allowed_authority_needed": {
+        "write_paths": [
+          ".agents/skills/*/assets",
+          "tests/skills/test_json_control_template_hard_cut.py",
+          "MANIFEST.txt"
+        ],
+        "run_commands": [
+          "python3 -m unittest tests.skills.test_json_control_template_hard_cut"
+        ]
+      },
+      "evidence_after_action": [
+        "tests.skills.test_json_control_template_hard_cut"
+      ],
+      "if_not_producible": "return_to_plan_or_design_with_missing_authority_reason"
+    }
+  ],
   "work_packages": [
     {
       "work_package_id": "WP4",
@@ -46,7 +69,14 @@
       ],
       "required_tests": [
         "python3 -m unittest tests.skills.test_json_control_template_hard_cut"
-      ]
+      ],
+      "role": "mainline",
+      "uses_step_action_alignment": [
+        "S8"
+      ],
+      "state_change_it_produces": "Required step state changes from unsatisfied to satisfied for S8",
+      "not_merely_verification": true,
+      "counts_as_goal_progress": true
     }
   ],
   "runtime": {

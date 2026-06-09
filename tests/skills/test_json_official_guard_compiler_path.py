@@ -412,6 +412,54 @@ class JsonOfficialGuardCompilerPathTest(unittest.TestCase):
                 result.stdout + result.stderr,
             )
 
+    def test_control_chain_guard_rejects_blocking_outcome_package_without_producing_action(self):
+        fixture_by_file = outcome_covered_control_run_files()
+        package = fixture_by_file["plan.control.json"]["work_packages"][0]
+        package["role"] = "supporting-only"
+        package["not_merely_verification"] = False
+        package["counts_as_goal_progress"] = False
+        apply_integrity_metadata(fixture_by_file)
+        with tempfile.TemporaryDirectory() as tmpdir:
+            run_dir = Path(tmpdir)
+            write_control_run(run_dir, fixture_by_file=fixture_by_file)
+
+            result = subprocess.run(
+                ["python3", str(CONTROL_GUARD), "--run-dir", str(run_dir)],
+                text=True,
+                capture_output=True,
+            )
+
+            self.assertNotEqual(result.returncode, 0, result.stdout + result.stderr)
+            self.assertIn(
+                "plan.control.json mainline work package required for blocking outcomes must use a producing action",
+                result.stdout + result.stderr,
+            )
+
+    def test_control_chain_guard_rejects_producing_action_without_write_authority(self):
+        fixture_by_file = outcome_covered_control_run_files()
+        fixture_by_file["plan.control.json"]["step_action_alignment"][0]["allowed_authority_needed"]["write_paths"] = [
+            "scripts/new-runner-mode.py"
+        ]
+        fixture_by_file["plan.control.json"]["work_packages"][0]["allowed_write_paths"] = [
+            "evidence/"
+        ]
+        apply_integrity_metadata(fixture_by_file)
+        with tempfile.TemporaryDirectory() as tmpdir:
+            run_dir = Path(tmpdir)
+            write_control_run(run_dir, fixture_by_file=fixture_by_file)
+
+            result = subprocess.run(
+                ["python3", str(CONTROL_GUARD), "--run-dir", str(run_dir)],
+                text=True,
+                capture_output=True,
+            )
+
+            self.assertNotEqual(result.returncode, 0, result.stdout + result.stderr)
+            self.assertIn(
+                "plan.control.json producing action write authority is not covered by work package allowed_write_paths",
+                result.stdout + result.stderr,
+            )
+
     def test_control_chain_guard_requires_intent_obligation_and_outcome_review_checks(self):
         fixture_by_file = outcome_covered_control_run_files()
         fixture_by_file["review.control.json"]["review_checks"] = [
@@ -422,6 +470,7 @@ class JsonOfficialGuardCompilerPathTest(unittest.TestCase):
                 "intent-preservation",
                 "obligation-preservation",
                 "required-outcome-coverage",
+                "producing-action-alignment",
             }
         ]
         apply_integrity_metadata(fixture_by_file)
@@ -439,6 +488,7 @@ class JsonOfficialGuardCompilerPathTest(unittest.TestCase):
             self.assertIn("intent-preservation", result.stdout + result.stderr)
             self.assertIn("obligation-preservation", result.stdout + result.stderr)
             self.assertIn("required-outcome-coverage", result.stdout + result.stderr)
+            self.assertIn("producing-action-alignment", result.stdout + result.stderr)
 
     def test_control_chain_guard_rejects_review_check_with_non_approved_verdict(self):
         fixture_by_file = outcome_covered_control_run_files()

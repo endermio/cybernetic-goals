@@ -191,6 +191,50 @@
             ]
           }
         ],
+        "step_action_alignment": [
+          {
+            "required_step_id": "S7",
+            "what_would_make_it_true": "runtime progress and verifier implemented is produced and its required evidence exists.",
+            "current_state": "S7 is not assumed satisfied before its producing work runs.",
+            "planned_producing_action": "Execute the work package actions that create evidence for S7, not just inspect old artifacts.",
+            "why_this_can_make_it_true": "The planned work writes or generates the evidence named by S7 and then verifies it.",
+            "allowed_authority_needed": {
+              "write_paths": [
+                ".agents/skills/using-control-json/scripts",
+                "tests/fixtures/cybernetics/runtime_verifier",
+                "tests/skills/test_runtime_json_progress_verifier.py"
+              ],
+              "run_commands": [
+                "python3 -m unittest tests.skills.test_runtime_json_progress_verifier"
+              ]
+            },
+            "evidence_after_action": [
+              "runtime verifier tests"
+            ],
+            "if_not_producible": "return_to_plan_or_design_with_missing_authority_reason"
+          },
+          {
+            "required_step_id": "S9",
+            "what_would_make_it_true": "old accident regressions ported to JSON is produced and its required evidence exists.",
+            "current_state": "S9 is not assumed satisfied before its producing work runs.",
+            "planned_producing_action": "Execute the work package actions that create evidence for S9, not just inspect old artifacts.",
+            "why_this_can_make_it_true": "The planned work writes or generates the evidence named by S9 and then verifies it.",
+            "allowed_authority_needed": {
+              "write_paths": [
+                ".agents/skills/using-control-json/scripts",
+                "tests/fixtures/cybernetics/runtime_verifier",
+                "tests/skills/test_runtime_json_progress_verifier.py"
+              ],
+              "run_commands": [
+                "python3 -m unittest tests.skills.test_runtime_json_progress_verifier"
+              ]
+            },
+            "evidence_after_action": [
+              "JSON regression tests"
+            ],
+            "if_not_producible": "return_to_plan_or_design_with_missing_authority_reason"
+          }
+        ],
         "work_packages": [
           {
             "work_package_id": "WP5",
@@ -210,7 +254,15 @@
             ],
             "required_tests": [
               "python3 -m unittest tests.skills.test_runtime_json_progress_verifier"
-            ]
+            ],
+            "role": "mainline",
+            "uses_step_action_alignment": [
+              "S7",
+              "S9"
+            ],
+            "state_change_it_produces": "Required step state changes from unsatisfied to satisfied for S7, S9",
+            "not_merely_verification": true,
+            "counts_as_goal_progress": true
           }
         ],
         "runtime": {
@@ -331,6 +383,21 @@
             ]
           },
           {
+            "check_id": "producing-action-alignment",
+            "status": "pass",
+            "verdict": "approved",
+            "return_to_stage": null,
+            "evidence": [
+              "blocking required steps map to producing actions and mainline work packages"
+            ],
+            "findings": [],
+            "required_changes": [],
+            "checked_transformations": [
+              "goal->plan",
+              "plan->runtime"
+            ]
+          },
+          {
             "check_id": "work-assignment",
             "status": "pass",
             "evidence": [
@@ -390,7 +457,7 @@
           "requirements.control.json": "sha256:2c648815ef5254d57bb6a27eb2d258a8de3af8d5d9ba38cdc6ace3a0a2fffa76",
           "design.control.json": "sha256:97833fb2eaa995a093d159c234eb07c477c4a008a6910325c234b216e67f8ffd",
           "goal.control.json": "sha256:77f089399386a93d6ec997e97dc18f10c1a7b358bfb0e0653cfb9923b7b51147",
-          "plan.control.json": "sha256:62560b9280fc281f4b74cf14df7c90578cf4614397d5b7c88046b548b8f27d1e"
+          "plan.control.json": "sha256:5e4398e12a4b8f1816e1865a62b381a865023bbb9fe24a2803e3dfe6ba92d474"
         }
       },
       "runtime.control.json": {
@@ -472,8 +539,8 @@
           "requirements.control.json": "sha256:2c648815ef5254d57bb6a27eb2d258a8de3af8d5d9ba38cdc6ace3a0a2fffa76",
           "design.control.json": "sha256:97833fb2eaa995a093d159c234eb07c477c4a008a6910325c234b216e67f8ffd",
           "goal.control.json": "sha256:77f089399386a93d6ec997e97dc18f10c1a7b358bfb0e0653cfb9923b7b51147",
-          "plan.control.json": "sha256:62560b9280fc281f4b74cf14df7c90578cf4614397d5b7c88046b548b8f27d1e",
-          "review.control.json": "sha256:891c0334d70d5365867b559d41146ea88f0416fb6bc9018bbd7cdd0cf8134497",
+          "plan.control.json": "sha256:5e4398e12a4b8f1816e1865a62b381a865023bbb9fe24a2803e3dfe6ba92d474",
+          "review.control.json": "sha256:052b92e608900e6ba8be32c6949dbe1c19aedc12b1eb9a69cc83f0aef278e561",
           "runtime.control.json": "sha256:867adbe095c4174b93653562ed6941dc5a7f54b327e80636fe48640d3913f36d"
         }
       }
