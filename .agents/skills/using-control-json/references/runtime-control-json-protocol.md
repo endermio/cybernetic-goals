@@ -47,6 +47,12 @@ runtime writes only these control-output files:
 - `runtime-status.json`
 - `final-report.json`
 
+Non-control evidence artifacts are separate. Runtime may write evidence files
+only under `runtime.control.json.runtime.writable_evidence_paths`, such as
+`evidence/`, when the approved requirements, plan, or verifier require those
+evidence artifacts. Do not add evidence artifact paths to `writable_files`;
+`writable_files` is reserved for the three control-output files above.
+
 `progress.jsonl` is the append-only event log. Append to `progress.jsonl` as one JSON object per line. Each event should be a small observation about a command, evidence item, required-step state, blocker, deviation, or verifier result. Progress observations are additive; do not mutate approved JSON to make the contract match the run.
 
 `runtime-status.json` is the current bounded status snapshot. It can summarize active step state, blockers, next action, and last evidence pointer.

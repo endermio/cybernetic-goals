@@ -26,6 +26,7 @@ APPROVED_CONTROL_FILES = [
     "runtime.control.json",
 ]
 WRITABLE_FILES = ["progress.jsonl", "runtime-status.json", "final-report.json"]
+WRITABLE_EVIDENCE_PATHS = ["evidence/"]
 
 
 def runtime_control_pointer(runtime_control_path: Path) -> str:
@@ -92,6 +93,7 @@ def compile_runtime_control(run_dir: Path) -> Path:
             "runtime": {
                 "readonly_files": APPROVED_CONTROL_FILES,
                 "writable_files": WRITABLE_FILES,
+                "writable_evidence_paths": plan.get("runtime", {}).get("writable_evidence_paths", WRITABLE_EVIDENCE_PATHS),
             },
             "required_steps": plan.get("required_steps", []),
             "progress": plan.get("progress", {"event_schema": "progress-event.schema.json", "append_only": True}),

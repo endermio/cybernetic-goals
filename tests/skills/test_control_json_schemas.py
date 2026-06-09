@@ -157,6 +157,7 @@ SCHEMA_FIXTURES = {
         "runtime": {
             "readonly_files": ["requirements.control.json", "design.control.json", "goal.control.json", "plan.control.json", "review.control.json", "runtime.control.json"],
             "writable_files": ["progress.jsonl", "runtime-status.json", "final-report.json"],
+            "writable_evidence_paths": ["evidence/"],
         },
         "progress": {
             "event_schema": "progress-event.schema.json",
@@ -211,6 +212,7 @@ SCHEMA_FIXTURES = {
         "runtime": {
             "readonly_files": ["requirements.control.json", "design.control.json", "goal.control.json", "plan.control.json", "review.control.json", "runtime.control.json"],
             "writable_files": ["progress.jsonl", "runtime-status.json", "final-report.json"],
+            "writable_evidence_paths": ["evidence/"],
         },
         "required_steps": [
             {

@@ -160,7 +160,8 @@
       "additionalProperties": false,
       "required": [
         "readonly_files",
-        "writable_files"
+        "writable_files",
+        "writable_evidence_paths"
       ],
       "properties": {
         "readonly_files": {
@@ -172,6 +173,14 @@
           }
         },
         "writable_files": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "writable_evidence_paths": {
           "type": "array",
           "minItems": 1,
           "items": {

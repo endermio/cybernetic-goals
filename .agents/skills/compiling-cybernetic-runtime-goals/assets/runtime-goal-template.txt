@@ -16,6 +16,7 @@ Official run artifacts:
 - `progress.jsonl`
 - `runtime-status.json`
 - `final-report.json`
+- non-control evidence artifacts under `runtime.control.json.runtime.writable_evidence_paths`
 
 The runtime entry point is a short `/goal` pointer to `runtime.control.json`
 using `.agents/skills/using-control-json`.

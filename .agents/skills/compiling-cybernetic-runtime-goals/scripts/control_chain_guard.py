@@ -35,6 +35,7 @@ MARKDOWN_CONTROL_FILENAMES = {
 }
 READONLY_FILES = list(CONTROL_SCHEMAS)
 WRITABLE_FILES = ["progress.jsonl", "runtime-status.json", "final-report.json"]
+DEFAULT_WRITABLE_EVIDENCE_PATHS = ["evidence/"]
 REQUIRED_REVIEW_CHECKS = {
     "design-answer-method",
     "required-answer-path",
@@ -179,6 +180,35 @@ def string_list(value: Any) -> list[str]:
     return [item for item in value if isinstance(item, str)]
 
 
+def path_is_under(path: str, allowed_paths: list[str]) -> bool:
+    normalized = path.lstrip("./")
+    for allowed in allowed_paths:
+        allowed_normalized = allowed.lstrip("./")
+        if allowed_normalized.endswith("/"):
+            if normalized.startswith(allowed_normalized):
+                return True
+        elif normalized == allowed_normalized:
+            return True
+    return False
+
+
+def required_evidence_paths(requirements: dict[str, Any]) -> list[str]:
+    outcomes = requirements.get("approved_control", {}).get("required_outcomes")
+    if not isinstance(outcomes, list):
+        return []
+    paths: list[str] = []
+    for outcome in outcomes:
+        if not isinstance(outcome, dict):
+            continue
+        required_evidence = outcome.get("required_evidence")
+        if not isinstance(required_evidence, list):
+            continue
+        for evidence in required_evidence:
+            if isinstance(evidence, dict) and isinstance(evidence.get("path"), str) and evidence.get("path"):
+                paths.append(evidence["path"])
+    return paths
+
+
 def registry_bindings(artifact: dict[str, Any]) -> dict[str, Any]:
     bindings = artifact.get("registry_bindings")
     return bindings if isinstance(bindings, dict) else {}
@@ -301,9 +331,20 @@ def validate_json_control_run(run_dir: Path) -> dict[str, dict[str, Any]]:
         raise ControlJsonValidationError("runtime.control.json: approved control JSON must be read-only")
     if runtime_files.get("writable_files") != WRITABLE_FILES:
         raise ControlJsonValidationError("runtime.control.json: writable files must be progress.jsonl, runtime-status.json, final-report.json")
+    writable_evidence_paths = string_list(runtime_files.get("writable_evidence_paths"))
+    if not writable_evidence_paths:
+        raise ControlJsonValidationError("runtime.control.json: writable_evidence_paths must authorize non-control evidence artifacts")
     plan_runtime = artifacts["plan.control.json"].get("runtime", {})
     if plan_runtime.get("readonly_files") != READONLY_FILES or plan_runtime.get("writable_files") != WRITABLE_FILES:
         raise ControlJsonValidationError("plan.control.json: runtime read/write files must match runtime.control.json")
+    if string_list(plan_runtime.get("writable_evidence_paths")) != writable_evidence_paths:
+        raise ControlJsonValidationError("plan.control.json: writable_evidence_paths must match runtime.control.json")
+    for path in required_evidence_paths(artifacts["requirements.control.json"]):
+        if not path_is_under(path, writable_evidence_paths):
+            raise ControlJsonValidationError(
+                "requirements.control.json required evidence path is not authorized by runtime writable_evidence_paths: "
+                + path
+            )
 
     if artifacts["plan.control.json"].get("progress", {}).get("append_only") is not True:
         raise ControlJsonValidationError("plan.control.json: progress.append_only must be true")

@@ -240,6 +240,9 @@
             "progress.jsonl",
             "runtime-status.json",
             "final-report.json"
+          ],
+          "writable_evidence_paths": [
+            "evidence/"
           ]
         },
         "progress": {
@@ -419,7 +422,7 @@
           "requirements.control.json": "sha256:7dd997dc6c57b8d8d9341b7143dcaab0cf3590ddc9b14b1da8a65535424c2e2f",
           "design.control.json": "sha256:09ea7bff8c88ee3fa36ec410955017fcc0363721014c6be094d7e1295f67cb38",
           "goal.control.json": "sha256:2041b7114ae875d10f96f7f814b2c3645edc817e7b5bb7100df75fa738caad9e",
-          "plan.control.json": "sha256:a1156a33e92d182d720c35f89882d8295266da1ca34b2e85b7ee5dd233ff1ecf"
+          "plan.control.json": "sha256:d82a462589456cf2fa76fff1fb04ffb600605b0e013fa32da62d6d90c527d37a"
         }
       },
       "runtime.control.json": {
@@ -454,6 +457,9 @@
             "progress.jsonl",
             "runtime-status.json",
             "final-report.json"
+          ],
+          "writable_evidence_paths": [
+            "evidence/"
           ]
         },
         "required_steps": [
@@ -499,9 +505,9 @@
           "requirements.control.json": "sha256:7dd997dc6c57b8d8d9341b7143dcaab0cf3590ddc9b14b1da8a65535424c2e2f",
           "design.control.json": "sha256:09ea7bff8c88ee3fa36ec410955017fcc0363721014c6be094d7e1295f67cb38",
           "goal.control.json": "sha256:2041b7114ae875d10f96f7f814b2c3645edc817e7b5bb7100df75fa738caad9e",
-          "plan.control.json": "sha256:a1156a33e92d182d720c35f89882d8295266da1ca34b2e85b7ee5dd233ff1ecf",
-          "review.control.json": "sha256:6160610a12ef57a43ba0439bff1f0154b91bdaeb428e09532e104188a55424bd",
-          "runtime.control.json": "sha256:b4cded24a849516ae3eabab76c1aac5bbe71c424fd6f917bb04b94eb30d49e3d"
+          "plan.control.json": "sha256:d82a462589456cf2fa76fff1fb04ffb600605b0e013fa32da62d6d90c527d37a",
+          "review.control.json": "sha256:6f16573931238ed2103659765b87ceb1e260864cd15e61d195c66371932a4715",
+          "runtime.control.json": "sha256:2739b7f4c24af9e2a696cafa650b1c73547e18ab9ae744d8115718cc414e8b22"
         }
       }
     },

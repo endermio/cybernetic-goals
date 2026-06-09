@@ -72,6 +72,20 @@ def outcome_covered_control_run_files() -> dict[str, dict]:
     return fixture_by_file
 
 
+def evidence_artifact_control_run_files() -> dict[str, dict]:
+    fixture_by_file = outcome_covered_control_run_files()
+    fixture_by_file["requirements.control.json"]["approved_control"]["required_outcomes"][0]["required_evidence"][0] = {
+        "evidence_id": "evidence.required-outcome-mainline",
+        "kind": "json_file",
+        "description": "mainline evidence artifact",
+        "path": "evidence/required-outcome-mainline.json",
+    }
+    fixture_by_file["plan.control.json"]["runtime"]["writable_evidence_paths"] = ["evidence/"]
+    fixture_by_file["runtime.control.json"]["runtime"]["writable_evidence_paths"] = ["evidence/"]
+    apply_integrity_metadata(fixture_by_file)
+    return fixture_by_file
+
+
 def candidate_design_plan_control_run_files() -> dict[str, dict]:
     fixture_by_file = copy.deepcopy(control_run_files())
     fixture_by_file["design.control.json"]["status"] = "candidate"
@@ -294,6 +308,40 @@ class JsonOfficialGuardCompilerPathTest(unittest.TestCase):
 
             self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
             self.assertIn("PASS", result.stdout)
+
+    def test_control_chain_guard_accepts_required_evidence_artifact_when_authorized(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            run_dir = Path(tmpdir)
+            write_control_run(run_dir, fixture_by_file=evidence_artifact_control_run_files())
+
+            result = subprocess.run(
+                ["python3", str(CONTROL_GUARD), "--run-dir", str(run_dir)],
+                text=True,
+                capture_output=True,
+            )
+
+            self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+
+    def test_control_chain_guard_rejects_required_evidence_artifact_outside_authorized_paths(self):
+        fixture_by_file = evidence_artifact_control_run_files()
+        fixture_by_file["plan.control.json"]["runtime"]["writable_evidence_paths"] = ["results/"]
+        fixture_by_file["runtime.control.json"]["runtime"]["writable_evidence_paths"] = ["results/"]
+        apply_integrity_metadata(fixture_by_file)
+        with tempfile.TemporaryDirectory() as tmpdir:
+            run_dir = Path(tmpdir)
+            write_control_run(run_dir, fixture_by_file=fixture_by_file)
+
+            result = subprocess.run(
+                ["python3", str(CONTROL_GUARD), "--run-dir", str(run_dir)],
+                text=True,
+                capture_output=True,
+            )
+
+            self.assertNotEqual(result.returncode, 0, result.stdout + result.stderr)
+            self.assertIn(
+                "requirements.control.json required evidence path is not authorized by runtime writable_evidence_paths: evidence/required-outcome-mainline.json",
+                result.stdout + result.stderr,
+            )
 
     def test_control_chain_guard_rejects_blocking_required_outcome_without_required_step_coverage(self):
         fixture_by_file = outcome_covered_control_run_files()

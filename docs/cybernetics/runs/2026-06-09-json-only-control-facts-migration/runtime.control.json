@@ -30,6 +30,9 @@
       "progress.jsonl",
       "runtime-status.json",
       "final-report.json"
+    ],
+    "writable_evidence_paths": [
+      "evidence/"
     ]
   },
   "required_steps": [
@@ -159,8 +162,8 @@
     "requirements.control.json": "sha256:5938d4e32203fe86c06011dd96d1d6848d0ce384433987b4063bdc7da9abc584",
     "design.control.json": "sha256:4ae981189811541dbbacec126fd333de2991fa51d5b22e7b0c6f9a72edbc6f8c",
     "goal.control.json": "sha256:0929c02bffde480680c85426aecaf9e7a2d79b86fab5c35ac842d0836cf238de",
-    "plan.control.json": "sha256:3027b1faac8fff18c94c5a1c8a7f8252915aa64dc7b0a8c0b098b9a14cdebad3",
-    "review.control.json": "sha256:b3bad88c3f64ba0969f5f6da361eb41417dd24a77c33b048d31d2ed8e7fe7606",
-    "runtime.control.json": "sha256:88cbf239f6d3c209bf839122625564f16a51bbb1825970d83b3d2d307bff50f0"
+    "plan.control.json": "sha256:81c1e19fe583070cea2a56d9a7a30dfde0267fda9300a6f58ebf9c7985bb4c4c",
+    "review.control.json": "sha256:918fbc2545f9cb021ae72142dd85fe8d448476bf4efebdf06acc0b5facc692df",
+    "runtime.control.json": "sha256:0133693b89daad2a47415ca711ab84d10323746c430c323d31fdb3f09d1a8c35"
   }
 }
