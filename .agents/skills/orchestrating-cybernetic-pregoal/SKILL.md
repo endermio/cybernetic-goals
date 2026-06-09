@@ -39,6 +39,8 @@ Owned orchestration:
 - invoke, request, or validate a solution design when required design is required
 - propacheck and validate output contract presence across downstream artifacts
 - use explicitly authorized subagents as independent reviewers
+- run an Intent Preservation / Obligation Preservation subagent review pass
+  when subagent review is authorized
 - iterate review and revision up to the configured limit
 - compile `runtime.control.json` and the final short `/goal` pointer after approval
 
@@ -230,6 +232,39 @@ If review does not converge after two cycles, stop and report:
 
 Do not continue self-revising indefinitely.
 
+## NeedsRevision Routing Rule
+
+Subagent semantic review must use normalized verdicts:
+
+```text
+`Approved` / `NeedsRevision` / `Blocked`
+```
+
+`NeedsRevision` is a review/revision loop result, not a terminal project
+failure. It means the approved work chain has repairable intent drift,
+obligation downgrade, or stage mismatch. `Blocked` is reserved for cases where
+the next revision would require a human decision, missing dependency, or
+external fact that cannot be safely inferred.
+
+NeedsRevision routes to the earliest artifact that introduced drift:
+
+- Requirements drift -> `ReturnToRequirementsAnalysis`: approved meaning,
+  required outcome, authorization, or non-goal must be revised or reapproved.
+- Design drift -> `RunDesign`: the solution model weakened or redirected the
+  approved outcome.
+- Goal drift -> `RunGoalWriting`: success conditions, scope, limits, or
+  what-counts-as-done no longer preserve the approved outcome.
+- Plan drift -> `RunExecutionPolicy`: execution policy downgrades required
+  work into readiness, future work, allowed action, prepare-only handling, or
+  compatibility-only work while still allowing approval.
+
+After the routed revision, rerun independent review and Final Observer before
+runtime compilation. Until the review verdict is `Approved`, do not compile `runtime.control.json`.
+
+Regression example: a required `/api/v2` implementation must not be accepted
+as legacy Drogon compatibility readiness. That is `NeedsRevision`, routed to
+the first artifact that converted implementation into compatibility readiness.
+
 ## Workflow
 
 Read `references/orchestration-protocol.md` for the control-layer map, then use
@@ -350,6 +385,7 @@ If any non-emulatable stage is required and unavailable, stop and report the mis
 | `DesignReady` | design exists, references requirements, has no blocking open questions, and passes Design Answer Path Check when What the User Approved records an answering method or answer path family | `RunGoalWriting` | execution policy |
 | `GoalReady` | `goal.control.json` exists and references requirements plus any design path | `RunExecutionPolicy` | review |
 | `PolicyReady` | execution policy exists, references requirements, goal, any design path, and records selected execution work assignment | `RunReview` | runtime compile |
+| `ReviewNeedsRevision` | review verdict/status is `NeedsRevision` / `Needs Revision`, `Dirty`, `Needs Re-review`, or `Needs Independent Review` | route by NeedsRevision Routing Rule or obtain independent review | runtime compile |
 | `ReviewApproved` | review is Approved and Final Observer allows approval | `RunRuntimeCompile` | execution |
 | `RuntimeGoalReady` | `runtime.control.json` and final short `/goal` pointer are compiled | output command | start `/goal` |
 | `Blocked` | any required check fails | report blocker | continue |

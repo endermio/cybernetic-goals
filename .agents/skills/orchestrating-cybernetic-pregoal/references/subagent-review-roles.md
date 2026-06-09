@@ -13,6 +13,29 @@ Check:
 - No confirmed meaning decision is weakened, reworded into ambiguity, or converted into an execution option.
 - No new requirement appears without source.
 
+## Intent Preservation / Obligation Preservation Reviewer
+
+Input: `requirements.control.json`, `design.control.json` when present, `goal.control.json`, and `plan.control.json`.
+
+Check:
+
+- Required outcomes remain required outcomes through design, goal, and plan.
+- Required implementation is not downgraded into readiness, future work,
+  allowed action, prepare-only handling, or compatibility-only behavior.
+- The review distinguishes tactical execution freedom from obligation removal.
+- A required `/api/v2` implementation is not accepted as legacy Drogon
+  compatibility readiness.
+- Drift findings identify the earliest artifact that introduced the drift:
+  requirements, design, goal, or plan.
+
+Verdict:
+
+- `Approved`: no intent drift or obligation downgrade.
+- `NeedsRevision`: repairable drift exists; route to the named stage and
+  rerun review after revision.
+- `Blocked`: the drift cannot be repaired without a human decision, missing
+  dependency, or unavailable fact.
+
 ## Solution Design Match Reviewer
 
 Input: `requirements.control.json`, `design.control.json`, `goal.control.json`, and `plan.control.json`.

@@ -38,6 +38,24 @@ If pre-goal review subagents are explicitly authorized, use independent reviewer
 
 If pre-goal review subagents are not authorized and no explicit human approval or other independent reviewer exists, produce a review marked `Needs Independent Review`. Do not mark `Approved`.
 
+## Semantic Review Verdicts
+
+Subagent semantic review verdicts must be one of:
+
+```text
+`Approved` / `NeedsRevision` / `Blocked`
+```
+
+This verdict is not a simple fail. `NeedsRevision` means the approved work
+chain contains repairable intent drift, obligation downgrade, or artifact
+misrouting, and orchestration must return to the earliest artifact that
+introduced the drift. `Blocked` means review cannot identify a safe revision
+path without a human decision, missing dependency, or unavailable evidence.
+
+When persisted in `review.control.json`, `NeedsRevision` may be rendered as
+the existing review status `Needs Revision`; response-only handoff should still
+include the normalized verdict. The review contract is: runtime compilation is forbidden until the verdict is `Approved`.
+
 ## Final Observer Rule
 
 No `Approved` state is allowed after an unreviewed substantive artifact mutation.
@@ -102,6 +120,42 @@ If Design Answer Method Check is `FAIL`, the review cannot be `Approved`; route 
 ### 1. Requirement Traceability
 
 Every confirmed human decision in requirements control JSON must appear in the goal and execution policy.
+
+### 1A. Intent Preservation / Obligation Preservation Review
+
+Independent reviewers must check that downstream artifacts preserve the
+approved intent and required obligations, not only that they mention similar
+terms. Flag `NeedsRevision` when a required outcome is downgraded into:
+
+- readiness instead of implementation or delivery;
+- future work, roadmap, handoff, or later-goal language;
+- allowed or permitted action instead of the action being covered by the plan;
+- compatibility-only behavior when the approved obligation requires a new or
+  changed behavior.
+
+Example regression: a required `/api/v2` implementation must not be accepted
+as legacy Drogon compatibility readiness. That downgrade is `NeedsRevision`,
+not `Approved`, because the obligation changed from implementing the required
+endpoint to preparing or preserving compatibility.
+
+Route `NeedsRevision` to the earliest artifact that introduced the drift:
+
+- Requirements drift -> `ReturnToRequirementsAnalysis`: approved meaning is
+  ambiguous, contradictory, infeasible, or lacks the obligation that downstream
+  artifacts are trying to satisfy.
+- Design drift -> `RunDesign`: the design turns a required outcome into
+  readiness, future, allowed, or compatibility-only behavior.
+- Goal drift -> `RunGoalWriting`: the goal downscopes success conditions,
+  target state, what-counts-as-done, or final answer format.
+- Plan drift -> `RunExecutionPolicy`: the plan moves required work to future
+  work, compatibility readiness, prepare-only status, or permission-only
+  handling while keeping success claims possible.
+
+NeedsRevision routes to the earliest artifact that introduced drift; after
+revision, rerun independent review before approval. If the review owns the
+handoff inside full pre-goal orchestration, return the review path, verdict,
+and revision route to `$orchestrating-cybernetic-pregoal`; do not compile
+`runtime.control.json`.
 
 ### 2. What The User Approved Check
 
@@ -397,15 +451,26 @@ python3 .agents/skills/reviewing-cybernetic-control-structures/scripts/control_a
 
 Use the lint output as a structural evidence check. Do not treat lint as meaning approval.
 
-## Output Status
+## Output Verdict And Status
 
-The review must be either:
+The normalized semantic review verdict must be one of:
+
+- `Approved`
+- `NeedsRevision`
+- `Blocked`
+
+The persisted review status must be one of:
 
 - `Needs Revision`
 - `Needs Independent Review`
 - `Dirty`
 - `Needs Re-review`
+- `Blocked`
 - `Approved`
+
+Use `NeedsRevision` / `Needs Revision` for repairable drift or missing
+independent review loops. Use `Blocked` only when no safe revision route exists
+without a human decision, missing dependency, or unavailable external fact.
 
 Only mark `Approved` when:
 
@@ -439,6 +504,7 @@ After review status is set:
 - If standalone/manual and status is `Approved`, hand off to `$compiling-cybernetic-runtime-goals`.
 - If status is `Needs Revision`, `Dirty`, or `Needs Re-review`, revise the relevant approved files and rerun review; do not compile runtime `/goal`.
 - If status is `Needs Independent Review`, obtain independent review or explicit human approval; do not compile runtime `/goal`.
+- If verdict/status is `Blocked`, stop and report the smallest human decision, missing dependency, or unavailable fact; do not compile runtime `/goal`.
 
 ## Output Format
 
@@ -450,7 +516,10 @@ Created or updated review:
 `docs/cybernetics/runs/YYYY-MM-DD-slug/review.control.json`
 
 Review status:
-- `Approved` / `Needs Revision` / `Needs Independent Review` / `Dirty` / `Needs Re-review`
+- `Approved` / `Needs Revision` / `Needs Independent Review` / `Dirty` / `Needs Re-review` / `Blocked`
+
+Review verdict:
+- `Approved` / `NeedsRevision` / `Blocked`
 
 Key findings:
 - ...
@@ -460,12 +529,14 @@ Response-only next step:
 - If standalone/manual and `Approved`: run `$compiling-cybernetic-runtime-goals`.
 - If `Needs Revision`, `Dirty`, or `Needs Re-review`: revise the named artifacts and rerun `$reviewing-cybernetic-control-structures`.
 - If `Needs Independent Review`: obtain independent review or explicit human approval before runtime compilation.
+- If `Blocked`: report the smallest unresolved decision, dependency, or unavailable fact.
 ```
 
 ## Validation Checklist
 
 - [ ] The review file was created.
 - [ ] Review status is explicit.
+- [ ] Review verdict is `Approved`, `NeedsRevision`, or `Blocked`.
 - [ ] Review independence is recorded.
 - [ ] What The User Approved Check was checked when full pre-goal orchestration is used.
 - [ ] Design Answer Method Check was checked when What the User Approved records an answering method or answer method.
