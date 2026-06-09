@@ -2,6 +2,7 @@ import subprocess
 import sys
 import tempfile
 import unittest
+import json
 from pathlib import Path
 
 
@@ -29,8 +30,7 @@ Status: `Approved`
 | Non-achieved terminal report handling | report goal achieved: no when coverage answer path is unsatisfied |
 | Required answer path | coverage inventory -> coverage criterion -> candidate coverage matrix -> same-workload run -> interpretation |
 | How this should be answered | list full workflow scope, identify major removable sources, define ceiling coverage, prove candidate coverage, run full workflow, and interpret against coverage |
-| What is not enough | full-workflow-run-validation |
-| How this should be answered | coverage-ceiling-measurement |
+| What is not enough | only running one full-workflow candidate path and passing same-workload checks |
 | Work covered in this run | full workflow ceiling measurement horizon |
 | What the agent may do | local measurement and report generation |
 | Forbidden live / irreversible actions | none |
@@ -51,7 +51,13 @@ Approval record:
 """
 
 
-def write_requirements(tmp: Path) -> Path:
+def write_requirements(
+    tmp: Path,
+    *,
+    control_sidecar: bool = True,
+    answer_method_key: str = "coverage-ceiling-measurement",
+    forbidden_substitute_key: str = "full-workflow-run-validation",
+) -> Path:
     requirements = tmp / "requirements.md"
     requirements.write_text(
         "\n".join(
@@ -74,6 +80,19 @@ def write_requirements(tmp: Path) -> Path:
         ),
         encoding="utf-8",
     )
+    if control_sidecar:
+        (tmp / "requirements.control.json").write_text(
+            json.dumps(
+                {
+                    "answer_method_key": answer_method_key,
+                    "forbidden_substitute_key": forbidden_substitute_key,
+                },
+                indent=2,
+                sort_keys=True,
+            )
+            + "\n",
+            encoding="utf-8",
+        )
     return requirements
 
 
@@ -150,7 +169,7 @@ def write_runtime_chain(
     design = write_design(
         tmp,
         requirements,
-        answer_path="coverage-ceiling-measurement",
+        answer_path="scope inventory -> removable-source inventory -> coverage criterion -> candidate coverage matrix -> same-workload run -> interpretation",
         mandatory_nodes=[
             "full workflow scope inventory",
             "major removable source inventory",
@@ -159,7 +178,7 @@ def write_runtime_chain(
             "same-workload full workflow run",
             "interpretation against coverage matrix",
         ],
-        substitution_avoided="yes, the forbidden full-workflow-run-validation substitute is not used",
+        substitution_avoided="yes, the insufficient one-candidate run-validation answer is not used",
     )
     goal = tmp / "goal.md"
     plan = tmp / "plan.md"
@@ -184,7 +203,7 @@ def write_runtime_chain(
                 "| Element | Requirement |",
                 "|---|---|",
                 "| Beneficiary / observer | operator |",
-                "| Purpose-realizing outcome observed | operator observes the coverage-ceiling answer |",
+                "| Purpose-realizing outcome observed | operator observes the full workflow ceiling answer |",
                 "| Supporting Evidence | internal checks support progress only |",
                 "| Sufficient evidence level | user-purpose |",
                 "| If user-purpose evidence unavailable | report pending and next observation |",
@@ -206,16 +225,16 @@ def write_runtime_chain(
                 "",
                 "| Element | Requirement |",
                 "|---|---|",
-                "| What counts as done | coverage-ceiling answer path is satisfied |",
+                "| What counts as done | the full workflow ceiling answer path is satisfied |",
                 "| Evidence needed to call it done | scope inventory, source inventory, coverage criterion, coverage matrix, full workflow run, and interpretation evidence exist |",
-                "| Allowed achieved claim | goal achieved: yes only when coverage-ceiling answer path is satisfied |",
+                "| Allowed achieved claim | goal achieved: yes only when the full workflow ceiling answer path is satisfied |",
                 "| Steps that make the result true | coverage inventory -> criterion -> matrix -> same-workload run -> interpretation |",
                 "",
                 "## Work Covered And Allowed Actions Contract",
                 "",
                 "| Element | Requirement |",
                 "|---|---|",
-                "| work covered in this run | coverage-ceiling measurement horizon |",
+                "| work covered in this run | full workflow ceiling measurement work |",
                 "| What the agent may do | local measurement fixture actions |",
                 "| Forbidden actions | none |",
                 "| Prepare-only / observe-only actions | none |",
@@ -246,7 +265,7 @@ def write_runtime_chain(
                 "",
                 "| Work item / place | In work covered in this run? | What the agent may do | Required runtime handling | Counts as achieved? |",
                 "|---|---|---|---|---|",
-                "| coverage-ceiling fixture | yes | execute | run fixture checks | yes if required answer evidence exists |",
+                "| full workflow ceiling fixture | yes | execute | run fixture checks | yes if required answer evidence exists |",
                 "",
                 "## Steps That Make The Result True",
                 "",
@@ -300,7 +319,7 @@ def write_runtime_chain(
                 "",
                 "## Candidate Plan Tasks",
                 "",
-                "### Batch 1: satisfy coverage-ceiling answer path fixture",
+                "### Batch 1: satisfy full workflow ceiling answer path fixture",
                 "",
                 "Required step(s):",
                 "",
@@ -315,11 +334,11 @@ def write_runtime_chain(
                 "",
                 "State transition advanced:",
                 "",
-                "- S1 through S6 coverage-ceiling transitions are satisfied.",
+                "- S1 through S6 answer-path transitions are satisfied.",
                 "",
                 "Transition evidence produced:",
                 "",
-                "- Coverage-ceiling required answer evidence is recorded.",
+                "- Full workflow ceiling required answer evidence is recorded.",
                 "",
                 "Integration check:",
                 "",
@@ -329,11 +348,11 @@ def write_runtime_chain(
                 "",
                 "Why this is not merely component completion:",
                 "",
-                "- It records coverage-ceiling transition evidence for the approved answer path.",
+                "- It records full workflow ceiling transition evidence for the approved answer path.",
                 "",
                 "Goal:",
                 "",
-                "- Drive the fixture through the approved coverage-ceiling answer path.",
+                "- Drive the fixture through the approved full workflow ceiling answer path.",
                 "",
                 "Batch-end check:",
                 "",
@@ -370,7 +389,7 @@ def write_runtime_chain(
                 "## Design Answer Method Check",
                 "",
                 "Findings:",
-                "- The design preserves coverage-ceiling-measurement and does not substitute full-workflow-run-validation.",
+                "- The design preserves the approved full workflow ceiling answering method and does not substitute a one-candidate run validation.",
                 "",
             ]
         )
@@ -487,6 +506,85 @@ class DesignAnswerPathCheckTest(unittest.TestCase):
         self.assertNotIn("COVERAGE_CEILING_REQUIRED_NODES", orchestration_guard)
         self.assertNotIn("COVERAGE_CEILING_REQUIRED_NODES", control_guard)
 
+    def test_orchestration_guard_requires_answer_method_sidecar_before_goal(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            tmp = Path(tmpdir)
+            requirements = write_requirements(tmp, control_sidecar=False)
+            design = write_design(
+                tmp,
+                requirements,
+                answer_path="coverage answer path",
+                mandatory_nodes=[
+                    "full workflow scope inventory",
+                    "major removable source inventory",
+                    "ceiling coverage criterion",
+                    "candidate coverage matrix",
+                    "same-workload full workflow run",
+                    "interpretation against coverage matrix",
+                ],
+                substitution_avoided="yes, the insufficient one-candidate run-validation answer is not used",
+            )
+
+            result = subprocess.run(
+                [
+                    sys.executable,
+                    str(ORCHESTRATION_GUARD),
+                    "--state",
+                    "before-goal",
+                    "--requirements",
+                    str(requirements),
+                    "--design",
+                    str(design),
+                ],
+                cwd=ROOT,
+                text=True,
+                capture_output=True,
+            )
+
+        output = result.stdout + result.stderr
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("NEXT: ReturnToRequirementsAnalysis", output)
+        self.assertIn("requirements control sidecar missing", output)
+
+    def test_orchestration_guard_rejects_missing_registry_mandatory_step(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            tmp = Path(tmpdir)
+            requirements = write_requirements(tmp)
+            design = write_design(
+                tmp,
+                requirements,
+                answer_path="coverage answer path",
+                mandatory_nodes=[
+                    "full workflow scope inventory",
+                    "major removable source inventory",
+                    "ceiling coverage criterion",
+                    "same-workload full workflow run",
+                    "interpretation against coverage matrix",
+                ],
+                substitution_avoided="yes, the insufficient one-candidate run-validation answer is not used",
+            )
+
+            result = subprocess.run(
+                [
+                    sys.executable,
+                    str(ORCHESTRATION_GUARD),
+                    "--state",
+                    "before-goal",
+                    "--requirements",
+                    str(requirements),
+                    "--design",
+                    str(design),
+                ],
+                cwd=ROOT,
+                text=True,
+                capture_output=True,
+            )
+
+        output = result.stdout + result.stderr
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("NEXT: RunDesign", output)
+        self.assertIn("candidate coverage matrix", output)
+
     def test_orchestration_guard_rejects_run_validation_substitution_before_goal(self):
         with tempfile.TemporaryDirectory() as tmpdir:
             tmp = Path(tmpdir)
@@ -528,7 +626,7 @@ class DesignAnswerPathCheckTest(unittest.TestCase):
             design = write_design(
                 tmp,
                 requirements,
-                answer_path="coverage-ceiling-measurement",
+                answer_path="scope inventory -> removable-source inventory -> coverage criterion -> candidate coverage matrix -> same-workload run -> interpretation",
                 mandatory_nodes=[
                     "full workflow scope inventory",
                     "major removable source inventory",
@@ -537,7 +635,7 @@ class DesignAnswerPathCheckTest(unittest.TestCase):
                     "same-workload full workflow run",
                     "interpretation against coverage matrix",
                 ],
-                substitution_avoided="yes, the forbidden full-workflow-run-validation substitute is not used",
+                substitution_avoided="yes, the insufficient one-candidate run-validation answer is not used",
             )
 
             result = subprocess.run(
@@ -590,6 +688,36 @@ class DesignAnswerPathCheckTest(unittest.TestCase):
         self.assertIn("NEXT: RunReview", output)
         self.assertIn("Design Answer Method Check", output)
         self.assertIn("Design answer method check: yes", output)
+
+    def test_control_chain_guard_requires_answer_method_sidecar(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            tmp = Path(tmpdir)
+            requirements, design, goal, plan, review = write_runtime_chain(tmp)
+            requirements.with_suffix(".control.json").unlink()
+            result = subprocess.run(
+                [
+                    sys.executable,
+                    str(CONTROL_CHAIN_GUARD),
+                    "--requirements",
+                    str(requirements),
+                    "--design",
+                    str(design),
+                    "--goal",
+                    str(goal),
+                    "--plan",
+                    str(plan),
+                    "--review",
+                    str(review),
+                ],
+                cwd=ROOT,
+                text=True,
+                capture_output=True,
+            )
+
+        output = result.stdout + result.stderr
+        self.assertEqual(2, result.returncode, output)
+        self.assertIn("NEXT: ReturnToRequirementsAnalysis", output)
+        self.assertIn("requirements control sidecar missing", output)
 
     def test_runtime_contract_indexes_design_answer_path_check(self):
         with tempfile.TemporaryDirectory() as tmpdir:

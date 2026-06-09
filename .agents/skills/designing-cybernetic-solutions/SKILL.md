@@ -141,7 +141,7 @@ The design must not replace the approved answering method with a weaker answer p
 
 Use `.agents/skills/references/answer-method-registry.json` internally for required-step sets, forbidden substitutions, minimum evidence, and review red flags. Do not expose the internal registry label in the user-visible design. If the approved answer method is missing from the registry, record the gap and return to requirements approval or design-maintenance work rather than inventing an unreviewed family.
 
-For `coverage-ceiling-measurement`, the design must instantiate a coverage answer path with these mandatory nodes:
+For the full workflow ceiling measurement entry in the internal answer-method registry, the design must instantiate a coverage answer path with these mandatory nodes:
 
 - full workflow scope inventory;
 - major removable source / bottleneck inventory;
@@ -150,7 +150,7 @@ For `coverage-ceiling-measurement`, the design must instantiate a coverage answe
 - same-workload full workflow run;
 - interpretation against coverage matrix.
 
-Do not substitute a `full-workflow-run-validation` answer path for `coverage-ceiling-measurement`.
+Do not substitute a weaker full-workflow run-validation answer path for the approved full workflow ceiling measurement method.
 
 ## Required Sections
 

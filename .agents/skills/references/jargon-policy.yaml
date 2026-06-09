@@ -93,6 +93,18 @@ forbidden_in_user_artifacts:
     replacement: "intended-result"
   - term: "target-realization"
     replacement: "result claim"
+  - term: "coverage-ceiling-measurement"
+    replacement: "How this should be answered"
+  - term: "full-workflow-run-validation"
+    replacement: "What is not enough"
+  - term: "component-inventory-completion"
+    replacement: "component work alone is not enough"
+  - term: "single-run-validation"
+    replacement: "one run alone is not enough"
+  - term: "checklist-completion"
+    replacement: "completed checklist alone is not enough"
+  - term: "generic-audit"
+    replacement: "generic audit is not enough"
 
 allowed_internal_paths:
   - ".agents/skills/references/"

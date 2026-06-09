@@ -311,7 +311,7 @@ The design must instantiate the approved how this should be answered. It must no
 
 If the approved how this should be answered cannot be instantiated, return to requirements for revision. Do not ask the user to review downstream goal or plan artifacts as compensation.
 
-For `coverage-ceiling-measurement`, the design must include:
+For the full workflow ceiling measurement entry in the internal answer-method registry, the design must include:
 
 - full workflow scope inventory;
 - major removable source / bottleneck inventory;
@@ -320,7 +320,7 @@ For `coverage-ceiling-measurement`, the design must include:
 - same-workload full workflow run;
 - interpretation against coverage matrix.
 
-If the design substitutes `full-workflow-run-validation` for `coverage-ceiling-measurement`, stop before goal writing and rerun design.
+If the design substitutes a weaker full-workflow run-validation answer path for the approved full workflow ceiling measurement method, stop before goal writing and rerun design.
 
 ## Non-Fallback Rule
 

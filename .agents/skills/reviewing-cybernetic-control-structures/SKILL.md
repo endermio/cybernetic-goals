@@ -160,7 +160,7 @@ Flag as Major or Blocking when:
 - design substitutes a weaker answer method for the approved answering method;
 - design instantiates a different how this should be answered without returning to What the User Approved;
 - design reports the what is not enough as sufficient;
-- `coverage-ceiling-measurement` lacks full workflow scope inventory, major removable source / bottleneck inventory, ceiling coverage criterion, candidate coverage matrix, same-workload full workflow run, or interpretation against coverage matrix;
+- full workflow ceiling measurement lacks full workflow scope inventory, major removable source / bottleneck inventory, ceiling coverage criterion, candidate coverage matrix, same-workload full workflow run, or interpretation against coverage matrix;
 - goal or execution policy inherits a weaker answer method than the design;
 - review approves run-validation evidence as coverage-ceiling evidence.
 

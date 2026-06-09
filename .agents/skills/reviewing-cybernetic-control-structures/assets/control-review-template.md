@@ -115,7 +115,7 @@ Check:
 
 - requirements `How this should be answered` and `What is not enough` are preserved when present;
 - design instantiates the approved answer method or returns to requirements approval instead of substituting a weaker answer path;
-- `coverage-ceiling-measurement` includes full workflow scope inventory, major removable source / bottleneck inventory, ceiling coverage criterion, candidate coverage matrix, same-workload full workflow run, and interpretation against coverage matrix;
+- full workflow ceiling measurement includes full workflow scope inventory, major removable source / bottleneck inventory, ceiling coverage criterion, candidate coverage matrix, same-workload full workflow run, and interpretation against coverage matrix;
 - goal and execution policy do not weaken the design answer method.
 
 Findings:

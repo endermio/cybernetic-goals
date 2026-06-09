@@ -40,9 +40,10 @@ Owned analysis:
 - identify how we know the user's purpose was met: who can observe purpose realization, what outcome realizes the human purpose, what feedback can judge it, and what internal checks can or cannot prove;
 - identify where the result must show up when intended result must be realized across a controlled object: intended result, required result places, required action, old behavior check, and result-placement status;
 - identify the work covered and allowed actions limit for full-route or multi-batch work: work covered in this run, what the agent may do, forbidden actions, unauthorized-action handling, and explicitly out-of-scope items;
-- identify the target-producing path for target-achieving implementation work: one actor-centered path from initial state to the what counts as done;
+- identify the path that makes the result true for implementation work: one actor-centered path from initial state to the what counts as done;
 - identify the approved answering method for tasks where merely running a plausible path would not answer the question, including what is not enough;
 - prepare the What the User Approved compact control commitment for Level 3/4 or full pre-goal work: Human purpose, Input role binding, Primary object, Requested transformation, Non-goals, how we know the user's purpose was met, where the result must show up, What counts as done, Evidence needed to call it done, If it is not done, what should be reported, Required answer path, How this should be answered, What is not enough, Work covered in this run, What the agent may do, Forbidden live / irreversible actions, Required handling for unauthorized actions, Explicitly out-of-scope items, Agent delegation preference, Agent workflow preference, Parallel execution authority, Maximum parallel agents, Final answer format, Why this process is needed, and Known assumptions;
+- when How this should be answered or What is not enough maps to an internal answer-method registry entry, write a sibling machine-readable file at `docs/cybernetics/requirements/YYYY-MM-DD-<slug>.control.json` with the internal keys needed by guards. Do not put those keys in the Markdown brief;
 - identify constraints, rules that cannot change, assumptions, and stop conditions;
 - decide whether Meaning, Rubric, Output Contract, Design, Goal, Execution Plan, Review, or Risk checks are required;
 - ask high-value human questions;
@@ -119,7 +120,7 @@ Before handoff to `$orchestrating-cybernetic-pregoal`, present a compact control
 - Agent workflow preference;
 - Parallel execution authority;
 - Maximum parallel agents;
-- Output Contract;
+- Final answer format;
 - Why this process is needed;
 - Known assumptions.
 
@@ -271,13 +272,14 @@ For Level 3/4 or full pre-goal work, pass design check to `$orchestrating-cybern
 7. Identify where the result must show up when intended-result realization spans places.
 8. Identify output-contract needs and whether a safe default is sufficient.
 9. For Level 3/4 or full pre-goal work, build or update the What the User Approved compact control commitment.
-10. Identify required checks: Meaning, Rubric, Output Contract, Design, Goal, Execution Plan, Review, Risk.
-11. Classify uncertainty as blocking human decision, safe default assumption, or deferred design/planning/execution detail.
-12. Ask 3-7 high-value questions, preferably no more than 5.
-13. Create or update the requirements analysis brief.
-14. If the human answers, update `Confirmed Requirement Decisions`, `Requirements Analysis Status`, and the What the User Approved record without treating answers as approval.
-15. Do not create a solution design, goal, plan, review, runtime `/goal`, or target-work artifacts.
-16. If analysis is complete and the brief path deterministically identifies a date/slug, output the approval request or queue-friendly next commands as described below.
+10. If the commitment includes How this should be answered or What is not enough, map the plain-language commitment to the internal answer-method registry and write the sibling `.control.json`. The Markdown stays plain; the sidecar carries machine keys.
+11. Identify required checks: Meaning, Rubric, Output Contract, Design, Goal, Execution Plan, Review, Risk.
+12. Classify uncertainty as blocking human decision, safe default assumption, or deferred design/planning/execution detail.
+13. Ask 3-7 high-value questions, preferably no more than 5.
+14. Create or update the requirements analysis brief.
+15. If the human answers, update `Confirmed Requirement Decisions`, `Requirements Analysis Status`, and the What the User Approved record without treating answers as approval.
+16. Do not create a solution design, goal, plan, review, runtime `/goal`, or target-work artifacts.
+17. If analysis is complete and the brief path deterministically identifies a date/slug, output the approval request or queue-friendly next commands as described below.
 
 ## Queue-Friendly Next Commands
 
@@ -303,7 +305,7 @@ python3 .agents/skills/analyzing-cybernetic-requirements/scripts/predict_pregoal
   --requirements docs/cybernetics/requirements/YYYY-MM-DD-<slug>.md
 ```
 
-Use the script output instead of hand-writing predicted runtime commands. The script checks `Requirements Analysis Status: Complete`, `What the User Approved: Approved`, deterministic path shape, design check, and same-slug artifact paths.
+Use the script output instead of hand-writing predicted runtime commands. The script checks `Requirements Analysis Status: Complete`, `What the User Approved: Approved`, required answer-method sidecar presence, deterministic path shape, design check, and same-slug artifact paths.
 
 If `design check: required`, still output the predicted runtime contract path and pointer-only `/goal` shape. State that `$orchestrating-cybernetic-pregoal` must invoke or request `$designing-cybernetic-solutions` before goal writing, and make the predicted downstream artifact paths include the expected solution design path. design check dispatch note must not replace the predicted pointer-only `/goal`. Do not output `$designing-cybernetic-solutions` as a standalone command before orchestration for Level 3/4 or full pre-goal work.
 
@@ -415,6 +417,7 @@ For Level 1/2 work with `rubric check: required`, summarize the confirmed rubric
 - [ ] There are no more than 7 questions.
 - [ ] The brief includes `Requirements Analysis Status`.
 - [ ] Level 3/4 or full pre-goal work includes `What the User Approved`.
+- [ ] If How this should be answered or What is not enough is recorded, the sibling `.control.json` exists and carries internal answer-method keys; the Markdown does not expose those keys.
 - [ ] Human answers to clarification questions are not treated as approval.
 - [ ] If What the User Approved is not `Approved`, the response asks for approval or revision and does not output the orchestration command or predicted `/goal`.
 - [ ] No solution design, goal, plan, review, or approved runtime `/goal` was created.

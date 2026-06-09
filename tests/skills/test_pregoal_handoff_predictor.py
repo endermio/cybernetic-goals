@@ -32,6 +32,28 @@ Status: `Approved`
 """
 
 
+USER_APPROVAL_WITH_ANSWER_METHOD = """## What the User Approved
+
+Status: `Approved`
+
+| Element | Commitment |
+|---|---|
+| Human purpose | measure the complete workflow ceiling |
+| Input role binding | prior partial results are source material |
+| Primary object | complete workflow ceiling answer |
+| Requested transformation | workflow evidence into a ceiling answer |
+| Non-goals | do not validate only one candidate run |
+| How We Know The User Purpose Was Met | the full workflow ceiling question is answered |
+| Where The Result Must Show Up | final evidence bundle |
+| Required answer path | scope inventory -> source inventory -> coverage criterion -> matrix -> run -> interpretation |
+| How this should be answered | list full workflow scope, identify major removable sources, define coverage, prove candidate coverage, run full workflow, and interpret against coverage |
+| What is not enough | only running one full-workflow candidate |
+| Final Answer Format | response-only handoff text |
+| Why this process is needed | full pre-goal orchestration |
+| Known assumptions | fixture-only |
+"""
+
+
 class PregoalHandoffPredictorTest(unittest.TestCase):
     def write_requirements(
         self,
@@ -124,6 +146,20 @@ class PregoalHandoffPredictorTest(unittest.TestCase):
         output = result.stdout + result.stderr
         self.assertNotEqual(result.returncode, 0)
         self.assertIn("requirements path must look like", output)
+        self.assertNotIn("/goal Execute", output)
+
+    def test_blocks_when_answer_method_sidecar_is_missing(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            requirements = self.write_requirements(
+                Path(tmpdir),
+                hsa=USER_APPROVAL_WITH_ANSWER_METHOD,
+            )
+            result = self.run_script(requirements)
+
+        output = result.stdout + result.stderr
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("requirements control sidecar missing", output)
+        self.assertNotIn("$orchestrating-cybernetic-pregoal", output)
         self.assertNotIn("/goal Execute", output)
 
     def test_skill_and_manifest_reference_predictor(self):

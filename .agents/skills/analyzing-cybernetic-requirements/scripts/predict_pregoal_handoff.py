@@ -8,6 +8,7 @@ downstream artifacts.
 from __future__ import annotations
 
 import argparse
+import json
 import re
 import sys
 from pathlib import Path
@@ -70,6 +71,47 @@ def design_check_required(text: str) -> bool:
     return False
 
 
+def table_field_value(section: str, field: str) -> str | None:
+    for line in section.splitlines():
+        stripped = line.strip()
+        if "|" not in stripped:
+            continue
+        if re.fullmatch(r"\|?\s*:?-{3,}:?\s*(\|\s*:?-{3,}:?\s*)+\|?", stripped):
+            continue
+        cells = [cell.strip().strip("`") for cell in stripped.strip("|").split("|")]
+        if len(cells) >= 2 and field.casefold() in cells[0].casefold() and cells[1]:
+            return cells[1]
+    return None
+
+
+def answer_method_sidecar_required(text: str) -> bool:
+    body = section_body(text, "What the User Approved")
+    if body is None:
+        return False
+    return bool(table_field_value(body, "How this should be answered") or table_field_value(body, "What is not enough"))
+
+
+def check_requirements_control_sidecar(requirements_path: Path, text: str) -> str | None:
+    if not answer_method_sidecar_required(text):
+        return None
+    control_path = requirements_path.with_suffix(".control.json")
+    try:
+        value = json.loads(control_path.read_text(encoding="utf-8"))
+    except FileNotFoundError:
+        return f"requirements control sidecar missing: {control_path}"
+    except json.JSONDecodeError as exc:
+        return f"requirements control sidecar invalid JSON: {control_path}: {exc}"
+    if not isinstance(value, dict):
+        return f"requirements control sidecar must be a JSON object: {control_path}"
+    if not isinstance(value.get("answer_method_key"), str) or not value["answer_method_key"].strip():
+        return "requirements control sidecar missing answer_method_key"
+    body = section_body(text, "What the User Approved") or ""
+    if table_field_value(body, "What is not enough"):
+        if not isinstance(value.get("forbidden_substitute_key"), str) or not value["forbidden_substitute_key"].strip():
+            return "requirements control sidecar missing forbidden_substitute_key"
+    return None
+
+
 def derive_paths(requirements: Path) -> dict[str, str] | None:
     parts = requirements.as_posix().split("/")
     if len(parts) < 4:
@@ -118,6 +160,10 @@ def main() -> int:
     hsa_status = section_status(text, "What the User Approved")
     if hsa_status != "Approved":
         return blocked(f"What the User Approved is not Approved: {hsa_status!r}")
+
+    sidecar_error = check_requirements_control_sidecar(requirements_path, text)
+    if sidecar_error:
+        return blocked(sidecar_error)
 
     paths = derive_paths(requirements_path)
     if paths is None:

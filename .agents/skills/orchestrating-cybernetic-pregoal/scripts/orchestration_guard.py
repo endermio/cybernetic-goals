@@ -48,6 +48,7 @@ def blocked_next_action(errors: list[str]) -> str:
     if (
         "requirements missing ## what the user approved" in joined
         or "what the user approved is not approved" in joined
+        or "requirements control sidecar" in joined
         or "records conflicting agent workflow preference" in joined
     ):
         return "ReturnToRequirementsAnalysis"
@@ -848,7 +849,7 @@ def check_design_ready(
     require_reference(design, requirements_path, "design", errors)
     if output_contract_check_required(requirements, design) and not output_contract_present_upstream(requirements, design):
         errors.append("Final Answer Format Check is required but no upstream output contract is present")
-    check_design_answer_path_check(requirements, design, errors)
+    check_design_answer_path_check(requirements_path, requirements, design, errors)
     if has_blocking_design_questions(design):
         errors.append("design has blocking open design questions")
 
@@ -875,7 +876,39 @@ def registry_string_list(definition: dict[str, object], key: str) -> list[str]:
     return [item for item in value if isinstance(item, str)]
 
 
-def check_design_answer_path_check(requirements: str | None, design: str | None, errors: list[str]) -> None:
+def requirements_control_path(requirements_path: str | None) -> Path | None:
+    if not requirements_path:
+        return None
+    return Path(requirements_path).with_suffix(".control.json")
+
+
+def read_requirements_control(requirements_path: str | None, errors: list[str]) -> dict[str, object] | None:
+    control_path = requirements_control_path(requirements_path)
+    if control_path is None:
+        errors.append("requirements control sidecar path unavailable")
+        return None
+    try:
+        value = json.loads(control_path.read_text(encoding="utf-8"))
+    except FileNotFoundError:
+        errors.append(f"requirements control sidecar missing: {control_path}")
+        return None
+    except json.JSONDecodeError as exc:
+        errors.append(f"requirements control sidecar invalid JSON: {control_path}: {exc}")
+        return None
+    if not isinstance(value, dict):
+        errors.append(f"requirements control sidecar must be a JSON object: {control_path}")
+        return None
+    return value
+
+
+def sidecar_string(control: dict[str, object] | None, key: str) -> str | None:
+    if control is None:
+        return None
+    value = control.get(key)
+    return value if isinstance(value, str) and value.strip() else None
+
+
+def check_design_answer_path_check(requirements_path: str | None, requirements: str | None, design: str | None, errors: list[str]) -> None:
     hsa = section_body(requirements or "", "What the User Approved")
     if hsa is None or design is None:
         return
@@ -884,6 +917,18 @@ def check_design_answer_path_check(requirements: str | None, design: str | None,
     not_sufficient = field_value(hsa, "What is not enough")
     if not any((answering_method, not_sufficient)):
         return
+
+    control = read_requirements_control(requirements_path, errors)
+    answer_method_key = sidecar_string(control, "answer_method_key")
+    forbidden_substitute_key = sidecar_string(control, "forbidden_substitute_key")
+    if not answer_method_key:
+        errors.append("requirements control sidecar missing answer_method_key")
+    if not_sufficient and not forbidden_substitute_key:
+        errors.append("requirements control sidecar missing forbidden_substitute_key")
+
+    definition = answer_method_definition(answer_method_key or "")
+    if answer_method_key and not definition:
+        errors.append(f"requirements control sidecar uses unknown answer_method_key: {answer_method_key}")
 
     body = section_body(design, "Answer Method Check")
     if body is None:
@@ -906,12 +951,23 @@ def check_design_answer_path_check(requirements: str | None, design: str | None,
     approved = (field_value(body, "Approved answer method") or "").casefold()
     if answering_method and answering_method.casefold() not in approved:
         errors.append("design Answer Method Check does not preserve approved answer method")
+    forbidden_terms = set(registry_string_list(definition, "forbidden_substitutions"))
+    if forbidden_substitute_key:
+        forbidden_terms.add(forbidden_substitute_key)
+    if substitute:
+        forbidden_terms.add(substitute)
+    for term in sorted(term for term in forbidden_terms if term):
+        if term.casefold() in instantiated:
+            errors.append(f"design Answer Method Check substitutes what is not enough: {term}")
     if substitute and substitute in instantiated:
         errors.append(f"design Answer Method Check substitutes what is not enough: {not_sufficient}")
     if substitute and (avoided.startswith("no") or " no" in avoided[:12]):
         errors.append("design Answer Method Check records what is not enough was not avoided")
     if answering_method and not mandatory:
         errors.append("design Answer Method Check missing required steps coverage")
+    for node in registry_string_list(definition, "mandatory_nodes"):
+        if node.casefold() not in mandatory:
+            errors.append(f"design Answer Method Check missing registry required step: {node}")
 
 
 def check_goal_ready(
