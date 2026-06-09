@@ -18,6 +18,16 @@
       "status": "pass",
       "evidence": [
         "answer method preserves required implementation path"
+      ],
+      "verdict": "approved",
+      "return_to_stage": null,
+      "findings": [],
+      "required_changes": [],
+      "checked_transformations": [
+        "requirements->design",
+        "design->goal",
+        "goal->plan",
+        "plan->runtime"
       ]
     },
     {
@@ -25,6 +35,67 @@
       "status": "pass",
       "evidence": [
         "mandatory required steps are present"
+      ],
+      "verdict": "approved",
+      "return_to_stage": null,
+      "findings": [],
+      "required_changes": [],
+      "checked_transformations": [
+        "requirements->design",
+        "design->goal",
+        "goal->plan",
+        "plan->runtime"
+      ]
+    },
+    {
+      "check_id": "intent-preservation",
+      "status": "pass",
+      "evidence": [
+        "approved user intent is preserved across design, goal, and plan"
+      ],
+      "verdict": "approved",
+      "return_to_stage": null,
+      "findings": [],
+      "required_changes": [],
+      "checked_transformations": [
+        "requirements->design",
+        "design->goal",
+        "goal->plan",
+        "plan->runtime"
+      ]
+    },
+    {
+      "check_id": "obligation-preservation",
+      "status": "pass",
+      "evidence": [
+        "required outcomes are not downgraded into permission, readiness, compatibility-only work, or future work"
+      ],
+      "verdict": "approved",
+      "return_to_stage": null,
+      "findings": [],
+      "required_changes": [],
+      "checked_transformations": [
+        "requirements->design",
+        "design->goal",
+        "goal->plan",
+        "plan->runtime"
+      ]
+    },
+    {
+      "check_id": "required-outcome-coverage",
+      "status": "pass",
+      "evidence": [
+        "blocking required outcomes are mapped through required steps, work packages, runtime steps, and verifier requirements"
+      ],
+      "verdict": "approved",
+      "return_to_stage": null,
+      "findings": [],
+      "required_changes": [],
+      "checked_transformations": [
+        "requirements->design",
+        "design->goal",
+        "goal->plan",
+        "plan->runtime"
       ]
     },
     {
@@ -32,6 +103,16 @@
       "status": "pass",
       "evidence": [
         "parallel workflow registry binding is explicit"
+      ],
+      "verdict": "approved",
+      "return_to_stage": null,
+      "findings": [],
+      "required_changes": [],
+      "checked_transformations": [
+        "requirements->design",
+        "design->goal",
+        "goal->plan",
+        "plan->runtime"
       ]
     },
     {
@@ -39,6 +120,16 @@
       "status": "pass",
       "evidence": [
         "covered work remains inside the JSON run"
+      ],
+      "verdict": "approved",
+      "return_to_stage": null,
+      "findings": [],
+      "required_changes": [],
+      "checked_transformations": [
+        "requirements->design",
+        "design->goal",
+        "goal->plan",
+        "plan->runtime"
       ]
     },
     {
@@ -46,6 +137,16 @@
       "status": "pass",
       "evidence": [
         "verifier-gated final report is required"
+      ],
+      "verdict": "approved",
+      "return_to_stage": null,
+      "findings": [],
+      "required_changes": [],
+      "checked_transformations": [
+        "requirements->design",
+        "design->goal",
+        "goal->plan",
+        "plan->runtime"
       ]
     }
   ],

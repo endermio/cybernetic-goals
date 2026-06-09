@@ -11,6 +11,20 @@ ANSWER_METHOD_REGISTRY = ROOT / ".agents/skills/references/answer-method-registr
 DELEGATION_WORKFLOW_REGISTRY = ROOT / ".agents/skills/references/delegation-workflow-registry.json"
 
 
+def review_check(check_id: str, evidence: list[str], checked_transformations: list[str] | None = None) -> dict:
+    return {
+        "check_id": check_id,
+        "status": "pass",
+        "verdict": "approved",
+        "return_to_stage": None,
+        "evidence": evidence,
+        "findings": [],
+        "required_changes": [],
+        "checked_transformations": checked_transformations
+        or ["requirements->design", "design->goal", "goal->plan", "plan->runtime"],
+    }
+
+
 SCHEMA_FIXTURES = {
     "requirements.control.schema.json": {
         "artifact_type": "requirements.control",
@@ -163,31 +177,14 @@ SCHEMA_FIXTURES = {
             "selected_agent_workflow": "superpowers-dispatching-parallel-agents",
         },
         "review_checks": [
-            {
-                "check_id": "design-answer-method",
-                "status": "pass",
-                "evidence": ["required answer path preserved"],
-            },
-            {
-                "check_id": "work-assignment",
-                "status": "pass",
-                "evidence": ["parallel workflow registry binding present"],
-            },
-            {
-                "check_id": "required-answer-path",
-                "status": "pass",
-                "evidence": ["runtime required steps are covered"],
-            },
-            {
-                "check_id": "horizon-authority",
-                "status": "pass",
-                "evidence": ["covered work remains in this run"],
-            },
-            {
-                "check_id": "final-observer",
-                "status": "pass",
-                "evidence": ["approved JSON chain ready for runtime"],
-            },
+            review_check("design-answer-method", ["required answer path preserved"]),
+            review_check("required-answer-path", ["runtime required steps are covered"]),
+            review_check("intent-preservation", ["approved user intent is preserved across design, goal, and plan"]),
+            review_check("obligation-preservation", ["required outcomes are not downgraded into permission, readiness, or future work"]),
+            review_check("required-outcome-coverage", ["blocking required outcomes are mapped through required steps, work packages, and verifier"]),
+            review_check("work-assignment", ["parallel workflow registry binding present"]),
+            review_check("horizon-authority", ["covered work remains in this run"]),
+            review_check("final-observer", ["approved JSON chain ready for runtime"]),
         ],
     },
     "runtime.control.schema.json": {
@@ -502,6 +499,28 @@ class ControlJsonSchemaTest(unittest.TestCase):
             verifier = schema["properties"]["verifier"]
             self.assertIn("required_outcomes", verifier["required"])
             self.assertIn("required_outcomes", verifier["properties"])
+
+    def test_review_checks_are_structured_certificates(self):
+        review = load_json(SCHEMA_DIR / "review.control.schema.json")
+        check_schema = review["properties"]["review_checks"]["items"]
+
+        for field in (
+            "check_id",
+            "status",
+            "verdict",
+            "return_to_stage",
+            "evidence",
+            "findings",
+            "required_changes",
+            "checked_transformations",
+        ):
+            with self.subTest(field=field):
+                self.assertIn(field, check_schema["required"])
+                self.assertIn(field, check_schema["properties"])
+
+        self.assertIn("approved", check_schema["properties"]["verdict"]["enum"])
+        self.assertIn("needs_revision", check_schema["properties"]["verdict"]["enum"])
+        self.assertIn("blocked", check_schema["properties"]["verdict"]["enum"])
 
 
 if __name__ == "__main__":

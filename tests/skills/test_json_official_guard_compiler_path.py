@@ -315,6 +315,56 @@ class JsonOfficialGuardCompilerPathTest(unittest.TestCase):
                 result.stdout + result.stderr,
             )
 
+    def test_control_chain_guard_requires_intent_obligation_and_outcome_review_checks(self):
+        fixture_by_file = outcome_covered_control_run_files()
+        fixture_by_file["review.control.json"]["review_checks"] = [
+            check
+            for check in fixture_by_file["review.control.json"]["review_checks"]
+            if check["check_id"]
+            not in {
+                "intent-preservation",
+                "obligation-preservation",
+                "required-outcome-coverage",
+            }
+        ]
+        apply_integrity_metadata(fixture_by_file)
+        with tempfile.TemporaryDirectory() as tmpdir:
+            run_dir = Path(tmpdir)
+            write_control_run(run_dir, fixture_by_file=fixture_by_file)
+
+            result = subprocess.run(
+                ["python3", str(CONTROL_GUARD), "--run-dir", str(run_dir)],
+                text=True,
+                capture_output=True,
+            )
+
+            self.assertNotEqual(result.returncode, 0, result.stdout + result.stderr)
+            self.assertIn("intent-preservation", result.stdout + result.stderr)
+            self.assertIn("obligation-preservation", result.stdout + result.stderr)
+            self.assertIn("required-outcome-coverage", result.stdout + result.stderr)
+
+    def test_control_chain_guard_rejects_review_check_with_non_approved_verdict(self):
+        fixture_by_file = outcome_covered_control_run_files()
+        fixture_by_file["review.control.json"]["review_checks"][0]["verdict"] = "needs_revision"
+        fixture_by_file["review.control.json"]["review_checks"][0]["return_to_stage"] = "design"
+        fixture_by_file["review.control.json"]["review_checks"][0]["required_changes"] = [
+            "repair answer method drift"
+        ]
+        apply_integrity_metadata(fixture_by_file)
+        with tempfile.TemporaryDirectory() as tmpdir:
+            run_dir = Path(tmpdir)
+            write_control_run(run_dir, fixture_by_file=fixture_by_file)
+
+            result = subprocess.run(
+                ["python3", str(CONTROL_GUARD), "--run-dir", str(run_dir)],
+                text=True,
+                capture_output=True,
+            )
+
+            self.assertNotEqual(result.returncode, 0, result.stdout + result.stderr)
+            self.assertIn("required review checks did not pass", result.stdout + result.stderr)
+            self.assertIn("design-answer-method", result.stdout + result.stderr)
+
     def test_legacy_markdown_cli_arguments_are_rejected_as_official_inputs(self):
         with tempfile.TemporaryDirectory() as tmpdir:
             run_dir = Path(tmpdir)

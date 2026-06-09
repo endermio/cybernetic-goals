@@ -46,6 +46,14 @@ class UsingControlJsonProtocolTest(unittest.TestCase):
         for writable in ("progress.jsonl", "runtime-status.json", "final-report.json"):
             self.assertIn(writable, text)
 
+    def test_runtime_self_hash_excludes_approved_control_hashes(self):
+        text = combined_protocol_text()
+
+        self.assertIn("approved_control_hashes", text)
+        self.assertIn("runtime.control.json", text)
+        self.assertRegex(text, re.compile(r"runtime\.control\.json[^.\n]*exclude[^.\n]*approved_control_hashes", re.I))
+        self.assertIn("self-reference", text)
+
     def test_progress_events_are_append_only_jsonl_observations(self):
         text = combined_protocol_text()
 

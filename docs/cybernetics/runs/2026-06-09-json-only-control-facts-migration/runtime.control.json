@@ -160,7 +160,7 @@
     "design.control.json": "sha256:a3f5daa6d9afdc0144f4f876317c29668bc28354f312f45a3b0d23d810d48de3",
     "goal.control.json": "sha256:35642633514262682b2263c99c5114cb9ce66dbe8a556a515cdd299705564f6e",
     "plan.control.json": "sha256:b40612dca7069ee6708428b4dc12a92decfa70f825fe82cbd4e6a0a8fc20c66b",
-    "review.control.json": "sha256:4b5860c3dde853bfc859259f8d21b74b481790a7e398a98cb31ad2f74bfd1fef",
+    "review.control.json": "sha256:72f4c46563736668e24b5840e2d0d6b52a518a0e2d739457db17fbae254f357e",
     "runtime.control.json": "sha256:51c87db9af649d8279bf03f8693189008566828ff3c41a4f92ef722a6a3c6d12"
   }
 }

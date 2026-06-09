@@ -38,6 +38,9 @@ WRITABLE_FILES = ["progress.jsonl", "runtime-status.json", "final-report.json"]
 REQUIRED_REVIEW_CHECKS = {
     "design-answer-method",
     "required-answer-path",
+    "intent-preservation",
+    "obligation-preservation",
+    "required-outcome-coverage",
     "work-assignment",
     "horizon-authority",
     "final-observer",
@@ -319,7 +322,10 @@ def validate_json_control_run(run_dir: Path) -> dict[str, dict[str, Any]]:
     failed_checks = sorted(
         check_id
         for check_id in REQUIRED_REVIEW_CHECKS
-        if checks_by_id[check_id].get("status") != "pass" or not string_list(checks_by_id[check_id].get("evidence"))
+        if checks_by_id[check_id].get("status") != "pass"
+        or checks_by_id[check_id].get("verdict") != "approved"
+        or checks_by_id[check_id].get("return_to_stage") is not None
+        or not string_list(checks_by_id[check_id].get("evidence"))
     )
     if failed_checks:
         raise ControlJsonValidationError("review.control.json: required review checks did not pass: " + ", ".join(failed_checks))

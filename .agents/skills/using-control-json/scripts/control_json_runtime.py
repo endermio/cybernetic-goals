@@ -24,6 +24,9 @@ WRITABLE_FILES = ("progress.jsonl", "runtime-status.json", "final-report.json")
 REQUIRED_REVIEW_CHECKS = {
     "design-answer-method",
     "required-answer-path",
+    "intent-preservation",
+    "obligation-preservation",
+    "required-outcome-coverage",
     "work-assignment",
     "horizon-authority",
     "final-observer",
@@ -393,7 +396,12 @@ def validate_control_chain(run_dir: Path) -> tuple[dict[str, dict[str, Any]] | N
             errors.append(f"missing required review checks: {', '.join(missing)}")
         for check_id in REQUIRED_REVIEW_CHECKS & set(checks_by_id):
             check = checks_by_id[check_id]
-            if check.get("status") != "pass" or not string_list(check.get("evidence")):
+            if (
+                check.get("status") != "pass"
+                or check.get("verdict") != "approved"
+                or check.get("return_to_stage") is not None
+                or not string_list(check.get("evidence"))
+            ):
                 errors.append(f"required review check did not pass with evidence: {check_id}")
 
     try:

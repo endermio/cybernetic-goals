@@ -23,6 +23,17 @@ Use approved JSON to decide what work is authorized, what counts as done, where 
 
 If the approved target, plan, review, or runtime contract appears wrong, stale, or insufficient, stop and report the inconsistency. Append an observation only when `progress.jsonl` is available and valid.
 
+## Approved Hashes
+
+`review.control.json` binds the approved pre-runtime inputs by hash.
+`runtime.control.json` binds all read-only control JSON, including itself.
+
+When calculating the hash for `runtime.control.json`, exclude the top-level `approved_control_hashes` field. This avoids an impossible self-reference loop.
+All other read-only control JSON hashes include the full JSON object.
+
+If any approved hash does not match the current file content, stop before
+writing progress. Runtime execution must not repair approved JSON hashes.
+
 ## Writable Runtime Files
 
 runtime writes only these control-output files:

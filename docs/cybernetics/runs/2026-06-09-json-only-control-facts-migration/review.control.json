@@ -18,6 +18,16 @@
       "status": "pass",
       "evidence": [
         "design.control.json preserves implementation-spine answer method and avoids component-inventory-completion"
+      ],
+      "verdict": "approved",
+      "return_to_stage": null,
+      "findings": [],
+      "required_changes": [],
+      "checked_transformations": [
+        "requirements->design",
+        "design->goal",
+        "goal->plan",
+        "plan->runtime"
       ]
     },
     {
@@ -25,6 +35,67 @@
       "status": "pass",
       "evidence": [
         "goal/plan/runtime required steps S1-S10 are aligned and work packages cover every runtime step"
+      ],
+      "verdict": "approved",
+      "return_to_stage": null,
+      "findings": [],
+      "required_changes": [],
+      "checked_transformations": [
+        "requirements->design",
+        "design->goal",
+        "goal->plan",
+        "plan->runtime"
+      ]
+    },
+    {
+      "check_id": "intent-preservation",
+      "status": "pass",
+      "evidence": [
+        "approved user intent is preserved across design, goal, and plan"
+      ],
+      "verdict": "approved",
+      "return_to_stage": null,
+      "findings": [],
+      "required_changes": [],
+      "checked_transformations": [
+        "requirements->design",
+        "design->goal",
+        "goal->plan",
+        "plan->runtime"
+      ]
+    },
+    {
+      "check_id": "obligation-preservation",
+      "status": "pass",
+      "evidence": [
+        "required outcomes are not downgraded into permission, readiness, compatibility-only work, or future work"
+      ],
+      "verdict": "approved",
+      "return_to_stage": null,
+      "findings": [],
+      "required_changes": [],
+      "checked_transformations": [
+        "requirements->design",
+        "design->goal",
+        "goal->plan",
+        "plan->runtime"
+      ]
+    },
+    {
+      "check_id": "required-outcome-coverage",
+      "status": "pass",
+      "evidence": [
+        "blocking required outcomes are mapped through required steps, work packages, runtime steps, and verifier requirements"
+      ],
+      "verdict": "approved",
+      "return_to_stage": null,
+      "findings": [],
+      "required_changes": [],
+      "checked_transformations": [
+        "requirements->design",
+        "design->goal",
+        "goal->plan",
+        "plan->runtime"
       ]
     },
     {
@@ -32,6 +103,16 @@
       "status": "pass",
       "evidence": [
         "plan/control registry binds superpowers-dispatching-parallel-agents with Parallel subagent-driven work"
+      ],
+      "verdict": "approved",
+      "return_to_stage": null,
+      "findings": [],
+      "required_changes": [],
+      "checked_transformations": [
+        "requirements->design",
+        "design->goal",
+        "goal->plan",
+        "plan->runtime"
       ]
     },
     {
@@ -39,6 +120,16 @@
       "status": "pass",
       "evidence": [
         "approved JSON-only migration work remains in this run; Markdown compatibility is explicitly non-goal"
+      ],
+      "verdict": "approved",
+      "return_to_stage": null,
+      "findings": [],
+      "required_changes": [],
+      "checked_transformations": [
+        "requirements->design",
+        "design->goal",
+        "goal->plan",
+        "plan->runtime"
       ]
     },
     {
@@ -46,6 +137,16 @@
       "status": "pass",
       "evidence": [
         "JSON-only focused tests and full tests pass before runtime verification"
+      ],
+      "verdict": "approved",
+      "return_to_stage": null,
+      "findings": [],
+      "required_changes": [],
+      "checked_transformations": [
+        "requirements->design",
+        "design->goal",
+        "goal->plan",
+        "plan->runtime"
       ]
     }
   ],

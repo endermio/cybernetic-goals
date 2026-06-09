@@ -271,6 +271,16 @@
             "status": "pass",
             "evidence": [
               "registry answer path preserved"
+            ],
+            "verdict": "approved",
+            "return_to_stage": null,
+            "findings": [],
+            "required_changes": [],
+            "checked_transformations": [
+              "requirements->design",
+              "design->goal",
+              "goal->plan",
+              "plan->runtime"
             ]
           },
           {
@@ -278,6 +288,67 @@
             "status": "pass",
             "evidence": [
               "mandatory nodes present"
+            ],
+            "verdict": "approved",
+            "return_to_stage": null,
+            "findings": [],
+            "required_changes": [],
+            "checked_transformations": [
+              "requirements->design",
+              "design->goal",
+              "goal->plan",
+              "plan->runtime"
+            ]
+          },
+          {
+            "check_id": "intent-preservation",
+            "status": "pass",
+            "evidence": [
+              "approved user intent is preserved across design, goal, and plan"
+            ],
+            "verdict": "approved",
+            "return_to_stage": null,
+            "findings": [],
+            "required_changes": [],
+            "checked_transformations": [
+              "requirements->design",
+              "design->goal",
+              "goal->plan",
+              "plan->runtime"
+            ]
+          },
+          {
+            "check_id": "obligation-preservation",
+            "status": "pass",
+            "evidence": [
+              "required outcomes are not downgraded into permission, readiness, compatibility-only work, or future work"
+            ],
+            "verdict": "approved",
+            "return_to_stage": null,
+            "findings": [],
+            "required_changes": [],
+            "checked_transformations": [
+              "requirements->design",
+              "design->goal",
+              "goal->plan",
+              "plan->runtime"
+            ]
+          },
+          {
+            "check_id": "required-outcome-coverage",
+            "status": "pass",
+            "evidence": [
+              "blocking required outcomes are mapped through required steps, work packages, runtime steps, and verifier requirements"
+            ],
+            "verdict": "approved",
+            "return_to_stage": null,
+            "findings": [],
+            "required_changes": [],
+            "checked_transformations": [
+              "requirements->design",
+              "design->goal",
+              "goal->plan",
+              "plan->runtime"
             ]
           },
           {
@@ -285,6 +356,16 @@
             "status": "pass",
             "evidence": [
               "parallel workflow registry binding present"
+            ],
+            "verdict": "approved",
+            "return_to_stage": null,
+            "findings": [],
+            "required_changes": [],
+            "checked_transformations": [
+              "requirements->design",
+              "design->goal",
+              "goal->plan",
+              "plan->runtime"
             ]
           },
           {
@@ -292,6 +373,16 @@
             "status": "pass",
             "evidence": [
               "covered work remains in this run"
+            ],
+            "verdict": "approved",
+            "return_to_stage": null,
+            "findings": [],
+            "required_changes": [],
+            "checked_transformations": [
+              "requirements->design",
+              "design->goal",
+              "goal->plan",
+              "plan->runtime"
             ]
           },
           {
@@ -299,6 +390,16 @@
             "status": "pass",
             "evidence": [
               "approved JSON chain ready for runtime"
+            ],
+            "verdict": "approved",
+            "return_to_stage": null,
+            "findings": [],
+            "required_changes": [],
+            "checked_transformations": [
+              "requirements->design",
+              "design->goal",
+              "goal->plan",
+              "plan->runtime"
             ]
           }
         ],
@@ -391,7 +492,7 @@
           "design.control.json": "sha256:ccff7b571653609550e19126823bf300bb039734c5553e50eb284ad56c210061",
           "goal.control.json": "sha256:a907fb6c552a045ccb143049a4c7735a0aaf0d50e4034fd13649c0084cab7df8",
           "plan.control.json": "sha256:da3a66440891a04676958c45209dbac5419963cba4005a3caeed17ea3a7310c3",
-          "review.control.json": "sha256:d7198ec5bc951ed7389eceebc35ffeb251fd521c4be04e3ac5334009963dd6c3",
+          "review.control.json": "sha256:bbee0cd4e95dd4c7c3e2f963f393e3fcbff09740a3e0830c3cccec94bb72d41e",
           "runtime.control.json": "sha256:5e176888358e808fd8522e38e99db2c55098f450c19971462ae8e1209cbd5e74"
         }
       }
