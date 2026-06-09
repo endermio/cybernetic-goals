@@ -134,6 +134,87 @@ def step_ids(artifact: dict[str, Any]) -> set[str]:
     }
 
 
+def required_outcome_sets(requirements: dict[str, Any]) -> tuple[set[str], set[str], list[str]]:
+    outcomes = requirements.get("approved_control", {}).get("required_outcomes")
+    if outcomes is None:
+        return set(), set(), []
+    if not isinstance(outcomes, list):
+        return set(), set(), ["requirements.control.json approved_control.required_outcomes must be a list"]
+
+    all_outcomes: set[str] = set()
+    blocking_outcomes: set[str] = set()
+    errors: list[str] = []
+    for index, outcome in enumerate(outcomes):
+        if not isinstance(outcome, dict):
+            errors.append(f"requirements.control.json required_outcomes[{index}] must be an object")
+            continue
+
+        outcome_id = outcome.get("id")
+        if not isinstance(outcome_id, str) or not outcome_id:
+            errors.append(f"requirements.control.json required_outcomes[{index}].id must be a non-empty string")
+            continue
+        if outcome_id in all_outcomes:
+            errors.append(f"requirements.control.json duplicate required_outcomes id: {outcome_id}")
+            continue
+        all_outcomes.add(outcome_id)
+
+        blocks = outcome.get("blocks_goal_achieved_if_missing")
+        if not isinstance(blocks, bool):
+            errors.append(
+                f"requirements.control.json required_outcomes[{index}].blocks_goal_achieved_if_missing must be boolean"
+            )
+            continue
+        if blocks:
+            blocking_outcomes.add(outcome_id)
+    return all_outcomes, blocking_outcomes, errors
+
+
+def blocking_required_outcomes(requirements: dict[str, Any]) -> set[str]:
+    _, blocking_outcomes, _ = required_outcome_sets(requirements)
+    return blocking_outcomes
+
+
+def step_outcome_map(
+    artifact: dict[str, Any],
+    *,
+    known_outcomes: set[str] | None = None,
+    errors: list[str] | None = None,
+    label: str = "control artifact",
+) -> dict[str, set[str]]:
+    steps = artifact.get("required_steps")
+    if not isinstance(steps, list):
+        return {}
+    mapped: dict[str, set[str]] = {}
+    for index, step in enumerate(steps):
+        if not isinstance(step, dict) or not isinstance(step.get("step_id"), str):
+            continue
+        step_id = step["step_id"]
+        raw_outcomes = step.get("satisfies_outcomes", [])
+        if not isinstance(raw_outcomes, list) or not all(isinstance(outcome, str) and outcome for outcome in raw_outcomes):
+            if errors is not None:
+                errors.append(f"{label} required_steps[{index}].satisfies_outcomes must be a list of non-empty strings")
+            mapped[step_id] = set()
+            continue
+        outcome_ids = set(raw_outcomes)
+        if known_outcomes is not None:
+            unknown = sorted(outcome_ids - known_outcomes)
+            if unknown and errors is not None:
+                errors.append(
+                    f"{label} required_steps.{step_id}.satisfies_outcomes references unknown required outcomes: "
+                    + ", ".join(unknown)
+                )
+        mapped[step_id] = outcome_ids
+    return mapped
+
+
+def covered_outcomes_by_steps(step_map: dict[str, set[str]], steps: set[str] | None = None) -> set[str]:
+    selected = steps if steps is not None else set(step_map)
+    covered: set[str] = set()
+    for step_id in selected:
+        covered.update(step_map.get(step_id, set()))
+    return covered
+
+
 def validate_event(event: dict[str, Any]) -> list[str]:
     errors: list[str] = []
     for field in (
@@ -380,6 +461,48 @@ def validate_control_chain(run_dir: Path) -> tuple[dict[str, dict[str, Any]] | N
     if not runtime_steps <= goal_steps:
         errors.append("runtime required_steps must be present in goal.control.json")
 
+    all_required_outcomes, required_outcomes, outcome_errors = required_outcome_sets(artifacts["requirements"])
+    errors.extend(outcome_errors)
+    step_outcomes_by_key: dict[str, dict[str, set[str]]] = {}
+    if all_required_outcomes:
+        for key in ("design", "goal", "plan", "runtime"):
+            step_outcomes_by_key[key] = step_outcome_map(
+                artifacts[key],
+                known_outcomes=all_required_outcomes,
+                errors=errors,
+                label=CONTROL_FILES[key],
+            )
+    if required_outcomes:
+        for key in ("design", "goal", "plan", "runtime"):
+            covered = covered_outcomes_by_steps(step_outcomes_by_key.get(key, {}))
+            missing = sorted(required_outcomes - covered)
+            if missing:
+                errors.append(
+                    f"{CONTROL_FILES[key]} required_steps do not satisfy blocking required outcomes: "
+                    + ", ".join(missing)
+                )
+
+        raw_verifier_outcomes = artifacts["runtime"].get("verifier", {}).get("required_outcomes")
+        if not isinstance(raw_verifier_outcomes, list) or not all(
+            isinstance(outcome, str) and outcome for outcome in raw_verifier_outcomes
+        ):
+            verifier_outcomes: set[str] = set()
+            errors.append("runtime.control.json verifier.required_outcomes must be a list of non-empty strings")
+        else:
+            verifier_outcomes = set(raw_verifier_outcomes)
+            unknown_verifier_outcomes = sorted(verifier_outcomes - all_required_outcomes)
+            if unknown_verifier_outcomes:
+                errors.append(
+                    "runtime.control.json verifier.required_outcomes references unknown required outcomes: "
+                    + ", ".join(unknown_verifier_outcomes)
+                )
+        missing_verifier = sorted(required_outcomes - verifier_outcomes)
+        if missing_verifier:
+            errors.append(
+                "runtime.control.json verifier.required_outcomes missing blocking required outcomes: "
+                + ", ".join(missing_verifier)
+            )
+
     work_packages = artifacts["plan"].get("work_packages")
     if not isinstance(work_packages, list) or not work_packages:
         errors.append("plan.control.json must declare work_packages")
@@ -394,6 +517,14 @@ def validate_control_chain(run_dir: Path) -> tuple[dict[str, dict[str, Any]] | N
             covered_steps.update(string_list(package.get("required_steps")))
         if not runtime_steps <= covered_steps:
             errors.append("runtime required_steps must be covered by work packages")
+        if required_outcomes:
+            covered_outcomes = covered_outcomes_by_steps(step_outcomes_by_key.get("plan", {}), covered_steps)
+            missing_outcomes = sorted(required_outcomes - covered_outcomes)
+            if missing_outcomes:
+                errors.append(
+                    "plan.control.json work_packages do not cover blocking required outcomes: "
+                    + ", ".join(missing_outcomes)
+                )
 
     return artifacts, errors
 

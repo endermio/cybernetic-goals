@@ -1,10 +1,11 @@
+import copy
 import json
 import subprocess
 import tempfile
 import unittest
 from pathlib import Path
 
-from tests.skills.test_control_json_schemas import SCHEMA_FIXTURES
+from tests.skills.test_control_json_schemas import SCHEMA_FIXTURES, apply_integrity_metadata
 
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -22,8 +23,8 @@ CONTROL_FILES = (
 )
 
 
-def write_control_run(run_dir: Path, include_runtime: bool = True) -> None:
-    fixture_by_file = {
+def control_run_files() -> dict[str, dict]:
+    return {
         "requirements.control.json": SCHEMA_FIXTURES["requirements.control.schema.json"],
         "design.control.json": SCHEMA_FIXTURES["design.control.schema.json"],
         "goal.control.json": SCHEMA_FIXTURES["goal.control.schema.json"],
@@ -31,6 +32,37 @@ def write_control_run(run_dir: Path, include_runtime: bool = True) -> None:
         "review.control.json": SCHEMA_FIXTURES["review.control.schema.json"],
         "runtime.control.json": SCHEMA_FIXTURES["runtime.control.schema.json"],
     }
+
+
+def outcome_covered_control_run_files() -> dict[str, dict]:
+    fixture_by_file = copy.deepcopy(control_run_files())
+    outcome_id = "O-required-outcome-coverage"
+    fixture_by_file["requirements.control.json"]["approved_control"]["required_outcomes"] = [
+        {
+            "id": outcome_id,
+            "statement": "blocking required outcomes stay covered through runtime verification",
+            "blocks_goal_achieved_if_missing": True,
+            "required_evidence": ["mainline completed progress event"],
+            "not_satisfied_by": ["supporting-only progress"],
+        },
+        {
+            "id": "O-nonblocking-support",
+            "statement": "supporting work may be present but cannot replace the blocking outcome",
+            "blocks_goal_achieved_if_missing": False,
+            "required_evidence": ["supporting evidence"],
+            "not_satisfied_by": ["claiming support as the required outcome"],
+        }
+    ]
+    for filename in ("design.control.json", "goal.control.json", "plan.control.json", "runtime.control.json"):
+        fixture_by_file[filename]["required_steps"][0]["satisfies_outcomes"] = [outcome_id]
+    fixture_by_file["runtime.control.json"]["verifier"]["required_outcomes"] = [outcome_id]
+    apply_integrity_metadata(fixture_by_file)
+    return fixture_by_file
+
+
+def write_control_run(run_dir: Path, include_runtime: bool = True, fixture_by_file: dict[str, dict] | None = None) -> None:
+    if fixture_by_file is None:
+        fixture_by_file = control_run_files()
     for filename, value in fixture_by_file.items():
         if filename == "runtime.control.json" and not include_runtime:
             continue
@@ -156,6 +188,89 @@ class JsonOfficialGuardCompilerPathTest(unittest.TestCase):
 
             self.assertNotEqual(result.returncode, 0, result.stdout + result.stderr)
             self.assertIn("approved_control_hashes mismatch for goal.control.json", result.stdout + result.stderr)
+
+    def test_control_chain_guard_accepts_required_outcome_covered_chain(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            run_dir = Path(tmpdir)
+            write_control_run(run_dir, fixture_by_file=outcome_covered_control_run_files())
+
+            result = subprocess.run(
+                ["python3", str(CONTROL_GUARD), "--run-dir", str(run_dir)],
+                text=True,
+                capture_output=True,
+            )
+
+            self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+            self.assertIn("PASS", result.stdout)
+
+    def test_control_chain_guard_rejects_blocking_required_outcome_without_required_step_coverage(self):
+        fixture_by_file = outcome_covered_control_run_files()
+        fixture_by_file["runtime.control.json"]["required_steps"][0]["satisfies_outcomes"] = ["O-nonblocking-support"]
+        apply_integrity_metadata(fixture_by_file)
+        with tempfile.TemporaryDirectory() as tmpdir:
+            run_dir = Path(tmpdir)
+            write_control_run(run_dir, fixture_by_file=fixture_by_file)
+
+            result = subprocess.run(
+                ["python3", str(CONTROL_GUARD), "--run-dir", str(run_dir)],
+                text=True,
+                capture_output=True,
+            )
+
+            self.assertNotEqual(result.returncode, 0, result.stdout + result.stderr)
+            self.assertIn(
+                "runtime.control.json required_steps do not satisfy blocking required outcomes: O-required-outcome-coverage",
+                result.stdout + result.stderr,
+            )
+
+    def test_control_chain_guard_rejects_missing_runtime_verifier_required_outcome(self):
+        fixture_by_file = outcome_covered_control_run_files()
+        fixture_by_file["runtime.control.json"]["verifier"]["required_outcomes"] = ["O-nonblocking-support"]
+        apply_integrity_metadata(fixture_by_file)
+        with tempfile.TemporaryDirectory() as tmpdir:
+            run_dir = Path(tmpdir)
+            write_control_run(run_dir, fixture_by_file=fixture_by_file)
+
+            result = subprocess.run(
+                ["python3", str(CONTROL_GUARD), "--run-dir", str(run_dir)],
+                text=True,
+                capture_output=True,
+            )
+
+            self.assertNotEqual(result.returncode, 0, result.stdout + result.stderr)
+            self.assertIn(
+                "runtime.control.json verifier.required_outcomes missing blocking required outcomes: O-required-outcome-coverage",
+                result.stdout + result.stderr,
+            )
+
+    def test_control_chain_guard_rejects_work_packages_that_do_not_cover_blocking_outcomes(self):
+        fixture_by_file = outcome_covered_control_run_files()
+        fixture_by_file["plan.control.json"]["required_steps"][0]["satisfies_outcomes"] = ["O-nonblocking-support"]
+        fixture_by_file["plan.control.json"]["required_steps"].append(
+            {
+                "step_id": "S2",
+                "transition": "blocking outcome is documented but not assigned to a work package",
+                "evidence": ["unassigned evidence"],
+                "satisfies_outcomes": ["O-required-outcome-coverage"],
+            }
+        )
+        fixture_by_file["plan.control.json"]["work_packages"][0]["required_steps"] = ["S1"]
+        apply_integrity_metadata(fixture_by_file)
+        with tempfile.TemporaryDirectory() as tmpdir:
+            run_dir = Path(tmpdir)
+            write_control_run(run_dir, fixture_by_file=fixture_by_file)
+
+            result = subprocess.run(
+                ["python3", str(CONTROL_GUARD), "--run-dir", str(run_dir)],
+                text=True,
+                capture_output=True,
+            )
+
+            self.assertNotEqual(result.returncode, 0, result.stdout + result.stderr)
+            self.assertIn(
+                "plan.control.json work_packages do not cover blocking required outcomes: O-required-outcome-coverage",
+                result.stdout + result.stderr,
+            )
 
     def test_legacy_markdown_cli_arguments_are_rejected_as_official_inputs(self):
         with tempfile.TemporaryDirectory() as tmpdir:

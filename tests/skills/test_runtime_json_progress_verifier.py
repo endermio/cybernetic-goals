@@ -6,7 +6,7 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from tests.skills.test_control_json_schemas import validate
+from tests.skills.test_control_json_schemas import apply_integrity_metadata, validate
 
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -21,6 +21,38 @@ BUILD_PROMPT = SCRIPTS / "build_runtime_prompt.py"
 
 def load_fixture() -> dict:
     return json.loads(FIXTURE.read_text(encoding="utf-8"))["valid"]
+
+
+def outcome_covered_fixture() -> dict:
+    fixture = load_fixture()
+    control_files = fixture["control_files"]
+    outcomes = [
+        {
+            "id": "O-runtime-progress",
+            "statement": "runtime writes evidence-backed progress events",
+            "blocks_goal_achieved_if_missing": True,
+            "required_evidence": ["mainline progress event for S7"],
+            "not_satisfied_by": ["supporting-only progress"],
+        },
+        {
+            "id": "O-json-regressions",
+            "statement": "old accident regressions are covered by JSON runtime verification",
+            "blocks_goal_achieved_if_missing": True,
+            "required_evidence": ["mainline progress event for S9"],
+            "not_satisfied_by": ["supporting-only progress"],
+        },
+    ]
+    control_files["requirements.control.json"]["approved_control"]["required_outcomes"] = outcomes
+    step_outcomes = {"S7": ["O-runtime-progress"], "S9": ["O-json-regressions"]}
+    for filename in ("design.control.json", "goal.control.json", "plan.control.json", "runtime.control.json"):
+        for step in control_files[filename]["required_steps"]:
+            step["satisfies_outcomes"] = step_outcomes[step["step_id"]]
+    control_files["runtime.control.json"]["verifier"]["required_outcomes"] = [
+        "O-runtime-progress",
+        "O-json-regressions",
+    ]
+    apply_integrity_metadata(control_files)
+    return fixture
 
 
 def write_run(run_dir: Path, fixture: dict) -> None:
@@ -106,6 +138,54 @@ class RuntimeJsonProgressVerifierTest(unittest.TestCase):
         for fixture, expected in (
             (weaker, "forbidden or unknown answer method"),
             (missing_node, "missing mandatory answer path nodes"),
+        ):
+            with self.subTest(expected=expected), tempfile.TemporaryDirectory() as tmpdir:
+                run_dir = Path(tmpdir)
+                write_run(run_dir, fixture)
+
+                result = run_script(VALIDATE, str(run_dir))
+
+                self.assertNotEqual(result.returncode, 0, result.stdout + result.stderr)
+                self.assertIn(expected, result.stdout + result.stderr)
+
+    def test_validate_control_chain_rejects_required_outcome_coverage_gaps(self):
+        missing_outcome_id = outcome_covered_fixture()
+        del missing_outcome_id["control_files"]["requirements.control.json"]["approved_control"]["required_outcomes"][1]["id"]
+        apply_integrity_metadata(missing_outcome_id["control_files"])
+
+        missing_step_coverage = outcome_covered_fixture()
+        missing_step_coverage["control_files"]["goal.control.json"]["required_steps"][1]["satisfies_outcomes"] = []
+        apply_integrity_metadata(missing_step_coverage["control_files"])
+
+        missing_verifier_outcome = outcome_covered_fixture()
+        missing_verifier_outcome["control_files"]["runtime.control.json"]["verifier"]["required_outcomes"] = [
+            "O-runtime-progress"
+        ]
+        apply_integrity_metadata(missing_verifier_outcome["control_files"])
+
+        missing_work_package_coverage = outcome_covered_fixture()
+        missing_work_package_coverage["control_files"]["plan.control.json"]["work_packages"][0]["required_steps"] = [
+            "S7"
+        ]
+        apply_integrity_metadata(missing_work_package_coverage["control_files"])
+
+        for fixture, expected in (
+            (
+                missing_outcome_id,
+                "requirements.control.json required_outcomes[1].id must be a non-empty string",
+            ),
+            (
+                missing_step_coverage,
+                "goal.control.json required_steps do not satisfy blocking required outcomes: O-json-regressions",
+            ),
+            (
+                missing_verifier_outcome,
+                "runtime.control.json verifier.required_outcomes missing blocking required outcomes: O-json-regressions",
+            ),
+            (
+                missing_work_package_coverage,
+                "plan.control.json work_packages do not cover blocking required outcomes: O-json-regressions",
+            ),
         ):
             with self.subTest(expected=expected), tempfile.TemporaryDirectory() as tmpdir:
                 run_dir = Path(tmpdir)
@@ -219,6 +299,22 @@ class RuntimeJsonProgressVerifierTest(unittest.TestCase):
                 result.stdout + result.stderr,
             )
 
+    def test_verify_runtime_progress_rejects_blocking_outcome_without_mainline_evidence(self):
+        fixture = outcome_covered_fixture()
+        fixture["progress_events"][1]["progress_role"] = "supporting_only"
+        fixture["progress_events"][1]["counts_as_goal_progress"] = False
+        with tempfile.TemporaryDirectory() as tmpdir:
+            run_dir = Path(tmpdir)
+            write_run(run_dir, fixture)
+
+            result = run_script(VERIFY, str(run_dir))
+
+            self.assertNotEqual(result.returncode, 0, result.stdout + result.stderr)
+            self.assertIn(
+                "missing mainline evidence-backed progress for blocking required outcomes: O-json-regressions",
+                result.stdout + result.stderr,
+            )
+
     def test_verify_runtime_progress_permits_complete_mainline_verified_report(self):
         with tempfile.TemporaryDirectory() as tmpdir:
             run_dir = Path(tmpdir)
@@ -229,6 +325,18 @@ class RuntimeJsonProgressVerifierTest(unittest.TestCase):
             self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
             payload = json.loads(result.stdout)
             self.assertTrue(payload["goal_achieved_permitted"])
+
+    def test_verify_runtime_progress_permits_required_outcome_covered_progress(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            run_dir = Path(tmpdir)
+            write_run(run_dir, outcome_covered_fixture())
+
+            result = run_script(VERIFY, str(run_dir))
+
+            self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+            payload = json.loads(result.stdout)
+            self.assertEqual(["O-json-regressions", "O-runtime-progress"], payload["required_outcomes"])
+            self.assertEqual(["O-json-regressions", "O-runtime-progress"], payload["completed_required_outcomes"])
 
     def test_build_runtime_prompt_outputs_short_goal_pointer(self):
         with tempfile.TemporaryDirectory() as tmpdir:

@@ -6,8 +6,11 @@ import json
 from pathlib import Path
 
 from control_json_runtime import (
+    blocking_required_outcomes,
+    covered_outcomes_by_steps,
     result_payload,
     read_progress_events,
+    step_outcome_map,
     step_ids,
     validate_control_chain,
     verify_approved_hashes,
@@ -72,11 +75,19 @@ def main() -> int:
 
     required_steps = step_ids(artifacts["runtime"])
     completed_steps = mainline_completed_steps(events)
+    required_outcomes = blocking_required_outcomes(artifacts["requirements"])
+    completed_outcomes = covered_outcomes_by_steps(step_outcome_map(artifacts["runtime"]), completed_steps)
     missing_steps = sorted(required_steps - completed_steps)
     if missing_steps:
         errors.append(
             "missing mainline evidence-backed progress for required steps: "
             + ", ".join(missing_steps)
+        )
+    missing_outcomes = sorted(required_outcomes - completed_outcomes)
+    if missing_outcomes:
+        errors.append(
+            "missing mainline evidence-backed progress for blocking required outcomes: "
+            + ", ".join(missing_outcomes)
         )
 
     final_report_path = run_dir / "final-report.json"
@@ -102,6 +113,8 @@ def main() -> int:
                 goal_achieved_permitted=ok,
                 completed_required_steps=sorted(completed_steps),
                 required_steps=sorted(required_steps),
+                completed_required_outcomes=sorted(completed_outcomes),
+                required_outcomes=sorted(required_outcomes),
             ),
             indent=2,
         )

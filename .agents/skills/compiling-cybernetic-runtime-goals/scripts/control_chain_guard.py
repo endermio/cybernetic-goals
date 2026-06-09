@@ -163,6 +163,45 @@ def step_ids(artifact: dict[str, Any]) -> set[str]:
     return {step.get("step_id") for step in steps if isinstance(step, dict) and isinstance(step.get("step_id"), str)}
 
 
+def blocking_required_outcomes(requirements: dict[str, Any]) -> set[str]:
+    outcomes = requirements.get("approved_control", {}).get("required_outcomes", [])
+    if not isinstance(outcomes, list):
+        return set()
+    return {
+        outcome.get("id")
+        for outcome in outcomes
+        if isinstance(outcome, dict)
+        and isinstance(outcome.get("id"), str)
+        and outcome.get("blocks_goal_achieved_if_missing") is True
+    }
+
+
+def step_outcome_map(artifact: dict[str, Any]) -> dict[str, set[str]]:
+    steps = artifact.get("required_steps")
+    if not isinstance(steps, list):
+        return {}
+    mapped: dict[str, set[str]] = {}
+    for step in steps:
+        if not isinstance(step, dict) or not isinstance(step.get("step_id"), str):
+            continue
+        mapped[step["step_id"]] = set(string_list(step.get("satisfies_outcomes")))
+    return mapped
+
+
+def covered_outcomes_by_steps(step_map: dict[str, set[str]], steps: set[str] | None = None) -> set[str]:
+    selected = steps if steps is not None else set(step_map)
+    covered: set[str] = set()
+    for step_id in selected:
+        covered.update(step_map.get(step_id, set()))
+    return covered
+
+
+def require_outcome_coverage(label: str, covered: set[str], required: set[str]) -> None:
+    missing = sorted(required - covered)
+    if missing:
+        raise ControlJsonValidationError(f"{label}: " + ", ".join(missing))
+
+
 def reject_markdown_control_artifacts(run_dir: Path) -> None:
     found = sorted(path.name for path in run_dir.iterdir() if path.name in MARKDOWN_CONTROL_FILENAMES or path.name.endswith(".goal.md"))
     if found:
@@ -310,11 +349,33 @@ def validate_json_control_run(run_dir: Path) -> dict[str, dict[str, Any]]:
     if not runtime_steps <= goal_steps:
         raise ControlJsonValidationError("runtime required_steps must be present in goal.control.json")
 
+    required_outcomes = blocking_required_outcomes(artifacts["requirements.control.json"])
+    if required_outcomes:
+        for filename in ("design.control.json", "goal.control.json", "plan.control.json", "runtime.control.json"):
+            require_outcome_coverage(
+                f"{filename} required_steps do not satisfy blocking required outcomes",
+                covered_outcomes_by_steps(step_outcome_map(artifacts[filename])),
+                required_outcomes,
+            )
+
+        verifier_outcomes = set(string_list(runtime.get("verifier", {}).get("required_outcomes")))
+        require_outcome_coverage(
+            "runtime.control.json verifier.required_outcomes missing blocking required outcomes",
+            verifier_outcomes,
+            required_outcomes,
+        )
+
     covered_steps: set[str] = set()
     for package in artifacts["plan.control.json"].get("work_packages", []):
         covered_steps.update(string_list(package.get("required_steps")))
         if not string_list(package.get("required_tests")):
             raise ControlJsonValidationError("plan.control.json: work package missing required tests")
+    if required_outcomes:
+        require_outcome_coverage(
+            "plan.control.json work_packages do not cover blocking required outcomes",
+            covered_outcomes_by_steps(step_outcome_map(artifacts["plan.control.json"]), covered_steps),
+            required_outcomes,
+        )
     if not runtime_steps <= covered_steps:
         raise ControlJsonValidationError("runtime required_steps must be covered by work packages")
 
