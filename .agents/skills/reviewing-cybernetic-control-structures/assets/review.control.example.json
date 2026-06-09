@@ -51,12 +51,12 @@
   ],
   "semantic_base_ref": {
     "id": "semantic-base:control-example",
-    "hash": "sha256:37c64594d76f781cfcba7346ef2e2f4ba707fe6fa38897bd3943638812525924"
+    "hash": "sha256:c012b8f869390414051a8c583f3032f32f7fa8be19cdf81364e2c39c32eafa2e"
   },
   "approved_control_hashes": {
-    "requirements.control.json": "sha256:578cd7159ea5cbd90ac04df4b45995ac2ef997ea61c966df7cd1bf51b463ea49",
-    "design.control.json": "sha256:595365630966ab41fd7b038261c03d45354d094a906ea2acdaa7a69853176789",
-    "goal.control.json": "sha256:755953d8fdfec5dedde1cbb55270d87751464678e20b8fdf69a6c59fc2135ccc",
-    "plan.control.json": "sha256:80e82674ffa95df7b9988bce23082e3062858b5964f29222e57e497aa6750ec6"
+    "requirements.control.json": "sha256:32bc8e78fb702486d9e269da6d438c40c862a5cb74b522a274fc025bd8d2ae30",
+    "design.control.json": "sha256:579e85ecd094d2d602510ff8d8eb57731173e878af4f452cc7d0ae48e81d2db9",
+    "goal.control.json": "sha256:80aeadd8ac285c832a6c3669ea772d4c2126f164af8b2af6dbdeb9792a52b160",
+    "plan.control.json": "sha256:ee61712488a91b273391ac6582287e6e4fba6ac0d3362b85b2fc7c7623370ef4"
   }
 }

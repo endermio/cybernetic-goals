@@ -49,6 +49,15 @@ def compile_runtime_control(run_dir: Path) -> Path:
         review = read_json_object(run_dir / "review.control.json")
 
         plan_bindings = plan.get("registry_bindings", {})
+        required_outcomes = plan.get("verifier", {}).get("required_outcomes")
+        if not required_outcomes:
+            required_outcomes = [
+                outcome.get("id")
+                for outcome in requirements.get("approved_control", {}).get("required_outcomes", [])
+                if isinstance(outcome, dict)
+                and isinstance(outcome.get("id"), str)
+                and outcome.get("blocks_goal_achieved_if_missing") is True
+            ]
         runtime = {
             "artifact_type": "runtime.control",
             "schema_version": goal.get("schema_version", "1"),
@@ -79,6 +88,7 @@ def compile_runtime_control(run_dir: Path) -> Path:
             "verifier": {
                 "required_before_goal_achieved": True,
                 "command": "python3 .agents/skills/using-control-json/scripts/verify_runtime_progress.py",
+                "required_outcomes": required_outcomes,
                 "output_schema": plan.get("verifier", {}).get("output_schema", "final-report.schema.json"),
             },
         }

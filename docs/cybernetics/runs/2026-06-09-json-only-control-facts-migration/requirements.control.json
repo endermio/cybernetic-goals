@@ -30,8 +30,36 @@
     },
     "semantic_base": {
       "id": "semantic-base:2026-06-09-json-only-control-facts-migration",
-      "hash": "sha256:f52ad0c4662baa1c6fb29758d3fe175132d28f8373cb48a45ce5e29fbc0087dd"
-    }
+      "hash": "sha256:5913363ce879217b09bd515dcc8c7863a43bc0a9886ca13c9eae4db837b22f0a"
+    },
+    "required_outcomes": [
+      {
+        "id": "O-json-only-control-facts",
+        "statement": "Official guard/compiler/runtime control facts are JSON-only.",
+        "blocks_goal_achieved_if_missing": true,
+        "required_evidence": [
+          "JSON guard passes",
+          "Markdown official input rejected",
+          "runtime verifier passes"
+        ],
+        "not_satisfied_by": [
+          "Markdown remains authoritative",
+          "JSON sidecars only"
+        ]
+      },
+      {
+        "id": "O-verifier-gated-completion",
+        "statement": "Runtime completion claims are gated by progress evidence and verifier permission.",
+        "blocks_goal_achieved_if_missing": true,
+        "required_evidence": [
+          "verify_runtime_progress permits goal_achieved true only with evidence"
+        ],
+        "not_satisfied_by": [
+          "runtime self-claims done",
+          "supporting-only progress"
+        ]
+      }
+    ]
   },
   "registry_bindings": {
     "answer_method_key": "implementation-spine",

@@ -38,6 +38,9 @@
       "transition": "JSON schemas exist for every official control file and runtime report/event type",
       "evidence": [
         "schemas/control-json/*.schema.json"
+      ],
+      "satisfies_outcomes": [
+        "O-json-only-control-facts"
       ]
     },
     {
@@ -45,6 +48,9 @@
       "transition": "using-control-json skill defines runtime JSON read/write and verifier discipline",
       "evidence": [
         ".agents/skills/using-control-json"
+      ],
+      "satisfies_outcomes": [
+        "O-json-only-control-facts"
       ]
     },
     {
@@ -53,6 +59,9 @@
       "evidence": [
         "control_chain_guard.py",
         "compile_runtime_goal.py"
+      ],
+      "satisfies_outcomes": [
+        "O-json-only-control-facts"
       ]
     },
     {
@@ -61,6 +70,9 @@
       "evidence": [
         "orchestration_guard.py",
         "predict_pregoal_handoff.py"
+      ],
+      "satisfies_outcomes": [
+        "O-json-only-control-facts"
       ]
     },
     {
@@ -68,6 +80,9 @@
       "transition": "runtime verifier checks progress JSONL, mainline evidence, final report, and verifier permission before achieved claims",
       "evidence": [
         "verify_runtime_progress.py"
+      ],
+      "satisfies_outcomes": [
+        "O-json-only-control-facts"
       ]
     },
     {
@@ -76,6 +91,9 @@
       "evidence": [
         "JSON example assets",
         "template hard-cut tests"
+      ],
+      "satisfies_outcomes": [
+        "O-json-only-control-facts"
       ]
     },
     {
@@ -83,6 +101,9 @@
       "transition": "old accident classes are represented as JSON regressions",
       "evidence": [
         "json_only_control_regression_inventory.json"
+      ],
+      "satisfies_outcomes": [
+        "O-verifier-gated-completion"
       ]
     },
     {
@@ -91,6 +112,9 @@
       "evidence": [
         "hot-path scan",
         "test_skill_hot_path_compression.py"
+      ],
+      "satisfies_outcomes": [
+        "O-json-only-control-facts"
       ]
     },
     {
@@ -98,6 +122,9 @@
       "transition": "actual JSON run directory validates through guard, runtime operation scripts, verifier, and compiler",
       "evidence": [
         "docs/cybernetics/runs/2026-06-09-json-only-control-facts-migration"
+      ],
+      "satisfies_outcomes": [
+        "O-json-only-control-facts"
       ]
     },
     {
@@ -105,6 +132,9 @@
       "transition": "full repository verification passes after the JSON-only migration",
       "evidence": [
         "full test suite"
+      ],
+      "satisfies_outcomes": [
+        "O-verifier-gated-completion"
       ]
     }
   ],
@@ -115,18 +145,22 @@
   "verifier": {
     "required_before_goal_achieved": true,
     "command": "python3 .agents/skills/using-control-json/scripts/verify_runtime_progress.py",
-    "output_schema": "final-report.schema.json"
+    "output_schema": "final-report.schema.json",
+    "required_outcomes": [
+      "O-json-only-control-facts",
+      "O-verifier-gated-completion"
+    ]
   },
   "semantic_base_ref": {
     "id": "semantic-base:2026-06-09-json-only-control-facts-migration",
-    "hash": "sha256:f52ad0c4662baa1c6fb29758d3fe175132d28f8373cb48a45ce5e29fbc0087dd"
+    "hash": "sha256:5913363ce879217b09bd515dcc8c7863a43bc0a9886ca13c9eae4db837b22f0a"
   },
   "approved_control_hashes": {
-    "requirements.control.json": "sha256:b6e0a1f59390b9ec5b277d89168faae33b08fa05a1536c6150675715399e7ab6",
-    "design.control.json": "sha256:5d5367a0b3dcd864d2e8922d62b594100bfd8f3e6c98d2e1f73ed9105559841c",
-    "goal.control.json": "sha256:af94432c098c021bda4d811ec43442e173211bc844cd18dd80490c471d03f984",
-    "plan.control.json": "sha256:4b6d08bfcc97bf62cc3b1400c3a76d012f2a8231bd9da22251978a30cf634deb",
-    "review.control.json": "sha256:bf6771b188d4f4b03dfdfddfbe26eddde1a844aeae7b6bc0aadff1eb6eb37347",
-    "runtime.control.json": "sha256:0346d850f632b267c9e3e94b4a85568f923081c20077561d7bdb7d9feb7d4827"
+    "requirements.control.json": "sha256:aa87476c2f5c5dd31e834d0a5e8828b0abe695d2b50cf4a08f4294027ef44566",
+    "design.control.json": "sha256:a3f5daa6d9afdc0144f4f876317c29668bc28354f312f45a3b0d23d810d48de3",
+    "goal.control.json": "sha256:35642633514262682b2263c99c5114cb9ce66dbe8a556a515cdd299705564f6e",
+    "plan.control.json": "sha256:b40612dca7069ee6708428b4dc12a92decfa70f825fe82cbd4e6a0a8fc20c66b",
+    "review.control.json": "sha256:4b5860c3dde853bfc859259f8d21b74b481790a7e398a98cb31ad2f74bfd1fef",
+    "runtime.control.json": "sha256:51c87db9af649d8279bf03f8693189008566828ff3c41a4f92ef722a6a3c6d12"
   }
 }

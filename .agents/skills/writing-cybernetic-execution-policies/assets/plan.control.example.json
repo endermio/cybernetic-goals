@@ -22,6 +22,9 @@
       "transition": "official Markdown template surface is deauthorized",
       "evidence": [
         "tests.skills.test_json_control_template_hard_cut"
+      ],
+      "satisfies_outcomes": [
+        "O-json-control-example"
       ]
     }
   ],
@@ -68,10 +71,13 @@
   },
   "verifier": {
     "required_before_goal_achieved": true,
-    "output_schema": "final-report.schema.json"
+    "output_schema": "final-report.schema.json",
+    "required_outcomes": [
+      "O-json-control-example"
+    ]
   },
   "semantic_base_ref": {
     "id": "semantic-base:control-example",
-    "hash": "sha256:37c64594d76f781cfcba7346ef2e2f4ba707fe6fa38897bd3943638812525924"
+    "hash": "sha256:c012b8f869390414051a8c583f3032f32f7fa8be19cdf81364e2c39c32eafa2e"
   }
 }

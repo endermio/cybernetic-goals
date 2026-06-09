@@ -144,6 +144,7 @@ SCHEMA_FIXTURES = {
         },
         "verifier": {
             "required_before_goal_achieved": True,
+            "required_outcomes": ["outcome.schema-validation"],
             "output_schema": "final-report.schema.json",
         },
     },
@@ -495,10 +496,12 @@ class ControlJsonSchemaTest(unittest.TestCase):
                 self.assertIn("satisfies_outcomes", step_schema["required"])
                 self.assertIn("satisfies_outcomes", step_schema["properties"])
 
+        plan = load_json(SCHEMA_DIR / "plan.control.schema.json")
         runtime = load_json(SCHEMA_DIR / "runtime.control.schema.json")
-        verifier = runtime["properties"]["verifier"]
-        self.assertIn("required_outcomes", verifier["required"])
-        self.assertIn("required_outcomes", verifier["properties"])
+        for schema in (plan, runtime):
+            verifier = schema["properties"]["verifier"]
+            self.assertIn("required_outcomes", verifier["required"])
+            self.assertIn("required_outcomes", verifier["properties"])
 
 
 if __name__ == "__main__":

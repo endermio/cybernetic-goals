@@ -31,8 +31,21 @@
     },
     "semantic_base": {
       "id": "semantic-base:control-example",
-      "hash": "sha256:37c64594d76f781cfcba7346ef2e2f4ba707fe6fa38897bd3943638812525924"
-    }
+      "hash": "sha256:c012b8f869390414051a8c583f3032f32f7fa8be19cdf81364e2c39c32eafa2e"
+    },
+    "required_outcomes": [
+      {
+        "id": "O-json-control-example",
+        "statement": "Example control chain demonstrates JSON-only control facts.",
+        "blocks_goal_achieved_if_missing": true,
+        "required_evidence": [
+          "example guard passes"
+        ],
+        "not_satisfied_by": [
+          "Markdown template authority"
+        ]
+      }
+    ]
   },
   "registry_bindings": {
     "answer_method_key": "implementation-spine",

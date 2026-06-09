@@ -29,6 +29,9 @@
       "evidence": [
         "schemas/control-json/*.schema.json",
         "tests/skills/test_control_json_schemas.py"
+      ],
+      "satisfies_outcomes": [
+        "O-json-only-control-facts"
       ]
     },
     {
@@ -37,6 +40,9 @@
       "evidence": [
         ".agents/skills/using-control-json/SKILL.md",
         "tests/skills/test_using_control_json_protocol.py"
+      ],
+      "satisfies_outcomes": [
+        "O-json-only-control-facts"
       ]
     },
     {
@@ -46,6 +52,9 @@
         ".agents/skills/compiling-cybernetic-runtime-goals/scripts/control_chain_guard.py",
         ".agents/skills/compiling-cybernetic-runtime-goals/scripts/compile_runtime_goal.py",
         "tests/skills/test_json_official_guard_compiler_path.py"
+      ],
+      "satisfies_outcomes": [
+        "O-json-only-control-facts"
       ]
     },
     {
@@ -54,6 +63,9 @@
       "evidence": [
         ".agents/skills/orchestrating-cybernetic-pregoal/scripts/orchestration_guard.py",
         ".agents/skills/analyzing-cybernetic-requirements/scripts/predict_pregoal_handoff.py"
+      ],
+      "satisfies_outcomes": [
+        "O-json-only-control-facts"
       ]
     },
     {
@@ -62,6 +74,9 @@
       "evidence": [
         ".agents/skills/using-control-json/scripts/verify_runtime_progress.py",
         "tests/skills/test_runtime_json_progress_verifier.py"
+      ],
+      "satisfies_outcomes": [
+        "O-json-only-control-facts"
       ]
     },
     {
@@ -70,6 +85,9 @@
       "evidence": [
         "tests/skills/test_json_control_template_hard_cut.py",
         ".agents/skills/*/assets/*.control.example.json"
+      ],
+      "satisfies_outcomes": [
+        "O-json-only-control-facts"
       ]
     },
     {
@@ -78,6 +96,9 @@
       "evidence": [
         "tests/fixtures/cybernetics/json_only_control_regression_inventory.json",
         "tests/skills/test_json_control_regression_inventory.py"
+      ],
+      "satisfies_outcomes": [
+        "O-verifier-gated-completion"
       ]
     },
     {
@@ -86,6 +107,9 @@
       "evidence": [
         "tests/skills/test_skill_hot_path_compression.py",
         "rg hot-path scan"
+      ],
+      "satisfies_outcomes": [
+        "O-json-only-control-facts"
       ]
     },
     {
@@ -96,6 +120,9 @@
         "validate_control_chain pass",
         "verify_runtime_progress pass",
         "compile_runtime_goal pass"
+      ],
+      "satisfies_outcomes": [
+        "O-json-only-control-facts"
       ]
     },
     {
@@ -105,11 +132,14 @@
         "python3 -m unittest discover -s tests",
         "python3 -m py_compile",
         "git diff --check"
+      ],
+      "satisfies_outcomes": [
+        "O-verifier-gated-completion"
       ]
     }
   ],
   "semantic_base_ref": {
     "id": "semantic-base:2026-06-09-json-only-control-facts-migration",
-    "hash": "sha256:f52ad0c4662baa1c6fb29758d3fe175132d28f8373cb48a45ce5e29fbc0087dd"
+    "hash": "sha256:5913363ce879217b09bd515dcc8c7863a43bc0a9886ca13c9eae4db837b22f0a"
   }
 }

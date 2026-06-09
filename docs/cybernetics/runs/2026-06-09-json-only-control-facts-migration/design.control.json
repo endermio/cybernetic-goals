@@ -31,6 +31,9 @@
       "evidence": [
         "JSON-only guard/compiler/predictor scripts",
         "tests rejecting legacy Markdown official input"
+      ],
+      "satisfies_outcomes": [
+        "O-json-only-control-facts"
       ]
     },
     {
@@ -40,11 +43,14 @@
         "validate_control_chain pass",
         "verify_runtime_progress pass",
         "full unittest pass"
+      ],
+      "satisfies_outcomes": [
+        "O-verifier-gated-completion"
       ]
     }
   ],
   "semantic_base_ref": {
     "id": "semantic-base:2026-06-09-json-only-control-facts-migration",
-    "hash": "sha256:f52ad0c4662baa1c6fb29758d3fe175132d28f8373cb48a45ce5e29fbc0087dd"
+    "hash": "sha256:5913363ce879217b09bd515dcc8c7863a43bc0a9886ca13c9eae4db837b22f0a"
   }
 }

@@ -127,9 +127,9 @@ Independent reviewers must check that downstream artifacts preserve the
 approved intent and required obligations, not only that they mention similar
 terms. Flag `NeedsRevision` when a required outcome is downgraded into:
 
-- readiness instead of implementation or delivery;
+- readiness while implementation or delivery is the approved obligation;
 - future work, roadmap, handoff, or later-goal language;
-- allowed or permitted action instead of the action being covered by the plan;
+- allowed or permitted action when the action must be covered by the plan;
 - compatibility-only behavior when the approved obligation requires a new or
   changed behavior.
 
@@ -344,7 +344,7 @@ Flag as Major or Blocking when:
 Flag as Major or Blocking when:
 
 - approved full work covered in this run is silently reduced to the first safe segment;
-- what the agent may do limits are used as scope removal instead of execute / prepare-only / observe-only / forbidden-not-executed handling;
+- what the agent may do limits are used as scope removal, bypassing execute / prepare-only / observe-only / forbidden-not-executed handling;
 - unauthorized live or irreversible actions are moved to future roadmap, handoff, or later goal while still inside the approved work covered in this run;
 - approved work covered in this run items lack coverage in the execution policy;
 - prepare-only or forbidden-not-executed work is claimed as executed or live complete;
@@ -422,7 +422,7 @@ Placement status. Do not claim intended-result realization from local action alo
 when Where The Result Must Show Up is required. Strongest positive
 result claims require result-placement adequate.
 
-Runtime what-counts-as-done claims must be calibrated to the what counts as done. not done report may stop execution honestly, but they do not support `goal achieved: yes`.
+Runtime what-counts-as-done claims must be calibrated to the what counts as done. not done report may stop execution honestly. They do not support `goal achieved: yes`.
 
 ### 21. Review Independence
 

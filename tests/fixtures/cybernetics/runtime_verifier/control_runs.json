@@ -30,8 +30,32 @@
           },
           "semantic_base": {
             "id": "semantic-base:runtime-verifier-fixture",
-            "hash": "sha256:17541255a20b0120b4b205dd39f21e0bd4cb08fdb41ea381143e9ead45853bf1"
-          }
+            "hash": "sha256:b7ec41ffca3c10e047b0cc9a3e66c3c4d5fc31ecd4e762484ea520e1b0f674e8"
+          },
+          "required_outcomes": [
+            {
+              "id": "O-runtime-progress",
+              "statement": "Runtime writes evidence-backed mainline progress before completion.",
+              "blocks_goal_achieved_if_missing": true,
+              "required_evidence": [
+                "S7 progress event"
+              ],
+              "not_satisfied_by": [
+                "supporting-only progress"
+              ]
+            },
+            {
+              "id": "O-json-regressions",
+              "statement": "JSON regressions are represented and completed before claim done.",
+              "blocks_goal_achieved_if_missing": true,
+              "required_evidence": [
+                "S9 progress event"
+              ],
+              "not_satisfied_by": [
+                "old Markdown-only regression"
+              ]
+            }
+          ]
         },
         "registry_bindings": {
           "answer_method_key": "implementation-spine",
@@ -67,6 +91,9 @@
             "transition": "runtime writes progress events only",
             "evidence": [
               "progress JSONL append evidence"
+            ],
+            "satisfies_outcomes": [
+              "O-runtime-progress"
             ]
           },
           {
@@ -74,12 +101,15 @@
             "transition": "old accident regressions are represented in JSON",
             "evidence": [
               "runtime verifier regression tests"
+            ],
+            "satisfies_outcomes": [
+              "O-json-regressions"
             ]
           }
         ],
         "semantic_base_ref": {
           "id": "semantic-base:runtime-verifier-fixture",
-          "hash": "sha256:17541255a20b0120b4b205dd39f21e0bd4cb08fdb41ea381143e9ead45853bf1"
+          "hash": "sha256:b7ec41ffca3c10e047b0cc9a3e66c3c4d5fc31ecd4e762484ea520e1b0f674e8"
         }
       },
       "goal.control.json": {
@@ -110,6 +140,9 @@
             "transition": "runtime progress and verifier implemented",
             "evidence": [
               "progress/verifier tests"
+            ],
+            "satisfies_outcomes": [
+              "O-runtime-progress"
             ]
           },
           {
@@ -117,12 +150,15 @@
             "transition": "old accident JSON regressions pass",
             "evidence": [
               "regression fixtures"
+            ],
+            "satisfies_outcomes": [
+              "O-json-regressions"
             ]
           }
         ],
         "semantic_base_ref": {
           "id": "semantic-base:runtime-verifier-fixture",
-          "hash": "sha256:17541255a20b0120b4b205dd39f21e0bd4cb08fdb41ea381143e9ead45853bf1"
+          "hash": "sha256:b7ec41ffca3c10e047b0cc9a3e66c3c4d5fc31ecd4e762484ea520e1b0f674e8"
         }
       },
       "plan.control.json": {
@@ -145,6 +181,9 @@
             "transition": "runtime progress and verifier implemented",
             "evidence": [
               "runtime verifier tests"
+            ],
+            "satisfies_outcomes": [
+              "O-runtime-progress"
             ]
           },
           {
@@ -152,6 +191,9 @@
             "transition": "old accident regressions ported to JSON",
             "evidence": [
               "JSON regression tests"
+            ],
+            "satisfies_outcomes": [
+              "O-json-regressions"
             ]
           }
         ],
@@ -198,11 +240,15 @@
         },
         "verifier": {
           "required_before_goal_achieved": true,
-          "output_schema": "final-report.schema.json"
+          "output_schema": "final-report.schema.json",
+          "required_outcomes": [
+            "O-json-regressions",
+            "O-runtime-progress"
+          ]
         },
         "semantic_base_ref": {
           "id": "semantic-base:runtime-verifier-fixture",
-          "hash": "sha256:17541255a20b0120b4b205dd39f21e0bd4cb08fdb41ea381143e9ead45853bf1"
+          "hash": "sha256:b7ec41ffca3c10e047b0cc9a3e66c3c4d5fc31ecd4e762484ea520e1b0f674e8"
         }
       },
       "review.control.json": {
@@ -258,13 +304,13 @@
         ],
         "semantic_base_ref": {
           "id": "semantic-base:runtime-verifier-fixture",
-          "hash": "sha256:17541255a20b0120b4b205dd39f21e0bd4cb08fdb41ea381143e9ead45853bf1"
+          "hash": "sha256:b7ec41ffca3c10e047b0cc9a3e66c3c4d5fc31ecd4e762484ea520e1b0f674e8"
         },
         "approved_control_hashes": {
-          "requirements.control.json": "sha256:72ca92cd182b80576f8bb7b12c4319e099f9c8e73dd4e60d6d902351290f8d80",
-          "design.control.json": "sha256:ba5a4b958bc8a6c95df0e14eec02357cebd57053f66cedd05c955a5c45ca3976",
-          "goal.control.json": "sha256:0405f70dcf5aa5582ff1b11d47c97c4123c084077db1f6cae304129a9a18175e",
-          "plan.control.json": "sha256:3b58d9bb52e056874f5051f95237ca32dbdeae7a056ef5c202b9f7f7006e1805"
+          "requirements.control.json": "sha256:bcb92d0ea72b6ade58725e228e7c4455bf3fc9700845f1bce80e39e5164440a9",
+          "design.control.json": "sha256:ccff7b571653609550e19126823bf300bb039734c5553e50eb284ad56c210061",
+          "goal.control.json": "sha256:a907fb6c552a045ccb143049a4c7735a0aaf0d50e4034fd13649c0084cab7df8",
+          "plan.control.json": "sha256:da3a66440891a04676958c45209dbac5419963cba4005a3caeed17ea3a7310c3"
         }
       },
       "runtime.control.json": {
@@ -307,6 +353,9 @@
             "transition": "runtime writes progress events only",
             "evidence": [
               "progress event validation"
+            ],
+            "satisfies_outcomes": [
+              "O-runtime-progress"
             ]
           },
           {
@@ -314,6 +363,9 @@
             "transition": "old accident regressions rewritten for JSON",
             "evidence": [
               "verifier regression tests"
+            ],
+            "satisfies_outcomes": [
+              "O-json-regressions"
             ]
           }
         ],
@@ -324,19 +376,23 @@
         "verifier": {
           "required_before_goal_achieved": true,
           "command": "python3 .agents/skills/using-control-json/scripts/verify_runtime_progress.py",
-          "output_schema": "final-report.schema.json"
+          "output_schema": "final-report.schema.json",
+          "required_outcomes": [
+            "O-json-regressions",
+            "O-runtime-progress"
+          ]
         },
         "semantic_base_ref": {
           "id": "semantic-base:runtime-verifier-fixture",
-          "hash": "sha256:17541255a20b0120b4b205dd39f21e0bd4cb08fdb41ea381143e9ead45853bf1"
+          "hash": "sha256:b7ec41ffca3c10e047b0cc9a3e66c3c4d5fc31ecd4e762484ea520e1b0f674e8"
         },
         "approved_control_hashes": {
-          "requirements.control.json": "sha256:72ca92cd182b80576f8bb7b12c4319e099f9c8e73dd4e60d6d902351290f8d80",
-          "design.control.json": "sha256:ba5a4b958bc8a6c95df0e14eec02357cebd57053f66cedd05c955a5c45ca3976",
-          "goal.control.json": "sha256:0405f70dcf5aa5582ff1b11d47c97c4123c084077db1f6cae304129a9a18175e",
-          "plan.control.json": "sha256:3b58d9bb52e056874f5051f95237ca32dbdeae7a056ef5c202b9f7f7006e1805",
-          "review.control.json": "sha256:9747a85c1744efbbed4115e63c7e488d534ec753ebc30e7d19ba26073d5ea39a",
-          "runtime.control.json": "sha256:58c934282d1fb2015ce21691d48fdd111e8a9e9ebdfe091f89e8b7020a348fa6"
+          "requirements.control.json": "sha256:bcb92d0ea72b6ade58725e228e7c4455bf3fc9700845f1bce80e39e5164440a9",
+          "design.control.json": "sha256:ccff7b571653609550e19126823bf300bb039734c5553e50eb284ad56c210061",
+          "goal.control.json": "sha256:a907fb6c552a045ccb143049a4c7735a0aaf0d50e4034fd13649c0084cab7df8",
+          "plan.control.json": "sha256:da3a66440891a04676958c45209dbac5419963cba4005a3caeed17ea3a7310c3",
+          "review.control.json": "sha256:d7198ec5bc951ed7389eceebc35ffeb251fd521c4be04e3ac5334009963dd6c3",
+          "runtime.control.json": "sha256:5e176888358e808fd8522e38e99db2c55098f450c19971462ae8e1209cbd5e74"
         }
       }
     },

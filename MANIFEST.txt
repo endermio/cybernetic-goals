@@ -124,5 +124,6 @@ tests/skills/test_json_control_regression_inventory.py
 tests/skills/test_json_control_template_hard_cut.py
 tests/skills/test_json_official_guard_compiler_path.py
 tests/skills/test_runtime_json_progress_verifier.py
+tests/skills/test_semantic_review_needs_revision.py
 tests/skills/test_skill_repository_integrity.py
 tests/skills/test_using_control_json_protocol.py

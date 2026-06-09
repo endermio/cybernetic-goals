@@ -26,11 +26,14 @@
       "transition": "new control authoring guidance points to run-directory JSON files",
       "evidence": [
         "JSON example files under skill assets"
+      ],
+      "satisfies_outcomes": [
+        "O-json-control-example"
       ]
     }
   ],
   "semantic_base_ref": {
     "id": "semantic-base:control-example",
-    "hash": "sha256:37c64594d76f781cfcba7346ef2e2f4ba707fe6fa38897bd3943638812525924"
+    "hash": "sha256:c012b8f869390414051a8c583f3032f32f7fa8be19cdf81364e2c39c32eafa2e"
   }
 }

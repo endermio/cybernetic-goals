@@ -22,6 +22,9 @@
       "transition": "JSON schemas exist for every official control file and runtime report/event type",
       "evidence": [
         "schema tests"
+      ],
+      "satisfies_outcomes": [
+        "O-json-only-control-facts"
       ]
     },
     {
@@ -29,6 +32,9 @@
       "transition": "using-control-json skill defines runtime JSON read/write and verifier discipline",
       "evidence": [
         "skill protocol tests"
+      ],
+      "satisfies_outcomes": [
+        "O-json-only-control-facts"
       ]
     },
     {
@@ -36,6 +42,9 @@
       "transition": "guard and compiler use JSON run directory as official input and reject Markdown official inputs",
       "evidence": [
         "guard/compiler tests"
+      ],
+      "satisfies_outcomes": [
+        "O-json-only-control-facts"
       ]
     },
     {
@@ -43,6 +52,9 @@
       "transition": "orchestration and handoff prediction point to runtime.control.json, not runtime Markdown",
       "evidence": [
         "orchestration/predictor tests"
+      ],
+      "satisfies_outcomes": [
+        "O-json-only-control-facts"
       ]
     },
     {
@@ -50,6 +62,9 @@
       "transition": "runtime verifier checks progress JSONL, mainline evidence, final report, and verifier permission before achieved claims",
       "evidence": [
         "runtime verifier tests"
+      ],
+      "satisfies_outcomes": [
+        "O-json-only-control-facts"
       ]
     },
     {
@@ -57,6 +72,9 @@
       "transition": "Markdown control templates are deauthorized as official control facts and replaced by JSON examples",
       "evidence": [
         "template hard-cut tests"
+      ],
+      "satisfies_outcomes": [
+        "O-json-only-control-facts"
       ]
     },
     {
@@ -64,6 +82,9 @@
       "transition": "old accident classes are represented as JSON regressions",
       "evidence": [
         "regression inventory tests"
+      ],
+      "satisfies_outcomes": [
+        "O-verifier-gated-completion"
       ]
     },
     {
@@ -71,6 +92,9 @@
       "transition": "hot-path docs and skill instructions no longer teach old runtime goal files as official control input",
       "evidence": [
         "hot-path scan and tests"
+      ],
+      "satisfies_outcomes": [
+        "O-json-only-control-facts"
       ]
     },
     {
@@ -78,6 +102,9 @@
       "transition": "actual JSON run directory validates through guard, runtime operation scripts, verifier, and compiler",
       "evidence": [
         "run directory validation"
+      ],
+      "satisfies_outcomes": [
+        "O-json-only-control-facts"
       ]
     },
     {
@@ -85,6 +112,9 @@
       "transition": "full repository verification passes after the JSON-only migration",
       "evidence": [
         "full tests"
+      ],
+      "satisfies_outcomes": [
+        "O-verifier-gated-completion"
       ]
     }
   ],
@@ -206,10 +236,14 @@
   },
   "verifier": {
     "required_before_goal_achieved": true,
-    "output_schema": "final-report.schema.json"
+    "output_schema": "final-report.schema.json",
+    "required_outcomes": [
+      "O-json-only-control-facts",
+      "O-verifier-gated-completion"
+    ]
   },
   "semantic_base_ref": {
     "id": "semantic-base:2026-06-09-json-only-control-facts-migration",
-    "hash": "sha256:f52ad0c4662baa1c6fb29758d3fe175132d28f8373cb48a45ce5e29fbc0087dd"
+    "hash": "sha256:5913363ce879217b09bd515dcc8c7863a43bc0a9886ca13c9eae4db837b22f0a"
   }
 }
