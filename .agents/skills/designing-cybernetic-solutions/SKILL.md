@@ -126,33 +126,22 @@ If the output requires a table, matrix, schema, evidence index, structured repor
 
 Do not leave runtime execution to invent the final output shape. Do not define output shape in the response-only handoff; put the design-owned structure in the design artifact.
 
-## Answer Method Check
+## Required Answer Path Check
 
 Design must be required answer path first. The first design-owned product is the required answer path instance; support objects, mechanisms, relationships, flows, and evidence model are derived from that answer path.
 
-For Level 3/4 or full pre-goal work, the design must preserve the approved answering method from What the User Approved.
+For Level 3/4 or full pre-goal work, the design must preserve the approved way the task should be answered from What the User Approved.
 
-When What the User Approved records `How this should be answered` or `What is not enough`, the design must include `## Answer Method Check` and record:
+When What the User Approved records `How this should be answered` or `What is not enough`, the design must include `## Required Answer Path Check` and record:
 
-- approved answering method;
+- approved way this should be answered;
 - instantiated answer path;
 - required steps coverage;
 - whether the what is not enough was avoided.
 
-The design must not replace the approved answering method with a weaker answer path because it is easier to execute or verify. If the approved answer method is insufficient, infeasible, or unsuitable, stop and return to `$analyzing-cybernetic-requirements` for What the User Approved revision instead of substituting another answer path.
+The design must not replace the approved answer path with a weaker answer because it is easier to execute or verify. If the approved way this should be answered is insufficient, infeasible, or unsuitable, stop and return to `$analyzing-cybernetic-requirements` for What the User Approved revision instead of substituting another answer path.
 
-Use `.agents/skills/references/answer-method-registry.json` internally for required-step sets, forbidden substitutions, minimum evidence, and review red flags. Do not expose the internal registry label in the user-visible design. If the approved answer method is missing from the registry, record the gap and return to requirements approval or design-maintenance work rather than inventing an unreviewed family.
-
-For the full workflow ceiling measurement entry in the internal answer-method registry, the design must instantiate a coverage answer path with these mandatory nodes:
-
-- full workflow scope inventory;
-- major removable source / bottleneck inventory;
-- ceiling coverage criterion;
-- candidate coverage matrix;
-- same-workload full workflow run;
-- interpretation against coverage matrix.
-
-Do not substitute a weaker full-workflow run-validation answer path for the approved full workflow ceiling measurement method.
+Do not use predefined task categories or internal method registries to fill in the required answer path. Derive required steps only from the approved user meaning, explicit not-enough answers, domain facts already in source material, and design reasoning recorded in this artifact.
 
 ## Required Sections
 
@@ -163,7 +152,7 @@ The design artifact must include:
 3. Human Purpose
 4. Confirmed Meaning
 5. Design Workflow
-6. Answer Method Check, when What the User Approved records an answering method or what is not enough
+6. Required Answer Path Check, when What the User Approved records how this should be answered or what is not enough
 7. Required Answer Path
 8. What Supports Each Required Step
 9. Design Details Tied To Required Steps
@@ -193,7 +182,7 @@ Open design questions that affect requirement meaning, controlled relationships,
 4. Inspect the routing context from the user request, router output, and requirements checks.
 5. Inspect only enough context to avoid generic design.
 6. Identify whether `$superpowers:brainstorming` is required, used, blocked, or not required.
-7. If What the User Approved records an answering method or what is not enough, instantiate that answer path and record Answer Method Check before deriving any model.
+7. If What the User Approved records how this should be answered or what is not enough, instantiate that answer path and record Required Answer Path Check before deriving any model.
 8. Build the target answer path instance: answer path nodes, answer/state transitions, required evidence, and completion conditions.
 9. Derive the what supports each required step from answer path nodes: support objects, mechanisms, relationships, flows, inside/outside choices, alternatives, and rules that cannot change.
 10. Write design details only as required-step mappings: mechanisms, interfaces/contracts, state/lifecycle, failure model, evidence/evidence check model, compatibility/integration, and decisions must each name the required step they support or be marked supporting-only.
@@ -267,7 +256,7 @@ Do not write goal control JSON until this design decision is resolved or the hum
 
 - [ ] Requirements analysis is complete before design is approved.
 - [ ] For Level 3/4 or full pre-goal work, What the User Approved is Approved before design starts.
-- [ ] If What the User Approved records How this should be answered, What is not enough, or Answer method, the design includes Answer Method Check and does not substitute a weaker answer path.
+- [ ] If What the User Approved records How this should be answered or What is not enough, the design includes Required Answer Path Check and does not substitute a weaker answer path.
 - [ ] The design path uses the requirements analysis date/slug.
 - [ ] The design stays within core cybernetic vocabulary unless an explicit adapter supplies additional terms.
 - [ ] Required answer path instance appears before what supports each required step.

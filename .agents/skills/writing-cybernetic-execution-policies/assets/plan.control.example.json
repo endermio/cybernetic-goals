@@ -13,8 +13,7 @@
   },
   "registry_bindings": {
     "selected_agent_workflow": "superpowers-dispatching-parallel-agents",
-    "allowed_work_assignment": "Parallel subagent-driven",
-    "answer_method_key": "implementation-spine"
+    "allowed_work_assignment": "Parallel subagent-driven"
   },
   "required_steps": [
     {

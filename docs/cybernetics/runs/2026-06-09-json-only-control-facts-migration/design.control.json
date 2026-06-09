@@ -3,8 +3,7 @@
   "schema_version": "1.0.0",
   "status": "approved",
   "source_contracts": {
-    "requirements": "requirements.control.json",
-    "requirements_registry_sidecar": "requirements.control.json"
+    "requirements": "requirements.control.json"
   },
   "approved_control": {
     "confirmed_meaning": "Chat confirms the target; JSON files are the only official control facts; registries provide internal method and workflow keys; guards validate JSON schema plus registry consistency; runtime uses using-control-json and writes only progress/status/report files; verifier decides whether completion can be claimed.",
@@ -19,10 +18,6 @@
       "JSON sidecars while Markdown remains authoritative",
       "runtime self-claiming done without verifier permission"
     ]
-  },
-  "registry_bindings": {
-    "answer_method_key": "implementation-spine",
-    "forbidden_substitute_key": "component-inventory-completion"
   },
   "required_steps": [
     {
@@ -51,6 +46,6 @@
   ],
   "semantic_base_ref": {
     "id": "semantic-base:2026-06-09-json-only-control-facts-migration",
-    "hash": "sha256:4e6ebe13645228a178988fd4f5b203e539d5f8e15945b77e1c5d67b1cf5ca83d"
+    "hash": "sha256:66e988b1542bfcf7ddc1869d9f8e0c5886ab4e55c1d866d7c6dd792dd712c0da"
   }
 }

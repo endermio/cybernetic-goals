@@ -55,10 +55,6 @@ def main() -> int:
         return blocked(f"requirements control JSON has wrong artifact_type: {requirements.get('artifact_type')!r}")
     if requirements.get("status") != "approved":
         return blocked(f"requirements control JSON status is not approved: {requirements.get('status')!r}")
-    bindings = requirements.get("registry_bindings", {})
-    if not isinstance(bindings, dict) or not bindings.get("answer_method_key"):
-        return blocked("requirements.control.json missing registry_bindings.answer_method_key")
-
     run_dir = requirements_path.parent
     runtime_control = run_dir / "runtime.control.json"
     print("Response-only queue suggestions:")

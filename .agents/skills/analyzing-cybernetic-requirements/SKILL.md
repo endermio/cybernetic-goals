@@ -43,9 +43,8 @@ Owned analysis:
 - identify where the result must show up when intended result must be realized across a controlled object: intended result, required result places, required action, old behavior check, and result-placement status;
 - identify the work covered and allowed actions limit for full-route or multi-batch work: work covered in this run, what the agent may do, forbidden actions, unauthorized-action handling, and explicitly out-of-scope items;
 - identify the path that makes the result true for implementation work: one actor-centered path from initial state to the what counts as done;
-- identify the approved answering method for tasks where merely running a plausible path would not answer the question, including what is not enough;
+- identify how this should be answered for tasks where merely running a plausible path would not answer the question, including what is not enough;
 - prepare the What the User Approved compact control commitment for Level 3/4 or full pre-goal work: Human purpose, Input role binding, Primary object, Requested transformation, Non-goals, how we know the user's purpose was met, where the result must show up, What counts as done, Evidence needed to call it done, If it is not done, what should be reported, Required answer path, How this should be answered, What is not enough, Work covered in this run, What the agent may do, Forbidden live / irreversible actions, Required handling for unauthorized actions, Explicitly out-of-scope items, Agent delegation preference, Agent workflow preference, Parallel execution authority, Maximum parallel agents, Final answer format, Why this process is needed, and Known assumptions;
-- when How this should be answered or What is not enough maps to an internal answer-method registry entry, record the internal keys needed by guards in `requirements.control.json`; do not expose internal registry labels in chat;
 - identify constraints, rules that cannot change, assumptions, and stop conditions;
 - decide whether Meaning, Rubric, Output Contract, Design, Goal, Execution Plan, Review, or Risk checks are required;
 - ask high-value human questions;
@@ -73,7 +72,7 @@ Execution complexity may be recorded as execution risk, planning concern, eviden
 
 Ask the human a question only if all are true:
 
-1. The answer materially changes any What the User Approved compact control commitment field, including how we know the user's purpose was met, beneficiary/observer, sufficient evidence level, feedback-unavailable handling, where the result must show up, intended result, required result places, required action, old behavior check, preserved/excluded places, what counts as done, required answer path, answering method, what is not enough, work covered in this run, what the agent may do, forbidden actions, unauthorized-action handling, explicit out-of-scope items, runtime delegation preference, agent workflow preference, parallel execution authority, or maximum parallel agents; or changes requirement meaning, evaluation rubric, output contract, visibility limit, authorization model, external contract meaning, observer-visible behavior, downstream consumption, acceptance condition, or control limits.
+1. The answer materially changes any What the User Approved compact control commitment field, including how we know the user's purpose was met, beneficiary/observer, sufficient evidence level, feedback-unavailable handling, where the result must show up, intended result, required result places, required action, old behavior check, preserved/excluded places, what counts as done, required answer path, how this should be answered, what is not enough, work covered in this run, what the agent may do, forbidden actions, unauthorized-action handling, explicit out-of-scope items, runtime delegation preference, agent workflow preference, parallel execution authority, or maximum parallel agents; or changes requirement meaning, evaluation rubric, output contract, visibility limit, authorization model, external contract meaning, observer-visible behavior, downstream consumption, acceptance condition, or control limits.
 2. There are at least two plausible business choices.
 3. The correct answer cannot be safely inferred from the user request, existing source artifacts, or common requirement conventions.
 4. A wrong default would be costly to reverse or would cause serious misalignment.
@@ -274,7 +273,7 @@ For Level 3/4 or full pre-goal work, pass design check to `$orchestrating-cybern
 7. Identify where the result must show up when intended-result realization spans places.
 8. Identify output-contract needs and whether a safe default is sufficient.
 9. For Level 3/4 or full pre-goal work, build or update the What the User Approved compact control commitment.
-10. If the commitment includes How this should be answered or What is not enough, map the plain-language commitment to the internal answer-method registry and record the machine keys in `requirements.control.json`.
+10. If the commitment includes How this should be answered or What is not enough, record the plain-language requirement in `requirements.control.json` and leave execution-shape synthesis to design; do not map it to a predefined internal category.
 11. Identify required checks: Meaning, Rubric, Output Contract, Design, Goal, Execution Plan, Review, Risk.
 12. Classify uncertainty as blocking human decision, safe default assumption, or deferred design/planning/execution detail.
 13. Ask 3-7 high-value questions, preferably no more than 5.
@@ -307,7 +306,7 @@ python3 .agents/skills/analyzing-cybernetic-requirements/scripts/predict_pregoal
   --run-dir docs/cybernetics/runs/YYYY-MM-DD-<slug>
 ```
 
-Use the script output instead of hand-writing predicted runtime commands when the script supports JSON run directories. The script checks `Requirements Analysis Status: Complete`, `What the User Approved: Approved`, required answer-method data, deterministic path shape, design check, and same-slug control paths.
+Use the script output instead of hand-writing predicted runtime commands when the script supports JSON run directories. The script checks `Requirements Analysis Status: Complete`, `What the User Approved: Approved`, required answer-path data, deterministic path shape, design check, and same-slug control paths.
 
 If `design check: required`, still output the predicted runtime contract path and pointer-only `/goal` shape. State that `$orchestrating-cybernetic-pregoal` must invoke or request `$designing-cybernetic-solutions` before goal writing, and make the predicted downstream artifact paths include the expected solution design path. design check dispatch note must not replace the predicted pointer-only `/goal`. Do not output `$designing-cybernetic-solutions` as a standalone command before orchestration for Level 3/4 or full pre-goal work.
 
@@ -424,7 +423,7 @@ For Level 1/2 work with `rubric check: required`, summarize the confirmed rubric
 - [ ] There are no more than 7 questions.
 - [ ] The brief includes `Requirements Analysis Status`.
 - [ ] Level 3/4 or full pre-goal work includes `What the User Approved`.
-- [ ] If How this should be answered or What is not enough is recorded, `requirements.control.json` carries the required internal answer-method keys; chat does not expose those keys.
+- [ ] If How this should be answered or What is not enough is recorded, `requirements.control.json` records the plain-language requirement without internal classification keys.
 - [ ] Human answers to clarification questions are not treated as approval.
 - [ ] If What the User Approved is not `Approved`, the response asks for approval or revision and does not output the orchestration command or predicted `/goal`.
 - [ ] No solution design, goal, plan, review, or approved runtime `/goal` was created.

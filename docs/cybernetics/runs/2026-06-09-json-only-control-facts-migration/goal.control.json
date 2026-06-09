@@ -9,7 +9,7 @@
   "approved_control": {
     "objective": "Migrate the cybernetic control chain to a JSON-only official control facts system.",
     "success_condition": "Official guard/compiler/orchestration/predictor/runtime inputs use JSON run directories, Markdown official inputs fail, using-control-json defines runtime read/write protocol, progress is JSONL, and verifier-gated completion passes.",
-    "what_counts_as_done": "JSON schemas, registry checks, JSON-only scripts, runtime JSON operation skill, JSONL progress verifier, regression tests, and final run validation all pass.",
+    "what_counts_as_done": "JSON schemas, JSON-only scripts, runtime JSON operation skill, JSONL progress verifier, regression tests, and final run validation all pass.",
     "rules_that_must_not_change": [
       "Approved control JSON is read-only at runtime.",
       "Runtime may write only progress.jsonl, runtime-status.json, and final-report.json.",
@@ -17,10 +17,6 @@
       "The /goal command is a short text pointer, not a control fact.",
       "goal_achieved true requires verifier permission."
     ]
-  },
-  "registry_bindings": {
-    "answer_method_key": "implementation-spine",
-    "forbidden_substitute_key": "component-inventory-completion"
   },
   "required_steps": [
     {
@@ -140,6 +136,6 @@
   ],
   "semantic_base_ref": {
     "id": "semantic-base:2026-06-09-json-only-control-facts-migration",
-    "hash": "sha256:4e6ebe13645228a178988fd4f5b203e539d5f8e15945b77e1c5d67b1cf5ca83d"
+    "hash": "sha256:66e988b1542bfcf7ddc1869d9f8e0c5886ab4e55c1d866d7c6dd792dd712c0da"
   }
 }

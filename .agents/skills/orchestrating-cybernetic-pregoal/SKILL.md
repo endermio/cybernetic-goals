@@ -374,29 +374,18 @@ Design artifacts with status `Candidate`, `Reviewed`, or `Approved` may enter do
 - the artifact was produced by `$designing-cybernetic-solutions` or explicitly provided by the user;
 - it references the requirements analysis in `Source Contracts`;
 - it has no blocking open design questions;
-- if What the User Approved records `How this should be answered`, `What is not enough`, or `How this should be answered`, the design includes `Answer Method Check` that preserves the approved answer method and how this should be answered;
-- final review will check Design Match and Design Answer Method Check when What the User Approved records an answer method or how this should be answered.
+- if What the User Approved records `How this should be answered` or `What is not enough`, the design records a Required Answer Path check that preserves the approved answer path and avoids what is not enough;
+- final review will check Design Match and Required Answer Path when What the User Approved records how this should be answered.
 
 If any design artifact exists, propacheck its path to goal writing, execution-policy writing, review, and runtime compilation, even when required design is satisfied or no longer required.
 
-## Design Answer Method Check
+## Required Answer Path Check
 
-Before goal writing, validate that design preserves the approved answer method when What the User Approved records an answer method or how this should be answered.
+Before goal writing, validate that design preserves the approved answer path when What the User Approved records how this should be answered.
 
-The design must instantiate the approved how this should be answered. It must not replace the approved answer method with what the user marked as not enough because the substitute is easier to run or verify.
+The design must instantiate the approved how this should be answered. It must not replace the approved answer path with what the user marked as not enough because the substitute is easier to run or verify.
 
 If the approved how this should be answered cannot be instantiated, return to requirements for revision. Do not ask the user to review downstream goal or plan artifacts as compensation.
-
-For the full workflow ceiling measurement entry in the internal answer-method registry, the design must include:
-
-- full workflow scope inventory;
-- major removable source / bottleneck inventory;
-- ceiling coverage criterion;
-- candidate coverage matrix;
-- same-workload full workflow run;
-- interpretation against coverage matrix.
-
-If the design substitutes a weaker full-workflow run-validation answer path for the approved full workflow ceiling measurement method, stop before goal writing and rerun design.
 
 ## Non-Fallback Rule
 
@@ -418,7 +407,7 @@ If any non-emulatable stage is required and unavailable, stop and report the mis
 |---|---|---|---|
 | `RequirementsMissing` | requirements absent, incomplete, or What the User Approved missing/not Approved | `Blocked` / `ReturnToRequirementsAnalysis` | design / goal / policy / review / runtime compile |
 | `RequirementsComplete` | requirements Complete and What the User Approved Approved; required design required and design missing | `RunDesign` | goal writing |
-| `DesignReady` | design exists, references requirements, has no blocking open questions, and passes Design Answer Path Check when What the User Approved records an answering method or answer path family | `RunGoalWriting` | execution policy |
+| `DesignReady` | design exists, references requirements, has no blocking open questions, and passes Required Answer Path Check when What the User Approved records how this should be answered | `RunGoalWriting` | execution policy |
 | `GoalReady` | `goal.control.json` exists and references requirements plus any design path | `RunExecutionPolicy` | review |
 | `PolicyReady` | execution policy exists, references requirements, goal, any design path, and records selected execution work assignment | `RunReview` | runtime compile |
 | `ReviewNeedsRevision` | review verdict/status is `NeedsRevision` / `Needs Revision`, `Dirty`, `Needs Re-review`, or `Needs Independent Review` | route by NeedsRevision Routing Rule or obtain independent review | runtime compile |

@@ -14,32 +14,6 @@
   },
   "old_accident_surfaces": [
     {
-      "id": "design_answer_method",
-      "retired_source_test_file": "tests/skills/test_design_answer_method.py",
-      "representative_tests": [
-        "test_orchestration_guard_requires_answer_method_sidecar_before_goal",
-        "test_orchestration_guard_rejects_run_validation_substitution_before_goal",
-        "test_control_chain_guard_requires_review_design_answer_path_check",
-        "test_runtime_contract_indexes_design_answer_path_check"
-      ],
-      "json_replacement_tests": [
-        {
-          "file": "tests/skills/test_runtime_json_progress_verifier.py",
-          "tests": [
-            "test_validate_control_chain_rejects_weaker_answer_method_and_missing_mandatory_nodes"
-          ]
-        },
-        {
-          "file": "tests/skills/test_json_official_guard_compiler_path.py",
-          "tests": [
-            "test_control_chain_guard_accepts_complete_json_run_directory"
-          ]
-        }
-      ],
-      "current_markdown_surface": "Markdown requirements/design/goal/plan/review fixtures plus a small requirements.control.json sidecar.",
-      "json_port_groundwork": "Port the approved answer method, forbidden substitute key, required path coverage, and design-answer-method review check into first-class JSON fields instead of Markdown section text."
-    },
-    {
       "id": "work_assignment_context",
       "retired_source_test_file": "tests/skills/test_work_assignment_context.py",
       "representative_tests": [
@@ -52,7 +26,7 @@
         {
           "file": "tests/skills/test_control_json_schemas.py",
           "tests": [
-            "test_registry_binding_keys_exist_for_answer_method_and_delegation_workflow"
+            "test_registry_binding_keys_exist_for_delegation_workflow_only"
           ]
         },
         {
@@ -77,13 +51,42 @@
         {
           "file": "tests/skills/test_runtime_json_progress_verifier.py",
           "tests": [
-            "test_validate_control_chain_rejects_weaker_answer_method_and_missing_mandatory_nodes",
+            "test_validate_control_chain_rejects_required_outcome_coverage_gaps",
             "test_verify_runtime_progress_rejects_verifier_bypass_supporting_only_and_not_done_success"
           ]
         }
       ],
       "current_markdown_surface": "Markdown goal and plan fixtures carry Steps That Make The Result True, required step ids, transition evidence, and supporting-only progress rules.",
       "json_port_groundwork": "Make required steps, state transitions, transition evidence, mainline/supporting-only role, and progress classification machine-checkable JSON fields."
+    },
+    {
+      "id": "required_outcome_coverage",
+      "retired_source_test_file": "tests/skills/test_json_official_guard_compiler_path.py",
+      "representative_tests": [
+        "test_control_chain_guard_accepts_required_outcome_covered_chain",
+        "test_control_chain_guard_rejects_blocking_required_outcome_without_required_step_coverage",
+        "test_control_chain_guard_rejects_missing_runtime_verifier_required_outcome",
+        "test_control_chain_guard_requires_intent_obligation_and_outcome_review_checks"
+      ],
+      "json_replacement_tests": [
+        {
+          "file": "tests/skills/test_json_official_guard_compiler_path.py",
+          "tests": [
+            "test_control_chain_guard_rejects_blocking_required_outcome_without_required_step_coverage",
+            "test_control_chain_guard_rejects_missing_runtime_verifier_required_outcome",
+            "test_control_chain_guard_requires_intent_obligation_and_outcome_review_checks"
+          ]
+        },
+        {
+          "file": "tests/skills/test_runtime_json_progress_verifier.py",
+          "tests": [
+            "test_validate_control_chain_rejects_required_outcome_coverage_gaps",
+            "test_verify_runtime_progress_permits_required_outcome_covered_progress"
+          ]
+        }
+      ],
+      "current_markdown_surface": "Legacy accidents allowed a user-required result to be rewritten as preparation, compatibility readiness, or future exposure while downstream checks still passed.",
+      "json_port_groundwork": "Represent user-required results as required_outcomes and require coverage through required steps, work packages, runtime verifier requirements, review checks, and final progress verification."
     },
     {
       "id": "what_counts_as_done",
@@ -183,17 +186,16 @@
       "failure_class": "A JSON sidecar is accepted while Markdown remains the authoritative control source.",
       "required_step": "S5",
       "legacy_sources": [
-        "tests/skills/test_design_answer_method.py::test_orchestration_guard_requires_answer_method_sidecar_before_goal",
-        "tests/skills/test_design_answer_method.py::test_control_chain_guard_requires_answer_method_sidecar"
+        "retired Markdown sidecar migration tests"
       ],
       "control_sources": [
-        "retired design answer-method note",
+        "retired design sidecar note",
         "retired requirements result-placement note"
       ],
-      "json_regression_requirement": "Future tests must reject a partial sidecar migration where machine keys exist in JSON but semantic control facts are still read from Markdown.",
+      "json_regression_requirement": "Future tests must reject a partial migration where some JSON files exist but semantic control facts are still read from Markdown.",
       "future_assertions": [
         "Failing path: sidecar-only requirements.control.json plus Markdown semantics is not a valid official JSON chain.",
-        "Passing path: semantic fields and registry bindings are both present in the JSON control files."
+        "Passing path: semantic fields and allowed workflow registry bindings are present in the JSON control files."
       ]
     },
     {
@@ -233,21 +235,22 @@
       ]
     },
     {
-      "id": "forbidden_weaker_answer_method",
-      "failure_class": "A weaker answer method or forbidden substitute replaces the approved answer method.",
+      "id": "required_outcome_coverage_gap",
+      "failure_class": "A user-required result is downgraded into preparation, compatibility readiness, permission, or future work instead of being covered by required steps and verifier checks.",
       "required_step": "S9",
       "legacy_sources": [
-        "tests/skills/test_design_answer_method.py::test_orchestration_guard_rejects_run_validation_substitution_before_goal",
-        "tests/skills/test_design_answer_method.py::test_orchestration_guard_rejects_missing_registry_mandatory_step",
-        "tests/skills/test_design_answer_method.py::test_control_chain_guard_requires_review_design_answer_path_check"
+        "legacy /api/v2 accident analysis: required external API implementation was weakened into old-path Drogon readiness"
       ],
       "control_sources": [
-        "retired design control note for S9"
+        "requirements.control.json required_outcomes",
+        "goal/plan/runtime required_steps.satisfies_outcomes",
+        "runtime.control.json verifier.required_outcomes",
+        "review.control.json intent-preservation/obligation-preservation/required-outcome-coverage checks"
       ],
-      "json_regression_requirement": "Future JSON regressions must validate answer_method_key, forbidden_substitute_key, mandatory answer-path nodes, and design-answer-method review status from JSON.",
+      "json_regression_requirement": "Future JSON guard and runtime tests must reject a chain where any blocking required_outcome is missing from design/goal/plan/runtime required steps, work packages, verifier requirements, or required review checks.",
       "future_assertions": [
-        "Failing path: JSON chain chooses a forbidden weaker method or omits mandatory answer-path nodes.",
-        "Passing path: approved method key, mandatory nodes, and review check are present and coherent."
+        "Failing path: required_outcomes contains an API implementation outcome but plan/runtime only cover compatibility readiness.",
+        "Passing path: every blocking required_outcome maps to mainline required steps, work packages, verifier required_outcomes, and verified progress evidence."
       ]
     },
     {

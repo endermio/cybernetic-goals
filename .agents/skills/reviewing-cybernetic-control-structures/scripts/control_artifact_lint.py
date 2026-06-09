@@ -156,7 +156,7 @@ def main() -> int:
     if design:
         check_required_sections("design", design, [
             "Design Status", "Source Contracts", "Human Purpose", "Confirmed Meaning",
-            "Design Workflow", "Answer Method Check", "Required Answer Path",
+            "Design Workflow", "Required Answer Path Check", "Required Answer Path",
             "What Supports Each Required Step", "Design Details Tied To Required Steps",
             "Design-to-Goal Mapping", "Design-to-Execution Mapping",
             "Open Design Questions", "Design Review Requirements"

@@ -13,7 +13,6 @@ from typing import Any
 
 REPO_ROOT = Path(__file__).resolve().parents[4]
 SCHEMA_DIR = REPO_ROOT / "schemas/control-json"
-ANSWER_METHOD_REGISTRY = REPO_ROOT / ".agents/skills/references/answer-method-registry.json"
 DELEGATION_WORKFLOW_REGISTRY = REPO_ROOT / ".agents/skills/references/delegation-workflow-registry.json"
 
 CONTROL_SCHEMAS = {
@@ -37,7 +36,6 @@ READONLY_FILES = list(CONTROL_SCHEMAS)
 WRITABLE_FILES = ["progress.jsonl", "runtime-status.json", "final-report.json"]
 DEFAULT_WRITABLE_EVIDENCE_PATHS = ["evidence/"]
 REQUIRED_REVIEW_CHECKS = {
-    "design-answer-method",
     "required-answer-path",
     "intent-preservation",
     "obligation-preservation",
@@ -371,37 +369,7 @@ def validate_json_control_run(run_dir: Path) -> dict[str, dict[str, Any]]:
     if failed_checks:
         raise ControlJsonValidationError("review.control.json: required review checks did not pass: " + ", ".join(failed_checks))
 
-    answer_registry = read_json_object(ANSWER_METHOD_REGISTRY)
     workflow_registry = read_json_object(DELEGATION_WORKFLOW_REGISTRY)
-
-    answer_key = registry_bindings(runtime).get("answer_method_key")
-    answer_keys = [
-        registry_bindings(artifacts[filename]).get("answer_method_key")
-        for filename in ("requirements.control.json", "design.control.json", "goal.control.json", "plan.control.json", "review.control.json", "runtime.control.json")
-        if registry_bindings(artifacts[filename]).get("answer_method_key")
-    ]
-    forbidden_keys = {
-        registry_bindings(artifacts[filename]).get("forbidden_substitute_key")
-        for filename in ("requirements.control.json", "design.control.json", "goal.control.json")
-        if registry_bindings(artifacts[filename]).get("forbidden_substitute_key")
-    }
-    if not answer_key or answer_key not in answer_registry or answer_key in forbidden_keys:
-        raise ControlJsonValidationError("forbidden or unknown answer method")
-    if any(key != answer_key for key in answer_keys):
-        raise ControlJsonValidationError("answer_method_key must be consistent across the control chain")
-
-    done_rule = answer_registry[answer_key].get("done_rule", {})
-    if not isinstance(done_rule, dict) or done_rule.get("all_mandatory_nodes_required") is not True:
-        raise ControlJsonValidationError("answer method registry missing done_rule.all_mandatory_nodes_required")
-
-    approved_path = [item.casefold() for item in string_list(artifacts["design.control.json"].get("approved_control", {}).get("required_answer_path"))]
-    missing_nodes = [
-        node
-        for node in string_list(answer_registry[answer_key].get("mandatory_nodes"))
-        if node.casefold() not in approved_path
-    ]
-    if missing_nodes:
-        raise ControlJsonValidationError("missing mandatory answer path nodes: " + ", ".join(missing_nodes))
 
     selected_workflow = registry_bindings(runtime).get("selected_agent_workflow")
     plan_workflow = registry_bindings(artifacts["plan.control.json"]).get("selected_agent_workflow")

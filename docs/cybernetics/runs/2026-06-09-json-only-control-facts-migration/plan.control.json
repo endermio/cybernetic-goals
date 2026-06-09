@@ -8,13 +8,12 @@
     "goal": "goal.control.json"
   },
   "approved_control": {
-    "work_coverage": "Complete JSON-only control facts migration across schemas, registries, using-control-json skill, JSON-only guard/compiler/orchestration/predictor scripts, JSON examples, tests, run validation, and hot-path docs.",
-    "action_that_can_make_it_done": "Implement schema-owned JSON artifacts, replace Markdown official inputs, validate registry consistency, execute parallel subagent work packages, integrate results, write progress JSONL, and run verifier plus full tests."
+    "work_coverage": "Complete JSON-only control facts migration across schemas, using-control-json skill, JSON-only guard/compiler/orchestration/predictor scripts, JSON examples, tests, run validation, and hot-path docs.",
+    "action_that_can_make_it_done": "Implement schema-owned JSON artifacts, replace Markdown official inputs, validate workflow registry consistency, execute parallel subagent work packages, integrate results, write progress JSONL, and run verifier plus full tests."
   },
   "registry_bindings": {
     "selected_agent_workflow": "superpowers-dispatching-parallel-agents",
-    "allowed_work_assignment": "Parallel subagent-driven",
-    "answer_method_key": "implementation-spine"
+    "allowed_work_assignment": "Parallel subagent-driven"
   },
   "required_steps": [
     {
@@ -247,6 +246,6 @@
   },
   "semantic_base_ref": {
     "id": "semantic-base:2026-06-09-json-only-control-facts-migration",
-    "hash": "sha256:4e6ebe13645228a178988fd4f5b203e539d5f8e15945b77e1c5d67b1cf5ca83d"
+    "hash": "sha256:66e988b1542bfcf7ddc1869d9f8e0c5886ab4e55c1d866d7c6dd792dd712c0da"
   }
 }

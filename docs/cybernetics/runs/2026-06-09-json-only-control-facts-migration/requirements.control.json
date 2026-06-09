@@ -5,13 +5,13 @@
   "approved_control": {
     "human_purpose": "Make the cybernetic control chain use JSON as the only persistent control fact source.",
     "primary_object": "cybernetic requirements, design, goal, plan, review, runtime, progress, and completion-verification chain",
-    "requested_transformation": "Replace official Markdown control artifacts with schema-validated JSON control files, registry-backed keys, JSON-only guards and compiler, a runtime JSON operation skill, append-only progress events, and verifier-gated completion.",
+    "requested_transformation": "Replace official Markdown control artifacts with schema-validated JSON control files, JSON-only guards and compiler, a runtime JSON operation skill, append-only progress events, and verifier-gated completion.",
     "non_goals": [
       "long-term Markdown and JSON dual-path compatibility",
       "treating Markdown control files as official guard/compiler/runtime inputs",
       "letting runtime Codex rewrite approved control JSON"
     ],
-    "how_we_know_purpose_was_met": "JSON schemas, registries, JSON-only guard/compiler/predictor/orchestration scripts, using-control-json runtime protocol, progress verifier, regression inventory, and focused/full tests pass while Markdown official inputs fail.",
+    "how_we_know_purpose_was_met": "JSON schemas, JSON-only guard/compiler/predictor/orchestration scripts, using-control-json runtime protocol, progress verifier, regression inventory, and focused/full tests pass while Markdown official inputs fail.",
     "where_result_must_show_up": [
       "schemas/control-json",
       ".agents/skills/using-control-json",
@@ -30,7 +30,7 @@
     },
     "semantic_base": {
       "id": "semantic-base:2026-06-09-json-only-control-facts-migration",
-      "hash": "sha256:4e6ebe13645228a178988fd4f5b203e539d5f8e15945b77e1c5d67b1cf5ca83d"
+      "hash": "sha256:66e988b1542bfcf7ddc1869d9f8e0c5886ab4e55c1d866d7c6dd792dd712c0da"
     },
     "required_outcomes": [
       {
@@ -76,9 +76,5 @@
         ]
       }
     ]
-  },
-  "registry_bindings": {
-    "answer_method_key": "implementation-spine",
-    "forbidden_substitute_key": "component-inventory-completion"
   }
 }

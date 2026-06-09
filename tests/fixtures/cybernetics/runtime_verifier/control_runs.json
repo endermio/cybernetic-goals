@@ -64,10 +64,6 @@
               ]
             }
           ]
-        },
-        "registry_bindings": {
-          "answer_method_key": "implementation-spine",
-          "forbidden_substitute_key": "component-inventory-completion"
         }
       },
       "design.control.json": {
@@ -75,8 +71,7 @@
         "schema_version": "1.0.0",
         "status": "approved",
         "source_contracts": {
-          "requirements": "requirements.control.json",
-          "requirements_registry_sidecar": "requirements.control.json"
+          "requirements": "requirements.control.json"
         },
         "approved_control": {
           "confirmed_meaning": "JSON is the only official persistent control fact",
@@ -88,10 +83,6 @@
           "what_is_not_enough_avoided": [
             "JSON sidecars with Markdown authority"
           ]
-        },
-        "registry_bindings": {
-          "answer_method_key": "implementation-spine",
-          "forbidden_substitute_key": "component-inventory-completion"
         },
         "required_steps": [
           {
@@ -138,10 +129,6 @@
             "goal_achieved true requires verifier permission"
           ]
         },
-        "registry_bindings": {
-          "answer_method_key": "implementation-spine",
-          "forbidden_substitute_key": "component-inventory-completion"
-        },
         "required_steps": [
           {
             "step_id": "S7",
@@ -180,8 +167,7 @@
         },
         "registry_bindings": {
           "selected_agent_workflow": "superpowers-dispatching-parallel-agents",
-          "allowed_work_assignment": "Parallel subagent-driven",
-          "answer_method_key": "implementation-spine"
+          "allowed_work_assignment": "Parallel subagent-driven"
         },
         "required_steps": [
           {
@@ -273,27 +259,9 @@
           "plan": "plan.control.json"
         },
         "registry_bindings": {
-          "answer_method_key": "implementation-spine",
           "selected_agent_workflow": "superpowers-dispatching-parallel-agents"
         },
         "review_checks": [
-          {
-            "check_id": "design-answer-method",
-            "status": "pass",
-            "evidence": [
-              "registry answer path preserved"
-            ],
-            "verdict": "approved",
-            "return_to_stage": null,
-            "findings": [],
-            "required_changes": [],
-            "checked_transformations": [
-              "requirements->design",
-              "design->goal",
-              "goal->plan",
-              "plan->runtime"
-            ]
-          },
           {
             "check_id": "required-answer-path",
             "status": "pass",
@@ -419,10 +387,10 @@
           "hash": "sha256:dc6fe73b1fb608254d4879a00d46411ad17452926dd26d2a8b3758fd522786ee"
         },
         "approved_control_hashes": {
-          "requirements.control.json": "sha256:7dd997dc6c57b8d8d9341b7143dcaab0cf3590ddc9b14b1da8a65535424c2e2f",
-          "design.control.json": "sha256:09ea7bff8c88ee3fa36ec410955017fcc0363721014c6be094d7e1295f67cb38",
-          "goal.control.json": "sha256:2041b7114ae875d10f96f7f814b2c3645edc817e7b5bb7100df75fa738caad9e",
-          "plan.control.json": "sha256:d82a462589456cf2fa76fff1fb04ffb600605b0e013fa32da62d6d90c527d37a"
+          "requirements.control.json": "sha256:2c648815ef5254d57bb6a27eb2d258a8de3af8d5d9ba38cdc6ace3a0a2fffa76",
+          "design.control.json": "sha256:97833fb2eaa995a093d159c234eb07c477c4a008a6910325c234b216e67f8ffd",
+          "goal.control.json": "sha256:77f089399386a93d6ec997e97dc18f10c1a7b358bfb0e0653cfb9923b7b51147",
+          "plan.control.json": "sha256:62560b9280fc281f4b74cf14df7c90578cf4614397d5b7c88046b548b8f27d1e"
         }
       },
       "runtime.control.json": {
@@ -441,7 +409,6 @@
           "what_counts_as_done": "runtime progress and verifier regressions pass"
         },
         "registry_bindings": {
-          "answer_method_key": "implementation-spine",
           "selected_agent_workflow": "superpowers-dispatching-parallel-agents"
         },
         "runtime": {
@@ -502,12 +469,12 @@
           "hash": "sha256:dc6fe73b1fb608254d4879a00d46411ad17452926dd26d2a8b3758fd522786ee"
         },
         "approved_control_hashes": {
-          "requirements.control.json": "sha256:7dd997dc6c57b8d8d9341b7143dcaab0cf3590ddc9b14b1da8a65535424c2e2f",
-          "design.control.json": "sha256:09ea7bff8c88ee3fa36ec410955017fcc0363721014c6be094d7e1295f67cb38",
-          "goal.control.json": "sha256:2041b7114ae875d10f96f7f814b2c3645edc817e7b5bb7100df75fa738caad9e",
-          "plan.control.json": "sha256:d82a462589456cf2fa76fff1fb04ffb600605b0e013fa32da62d6d90c527d37a",
-          "review.control.json": "sha256:6f16573931238ed2103659765b87ceb1e260864cd15e61d195c66371932a4715",
-          "runtime.control.json": "sha256:2739b7f4c24af9e2a696cafa650b1c73547e18ab9ae744d8115718cc414e8b22"
+          "requirements.control.json": "sha256:2c648815ef5254d57bb6a27eb2d258a8de3af8d5d9ba38cdc6ace3a0a2fffa76",
+          "design.control.json": "sha256:97833fb2eaa995a093d159c234eb07c477c4a008a6910325c234b216e67f8ffd",
+          "goal.control.json": "sha256:77f089399386a93d6ec997e97dc18f10c1a7b358bfb0e0653cfb9923b7b51147",
+          "plan.control.json": "sha256:62560b9280fc281f4b74cf14df7c90578cf4614397d5b7c88046b548b8f27d1e",
+          "review.control.json": "sha256:891c0334d70d5365867b559d41146ea88f0416fb6bc9018bbd7cdd0cf8134497",
+          "runtime.control.json": "sha256:867adbe095c4174b93653562ed6941dc5a7f54b327e80636fe48640d3913f36d"
         }
       }
     },

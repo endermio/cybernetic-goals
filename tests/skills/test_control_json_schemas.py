@@ -7,7 +7,6 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 SCHEMA_DIR = ROOT / "schemas/control-json"
-ANSWER_METHOD_REGISTRY = ROOT / ".agents/skills/references/answer-method-registry.json"
 DELEGATION_WORKFLOW_REGISTRY = ROOT / ".agents/skills/references/delegation-workflow-registry.json"
 
 
@@ -58,10 +57,6 @@ SCHEMA_FIXTURES = {
                 "required_structure": ["changed files", "verification commands"],
             },
         },
-        "registry_bindings": {
-            "answer_method_key": "implementation-spine",
-            "forbidden_substitute_key": "component-inventory-completion",
-        },
     },
     "design.control.schema.json": {
         "artifact_type": "design.control",
@@ -69,7 +64,6 @@ SCHEMA_FIXTURES = {
         "status": "approved",
         "source_contracts": {
             "requirements": "requirements.control.json",
-            "requirements_registry_sidecar": "requirements.control.json",
         },
         "approved_control": {
             "confirmed_meaning": "JSON is the only official persistent control fact",
@@ -79,10 +73,6 @@ SCHEMA_FIXTURES = {
                 "observable target state",
             ],
             "what_is_not_enough_avoided": ["JSON sidecars with Markdown authority"],
-        },
-        "registry_bindings": {
-            "answer_method_key": "implementation-spine",
-            "forbidden_substitute_key": "component-inventory-completion",
         },
         "required_steps": [
             {
@@ -110,10 +100,6 @@ SCHEMA_FIXTURES = {
                 "Markdown is not official control input",
             ],
         },
-        "registry_bindings": {
-            "answer_method_key": "implementation-spine",
-            "forbidden_substitute_key": "component-inventory-completion",
-        },
         "required_steps": [
             {
                 "step_id": "S1",
@@ -135,7 +121,6 @@ SCHEMA_FIXTURES = {
         "registry_bindings": {
             "selected_agent_workflow": "superpowers-dispatching-parallel-agents",
             "allowed_work_assignment": "Parallel subagent-driven",
-            "answer_method_key": "implementation-spine",
         },
         "required_steps": [
             {
@@ -180,11 +165,9 @@ SCHEMA_FIXTURES = {
             "plan": "plan.control.json",
         },
         "registry_bindings": {
-            "answer_method_key": "implementation-spine",
             "selected_agent_workflow": "superpowers-dispatching-parallel-agents",
         },
         "review_checks": [
-            review_check("design-answer-method", ["required answer path preserved"]),
             review_check("required-answer-path", ["runtime required steps are covered"]),
             review_check("intent-preservation", ["approved user intent is preserved across design, goal, and plan"]),
             review_check("obligation-preservation", ["required outcomes are not downgraded into permission, readiness, or future work"]),
@@ -206,7 +189,6 @@ SCHEMA_FIXTURES = {
             "review": "review.control.json",
         },
         "registry_bindings": {
-            "answer_method_key": "implementation-spine",
             "selected_agent_workflow": "superpowers-dispatching-parallel-agents",
         },
         "runtime": {
@@ -416,20 +398,16 @@ class ControlJsonSchemaTest(unittest.TestCase):
                     validate(invalid, schema)
 
     def test_schema_set_represents_control_chain_foundations(self):
-        for schema_name in (
-            "requirements.control.schema.json",
-            "design.control.schema.json",
-            "goal.control.schema.json",
-            "plan.control.schema.json",
-            "review.control.schema.json",
-            "runtime.control.schema.json",
-        ):
+        for schema_name in ("plan.control.schema.json", "review.control.schema.json", "runtime.control.schema.json"):
             with self.subTest(schema=schema_name):
                 schema = load_json(SCHEMA_DIR / schema_name)
                 properties = schema["properties"]
                 self.assertIn("registry_bindings", properties)
-                if schema_name != "review.control.schema.json":
-                    self.assertIn("approved_control", properties)
+        for schema_name in ("requirements.control.schema.json", "design.control.schema.json", "goal.control.schema.json"):
+            with self.subTest(schema=schema_name):
+                schema = load_json(SCHEMA_DIR / schema_name)
+                self.assertNotIn("registry_bindings", schema["properties"])
+                self.assertIn("approved_control", schema["properties"])
 
         plan = load_json(SCHEMA_DIR / "plan.control.schema.json")
         self.assertIn("work_packages", plan["properties"])
@@ -440,15 +418,22 @@ class ControlJsonSchemaTest(unittest.TestCase):
         review = load_json(SCHEMA_DIR / "review.control.schema.json")
         self.assertIn("review_checks", review["properties"])
 
-    def test_registry_binding_keys_exist_for_answer_method_and_delegation_workflow(self):
-        answer_registry = load_json(ANSWER_METHOD_REGISTRY)
-        delegation_registry = load_json(DELEGATION_WORKFLOW_REGISTRY)
+    def test_no_predefined_answer_method_registry_or_keys_remain(self):
+        self.assertFalse((ROOT / ".agents/skills/references/answer-method-registry.json").exists())
+        for schema_name in (
+            "requirements.control.schema.json",
+            "design.control.schema.json",
+            "goal.control.schema.json",
+            "plan.control.schema.json",
+            "review.control.schema.json",
+            "runtime.control.schema.json",
+        ):
+            schema_text = (SCHEMA_DIR / schema_name).read_text(encoding="utf-8")
+            self.assertNotIn("answer_method_key", schema_text)
+            self.assertNotIn("forbidden_substitute_key", schema_text)
 
-        self.assertIn("implementation-spine", answer_registry)
-        self.assertIn("mandatory_nodes", answer_registry["implementation-spine"])
-        self.assertIn("forbidden_substitutions", answer_registry["implementation-spine"])
-        self.assertIn("done_rule", answer_registry["implementation-spine"])
-        self.assertTrue(answer_registry["implementation-spine"]["done_rule"]["all_mandatory_nodes_required"])
+    def test_registry_binding_keys_exist_for_delegation_workflow_only(self):
+        delegation_registry = load_json(DELEGATION_WORKFLOW_REGISTRY)
 
         self.assertIn("superpowers-dispatching-parallel-agents", delegation_registry)
         workflow = delegation_registry["superpowers-dispatching-parallel-agents"]

@@ -361,7 +361,7 @@ The policy may choose tactical execution details, batch cadence, and workstream 
 - lifecycle or failure model;
 - design rules that cannot change.
 
-If the design includes `Answer Method Check`, decompose work against that approved answer path. Do not replace the design answer path with a component-first or weaker validation answer path.
+If the design records how this should be answered, decompose work against that approved answer path. Do not replace the design answer path with a component-first or weaker validation answer path.
 
 If the design is missing, contradictory, or insufficient for planning, stop and route back to `$designing-cybernetic-solutions` or ask for the smallest design decision.
 

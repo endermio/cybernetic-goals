@@ -9,27 +9,9 @@
     "plan": "plan.control.json"
   },
   "registry_bindings": {
-    "answer_method_key": "implementation-spine",
     "selected_agent_workflow": "superpowers-dispatching-parallel-agents"
   },
   "review_checks": [
-    {
-      "check_id": "design-answer-method",
-      "status": "pass",
-      "evidence": [
-        "answer method preserves required implementation path"
-      ],
-      "verdict": "approved",
-      "return_to_stage": null,
-      "findings": [],
-      "required_changes": [],
-      "checked_transformations": [
-        "requirements->design",
-        "design->goal",
-        "goal->plan",
-        "plan->runtime"
-      ]
-    },
     {
       "check_id": "required-answer-path",
       "status": "pass",

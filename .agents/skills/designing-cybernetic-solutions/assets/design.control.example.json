@@ -3,8 +3,7 @@
   "schema_version": "1",
   "status": "approved",
   "source_contracts": {
-    "requirements": "requirements.control.json",
-    "requirements_registry_sidecar": "requirements.control.json"
+    "requirements": "requirements.control.json"
   },
   "approved_control": {
     "confirmed_meaning": "JSON is the only official persistent control fact for the cybernetic control chain.",
@@ -20,10 +19,6 @@
       "JSON sidecars while Markdown remains authoritative.",
       "A short runtime pointer without a JSON operation protocol."
     ]
-  },
-  "registry_bindings": {
-    "answer_method_key": "implementation-spine",
-    "forbidden_substitute_key": "component-inventory-completion"
   },
   "required_steps": [
     {

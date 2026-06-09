@@ -14,7 +14,6 @@
     "what_counts_as_done": "Verifier permits the final report after required progress evidence is present."
   },
   "registry_bindings": {
-    "answer_method_key": "implementation-spine",
     "selected_agent_workflow": "superpowers-dispatching-parallel-agents"
   },
   "runtime": {

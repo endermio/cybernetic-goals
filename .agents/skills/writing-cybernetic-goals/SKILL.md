@@ -246,7 +246,7 @@ The goal control JSON must preserve confirmed meaning. It must not reinterpret o
 
 For Level 3/4 or full pre-goal work, the goal must preserve the approved compact control commitment from `What the User Approved`: human purpose, input role binding, primary object, requested transformation, non-goals, How We Know The User Purpose Was Met, result placement, What counts as done, Evidence needed to call it done, If it is not done, what should be reported, Required answer path, How this should be answered, What is not enough, Work covered in this run, What the agent may do, Forbidden live / irreversible actions, Required handling for unauthorized actions, Explicitly out-of-scope items, Final Answer Format, why this process is needed, and known assumptions.
 
-If a design includes `Answer Method Check`, the goal must not weaken the approved answering method or substitute a different how this should be answered. Bind the what counts as done and required answer path to the required answer path.
+If a design records how this should be answered, the goal must not weaken the approved answer path or substitute a different how this should be answered. Bind the what counts as done and required answer path to the required answer path.
 
 When a solution design is present, the goal must reference it under `Source of Truth`, preserve design rules that cannot change, and avoid freezing tactical design details as meaning rules that cannot change unless the design explicitly marks them as rule.
 

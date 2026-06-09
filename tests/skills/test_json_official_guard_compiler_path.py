@@ -445,7 +445,7 @@ class JsonOfficialGuardCompilerPathTest(unittest.TestCase):
         fixture_by_file["review.control.json"]["review_checks"][0]["verdict"] = "needs_revision"
         fixture_by_file["review.control.json"]["review_checks"][0]["return_to_stage"] = "design"
         fixture_by_file["review.control.json"]["review_checks"][0]["required_changes"] = [
-            "repair answer method drift"
+            "repair required answer path drift"
         ]
         apply_integrity_metadata(fixture_by_file)
         with tempfile.TemporaryDirectory() as tmpdir:
@@ -460,7 +460,7 @@ class JsonOfficialGuardCompilerPathTest(unittest.TestCase):
 
             self.assertNotEqual(result.returncode, 0, result.stdout + result.stderr)
             self.assertIn("required review checks did not pass", result.stdout + result.stderr)
-            self.assertIn("design-answer-method", result.stdout + result.stderr)
+            self.assertIn("required-answer-path", result.stdout + result.stderr)
 
     def test_legacy_markdown_cli_arguments_are_rejected_as_official_inputs(self):
         with tempfile.TemporaryDirectory() as tmpdir:

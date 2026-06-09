@@ -12,7 +12,7 @@ EXPECTED_FAILURE_MODES = {
     "json_sidecar_accepted_while_markdown_authoritative",
     "approved_json_mutated_at_runtime",
     "goal_achieved_verifier_bypass",
-    "forbidden_weaker_answer_method",
+    "required_outcome_coverage_gap",
     "supporting_only_counted_as_progress",
     "not_done_report_treated_as_success",
     "authority_shrink",
@@ -20,7 +20,7 @@ EXPECTED_FAILURE_MODES = {
 }
 
 EXPECTED_OLD_ACCIDENT_SURFACES = {
-    "design_answer_method",
+    "required_outcome_coverage",
     "work_assignment_context",
     "required_answer_path",
     "what_counts_as_done",

@@ -16,10 +16,6 @@
       "The verifier must permit any achieved final report."
     ]
   },
-  "registry_bindings": {
-    "answer_method_key": "implementation-spine",
-    "forbidden_substitute_key": "component-inventory-completion"
-  },
   "required_steps": [
     {
       "step_id": "S8",

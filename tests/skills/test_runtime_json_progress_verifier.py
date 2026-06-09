@@ -143,30 +143,6 @@ class RuntimeJsonProgressVerifierTest(unittest.TestCase):
             self.assertNotEqual(result.returncode, 0, result.stdout + result.stderr)
             self.assertIn("missing required review checks", result.stdout + result.stderr)
 
-    def test_validate_control_chain_rejects_weaker_answer_method_and_missing_mandatory_nodes(self):
-        weaker = load_fixture()
-        for filename in ("requirements.control.json", "design.control.json", "goal.control.json"):
-            weaker["control_files"][filename]["registry_bindings"]["answer_method_key"] = "component-inventory-completion"
-
-        missing_node = load_fixture()
-        missing_node["control_files"]["design.control.json"]["approved_control"]["required_answer_path"] = [
-            "initial state",
-            "observable target state",
-        ]
-
-        for fixture, expected in (
-            (weaker, "forbidden or unknown answer method"),
-            (missing_node, "missing mandatory answer path nodes"),
-        ):
-            with self.subTest(expected=expected), tempfile.TemporaryDirectory() as tmpdir:
-                run_dir = Path(tmpdir)
-                write_run(run_dir, fixture)
-
-                result = run_script(VALIDATE, str(run_dir))
-
-                self.assertNotEqual(result.returncode, 0, result.stdout + result.stderr)
-                self.assertIn(expected, result.stdout + result.stderr)
-
     def test_validate_control_chain_rejects_required_outcome_coverage_gaps(self):
         missing_outcome_id = outcome_covered_fixture()
         del missing_outcome_id["control_files"]["requirements.control.json"]["approved_control"]["required_outcomes"][1]["id"]

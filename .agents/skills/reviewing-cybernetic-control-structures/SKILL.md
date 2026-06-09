@@ -107,13 +107,13 @@ The author of a post-review revision must not be the sole approver of that revis
 
 Record required check results before detailed findings:
 
-1. Design Answer Method Check
+1. Required Answer Path Check
 2. Steps That Make The Result True Check
 3. Work Coverage / Action Limits Check
 4. what-counts-as-done / user-purpose evidence / result-placement Check
 5. Work Assignment / Subagent Check
 
-If Design Answer Method Check is `FAIL`, the review cannot be `Approved`; route back to design or What the User Approved according to the failing answer method contract. If another required check is `FAIL`, route to the earliest failing artifact before evaluating downstream polish.
+If Required Answer Path Check is `FAIL`, the review cannot be `Approved`; route back to design or What the User Approved according to the failing approved answer path. If another required check is `FAIL`, route to the earliest failing artifact before evaluating downstream polish.
 
 ## Review Dimensions
 
@@ -205,20 +205,19 @@ When a solution design exists or required design was required:
 - tactical degrees of freedom must not be frozen as meaning rules that cannot change unless the design explicitly says so;
 - the plan must not redesign the solution model.
 
-### 5. Design Answer Method Check
+### 5. Required Answer Path Check
 
-When What the User Approved records `How this should be answered`, `What is not enough`, or `How this should be answered`, the design is a meaning compiler for that approved answering method.
+When What the User Approved records `How this should be answered` or `What is not enough`, the design is a meaning compiler for that approved answer path.
 
 Flag as Major or Blocking when:
 
-- design substitutes a weaker answer method for the approved answering method;
+- design substitutes a weaker answer path for the approved way this should be answered;
 - design instantiates a different how this should be answered without returning to What the User Approved;
 - design reports the what is not enough as sufficient;
-- full workflow ceiling measurement lacks full workflow scope inventory, major removable source / bottleneck inventory, ceiling coverage criterion, candidate coverage matrix, same-workload full workflow run, or interpretation against coverage matrix;
-- goal or execution policy inherits a weaker answer method than the design;
-- review approves run-validation evidence as coverage-ceiling evidence.
+- goal or execution policy inherits a weaker answer path than the design;
+- review approves what the user marked as not enough as sufficient evidence.
 
-If the approved answer method is infeasible or unsuitable, require return to requirements/What the User Approved. Do not approve a design that silently changes task type.
+If the approved answer path is infeasible or unsuitable, require return to requirements/What the User Approved. Do not approve a design that silently changes task type.
 
 ### 6. Final Answer Format Check
 
@@ -478,7 +477,7 @@ Only mark `Approved` when:
 - What the User Approved is Approved when full pre-goal orchestration is used, and What The User Approved Check has no Blocking/Major findings;
 - Work Covered And Allowed Actions Check has no Blocking/Major findings for full-route or multi-batch work;
 - required design exists and is consistent with requirements analysis, goal, and plan;
-- Design Answer Method Check has no Blocking/Major findings when What the User Approved records an answering method or answer method;
+- Required Answer Path Check has no Blocking/Major findings when What the User Approved records how this should be answered;
 - any upstream final answer format is preserved in the goal and supported by the execution policy;
 - no unresolved meaning decision remains;
 - execution policy does not self-authorize uncontrolled changes;
@@ -539,7 +538,7 @@ Response-only next step:
 - [ ] Review verdict is `Approved`, `NeedsRevision`, or `Blocked`.
 - [ ] Review independence is recorded.
 - [ ] What The User Approved Check was checked when full pre-goal orchestration is used.
-- [ ] Design Answer Method Check was checked when What the User Approved records an answering method or answer method.
+- [ ] Required Answer Path Check was checked when What the User Approved records how this should be answered.
 - [ ] Final observer check is recorded.
 - [ ] The review does not mark self-review as `Approved`.
 - [ ] If subagents were not authorized and no human approval exists, status is `Needs Independent Review`.

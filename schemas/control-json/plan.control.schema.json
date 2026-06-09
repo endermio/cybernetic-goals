@@ -95,8 +95,7 @@
       "additionalProperties": false,
       "required": [
         "selected_agent_workflow",
-        "allowed_work_assignment",
-        "answer_method_key"
+        "allowed_work_assignment"
       ],
       "properties": {
         "selected_agent_workflow": {
@@ -104,10 +103,6 @@
           "minLength": 1
         },
         "allowed_work_assignment": {
-          "type": "string",
-          "minLength": 1
-        },
-        "answer_method_key": {
           "type": "string",
           "minLength": 1
         }

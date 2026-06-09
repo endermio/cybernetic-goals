@@ -8,8 +8,7 @@
     "artifact_type",
     "schema_version",
     "status",
-    "approved_control",
-    "registry_bindings"
+    "approved_control"
   ],
   "properties": {
     "artifact_type": {
@@ -197,24 +196,6 @@
               "minLength": 1
             }
           }
-        }
-      }
-    },
-    "registry_bindings": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": [
-        "answer_method_key",
-        "forbidden_substitute_key"
-      ],
-      "properties": {
-        "answer_method_key": {
-          "type": "string",
-          "minLength": 1
-        },
-        "forbidden_substitute_key": {
-          "type": "string",
-          "minLength": 1
         }
       }
     }

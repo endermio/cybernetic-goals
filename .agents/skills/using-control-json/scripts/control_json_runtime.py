@@ -8,7 +8,6 @@ from typing import Any
 
 
 REPO_ROOT = Path(__file__).resolve().parents[4]
-ANSWER_METHOD_REGISTRY = REPO_ROOT / ".agents/skills/references/answer-method-registry.json"
 DELEGATION_WORKFLOW_REGISTRY = REPO_ROOT / ".agents/skills/references/delegation-workflow-registry.json"
 
 CONTROL_FILES = {
@@ -23,7 +22,6 @@ READONLY_FILES = tuple(CONTROL_FILES.values())
 WRITABLE_FILES = ("progress.jsonl", "runtime-status.json", "final-report.json")
 DEFAULT_WRITABLE_EVIDENCE_PATHS = ("evidence/",)
 REQUIRED_REVIEW_CHECKS = {
-    "design-answer-method",
     "required-answer-path",
     "intent-preservation",
     "obligation-preservation",
@@ -500,47 +498,10 @@ def validate_control_chain(run_dir: Path) -> tuple[dict[str, dict[str, Any]] | N
                 errors.append(f"required review check did not pass with evidence: {check_id}")
 
     try:
-        answer_registry = load_json(ANSWER_METHOD_REGISTRY)
         workflow_registry = load_json(DELEGATION_WORKFLOW_REGISTRY)
     except ControlJsonError as exc:
         errors.append(str(exc))
-        answer_registry = {}
         workflow_registry = {}
-
-    answer_keys = [
-        registry_bindings(artifacts[key]).get("answer_method_key")
-        for key in ("requirements", "design", "goal", "plan", "runtime", "review")
-        if registry_bindings(artifacts[key]).get("answer_method_key")
-    ]
-    selected_answer_key = registry_bindings(artifacts["runtime"]).get("answer_method_key")
-    forbidden_keys = [
-        registry_bindings(artifacts[key]).get("forbidden_substitute_key")
-        for key in ("requirements", "design", "goal")
-        if registry_bindings(artifacts[key]).get("forbidden_substitute_key")
-    ]
-    if not selected_answer_key or selected_answer_key not in answer_registry or selected_answer_key in forbidden_keys:
-        errors.append("forbidden or unknown answer method")
-    if any(key != selected_answer_key for key in answer_keys):
-        errors.append("answer_method_key must be consistent across the control chain")
-
-    if selected_answer_key in answer_registry:
-        done_rule = answer_registry[selected_answer_key].get("done_rule", {})
-        if not isinstance(done_rule, dict) or done_rule.get("all_mandatory_nodes_required") is not True:
-            errors.append("answer method registry missing done_rule.all_mandatory_nodes_required")
-        forbidden_substitutions = set(string_list(answer_registry[selected_answer_key].get("forbidden_substitutions")))
-        if forbidden_substitutions & set(answer_keys):
-            errors.append("forbidden or unknown answer method")
-        approved_path = [
-            item.casefold()
-            for item in string_list(artifacts["design"].get("approved_control", {}).get("required_answer_path"))
-        ]
-        missing_nodes = [
-            node
-            for node in string_list(answer_registry[selected_answer_key].get("mandatory_nodes"))
-            if node.casefold() not in approved_path
-        ]
-        if missing_nodes:
-            errors.append(f"missing mandatory answer path nodes: {', '.join(missing_nodes)}")
 
     selected_workflow = registry_bindings(artifacts["runtime"]).get("selected_agent_workflow")
     plan_workflow = registry_bindings(artifacts["plan"]).get("selected_agent_workflow")

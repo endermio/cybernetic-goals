@@ -86,7 +86,6 @@ def compile_runtime_control(run_dir: Path) -> Path:
                 "what_counts_as_done": goal.get("approved_control", {}).get("what_counts_as_done", "Verifier permits the final report."),
             },
             "registry_bindings": {
-                "answer_method_key": plan_bindings.get("answer_method_key") or review.get("registry_bindings", {}).get("answer_method_key"),
                 "selected_agent_workflow": plan_bindings.get("selected_agent_workflow") or review.get("registry_bindings", {}).get("selected_agent_workflow"),
             },
             "approved_control_hashes": {},

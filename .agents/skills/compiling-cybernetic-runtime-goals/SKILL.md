@@ -42,8 +42,8 @@ Do not output `/goal` unless:
 - solution design exists when required design was required or a design artifact exists;
 - execution policy exists;
 - review status is Approved;
-- if What the User Approved records an answering method or how this should be answered, solution design includes `Answer Method Check`;
-- if What the User Approved records an answering method or how this should be answered, review records `Design answer method check: yes` in Review Independence and includes meaningful `Design Answer Method Check` findings;
+- if What the User Approved records how this should be answered, solution design records the required answer path and what supports each required step;
+- if What the User Approved records how this should be answered, review includes meaningful Required Answer Path findings;
 - review records `Who does the work / context use: yes` in Review Independence;
 - review includes meaningful `Who Does The Work / Context Use` findings;
 - when subagent-driven work assignment is selected, execution policy records `Subagent execution mode` and `Max concurrent subagents`;
@@ -84,10 +84,10 @@ Do not output `/goal` unless:
 The contract artifact must be `docs/cybernetics/runs/<slug>/runtime.control.json`, not a long copied prompt. It must include:
 
 - approved control chain paths for requirements, design when present, goal, execution policy, and review;
-- a runtime execution rule that forbids reinterpreting the what the user approved, answering method, answer method, what counts as done, output contract, work assignment, evidence checks, or control strategy;
-- a What the User Approved rule that treats primary object, requested transformation, non-goals, answering method, what is not enough, how this should be answered, work covered in this run, what the agent may do, forbidden actions, user purpose evidence, where the result must show up, what counts as done, output contract, why this process is needed, and known assumptions as source-owned by requirements;
-- required sections to read, including `What the User Approved`, design `Answer Method Check` when design exists, `What Counts As Done`, `Work Covered And Allowed Actions Contract`, `How We Know The User Purpose Was Met`, `Where The Result Must Show Up`, `Work Coverage And Action Limits Matrix`, `Steps That Make The Result True`, `Action That Can Make It Done`, `Candidate Plan Tasks`, `Who Does The Work / Context Use`, workflow compatibility, subagent execution mode/concurrency sections, `Design Answer Method Check`, `Work Covered And Allowed Actions Check`, `Parallel Agent Safety Check`, `Answer Path Check`, `What Counts As Done Check`, `User Purpose Evidence Check`, `Result Placement Check`, and `Final Independent Check`;
-- final report fields: `goal achieved: yes/no`, `what counts as done met: yes/no`, evidence needed to call it done, required answer path coverage and step evidence, answer method completion evidence when requirements/design define how this should be answered, not done reason when no, action that can make it done attempted or proof of impossibility when no, smallest next action that can make it done when no, work covered in this run, work coverage, executed, prepared-only, forbidden-not-executed, explicitly out-of-scope by what the user approved, user purpose evidence status and highest purpose-relevant evidence observed, and result places covered, actions completed or justified, old behavior checked, and pending or unknown places when result-placement applies;
+- a runtime execution rule that forbids reinterpreting the what the user approved, how this should be answered, what counts as done, output contract, work assignment, evidence checks, or control strategy;
+- a What the User Approved rule that treats primary object, requested transformation, non-goals, what is not enough, how this should be answered, work covered in this run, what the agent may do, forbidden actions, user purpose evidence, where the result must show up, what counts as done, output contract, why this process is needed, and known assumptions as source-owned by requirements;
+- required sections to read, including `What the User Approved`, design required answer path when design exists, `What Counts As Done`, `Work Covered And Allowed Actions Contract`, `How We Know The User Purpose Was Met`, `Where The Result Must Show Up`, `Work Coverage And Action Limits Matrix`, `Steps That Make The Result True`, `Action That Can Make It Done`, `Candidate Plan Tasks`, `Who Does The Work / Context Use`, workflow compatibility, subagent execution mode/concurrency sections, `Work Covered And Allowed Actions Check`, `Parallel Agent Safety Check`, `Answer Path Check`, `What Counts As Done Check`, `User Purpose Evidence Check`, `Result Placement Check`, and `Final Independent Check`;
+- final report fields: `goal achieved: yes/no`, `what counts as done met: yes/no`, evidence needed to call it done, required answer path coverage and step evidence, not done reason when no, action that can make it done attempted or proof of impossibility when no, smallest next action that can make it done when no, work covered in this run, work coverage, executed, prepared-only, forbidden-not-executed, explicitly out-of-scope by what the user approved, user purpose evidence status and highest purpose-relevant evidence observed, and result places covered, actions completed or justified, old behavior checked, and pending or unknown places when result-placement applies;
 - a stop rule for missing, unapproved, inconsistent, or insufficient referenced artifacts.
 
 The final `/goal` command must only point to `runtime.control.json` and tell runtime Codex to use `.agents/skills/using-control-json`.
@@ -157,7 +157,6 @@ Do not create or modify target-work artifacts.
 
 - [ ] Guard passed or equivalent checks passed.
 - [ ] Requirements analysis contains What the User Approved: Approved.
-- [ ] Design Answer Method Check is reviewed when What the User Approved records an answering method or answer method.
 - [ ] No approved file was rewritten.
 - [ ] Review records `Who does the work / context use: yes` in Review Independence.
 - [ ] Review includes meaningful `Who Does The Work / Context Use` findings.
@@ -169,7 +168,6 @@ Do not create or modify target-work artifacts.
 - [ ] `runtime.control.json` indexes the goal's Final Output Contract when present or required.
 - [ ] `runtime.control.json` preserves the approved work assignment through the plan section index.
 - [ ] `runtime.control.json` preserves the What the User Approved through the requirements section index.
-- [ ] `runtime.control.json` indexes design `Answer Method Check` and review `Design Answer Method Check` when design exists.
 - [ ] `runtime.control.json` includes final report fields for work coverage and action limits, user-purpose evidence, result-placement, and what-counts-as-done claim calibration.
 - [ ] `runtime.control.json` indexes the approved Steps That Make The Result True and review check section.
 - [ ] The user-entered `/goal` is pointer-only and length-bounded.

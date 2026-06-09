@@ -141,14 +141,9 @@
       "type": "object",
       "additionalProperties": false,
       "required": [
-        "answer_method_key",
         "selected_agent_workflow"
       ],
       "properties": {
-        "answer_method_key": {
-          "type": "string",
-          "minLength": 1
-        },
         "selected_agent_workflow": {
           "type": "string",
           "minLength": 1

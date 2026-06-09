@@ -14,7 +14,6 @@
     "what_counts_as_done": "All required JSON-only control migration steps have evidence, full tests pass, and verify_runtime_progress permits goal_achieved true."
   },
   "registry_bindings": {
-    "answer_method_key": "implementation-spine",
     "selected_agent_workflow": "superpowers-dispatching-parallel-agents"
   },
   "runtime": {
@@ -156,14 +155,14 @@
   },
   "semantic_base_ref": {
     "id": "semantic-base:2026-06-09-json-only-control-facts-migration",
-    "hash": "sha256:4e6ebe13645228a178988fd4f5b203e539d5f8e15945b77e1c5d67b1cf5ca83d"
+    "hash": "sha256:66e988b1542bfcf7ddc1869d9f8e0c5886ab4e55c1d866d7c6dd792dd712c0da"
   },
   "approved_control_hashes": {
-    "requirements.control.json": "sha256:5938d4e32203fe86c06011dd96d1d6848d0ce384433987b4063bdc7da9abc584",
-    "design.control.json": "sha256:4ae981189811541dbbacec126fd333de2991fa51d5b22e7b0c6f9a72edbc6f8c",
-    "goal.control.json": "sha256:0929c02bffde480680c85426aecaf9e7a2d79b86fab5c35ac842d0836cf238de",
-    "plan.control.json": "sha256:81c1e19fe583070cea2a56d9a7a30dfde0267fda9300a6f58ebf9c7985bb4c4c",
-    "review.control.json": "sha256:918fbc2545f9cb021ae72142dd85fe8d448476bf4efebdf06acc0b5facc692df",
-    "runtime.control.json": "sha256:0133693b89daad2a47415ca711ab84d10323746c430c323d31fdb3f09d1a8c35"
+    "requirements.control.json": "sha256:01c507c8795b46692ff414afa7fed5754ce215348d684315c29edfc1750ad1ee",
+    "design.control.json": "sha256:c95d319256b559749adfdd61548852f2662e78a8682a6fd7511e25014d823ae4",
+    "goal.control.json": "sha256:695c40a7892e2baa1be0a35c8d56ac9d3e031bc6caea6028ee9c586479cfec6a",
+    "plan.control.json": "sha256:2297d99c4009e69b6a5428679ff0ad50816139583eb48d9b6c9fc0adec5766b6",
+    "review.control.json": "sha256:e5c58b86a7a97cf77305103c4a89d80c3be007f884e96a34b9c1b761d01cfa0a",
+    "runtime.control.json": "sha256:62ca1711b17a584628d5031806159615e251ee1da8e206c114eb977bf2923e22"
   }
 }
