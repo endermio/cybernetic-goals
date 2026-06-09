@@ -1,4 +1,5 @@
 import copy
+import hashlib
 import json
 import unittest
 from pathlib import Path
@@ -243,6 +244,78 @@ SCHEMA_FIXTURES = {
 }
 
 
+READONLY_FILES = [
+    "requirements.control.json",
+    "design.control.json",
+    "goal.control.json",
+    "plan.control.json",
+    "review.control.json",
+    "runtime.control.json",
+]
+REVIEW_HASH_FILES = [
+    "requirements.control.json",
+    "design.control.json",
+    "goal.control.json",
+    "plan.control.json",
+]
+
+
+def canonical_json_hash(value: dict, omit_top_level: set[str] | None = None) -> str:
+    canonical_value = copy.deepcopy(value)
+    for key in omit_top_level or set():
+        canonical_value.pop(key, None)
+    encoded = json.dumps(canonical_value, ensure_ascii=False, sort_keys=True, separators=(",", ":")).encode("utf-8")
+    return "sha256:" + hashlib.sha256(encoded).hexdigest()
+
+
+def semantic_base_for_requirements(requirements: dict) -> dict:
+    approved = copy.deepcopy(requirements["approved_control"])
+    approved.pop("semantic_base", None)
+    return {
+        "id": "semantic-base:test-fixture",
+        "hash": canonical_json_hash(approved),
+    }
+
+
+def control_hash(filename: str, artifact: dict) -> str:
+    omit = {"approved_control_hashes"} if filename == "runtime.control.json" else set()
+    return canonical_json_hash(artifact, omit)
+
+
+def apply_integrity_metadata(control_files: dict[str, dict]) -> None:
+    semantic_base = semantic_base_for_requirements(control_files["requirements.control.json"])
+    control_files["requirements.control.json"]["approved_control"]["semantic_base"] = semantic_base
+    for filename in (
+        "design.control.json",
+        "goal.control.json",
+        "plan.control.json",
+        "review.control.json",
+        "runtime.control.json",
+    ):
+        control_files[filename]["semantic_base_ref"] = copy.deepcopy(semantic_base)
+
+    control_files["review.control.json"]["approved_control_hashes"] = {
+        filename: control_hash(filename, control_files[filename])
+        for filename in REVIEW_HASH_FILES
+    }
+    control_files["runtime.control.json"]["approved_control_hashes"] = {
+        filename: control_hash(filename, control_files[filename])
+        for filename in READONLY_FILES
+    }
+
+
+apply_integrity_metadata(
+    {
+        "requirements.control.json": SCHEMA_FIXTURES["requirements.control.schema.json"],
+        "design.control.json": SCHEMA_FIXTURES["design.control.schema.json"],
+        "goal.control.json": SCHEMA_FIXTURES["goal.control.schema.json"],
+        "plan.control.json": SCHEMA_FIXTURES["plan.control.schema.json"],
+        "review.control.json": SCHEMA_FIXTURES["review.control.schema.json"],
+        "runtime.control.json": SCHEMA_FIXTURES["runtime.control.schema.json"],
+    }
+)
+
+
 class SchemaValidationError(AssertionError):
     pass
 
@@ -354,6 +427,8 @@ class ControlJsonSchemaTest(unittest.TestCase):
         self.assertIn("implementation-spine", answer_registry)
         self.assertIn("mandatory_nodes", answer_registry["implementation-spine"])
         self.assertIn("forbidden_substitutions", answer_registry["implementation-spine"])
+        self.assertIn("done_rule", answer_registry["implementation-spine"])
+        self.assertTrue(answer_registry["implementation-spine"]["done_rule"]["all_mandatory_nodes_required"])
 
         self.assertIn("superpowers-dispatching-parallel-agents", delegation_registry)
         workflow = delegation_registry["superpowers-dispatching-parallel-agents"]
@@ -361,6 +436,22 @@ class ControlJsonSchemaTest(unittest.TestCase):
         self.assertNotIn("allowed_work assignment", workflow)
         self.assertIn("Parallel subagent-driven", workflow["allowed_work_assignment"])
         self.assertIn("parallel-max-safe", workflow["allowed_mode"])
+
+    def test_schemas_bind_semantic_base_and_approved_control_hashes(self):
+        requirements = load_json(SCHEMA_DIR / "requirements.control.schema.json")
+        design = load_json(SCHEMA_DIR / "design.control.schema.json")
+        goal = load_json(SCHEMA_DIR / "goal.control.schema.json")
+        plan = load_json(SCHEMA_DIR / "plan.control.schema.json")
+        review = load_json(SCHEMA_DIR / "review.control.schema.json")
+        runtime = load_json(SCHEMA_DIR / "runtime.control.schema.json")
+
+        self.assertIn("semantic_base", requirements["properties"]["approved_control"]["properties"])
+        for schema in (design, goal, plan, review, runtime):
+            self.assertIn("semantic_base_ref", schema["required"])
+            self.assertIn("semantic_base_ref", schema["properties"])
+        for schema in (review, runtime):
+            self.assertIn("approved_control_hashes", schema["required"])
+            self.assertIn("approved_control_hashes", schema["properties"])
 
 
 if __name__ == "__main__":

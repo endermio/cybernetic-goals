@@ -9,6 +9,7 @@
     "schema_version",
     "status",
     "source_contracts",
+    "semantic_base_ref",
     "registry_bindings",
     "required_steps",
     "work_packages",
@@ -48,6 +49,24 @@
           "minLength": 1
         },
         "goal": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "semantic_base_ref": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "hash"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "hash": {
           "type": "string",
           "minLength": 1
         }

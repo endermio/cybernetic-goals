@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import copy
 import hashlib
 import json
 from pathlib import Path
@@ -27,6 +28,12 @@ REQUIRED_REVIEW_CHECKS = {
     "horizon-authority",
     "final-observer",
 }
+REVIEW_HASH_FILES = (
+    "requirements.control.json",
+    "design.control.json",
+    "goal.control.json",
+    "plan.control.json",
+)
 
 EVENT_TYPES = {
     "step.started",
@@ -41,6 +48,43 @@ PROGRESS_ROLES = {"mainline", "supporting_only"}
 
 class ControlJsonError(Exception):
     pass
+
+
+def canonical_json_hash(value: dict[str, Any], *, omit_top_level: set[str] | None = None) -> str:
+    canonical_value = copy.deepcopy(value)
+    for key in omit_top_level or set():
+        canonical_value.pop(key, None)
+    encoded = json.dumps(canonical_value, ensure_ascii=False, sort_keys=True, separators=(",", ":")).encode("utf-8")
+    return "sha256:" + hashlib.sha256(encoded).hexdigest()
+
+
+def semantic_base_hash(requirements: dict[str, Any]) -> str:
+    approved = requirements.get("approved_control")
+    if not isinstance(approved, dict):
+        return ""
+    semantic_value = copy.deepcopy(approved)
+    semantic_value.pop("semantic_base", None)
+    return canonical_json_hash(semantic_value)
+
+
+def control_file_hash(filename: str, artifact: dict[str, Any]) -> str:
+    omit = {"approved_control_hashes"} if filename == "runtime.control.json" else set()
+    return canonical_json_hash(artifact, omit_top_level=omit)
+
+
+def expected_hashes(artifacts: dict[str, dict[str, Any]], filenames: tuple[str, ...]) -> dict[str, str]:
+    key_by_filename = {filename: key for key, filename in CONTROL_FILES.items()}
+    return {filename: control_file_hash(filename, artifacts[key_by_filename[filename]]) for filename in filenames}
+
+
+def check_hashes(label: str, actual: Any, expected: dict[str, str]) -> list[str]:
+    if not isinstance(actual, dict):
+        return [f"{label} approved_control_hashes must be an object"]
+    errors: list[str] = []
+    for filename, expected_hash in expected.items():
+        if actual.get(filename) != expected_hash:
+            errors.append(f"{label} approved_control_hashes mismatch for {filename}")
+    return errors
 
 
 def load_json(path: Path) -> dict[str, Any]:
@@ -189,6 +233,28 @@ def validate_control_chain(run_dir: Path) -> tuple[dict[str, dict[str, Any]] | N
     if runtime_chain != {key: filename for key, filename in CONTROL_FILES.items() if key != "runtime"}:
         errors.append("runtime.control.json has inconsistent control chain references")
 
+    semantic_base = artifacts["requirements"].get("approved_control", {}).get("semantic_base")
+    if not isinstance(semantic_base, dict) or semantic_base.get("hash") != semantic_base_hash(artifacts["requirements"]):
+        errors.append("requirements.control.json semantic_base hash must match approved_control")
+    for key in ("design", "goal", "plan", "review", "runtime"):
+        if artifacts[key].get("semantic_base_ref") != semantic_base:
+            errors.append(f"{CONTROL_FILES[key]} semantic_base_ref must match requirements approved semantic_base")
+
+    errors.extend(
+        check_hashes(
+            "review.control.json",
+            artifacts["review"].get("approved_control_hashes"),
+            expected_hashes(artifacts, REVIEW_HASH_FILES),
+        )
+    )
+    errors.extend(
+        check_hashes(
+            "runtime.control.json",
+            artifacts["runtime"].get("approved_control_hashes"),
+            expected_hashes(artifacts, READONLY_FILES),
+        )
+    )
+
     expected_sources = {
         "design": {"requirements": "requirements.control.json"},
         "goal": {"requirements": "requirements.control.json", "design": "design.control.json"},
@@ -274,6 +340,9 @@ def validate_control_chain(run_dir: Path) -> tuple[dict[str, dict[str, Any]] | N
         errors.append("answer_method_key must be consistent across the control chain")
 
     if selected_answer_key in answer_registry:
+        done_rule = answer_registry[selected_answer_key].get("done_rule", {})
+        if not isinstance(done_rule, dict) or done_rule.get("all_mandatory_nodes_required") is not True:
+            errors.append("answer method registry missing done_rule.all_mandatory_nodes_required")
         forbidden_substitutions = set(string_list(answer_registry[selected_answer_key].get("forbidden_substitutions")))
         if forbidden_substitutions & set(answer_keys):
             errors.append("forbidden or unknown answer method")

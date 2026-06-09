@@ -116,5 +116,17 @@
     "required_before_goal_achieved": true,
     "command": "python3 .agents/skills/using-control-json/scripts/verify_runtime_progress.py",
     "output_schema": "final-report.schema.json"
+  },
+  "semantic_base_ref": {
+    "id": "semantic-base:2026-06-09-json-only-control-facts-migration",
+    "hash": "sha256:f52ad0c4662baa1c6fb29758d3fe175132d28f8373cb48a45ce5e29fbc0087dd"
+  },
+  "approved_control_hashes": {
+    "requirements.control.json": "sha256:b6e0a1f59390b9ec5b277d89168faae33b08fa05a1536c6150675715399e7ab6",
+    "design.control.json": "sha256:5d5367a0b3dcd864d2e8922d62b594100bfd8f3e6c98d2e1f73ed9105559841c",
+    "goal.control.json": "sha256:af94432c098c021bda4d811ec43442e173211bc844cd18dd80490c471d03f984",
+    "plan.control.json": "sha256:4b6d08bfcc97bf62cc3b1400c3a76d012f2a8231bd9da22251978a30cf634deb",
+    "review.control.json": "sha256:bf6771b188d4f4b03dfdfddfbe26eddde1a844aeae7b6bc0aadff1eb6eb37347",
+    "runtime.control.json": "sha256:0346d850f632b267c9e3e94b4a85568f923081c20077561d7bdb7d9feb7d4827"
   }
 }

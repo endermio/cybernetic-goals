@@ -3,6 +3,8 @@
 from __future__ import annotations
 
 import argparse
+import copy
+import hashlib
 import json
 import sys
 from pathlib import Path
@@ -40,10 +42,50 @@ REQUIRED_REVIEW_CHECKS = {
     "horizon-authority",
     "final-observer",
 }
+REVIEW_HASH_FILES = [
+    "requirements.control.json",
+    "design.control.json",
+    "goal.control.json",
+    "plan.control.json",
+]
 
 
 class ControlJsonValidationError(Exception):
     pass
+
+
+def canonical_json_hash(value: dict[str, Any], *, omit_top_level: set[str] | None = None) -> str:
+    canonical_value = copy.deepcopy(value)
+    for key in omit_top_level or set():
+        canonical_value.pop(key, None)
+    encoded = json.dumps(canonical_value, ensure_ascii=False, sort_keys=True, separators=(",", ":")).encode("utf-8")
+    return "sha256:" + hashlib.sha256(encoded).hexdigest()
+
+
+def semantic_base_hash(requirements: dict[str, Any]) -> str:
+    approved = requirements.get("approved_control", {})
+    if not isinstance(approved, dict):
+        return ""
+    semantic_value = copy.deepcopy(approved)
+    semantic_value.pop("semantic_base", None)
+    return canonical_json_hash(semantic_value)
+
+
+def control_file_hash(filename: str, artifact: dict[str, Any]) -> str:
+    omit = {"approved_control_hashes"} if filename == "runtime.control.json" else set()
+    return canonical_json_hash(artifact, omit_top_level=omit)
+
+
+def expected_hashes(artifacts: dict[str, dict[str, Any]], filenames: list[str]) -> dict[str, str]:
+    return {filename: control_file_hash(filename, artifacts[filename]) for filename in filenames}
+
+
+def require_hashes(label: str, actual: Any, expected: dict[str, str]) -> None:
+    if not isinstance(actual, dict):
+        raise ControlJsonValidationError(f"{label}: approved_control_hashes must be an object")
+    for filename, expected_hash in expected.items():
+        if actual.get(filename) != expected_hash:
+            raise ControlJsonValidationError(f"{label}: approved_control_hashes mismatch for {filename}")
 
 
 def read_json_object(path: Path) -> dict[str, Any]:
@@ -140,6 +182,24 @@ def validate_json_control_run(run_dir: Path) -> dict[str, dict[str, Any]]:
         artifacts[filename] = artifact
 
     runtime = artifacts["runtime.control.json"]
+    semantic_base = artifacts["requirements.control.json"].get("approved_control", {}).get("semantic_base")
+    if not isinstance(semantic_base, dict) or semantic_base.get("hash") != semantic_base_hash(artifacts["requirements.control.json"]):
+        raise ControlJsonValidationError("requirements.control.json: semantic_base hash must match approved_control")
+    for filename in ("design.control.json", "goal.control.json", "plan.control.json", "review.control.json", "runtime.control.json"):
+        if artifacts[filename].get("semantic_base_ref") != semantic_base:
+            raise ControlJsonValidationError(f"{filename}: semantic_base_ref must match requirements approved semantic_base")
+
+    require_hashes(
+        "review.control.json",
+        artifacts["review.control.json"].get("approved_control_hashes"),
+        expected_hashes(artifacts, REVIEW_HASH_FILES),
+    )
+    require_hashes(
+        "runtime.control.json",
+        runtime.get("approved_control_hashes"),
+        expected_hashes(artifacts, READONLY_FILES),
+    )
+
     expected_chain = {
         "requirements": "requirements.control.json",
         "design": "design.control.json",
@@ -216,6 +276,10 @@ def validate_json_control_run(run_dir: Path) -> dict[str, dict[str, Any]]:
         raise ControlJsonValidationError("forbidden or unknown answer method")
     if any(key != answer_key for key in answer_keys):
         raise ControlJsonValidationError("answer_method_key must be consistent across the control chain")
+
+    done_rule = answer_registry[answer_key].get("done_rule", {})
+    if not isinstance(done_rule, dict) or done_rule.get("all_mandatory_nodes_required") is not True:
+        raise ControlJsonValidationError("answer method registry missing done_rule.all_mandatory_nodes_required")
 
     approved_path = [item.casefold() for item in string_list(artifacts["design.control.json"].get("approved_control", {}).get("required_answer_path"))]
     missing_nodes = [

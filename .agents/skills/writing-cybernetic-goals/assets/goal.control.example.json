@@ -28,5 +28,9 @@
         "JSON example files under skill assets"
       ]
     }
-  ]
+  ],
+  "semantic_base_ref": {
+    "id": "semantic-base:control-example",
+    "hash": "sha256:37c64594d76f781cfcba7346ef2e2f4ba707fe6fa38897bd3943638812525924"
+  }
 }

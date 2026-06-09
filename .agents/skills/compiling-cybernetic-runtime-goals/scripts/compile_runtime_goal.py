@@ -9,6 +9,7 @@ from pathlib import Path
 
 from control_chain_guard import (
     ControlJsonValidationError,
+    control_file_hash,
     read_json_object,
     reject_markdown_control_artifacts,
     validate_json_control_run,
@@ -41,6 +42,8 @@ def compile_runtime_control(run_dir: Path) -> Path:
 
     runtime_path = run_dir / "runtime.control.json"
     if not runtime_path.exists():
+        requirements = read_json_object(run_dir / "requirements.control.json")
+        design = read_json_object(run_dir / "design.control.json")
         goal = read_json_object(run_dir / "goal.control.json")
         plan = read_json_object(run_dir / "plan.control.json")
         review = read_json_object(run_dir / "review.control.json")
@@ -57,6 +60,7 @@ def compile_runtime_control(run_dir: Path) -> Path:
                 "plan": "plan.control.json",
                 "review": "review.control.json",
             },
+            "semantic_base_ref": plan.get("semantic_base_ref") or goal.get("semantic_base_ref"),
             "approved_control": {
                 "objective": goal.get("approved_control", {}).get("objective", "Execute the approved JSON control chain."),
                 "what_counts_as_done": goal.get("approved_control", {}).get("what_counts_as_done", "Verifier permits the final report."),
@@ -65,6 +69,7 @@ def compile_runtime_control(run_dir: Path) -> Path:
                 "answer_method_key": plan_bindings.get("answer_method_key") or review.get("registry_bindings", {}).get("answer_method_key"),
                 "selected_agent_workflow": plan_bindings.get("selected_agent_workflow") or review.get("registry_bindings", {}).get("selected_agent_workflow"),
             },
+            "approved_control_hashes": {},
             "runtime": {
                 "readonly_files": APPROVED_CONTROL_FILES,
                 "writable_files": WRITABLE_FILES,
@@ -76,6 +81,14 @@ def compile_runtime_control(run_dir: Path) -> Path:
                 "command": "python3 .agents/skills/using-control-json/scripts/verify_runtime_progress.py",
                 "output_schema": plan.get("verifier", {}).get("output_schema", "final-report.schema.json"),
             },
+        }
+        runtime["approved_control_hashes"] = {
+            "requirements.control.json": control_file_hash("requirements.control.json", requirements),
+            "design.control.json": control_file_hash("design.control.json", design),
+            "goal.control.json": control_file_hash("goal.control.json", goal),
+            "plan.control.json": control_file_hash("plan.control.json", plan),
+            "review.control.json": control_file_hash("review.control.json", review),
+            "runtime.control.json": control_file_hash("runtime.control.json", runtime),
         }
         runtime_path.write_text(json.dumps(runtime, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
 

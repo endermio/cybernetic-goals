@@ -14,11 +14,49 @@
   },
   "review_checks": [
     {
-      "check_id": "json-only-template-hard-cut",
+      "check_id": "design-answer-method",
       "status": "pass",
       "evidence": [
-        "Markdown assets are deauthorized and JSON examples exist."
+        "answer method preserves required implementation path"
+      ]
+    },
+    {
+      "check_id": "required-answer-path",
+      "status": "pass",
+      "evidence": [
+        "mandatory required steps are present"
+      ]
+    },
+    {
+      "check_id": "work-assignment",
+      "status": "pass",
+      "evidence": [
+        "parallel workflow registry binding is explicit"
+      ]
+    },
+    {
+      "check_id": "horizon-authority",
+      "status": "pass",
+      "evidence": [
+        "covered work remains inside the JSON run"
+      ]
+    },
+    {
+      "check_id": "final-observer",
+      "status": "pass",
+      "evidence": [
+        "verifier-gated final report is required"
       ]
     }
-  ]
+  ],
+  "semantic_base_ref": {
+    "id": "semantic-base:control-example",
+    "hash": "sha256:37c64594d76f781cfcba7346ef2e2f4ba707fe6fa38897bd3943638812525924"
+  },
+  "approved_control_hashes": {
+    "requirements.control.json": "sha256:578cd7159ea5cbd90ac04df4b45995ac2ef997ea61c966df7cd1bf51b463ea49",
+    "design.control.json": "sha256:595365630966ab41fd7b038261c03d45354d094a906ea2acdaa7a69853176789",
+    "goal.control.json": "sha256:755953d8fdfec5dedde1cbb55270d87751464678e20b8fdf69a6c59fc2135ccc",
+    "plan.control.json": "sha256:80e82674ffa95df7b9988bce23082e3062858b5964f29222e57e497aa6750ec6"
+  }
 }

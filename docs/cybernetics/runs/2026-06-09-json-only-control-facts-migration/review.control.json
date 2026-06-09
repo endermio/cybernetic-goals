@@ -48,5 +48,15 @@
         "JSON-only focused tests and full tests pass before runtime verification"
       ]
     }
-  ]
+  ],
+  "semantic_base_ref": {
+    "id": "semantic-base:2026-06-09-json-only-control-facts-migration",
+    "hash": "sha256:f52ad0c4662baa1c6fb29758d3fe175132d28f8373cb48a45ce5e29fbc0087dd"
+  },
+  "approved_control_hashes": {
+    "requirements.control.json": "sha256:b6e0a1f59390b9ec5b277d89168faae33b08fa05a1536c6150675715399e7ab6",
+    "design.control.json": "sha256:5d5367a0b3dcd864d2e8922d62b594100bfd8f3e6c98d2e1f73ed9105559841c",
+    "goal.control.json": "sha256:af94432c098c021bda4d811ec43442e173211bc844cd18dd80490c471d03f984",
+    "plan.control.json": "sha256:4b6d08bfcc97bf62cc3b1400c3a76d012f2a8231bd9da22251978a30cf634deb"
+  }
 }

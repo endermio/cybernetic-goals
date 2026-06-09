@@ -9,6 +9,9 @@
   "approved_control": {
     "confirmed_meaning": "JSON is the only official persistent control fact for the cybernetic control chain.",
     "required_answer_path": [
+      "initial state",
+      "state transition that makes the result true",
+      "observable target state",
       "Inventory old Markdown control inputs.",
       "Create strict JSON control files.",
       "Reject Markdown as official guard, compiler, and runtime input."
@@ -30,5 +33,9 @@
         "template hard-cut tests"
       ]
     }
-  ]
+  ],
+  "semantic_base_ref": {
+    "id": "semantic-base:control-example",
+    "hash": "sha256:37c64594d76f781cfcba7346ef2e2f4ba707fe6fa38897bd3943638812525924"
+  }
 }

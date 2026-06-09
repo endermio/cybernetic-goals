@@ -107,5 +107,9 @@
         "git diff --check"
       ]
     }
-  ]
+  ],
+  "semantic_base_ref": {
+    "id": "semantic-base:2026-06-09-json-only-control-facts-migration",
+    "hash": "sha256:f52ad0c4662baa1c6fb29758d3fe175132d28f8373cb48a45ce5e29fbc0087dd"
+  }
 }

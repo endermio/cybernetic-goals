@@ -9,6 +9,7 @@
     "schema_version",
     "status",
     "source_contracts",
+    "semantic_base_ref",
     "approved_control",
     "registry_bindings",
     "required_steps"
@@ -40,6 +41,24 @@
           "minLength": 1
         },
         "requirements_registry_sidecar": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "semantic_base_ref": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "hash"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "hash": {
           "type": "string",
           "minLength": 1
         }

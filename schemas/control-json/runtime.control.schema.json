@@ -9,7 +9,9 @@
     "schema_version",
     "status",
     "control_chain",
+    "semantic_base_ref",
     "registry_bindings",
+    "approved_control_hashes",
     "runtime",
     "required_steps",
     "progress",
@@ -61,6 +63,24 @@
         }
       }
     },
+    "semantic_base_ref": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "hash"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "hash": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
     "approved_control": {
       "type": "object",
       "additionalProperties": false,
@@ -74,6 +94,44 @@
           "minLength": 1
         },
         "what_counts_as_done": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "approved_control_hashes": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "requirements.control.json",
+        "design.control.json",
+        "goal.control.json",
+        "plan.control.json",
+        "review.control.json",
+        "runtime.control.json"
+      ],
+      "properties": {
+        "requirements.control.json": {
+          "type": "string",
+          "minLength": 1
+        },
+        "design.control.json": {
+          "type": "string",
+          "minLength": 1
+        },
+        "goal.control.json": {
+          "type": "string",
+          "minLength": 1
+        },
+        "plan.control.json": {
+          "type": "string",
+          "minLength": 1
+        },
+        "review.control.json": {
+          "type": "string",
+          "minLength": 1
+        },
+        "runtime.control.json": {
           "type": "string",
           "minLength": 1
         }

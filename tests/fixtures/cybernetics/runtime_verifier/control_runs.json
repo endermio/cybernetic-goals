@@ -9,13 +9,28 @@
           "human_purpose": "move official control facts to JSON",
           "primary_object": "cybernetic control chain",
           "requested_transformation": "replace Markdown authority with strict JSON control files",
-          "non_goals": ["long-term Markdown compatibility"],
+          "non_goals": [
+            "long-term Markdown compatibility"
+          ],
           "how_we_know_purpose_was_met": "JSON guard/compiler/runtime path operates without Markdown control inputs",
-          "where_result_must_show_up": ["schemas", "registries", "guards", "runtime verifier"],
+          "where_result_must_show_up": [
+            "schemas",
+            "registries",
+            "guards",
+            "runtime verifier"
+          ],
           "what_counts_as_done": "official JSON path passes and verifier-gated completion is enforced",
           "final_answer_format": {
             "medium": "chat summary",
-            "required_structure": ["changed files", "verification commands", "S7/S9/S10 status"]
+            "required_structure": [
+              "changed files",
+              "verification commands",
+              "S7/S9/S10 status"
+            ]
+          },
+          "semantic_base": {
+            "id": "semantic-base:runtime-verifier-fixture",
+            "hash": "sha256:17541255a20b0120b4b205dd39f21e0bd4cb08fdb41ea381143e9ead45853bf1"
           }
         },
         "registry_bindings": {
@@ -38,7 +53,9 @@
             "state transition that makes the result true",
             "observable target state"
           ],
-          "what_is_not_enough_avoided": ["JSON sidecars with Markdown authority"]
+          "what_is_not_enough_avoided": [
+            "JSON sidecars with Markdown authority"
+          ]
         },
         "registry_bindings": {
           "answer_method_key": "implementation-spine",
@@ -48,14 +65,22 @@
           {
             "step_id": "S7",
             "transition": "runtime writes progress events only",
-            "evidence": ["progress JSONL append evidence"]
+            "evidence": [
+              "progress JSONL append evidence"
+            ]
           },
           {
             "step_id": "S9",
             "transition": "old accident regressions are represented in JSON",
-            "evidence": ["runtime verifier regression tests"]
+            "evidence": [
+              "runtime verifier regression tests"
+            ]
           }
-        ]
+        ],
+        "semantic_base_ref": {
+          "id": "semantic-base:runtime-verifier-fixture",
+          "hash": "sha256:17541255a20b0120b4b205dd39f21e0bd4cb08fdb41ea381143e9ead45853bf1"
+        }
       },
       "goal.control.json": {
         "artifact_type": "goal.control",
@@ -83,14 +108,22 @@
           {
             "step_id": "S7",
             "transition": "runtime progress and verifier implemented",
-            "evidence": ["progress/verifier tests"]
+            "evidence": [
+              "progress/verifier tests"
+            ]
           },
           {
             "step_id": "S9",
             "transition": "old accident JSON regressions pass",
-            "evidence": ["regression fixtures"]
+            "evidence": [
+              "regression fixtures"
+            ]
           }
-        ]
+        ],
+        "semantic_base_ref": {
+          "id": "semantic-base:runtime-verifier-fixture",
+          "hash": "sha256:17541255a20b0120b4b205dd39f21e0bd4cb08fdb41ea381143e9ead45853bf1"
+        }
       },
       "plan.control.json": {
         "artifact_type": "plan.control",
@@ -110,25 +143,38 @@
           {
             "step_id": "S7",
             "transition": "runtime progress and verifier implemented",
-            "evidence": ["runtime verifier tests"]
+            "evidence": [
+              "runtime verifier tests"
+            ]
           },
           {
             "step_id": "S9",
             "transition": "old accident regressions ported to JSON",
-            "evidence": ["JSON regression tests"]
+            "evidence": [
+              "JSON regression tests"
+            ]
           }
         ],
         "work_packages": [
           {
             "work_package_id": "WP5",
-            "required_steps": ["S7", "S9"],
+            "required_steps": [
+              "S7",
+              "S9"
+            ],
             "allowed_write_paths": [
               ".agents/skills/using-control-json/scripts",
               "tests/fixtures/cybernetics/runtime_verifier",
               "tests/skills/test_runtime_json_progress_verifier.py"
             ],
-            "forbidden_write_paths": ["guard scripts", "compiler scripts", "official Markdown templates"],
-            "required_tests": ["python3 -m unittest tests.skills.test_runtime_json_progress_verifier"]
+            "forbidden_write_paths": [
+              "guard scripts",
+              "compiler scripts",
+              "official Markdown templates"
+            ],
+            "required_tests": [
+              "python3 -m unittest tests.skills.test_runtime_json_progress_verifier"
+            ]
           }
         ],
         "runtime": {
@@ -140,7 +186,11 @@
             "review.control.json",
             "runtime.control.json"
           ],
-          "writable_files": ["progress.jsonl", "runtime-status.json", "final-report.json"]
+          "writable_files": [
+            "progress.jsonl",
+            "runtime-status.json",
+            "final-report.json"
+          ]
         },
         "progress": {
           "event_schema": "progress-event.schema.json",
@@ -149,6 +199,10 @@
         "verifier": {
           "required_before_goal_achieved": true,
           "output_schema": "final-report.schema.json"
+        },
+        "semantic_base_ref": {
+          "id": "semantic-base:runtime-verifier-fixture",
+          "hash": "sha256:17541255a20b0120b4b205dd39f21e0bd4cb08fdb41ea381143e9ead45853bf1"
         }
       },
       "review.control.json": {
@@ -169,29 +223,49 @@
           {
             "check_id": "design-answer-method",
             "status": "pass",
-            "evidence": ["registry answer path preserved"]
+            "evidence": [
+              "registry answer path preserved"
+            ]
           },
           {
             "check_id": "required-answer-path",
             "status": "pass",
-            "evidence": ["mandatory nodes present"]
+            "evidence": [
+              "mandatory nodes present"
+            ]
           },
           {
             "check_id": "work-assignment",
             "status": "pass",
-            "evidence": ["parallel workflow registry binding present"]
+            "evidence": [
+              "parallel workflow registry binding present"
+            ]
           },
           {
             "check_id": "horizon-authority",
             "status": "pass",
-            "evidence": ["covered work remains in this run"]
+            "evidence": [
+              "covered work remains in this run"
+            ]
           },
           {
             "check_id": "final-observer",
             "status": "pass",
-            "evidence": ["approved JSON chain ready for runtime"]
+            "evidence": [
+              "approved JSON chain ready for runtime"
+            ]
           }
-        ]
+        ],
+        "semantic_base_ref": {
+          "id": "semantic-base:runtime-verifier-fixture",
+          "hash": "sha256:17541255a20b0120b4b205dd39f21e0bd4cb08fdb41ea381143e9ead45853bf1"
+        },
+        "approved_control_hashes": {
+          "requirements.control.json": "sha256:72ca92cd182b80576f8bb7b12c4319e099f9c8e73dd4e60d6d902351290f8d80",
+          "design.control.json": "sha256:ba5a4b958bc8a6c95df0e14eec02357cebd57053f66cedd05c955a5c45ca3976",
+          "goal.control.json": "sha256:0405f70dcf5aa5582ff1b11d47c97c4123c084077db1f6cae304129a9a18175e",
+          "plan.control.json": "sha256:3b58d9bb52e056874f5051f95237ca32dbdeae7a056ef5c202b9f7f7006e1805"
+        }
       },
       "runtime.control.json": {
         "artifact_type": "runtime.control",
@@ -221,18 +295,26 @@
             "review.control.json",
             "runtime.control.json"
           ],
-          "writable_files": ["progress.jsonl", "runtime-status.json", "final-report.json"]
+          "writable_files": [
+            "progress.jsonl",
+            "runtime-status.json",
+            "final-report.json"
+          ]
         },
         "required_steps": [
           {
             "step_id": "S7",
             "transition": "runtime writes progress events only",
-            "evidence": ["progress event validation"]
+            "evidence": [
+              "progress event validation"
+            ]
           },
           {
             "step_id": "S9",
             "transition": "old accident regressions rewritten for JSON",
-            "evidence": ["verifier regression tests"]
+            "evidence": [
+              "verifier regression tests"
+            ]
           }
         ],
         "progress": {
@@ -243,6 +325,18 @@
           "required_before_goal_achieved": true,
           "command": "python3 .agents/skills/using-control-json/scripts/verify_runtime_progress.py",
           "output_schema": "final-report.schema.json"
+        },
+        "semantic_base_ref": {
+          "id": "semantic-base:runtime-verifier-fixture",
+          "hash": "sha256:17541255a20b0120b4b205dd39f21e0bd4cb08fdb41ea381143e9ead45853bf1"
+        },
+        "approved_control_hashes": {
+          "requirements.control.json": "sha256:72ca92cd182b80576f8bb7b12c4319e099f9c8e73dd4e60d6d902351290f8d80",
+          "design.control.json": "sha256:ba5a4b958bc8a6c95df0e14eec02357cebd57053f66cedd05c955a5c45ca3976",
+          "goal.control.json": "sha256:0405f70dcf5aa5582ff1b11d47c97c4123c084077db1f6cae304129a9a18175e",
+          "plan.control.json": "sha256:3b58d9bb52e056874f5051f95237ca32dbdeae7a056ef5c202b9f7f7006e1805",
+          "review.control.json": "sha256:9747a85c1744efbbed4115e63c7e488d534ec753ebc30e7d19ba26073d5ea39a",
+          "runtime.control.json": "sha256:58c934282d1fb2015ce21691d48fdd111e8a9e9ebdfe091f89e8b7020a348fa6"
         }
       }
     },
@@ -256,7 +350,9 @@
         "status": "pass",
         "progress_role": "mainline",
         "counts_as_goal_progress": true,
-        "evidence": ["append_progress_event test passed"]
+        "evidence": [
+          "append_progress_event test passed"
+        ]
       },
       {
         "event_type": "step.completed",
@@ -267,7 +363,9 @@
         "status": "pass",
         "progress_role": "mainline",
         "counts_as_goal_progress": true,
-        "evidence": ["old accident JSON regression tests passed"]
+        "evidence": [
+          "old accident JSON regression tests passed"
+        ]
       }
     ],
     "final_report": {
@@ -275,17 +373,23 @@
       "schema_version": "1.0.0",
       "goal_achieved": true,
       "what_counts_as_done_met": true,
-      "evidence": ["runtime verifier focused tests passed"],
+      "evidence": [
+        "runtime verifier focused tests passed"
+      ],
       "verification": {
         "verifier_result": "pass",
         "verifier_permits_goal_achieved": true
       },
       "work_coverage": {
         "status": "complete",
-        "executed": ["WP5 runtime verifier and JSON regressions"],
+        "executed": [
+          "WP5 runtime verifier and JSON regressions"
+        ],
         "prepared_only": [],
         "forbidden_not_executed": [],
-        "out_of_scope": ["external production systems"]
+        "out_of_scope": [
+          "external production systems"
+        ]
       },
       "remaining_gaps": []
     }

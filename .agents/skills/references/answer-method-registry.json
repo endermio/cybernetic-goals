@@ -8,6 +8,9 @@
       "same-workload full workflow run",
       "interpretation against coverage matrix"
     ],
+    "done_rule": {
+      "all_mandatory_nodes_required": true
+    },
     "forbidden_substitutions": [
       "full-workflow-run-validation"
     ],
@@ -31,6 +34,9 @@
       "state transition that makes the result true",
       "observable target state"
     ],
+    "done_rule": {
+      "all_mandatory_nodes_required": true
+    },
     "forbidden_substitutions": [
       "component-inventory-completion"
     ],
@@ -49,6 +55,9 @@
       "execution evidence",
       "interpretation"
     ],
+    "done_rule": {
+      "all_mandatory_nodes_required": true
+    },
     "forbidden_substitutions": [
       "single-run-validation"
     ],
@@ -68,6 +77,9 @@
       "claim-evidence mapping",
       "unsupported claim disposition"
     ],
+    "done_rule": {
+      "all_mandatory_nodes_required": true
+    },
     "forbidden_substitutions": [
       "checklist-completion"
     ],
@@ -87,6 +99,9 @@
       "observation result",
       "hypothesis disposition"
     ],
+    "done_rule": {
+      "all_mandatory_nodes_required": true
+    },
     "forbidden_substitutions": [
       "generic-audit"
     ],

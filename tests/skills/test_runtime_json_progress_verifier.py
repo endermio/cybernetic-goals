@@ -201,6 +201,24 @@ class RuntimeJsonProgressVerifierTest(unittest.TestCase):
             self.assertNotEqual(result.returncode, 0, result.stdout + result.stderr)
             self.assertIn("approved control JSON changed after runtime start", result.stdout + result.stderr)
 
+    def test_verify_runtime_progress_rejects_approved_json_mutation_from_embedded_hashes(self):
+        fixture = load_fixture()
+        with tempfile.TemporaryDirectory() as tmpdir:
+            run_dir = Path(tmpdir)
+            write_run(run_dir, fixture)
+
+            goal = json.loads((run_dir / "goal.control.json").read_text(encoding="utf-8"))
+            goal["approved_control"]["objective"] = "mutated during runtime"
+            (run_dir / "goal.control.json").write_text(json.dumps(goal, indent=2), encoding="utf-8")
+
+            result = run_script(VERIFY, str(run_dir))
+
+            self.assertNotEqual(result.returncode, 0, result.stdout + result.stderr)
+            self.assertIn(
+                "runtime.control.json approved_control_hashes mismatch for goal.control.json",
+                result.stdout + result.stderr,
+            )
+
     def test_verify_runtime_progress_permits_complete_mainline_verified_report(self):
         with tempfile.TemporaryDirectory() as tmpdir:
             run_dir = Path(tmpdir)

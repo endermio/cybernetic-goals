@@ -121,6 +121,42 @@ class JsonOfficialGuardCompilerPathTest(unittest.TestCase):
             self.assertIn("Markdown control artifacts are not official JSON control input", guard.stdout + guard.stderr)
             self.assertIn("Markdown control artifacts are not official JSON control input", compiler.stdout + compiler.stderr)
 
+    def test_control_chain_guard_rejects_semantic_base_mismatch(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            run_dir = Path(tmpdir)
+            write_control_run(run_dir)
+            design_path = run_dir / "design.control.json"
+            design = json.loads(design_path.read_text(encoding="utf-8"))
+            design["semantic_base_ref"]["hash"] = "sha256:mismatched"
+            design_path.write_text(json.dumps(design, indent=2), encoding="utf-8")
+
+            result = subprocess.run(
+                ["python3", str(CONTROL_GUARD), "--run-dir", str(run_dir)],
+                text=True,
+                capture_output=True,
+            )
+
+            self.assertNotEqual(result.returncode, 0, result.stdout + result.stderr)
+            self.assertIn("semantic_base_ref must match requirements approved semantic_base", result.stdout + result.stderr)
+
+    def test_control_chain_guard_rejects_approved_control_hash_mismatch(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            run_dir = Path(tmpdir)
+            write_control_run(run_dir)
+            runtime_path = run_dir / "runtime.control.json"
+            runtime = json.loads(runtime_path.read_text(encoding="utf-8"))
+            runtime["approved_control_hashes"]["goal.control.json"] = "sha256:mismatched"
+            runtime_path.write_text(json.dumps(runtime, indent=2), encoding="utf-8")
+
+            result = subprocess.run(
+                ["python3", str(CONTROL_GUARD), "--run-dir", str(run_dir)],
+                text=True,
+                capture_output=True,
+            )
+
+            self.assertNotEqual(result.returncode, 0, result.stdout + result.stderr)
+            self.assertIn("approved_control_hashes mismatch for goal.control.json", result.stdout + result.stderr)
+
     def test_legacy_markdown_cli_arguments_are_rejected_as_official_inputs(self):
         with tempfile.TemporaryDirectory() as tmpdir:
             run_dir = Path(tmpdir)

@@ -35,7 +35,8 @@
         "how_we_know_purpose_was_met",
         "where_result_must_show_up",
         "what_counts_as_done",
-        "final_answer_format"
+        "final_answer_format",
+        "semantic_base"
       ],
       "properties": {
         "human_purpose": {
@@ -93,6 +94,24 @@
                 "type": "string",
                 "minLength": 1
               }
+            }
+          }
+        },
+        "semantic_base": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "id",
+            "hash"
+          ],
+          "properties": {
+            "id": {
+              "type": "string",
+              "minLength": 1
+            },
+            "hash": {
+              "type": "string",
+              "minLength": 1
             }
           }
         }

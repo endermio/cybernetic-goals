@@ -49,5 +49,17 @@
     "required_before_goal_achieved": true,
     "command": "verify-control-run",
     "output_schema": "final-report.schema.json"
+  },
+  "semantic_base_ref": {
+    "id": "semantic-base:control-example",
+    "hash": "sha256:37c64594d76f781cfcba7346ef2e2f4ba707fe6fa38897bd3943638812525924"
+  },
+  "approved_control_hashes": {
+    "requirements.control.json": "sha256:578cd7159ea5cbd90ac04df4b45995ac2ef997ea61c966df7cd1bf51b463ea49",
+    "design.control.json": "sha256:595365630966ab41fd7b038261c03d45354d094a906ea2acdaa7a69853176789",
+    "goal.control.json": "sha256:755953d8fdfec5dedde1cbb55270d87751464678e20b8fdf69a6c59fc2135ccc",
+    "plan.control.json": "sha256:80e82674ffa95df7b9988bce23082e3062858b5964f29222e57e497aa6750ec6",
+    "review.control.json": "sha256:1312c01665d7e40c39bfbddc233659f7906a76bb28bc28fb6f34ce189c05e372",
+    "runtime.control.json": "sha256:3efc9d172e3f8a311116bd8c5b3930400c905a44a11b23575eb099957fbe840e"
   }
 }
