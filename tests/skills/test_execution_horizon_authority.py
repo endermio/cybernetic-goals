@@ -174,7 +174,7 @@ class ExecutionHorizonAuthorityTest(unittest.TestCase):
                 "",
                 "- Record the condition proving a action that can make it done cannot be attempted.",
                 "",
-                "Non-achieved terminal report rule:",
+                "If it is not done, what should be reported:",
                 "",
                 "- If it is not done, the report may be produced only after work coverage is accounted for or impossibility is proven.",
                 "",

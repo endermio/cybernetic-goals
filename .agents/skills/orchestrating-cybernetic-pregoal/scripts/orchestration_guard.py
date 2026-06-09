@@ -631,7 +631,7 @@ def check_plan_target_producing_strategy(plan: str | None, errors: list[str]) ->
     for label in (
         "Action that can make it done",
         "Proof of impossibility, if any",
-        "Non-achieved terminal report rule",
+        "If it is not done, what should be reported",
     ):
         if not labeled_or_table_field_has_content(body, label):
             errors.append(f"execution policy Action That Can Make It Done missing {label}")

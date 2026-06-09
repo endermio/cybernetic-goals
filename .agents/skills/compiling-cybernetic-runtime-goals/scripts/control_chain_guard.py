@@ -676,9 +676,9 @@ def check_review_subagent_concurrency(plan: str, review: str, errors: list[str])
     if independence is None:
         errors.append("review missing ## Review Independence for Parallel Agent Safety Check")
     else:
-        reviewed = yes_no_value(independence, "Subagent concurrency check")
+        reviewed = yes_no_value(independence, "Parallel agent safety check")
         if reviewed != "yes":
-            errors.append("review did not record Subagent concurrency check: yes in ## Review Independence")
+            errors.append("review did not record Parallel agent safety check: yes in ## Review Independence")
 
     body = section_body(review, "Parallel Agent Safety Check")
     if body is None:
@@ -1077,7 +1077,7 @@ def check_plan_target_producing_strategy(plan: str, errors: list[str]) -> None:
     required_fields = [
         "Action that can make it done",
         "Proof of impossibility, if any",
-        "Non-achieved terminal report rule",
+        "If it is not done, what should be reported",
     ]
     for field in required_fields:
         if not labeled_or_table_field_has_content(body, field):

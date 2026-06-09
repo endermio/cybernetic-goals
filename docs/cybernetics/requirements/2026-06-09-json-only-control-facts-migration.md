@@ -32,10 +32,10 @@ Approval applies only to this compact control commitment.
 | Forbidden live / irreversible actions | No external production or live-state changes. Do not delete unrelated repository history or unrelated docs. Do not push destructive branch changes outside normal git commits. |
 | Required handling for unauthorized actions | If a requested action would touch external/live systems or unrelated history, record it as forbidden-not-executed and continue with local repository migration work. |
 | Explicitly out-of-scope items | Rewriting unrelated observability docs, changing Codex product behavior, or implementing target-work tasks outside the cybernetic control-chain migration. |
-| Agent delegation preference | no preference |
-| Agent workflow preference | no preference |
-| Parallel execution authority | not approved |
-| Maximum parallel agents | not specified |
+| Agent delegation preference | max-safe-parallel |
+| Agent workflow preference | superpowers-dispatching-parallel-agents |
+| Parallel execution authority | approved |
+| Maximum parallel agents | auto |
 | Final answer format | Chat summary with changed files, verification commands, commit/push status, and any remaining JSON-only migration gaps. Machine-readable runtime output must use JSON files defined by the new schemas. |
 | Why this process is needed | This is a Level 3 architecture migration across multiple skills, artifacts, guards, compiler, runtime protocol, and tests. Runtime Codex would otherwise invent JSON semantics or preserve Markdown compatibility. |
 | Known assumptions | The existing Markdown chain may be used only as current-system input while migrating; target behavior is JSON-only for official guard/compiler/runtime control. `/goal` remains a short text pointer and is not JSON-native. |
@@ -43,8 +43,8 @@ Approval applies only to this compact control commitment.
 Approval record:
 
 - Approved by: `human`
-- Approval phrase or source: `批准这个 What the User Approved,给出orchestration的推荐prompt`
-- Approval time/context: `2026-06-09 current chat message`
+- Approval phrase or source: `批准这个 What the User Approved,给出orchestration的推荐prompt`; later clarified `最后编排出来的执行是使用subagent高并发模式`
+- Approval time/context: `2026-06-09 current chat messages`
 
 If Status is not `Approved`, downstream full pre-goal orchestration must not start.
 

@@ -167,7 +167,7 @@ class PurposeFeedbackLimitTest(unittest.TestCase):
                     "",
                     "- Record the condition proving the action cannot be attempted.",
                     "",
-                    "Non-achieved terminal report rule:",
+                    "If it is not done, what should be reported:",
                     "",
                     "- If it is not done, the report may be produced only after the action is attempted and fails, or impossibility is proven.",
                     "",
