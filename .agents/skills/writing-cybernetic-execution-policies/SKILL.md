@@ -1,6 +1,6 @@
 ---
 name: writing-cybernetic-execution-policies
-description: 'Use when requirements, any required design, and a goal file exist before executable /goal work, and the task needs a bounded execution policy, phase checks, evidence handling, work assignment, batch rhythm, or stop conditions.'
+description: 'Use when requirements, any required design, and goal.control.json exist before executable /goal work, and the task needs a bounded execution policy, phase checks, evidence handling, work assignment, batch rhythm, or stop conditions.'
 ---
 
 # Writing Cybernetic Execution Policies
@@ -11,9 +11,9 @@ Create the execution execution rule for controlled work.
 
 This skill converts:
 
-- requirements analysis brief
+- requirements control JSON
 - solution design, when required design is required or a design exists
-- goal file
+- goal control JSON
 
 into:
 
@@ -25,11 +25,13 @@ Use `assets/execution-policy-template.md`.
 
 ## What This Skill Owns
 
-This skill does not analyze requirements, does not write the goal file, does not review its own policy, and does not execute target work.
+This skill does not analyze requirements, does not write goal control JSON, does not review its own policy, and does not execute target work.
 
 ## Required Input
 
-Use a completed requirements analysis brief and a goal file, plus solution design when required design was required or a design artifact exists.
+Use completed `requirements.control.json` and `goal.control.json`, plus `design.control.json` when required design was required or a design artifact exists.
+
+Official persistent control facts are JSON only. Historical Markdown may be read as non-authoritative background, but do not create or compile Markdown as official guard, compiler, runtime, or long-term dual-path control input.
 
 For Level 3, Level 4, or full pre-goal work, do not create an execution policy unless the requirements analysis contains `What the User Approved: Approved`, or the current user message explicitly approves the compact control commitment. Level 1/2 bounded work does not require What the User Approved unless the requirements analysis records it as required.
 
@@ -376,7 +378,7 @@ The response format below is response-only. Do not write `$skill ...` commands, 
 Create:
 
 ```text
-docs/cybernetics/plans/YYYY-MM-DD-<slug>.md
+docs/cybernetics/runs/<slug>/plan.control.json
 ```
 
 Then respond:
@@ -384,7 +386,7 @@ Then respond:
 ```markdown
 Created candidate execution policy:
 
-`docs/cybernetics/plans/YYYY-MM-DD-slug.md`
+`docs/cybernetics/runs/YYYY-MM-DD-slug/plan.control.json`
 
 Control-law summary:
 - Planning workflow: ...

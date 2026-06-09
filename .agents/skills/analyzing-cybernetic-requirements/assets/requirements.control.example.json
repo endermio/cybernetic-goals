@@ -1,0 +1,37 @@
+{
+  "artifact_type": "requirements.control",
+  "schema_version": "1",
+  "status": "approved",
+  "approved_control": {
+    "human_purpose": "Move official cybernetic control facts to strict JSON.",
+    "primary_object": "cybernetic control chain",
+    "requested_transformation": "Replace prose-backed control artifacts with schema-backed JSON control files.",
+    "non_goals": [
+      "Long-term Markdown compatibility for official guard, compiler, or runtime inputs."
+    ],
+    "how_we_know_purpose_was_met": "A run directory can be validated, compiled, executed, and verified without Markdown control inputs.",
+    "where_result_must_show_up": [
+      "skills",
+      "schemas",
+      "guards",
+      "compiler",
+      "runtime protocol",
+      "verifier",
+      "tests"
+    ],
+    "what_counts_as_done": "Official JSON control files pass and Markdown control inputs are rejected.",
+    "final_answer_format": {
+      "medium": "chat summary",
+      "required_structure": [
+        "files changed",
+        "commands run",
+        "blockers",
+        "completion status"
+      ]
+    }
+  },
+  "registry_bindings": {
+    "answer_method_key": "implementation-spine",
+    "forbidden_substitute_key": "component-inventory-completion"
+  }
+}

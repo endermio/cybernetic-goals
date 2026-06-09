@@ -7,7 +7,7 @@ description: 'Use when requirements analysis exists but the required answer path
 
 ## Overview
 
-Instantiate the approved required answer path from confirmed requirements, then derive the support model needed for goal writing and execution policy.
+Instantiate the approved required answer path from confirmed requirements control JSON, then derive the support model needed for goal writing and execution policy.
 
 This skill resolves the `required design` by turning:
 
@@ -15,15 +15,17 @@ This skill resolves the `required design` by turning:
 requirements analysis -> required answer path instance -> what supports each required step -> goal-ready design artifact
 ```
 
-The design expresses the required answer path and the controllable support structure needed for later approved files. It must stay in the core cybernetic vocabulary and avoid importing adapter-specific terms.
+The design expresses the required answer path and the controllable support structure needed for later approved JSON control files. It must stay in the core cybernetic vocabulary and avoid importing adapter-specific terms.
+
+Official persistent control facts are JSON only. Historical Markdown may be read as non-authoritative background, but do not create or compile Markdown as official guard, compiler, runtime, or long-term dual-path control input.
 
 Output:
 
 ```text
-docs/cybernetics/designs/YYYY-MM-DD-<slug>.md
+docs/cybernetics/runs/<slug>/design.control.json
 ```
 
-Use `assets/solution-design-template.md`.
+Use the approved design control JSON shape for the run directory. Do not use Markdown templates as official control input.
 
 ## Core Limit
 
@@ -31,9 +33,9 @@ This skill owns required answer path instantiation and what supports each requir
 
 Owned design:
 
-- inspect the completed requirements analysis brief and relevant source artifacts;
+- inspect completed requirements control JSON and relevant source artifacts;
 - ask a small number of high-value design questions when solution structure cannot be safely inferred;
-- create or update one solution design artifact;
+- create or update `design.control.json`;
 - design complex output/report/schema/artifact-bundle structures when Final Answer Format Check requires structure synthesis;
 - record open design questions and stop before approval;
 - recommend a route-appropriate response-only handoff when the design is sufficient.
@@ -41,7 +43,7 @@ Owned design:
 Routed elsewhere:
 
 - unresolved requirement meaning return to `$analyzing-cybernetic-requirements`;
-- goal files go to `$writing-cybernetic-goals`;
+- goal control JSON goes to `$writing-cybernetic-goals`;
 - execution policies go to `$writing-cybernetic-execution-policies`;
 - whole-chain review goes to `$reviewing-cybernetic-control-structures`;
 - runtime `/goal` compilation goes to `$compiling-cybernetic-runtime-goals`;
@@ -52,16 +54,16 @@ they are part of the confirmed domain.
 
 ## Required Input
 
-Use a completed requirements analysis brief, usually:
+Use a completed requirements control JSON file, usually:
 
 ```text
-docs/cybernetics/requirements/YYYY-MM-DD-<slug>.md
+docs/cybernetics/runs/<slug>/requirements.control.json
 ```
 
-The design path must use the same date/slug unless the user explicitly requests another path:
+The design path must use the same run directory unless the user explicitly requests another path:
 
 ```text
-docs/cybernetics/designs/YYYY-MM-DD-<slug>.md
+docs/cybernetics/runs/<slug>/design.control.json
 ```
 
 If the requirements analysis is missing, incomplete, or has open blocking human decisions, stop and return to `$analyzing-cybernetic-requirements`.
@@ -185,7 +187,7 @@ Open design questions that affect requirement meaning, controlled relationships,
 
 ## Process
 
-1. Read the completed requirements analysis brief.
+1. Read completed requirements control JSON.
 2. For Level 3/4 or full pre-goal work, verify `What the User Approved: Approved` before deriving or writing the design.
 3. Derive the design path from the requirements path.
 4. Inspect the routing context from the user request, router output, and requirements checks.
@@ -222,7 +224,7 @@ After creating or updating a design:
 ```markdown
 Created or updated solution design:
 
-`docs/cybernetics/designs/YYYY-MM-DD-slug.md`
+`docs/cybernetics/runs/YYYY-MM-DD-slug/design.control.json`
 
 Design summary:
 - Required answer path: ...
@@ -255,10 +257,10 @@ Response-only next step:
 - If requirements analysis is incomplete or has blocking human decisions: return to `$analyzing-cybernetic-requirements` with the missing decision.
 - If Level 3/4 or full pre-goal work lacks `What the User Approved: Approved`: return to `$analyzing-cybernetic-requirements` for approved target approval or revision.
 - If a design decision is missing: answer the smallest design question, then rerun `$designing-cybernetic-solutions`.
-- For Level 3/4 or full pre-goal work: return this blocked status to `$orchestrating-cybernetic-pregoal`; do not write the goal file.
+- For Level 3/4 or full pre-goal work: return this blocked status to `$orchestrating-cybernetic-pregoal`; do not write goal control JSON.
 - If the human explicitly says required design is unnecessary: return to the route-appropriate next stage.
 
-Do not write the goal file until this design decision is resolved or the human explicitly says the required design is unnecessary.
+Do not write goal control JSON until this design decision is resolved or the human explicitly says the required design is unnecessary.
 ```
 
 ## Validation Checklist

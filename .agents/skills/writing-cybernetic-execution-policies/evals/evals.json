@@ -41,7 +41,7 @@
     },
     {
       "id": "references-design-and-does-not-redesign",
-      "prompt": "根据 requirements analysis、docs/cybernetics/designs/2026-05-22-control-relationship.md 和 goal 为复杂目标写 execution policy。",
+      "prompt": "根据 requirements analysis、docs/cybernetics/runs/2026-05-22-control-relationship/design.control.json 和 goal 为复杂目标写 execution policy。",
       "expected_output": "Create a candidate execution policy that references the solution design and uses it as input, without redefining the conceptual model inside the plan.",
       "assertions": [
         "Source Contracts includes the solution design path.",
@@ -67,7 +67,7 @@
       "prompt": "根据 requirements、solution design 和 goal 创建 execution policy。路由结果是 Level 3 full pre-goal pipeline，review check required，$orchestrating-cybernetic-pregoal 可用。",
       "expected_output": "Create a candidate execution policy, then in the response hand off back to $orchestrating-cybernetic-pregoal rather than directly recommending $reviewing-cybernetic-control-structures.",
       "assertions": [
-        "Creates or references a docs/cybernetics/plans path.",
+        "Creates or references docs/cybernetics/runs/<slug>/plan.control.json.",
         "Marks the execution policy Candidate, not Approved.",
         "Response-only handoff recommends $orchestrating-cybernetic-pregoal.",
         "Does not recommend $reviewing-cybernetic-control-structures as the next user action for Level 3 full pre-goal work."

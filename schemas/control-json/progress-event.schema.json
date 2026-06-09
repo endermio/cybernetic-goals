@@ -1,0 +1,68 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://cybernetic-goals.local/schemas/control-json/progress-event.schema.json",
+  "title": "Cybernetic Runtime Progress Event",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "event_type",
+    "schema_version",
+    "occurred_at",
+    "work_package_id",
+    "required_step",
+    "status",
+    "evidence"
+  ],
+  "properties": {
+    "event_type": {
+      "enum": [
+        "step.started",
+        "step.completed",
+        "step.blocked",
+        "verification.completed",
+        "final_report.written"
+      ]
+    },
+    "schema_version": {
+      "type": "string",
+      "minLength": 1
+    },
+    "occurred_at": {
+      "type": "string",
+      "minLength": 1
+    },
+    "work_package_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "required_step": {
+      "type": "string",
+      "minLength": 1
+    },
+    "status": {
+      "enum": [
+        "pass",
+        "fail",
+        "blocked",
+        "partial"
+      ]
+    },
+    "progress_role": {
+      "enum": [
+        "mainline",
+        "supporting_only"
+      ]
+    },
+    "counts_as_goal_progress": {
+      "type": "boolean"
+    },
+    "evidence": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    }
+  }
+}

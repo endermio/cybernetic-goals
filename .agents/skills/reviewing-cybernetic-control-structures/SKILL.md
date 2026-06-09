@@ -1,6 +1,6 @@
 ---
 name: reviewing-cybernetic-control-structures
-description: 'Use when requirements analysis, any required design, goal file, and execution policy exist before runtime /goal, and the cybernetic approved work chain needs independent approval, blocker review, or risk review.'
+description: 'Use when requirements analysis, any required design, goal.control.json, and execution policy exist before runtime /goal, and the cybernetic approved work chain needs independent approval, blocker review, or risk review.'
 ---
 
 # Reviewing Cybernetic Control Structures
@@ -11,18 +11,18 @@ Review whether the AI approved work chain is coherent enough to execute.
 
 Inputs:
 
-- requirements analysis brief
+- requirements control JSON
 - solution design, when required design is required or a design exists
-- goal file
+- goal control JSON
 - execution policy / plan
 
 Output:
 
 ```text
-docs/cybernetics/control-reviews/YYYY-MM-DD-<slug>.md
+docs/cybernetics/runs/<slug>/review.control.json
 ```
 
-Use `assets/control-review-template.md`.
+Official persistent control facts are JSON only. Historical Markdown may be read as non-authoritative background, but do not create or compile Markdown as official guard, compiler, runtime, or long-term dual-path control input.
 
 This skill does not execute target work and does not start `/goal`.
 
@@ -101,7 +101,7 @@ If Design Answer Method Check is `FAIL`, the review cannot be `Approved`; route 
 
 ### 1. Requirement Traceability
 
-Every confirmed human decision in the requirements analysis brief must appear in the goal and execution policy.
+Every confirmed human decision in requirements control JSON must appear in the goal and execution policy.
 
 ### 2. What The User Approved Check
 
@@ -447,7 +447,7 @@ This output format is response-only. Do not write `$skill ...` commands, runtime
 ```markdown
 Created or updated review:
 
-`docs/cybernetics/control-reviews/YYYY-MM-DD-slug.md`
+`docs/cybernetics/runs/YYYY-MM-DD-slug/review.control.json`
 
 Review status:
 - `Approved` / `Needs Revision` / `Needs Independent Review` / `Dirty` / `Needs Re-review`

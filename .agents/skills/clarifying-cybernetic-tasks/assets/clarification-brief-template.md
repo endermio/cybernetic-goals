@@ -5,11 +5,11 @@ This template is retained only for older prompts that reference `$clarifying-cyb
 Use the primary template instead:
 
 ```text
-.agents/skills/analyzing-cybernetic-requirements/assets/requirements-analysis-template.md
+.agents/skills/analyzing-cybernetic-requirements/assets/requirements.control.example.json
 ```
 
 Write new artifacts under:
 
 ```text
-docs/cybernetics/requirements/YYYY-MM-DD-<slug>.md
+docs/cybernetics/runs/YYYY-MM-DD-<slug>/requirements.control.json
 ```

@@ -4,7 +4,7 @@ Use this reference after the orchestration state machine has reached
 `RuntimeGoalReady` or `Blocked`. These output formats are response-only. Do not
 write `/goal` prompts, `$skill ...` commands, or conversational next-step
 prompts into orchestration status, progress, goal, design, plan, review, or
-requirements artifacts.
+requirements control JSON.
 
 ## Approved Compilation
 
@@ -26,14 +26,14 @@ Control summary:
 - Evidence checks: ...
 - Runtime limit: ...
 
-Runtime goal file:
+Runtime control JSON:
 
-`docs/cybernetics/runtime-goals/YYYY-MM-DD-slug.goal.md`
+`docs/cybernetics/runs/YYYY-MM-DD-slug/runtime.control.json`
 
 User-entered short `/goal` pointer:
 
 ```text
-/goal Execute the runtime goal file at docs/cybernetics/runtime-goals/YYYY-MM-DD-slug.goal.md. Read it first and follow it exactly. If any referenced artifact is missing, not approved, or inconsistent, stop and report the smallest required human decision.
+/goal Use .agents/skills/using-control-json and execute docs/cybernetics/runs/YYYY-MM-DD-slug/runtime.control.json. If the JSON is missing, invalid, inconsistent, or insufficient, stop and report the smallest required human decision.
 ```
 
 Do not start the goal until you are ready for runtime execution.
@@ -81,9 +81,9 @@ Before responding, verify:
 - [ ] Required solution design was created by `$designing-cybernetic-solutions` or explicitly provided before goal writing, otherwise blocked.
 - [ ] Existing design artifact paths were propacheckd to goal, execution policy, review, and runtime compilation.
 - [ ] Output contract presence was propacheckd and validated; no output contract was synthesized by the orchestrator.
-- [ ] Goal file preserved confirmed human decisions.
-- [ ] Goal and execution policy preserved required solution design.
-- [ ] Execution policy preserved the goal file.
+- [ ] `goal.control.json` preserved confirmed human decisions.
+- [ ] Goal and execution policy control JSON preserved required solution design.
+- [ ] `plan.control.json` preserved `goal.control.json`.
 - [ ] Execution policy uses `$superpowers:writing-plans` for non-trivial execution policies or blocks.
 - [ ] Review checked the whole approved work chain, including design when required, not only the plan.
 - [ ] Review does not mark self-review as `Approved`.
@@ -92,11 +92,11 @@ Before responding, verify:
 - [ ] Review status is `Approved` before final runtime `/goal` is emitted.
 - [ ] If not approved, the response is blocked and asks for the smallest necessary decision.
 - [ ] If blocked, the response includes `Next allowed action` and a response-only next step.
-- [ ] Runtime goal file references requirements analysis, required design, goal, plan, and review files.
+- [ ] `runtime.control.json` references requirements analysis, required design, goal, plan, and review control JSON files.
 - [ ] User-entered `/goal` is pointer-only and length-bounded.
 - [ ] User-entered `/goal` does not inline What the User Approved, user-purpose evidence, result placement, what-counts-as-done, work coverage and action limits, work assignment, evidence check governance, or review discipline prose.
-- [ ] Runtime goal file includes the missing/not-approved/inconsistent artifact precondition.
-- [ ] Runtime goal file includes executing, debugging, and completion-verification discipline.
+- [ ] `runtime.control.json` includes the missing/not-approved/inconsistent artifact precondition.
+- [ ] `runtime.control.json` includes executing, debugging, and completion-verification discipline.
 - [ ] User-entered `/goal` does not tell Codex to write or approve a new plan.
 
 ## Common Mistakes
@@ -113,7 +113,7 @@ Before responding, verify:
 | Replacing missing `$superpowers:writing-plans` with an ad hoc approved plan | Stop and report missing planning infrastructure |
 | Marking Approved after fixing reviewer blockers without final re-review | Mark artifacts Dirty / Needs Re-review and run final independent re-review |
 | Treating lint PASS as proof that meaning reviewer blockers are resolved | Use lint only as a structural evidence check; require final observer pass for substantive changes |
-| Choosing a new slug for downstream artifacts | Use the requirements analysis brief's date/slug unless the user explicitly specified other paths |
+| Choosing a new slug for downstream artifacts | Use the `requirements.control.json` run directory slug unless the user explicitly specified other paths |
 | Letting review revisions change confirmed meaning | Stop and ask the human |
 | Infinite review-revision loops | Stop after two cycles |
 | Marking self-review as Approved | Require subagent, external reviewer, or explicit human approval |

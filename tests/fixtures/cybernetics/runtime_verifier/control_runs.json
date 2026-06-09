@@ -1,0 +1,293 @@
+{
+  "valid": {
+    "control_files": {
+      "requirements.control.json": {
+        "artifact_type": "requirements.control",
+        "schema_version": "1.0.0",
+        "status": "approved",
+        "approved_control": {
+          "human_purpose": "move official control facts to JSON",
+          "primary_object": "cybernetic control chain",
+          "requested_transformation": "replace Markdown authority with strict JSON control files",
+          "non_goals": ["long-term Markdown compatibility"],
+          "how_we_know_purpose_was_met": "JSON guard/compiler/runtime path operates without Markdown control inputs",
+          "where_result_must_show_up": ["schemas", "registries", "guards", "runtime verifier"],
+          "what_counts_as_done": "official JSON path passes and verifier-gated completion is enforced",
+          "final_answer_format": {
+            "medium": "chat summary",
+            "required_structure": ["changed files", "verification commands", "S7/S9/S10 status"]
+          }
+        },
+        "registry_bindings": {
+          "answer_method_key": "implementation-spine",
+          "forbidden_substitute_key": "component-inventory-completion"
+        }
+      },
+      "design.control.json": {
+        "artifact_type": "design.control",
+        "schema_version": "1.0.0",
+        "status": "approved",
+        "source_contracts": {
+          "requirements": "requirements.control.json",
+          "requirements_registry_sidecar": "requirements.control.json"
+        },
+        "approved_control": {
+          "confirmed_meaning": "JSON is the only official persistent control fact",
+          "required_answer_path": [
+            "initial state",
+            "state transition that makes the result true",
+            "observable target state"
+          ],
+          "what_is_not_enough_avoided": ["JSON sidecars with Markdown authority"]
+        },
+        "registry_bindings": {
+          "answer_method_key": "implementation-spine",
+          "forbidden_substitute_key": "component-inventory-completion"
+        },
+        "required_steps": [
+          {
+            "step_id": "S7",
+            "transition": "runtime writes progress events only",
+            "evidence": ["progress JSONL append evidence"]
+          },
+          {
+            "step_id": "S9",
+            "transition": "old accident regressions are represented in JSON",
+            "evidence": ["runtime verifier regression tests"]
+          }
+        ]
+      },
+      "goal.control.json": {
+        "artifact_type": "goal.control",
+        "schema_version": "1.0.0",
+        "status": "approved",
+        "source_contracts": {
+          "requirements": "requirements.control.json",
+          "design": "design.control.json"
+        },
+        "approved_control": {
+          "objective": "migrate official cybernetic control facts to JSON",
+          "success_condition": "JSON-only official path and verifier-gated completion are observed",
+          "what_counts_as_done": "schemas, registries, guard/compiler/runtime, progress, verifier, and regressions pass",
+          "rules_that_must_not_change": [
+            "approved JSON is runtime read-only",
+            "Markdown is not official control input",
+            "goal_achieved true requires verifier permission"
+          ]
+        },
+        "registry_bindings": {
+          "answer_method_key": "implementation-spine",
+          "forbidden_substitute_key": "component-inventory-completion"
+        },
+        "required_steps": [
+          {
+            "step_id": "S7",
+            "transition": "runtime progress and verifier implemented",
+            "evidence": ["progress/verifier tests"]
+          },
+          {
+            "step_id": "S9",
+            "transition": "old accident JSON regressions pass",
+            "evidence": ["regression fixtures"]
+          }
+        ]
+      },
+      "plan.control.json": {
+        "artifact_type": "plan.control",
+        "schema_version": "1.0.0",
+        "status": "approved",
+        "source_contracts": {
+          "requirements": "requirements.control.json",
+          "design": "design.control.json",
+          "goal": "goal.control.json"
+        },
+        "registry_bindings": {
+          "selected_agent_workflow": "superpowers-dispatching-parallel-agents",
+          "allowed_work_assignment": "Parallel subagent-driven",
+          "answer_method_key": "implementation-spine"
+        },
+        "required_steps": [
+          {
+            "step_id": "S7",
+            "transition": "runtime progress and verifier implemented",
+            "evidence": ["runtime verifier tests"]
+          },
+          {
+            "step_id": "S9",
+            "transition": "old accident regressions ported to JSON",
+            "evidence": ["JSON regression tests"]
+          }
+        ],
+        "work_packages": [
+          {
+            "work_package_id": "WP5",
+            "required_steps": ["S7", "S9"],
+            "allowed_write_paths": [
+              ".agents/skills/using-control-json/scripts",
+              "tests/fixtures/cybernetics/runtime_verifier",
+              "tests/skills/test_runtime_json_progress_verifier.py"
+            ],
+            "forbidden_write_paths": ["guard scripts", "compiler scripts", "official Markdown templates"],
+            "required_tests": ["python3 -m unittest tests.skills.test_runtime_json_progress_verifier"]
+          }
+        ],
+        "runtime": {
+          "readonly_files": [
+            "requirements.control.json",
+            "design.control.json",
+            "goal.control.json",
+            "plan.control.json",
+            "review.control.json",
+            "runtime.control.json"
+          ],
+          "writable_files": ["progress.jsonl", "runtime-status.json", "final-report.json"]
+        },
+        "progress": {
+          "event_schema": "progress-event.schema.json",
+          "append_only": true
+        },
+        "verifier": {
+          "required_before_goal_achieved": true,
+          "output_schema": "final-report.schema.json"
+        }
+      },
+      "review.control.json": {
+        "artifact_type": "review.control",
+        "schema_version": "1.0.0",
+        "status": "approved",
+        "source_contracts": {
+          "requirements": "requirements.control.json",
+          "design": "design.control.json",
+          "goal": "goal.control.json",
+          "plan": "plan.control.json"
+        },
+        "registry_bindings": {
+          "answer_method_key": "implementation-spine",
+          "selected_agent_workflow": "superpowers-dispatching-parallel-agents"
+        },
+        "review_checks": [
+          {
+            "check_id": "design-answer-method",
+            "status": "pass",
+            "evidence": ["registry answer path preserved"]
+          },
+          {
+            "check_id": "required-answer-path",
+            "status": "pass",
+            "evidence": ["mandatory nodes present"]
+          },
+          {
+            "check_id": "work-assignment",
+            "status": "pass",
+            "evidence": ["parallel workflow registry binding present"]
+          },
+          {
+            "check_id": "horizon-authority",
+            "status": "pass",
+            "evidence": ["covered work remains in this run"]
+          },
+          {
+            "check_id": "final-observer",
+            "status": "pass",
+            "evidence": ["approved JSON chain ready for runtime"]
+          }
+        ]
+      },
+      "runtime.control.json": {
+        "artifact_type": "runtime.control",
+        "schema_version": "1.0.0",
+        "status": "compiled",
+        "control_chain": {
+          "requirements": "requirements.control.json",
+          "design": "design.control.json",
+          "goal": "goal.control.json",
+          "plan": "plan.control.json",
+          "review": "review.control.json"
+        },
+        "approved_control": {
+          "objective": "migrate official cybernetic control facts to JSON",
+          "what_counts_as_done": "runtime progress and verifier regressions pass"
+        },
+        "registry_bindings": {
+          "answer_method_key": "implementation-spine",
+          "selected_agent_workflow": "superpowers-dispatching-parallel-agents"
+        },
+        "runtime": {
+          "readonly_files": [
+            "requirements.control.json",
+            "design.control.json",
+            "goal.control.json",
+            "plan.control.json",
+            "review.control.json",
+            "runtime.control.json"
+          ],
+          "writable_files": ["progress.jsonl", "runtime-status.json", "final-report.json"]
+        },
+        "required_steps": [
+          {
+            "step_id": "S7",
+            "transition": "runtime writes progress events only",
+            "evidence": ["progress event validation"]
+          },
+          {
+            "step_id": "S9",
+            "transition": "old accident regressions rewritten for JSON",
+            "evidence": ["verifier regression tests"]
+          }
+        ],
+        "progress": {
+          "event_schema": "progress-event.schema.json",
+          "append_only": true
+        },
+        "verifier": {
+          "required_before_goal_achieved": true,
+          "command": "python3 .agents/skills/using-control-json/scripts/verify_runtime_progress.py",
+          "output_schema": "final-report.schema.json"
+        }
+      }
+    },
+    "progress_events": [
+      {
+        "event_type": "step.completed",
+        "schema_version": "1.0.0",
+        "occurred_at": "2026-06-09T00:00:00Z",
+        "work_package_id": "WP5",
+        "required_step": "S7",
+        "status": "pass",
+        "progress_role": "mainline",
+        "counts_as_goal_progress": true,
+        "evidence": ["append_progress_event test passed"]
+      },
+      {
+        "event_type": "step.completed",
+        "schema_version": "1.0.0",
+        "occurred_at": "2026-06-09T00:01:00Z",
+        "work_package_id": "WP5",
+        "required_step": "S9",
+        "status": "pass",
+        "progress_role": "mainline",
+        "counts_as_goal_progress": true,
+        "evidence": ["old accident JSON regression tests passed"]
+      }
+    ],
+    "final_report": {
+      "artifact_type": "final-report",
+      "schema_version": "1.0.0",
+      "goal_achieved": true,
+      "what_counts_as_done_met": true,
+      "evidence": ["runtime verifier focused tests passed"],
+      "verification": {
+        "verifier_result": "pass",
+        "verifier_permits_goal_achieved": true
+      },
+      "work_coverage": {
+        "status": "complete",
+        "executed": ["WP5 runtime verifier and JSON regressions"],
+        "prepared_only": [],
+        "forbidden_not_executed": [],
+        "out_of_scope": ["external production systems"]
+      },
+      "remaining_gaps": []
+    }
+  }
+}

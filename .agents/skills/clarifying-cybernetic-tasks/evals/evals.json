@@ -8,7 +8,7 @@
       "assertions": [
         "States or behaves as if $clarifying-cybernetic-tasks is a deprecated alias.",
         "Uses $analyzing-cybernetic-requirements as the primary skill.",
-        "Creates or references docs/cybernetics/requirements/ rather than docs/cybernetics/clarifications/.",
+        "Creates or references docs/cybernetics/runs/<slug>/requirements.control.json rather than docs/cybernetics/clarifications/.",
         "Does not create a solution design, goal, execution policy, review, runtime /goal, or target-work artifact."
       ]
     }

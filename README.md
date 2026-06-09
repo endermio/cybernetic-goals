@@ -25,7 +25,19 @@ human situation
 Only route formed tasks. Do not treat a requested method or workflow as the
 human purpose.
 
-For complex work, do not let `/goal` analyze requirements, invent the solution design, write its own plan, review its own plan, or invent a new control strategy during execution. Instead, prepare and approve control artifacts first, then compile the final runtime `/goal` command.
+For complex work, do not let `/goal` analyze requirements, invent the solution design, write its own plan, review its own plan, or invent a new control strategy during execution. Instead, prepare and approve JSON control files first, then emit a short `/goal` pointer to the approved runtime control JSON.
+
+Official persistent control facts live only in:
+
+```text
+docs/cybernetics/runs/<slug>/*.control.json
+docs/cybernetics/runs/<slug>/progress.jsonl
+docs/cybernetics/runs/<slug>/runtime-status.json
+docs/cybernetics/runs/<slug>/final-report.json
+docs/cybernetics/runs/<slug>/evidence/
+```
+
+Historical Markdown artifacts are non-authoritative background only. Do not use Markdown as official guard, compiler, runtime, or long-term dual-path control input.
 
 Superpowers dependencies are stage-specific infrastructure, not optional style suggestions. See `docs/cybernetic-framework/superpowers-infrastructure-policy.md`.
 
@@ -61,7 +73,7 @@ $routing-cybernetic-workflows
   -> decide whether a formed task should use the cybernetic workflow
 
 $analyzing-cybernetic-requirements
-  -> docs/cybernetics/requirements/YYYY-MM-DD-feature.md
+  -> docs/cybernetics/runs/YYYY-MM-DD-feature/requirements.control.json
 
 $orchestrating-cybernetic-pregoal
   -> run pre-goal compilation after requirements analysis, invoking solution design when Design Gate is required
@@ -73,19 +85,19 @@ The orchestrator drives the following skills and stops if the review cannot conv
 
 ```text
 $designing-cybernetic-solutions
-  -> docs/cybernetics/designs/YYYY-MM-DD-feature.md when Design Gate is required
+  -> docs/cybernetics/runs/YYYY-MM-DD-feature/design.control.json when Design Gate is required
 
 $writing-cybernetic-goals
-  -> docs/cybernetics/goals/YYYY-MM-DD-feature.md
+  -> docs/cybernetics/runs/YYYY-MM-DD-feature/goal.control.json
 
 $writing-cybernetic-execution-policies
-  -> docs/cybernetics/plans/YYYY-MM-DD-feature.md
+  -> docs/cybernetics/runs/YYYY-MM-DD-feature/plan.control.json
 
 $reviewing-cybernetic-control-structures
-  -> docs/cybernetics/control-reviews/YYYY-MM-DD-feature.md
+  -> docs/cybernetics/runs/YYYY-MM-DD-feature/review.control.json
 
 $compiling-cybernetic-runtime-goals
-  -> final executable /goal command
+  -> docs/cybernetics/runs/YYYY-MM-DD-feature/runtime.control.json plus a short /goal pointer
 ```
 
 For simple work, the router should reject the full pipeline and recommend an inline prompt or inline `/goal`.
@@ -94,7 +106,7 @@ For simple work, the router should reject the full pipeline and recommend an inl
 
 - `framing-cybernetic-intent`: collaboratively frame pre-task human intent into shared understanding before optional task formation and routing.
 - `routing-cybernetic-workflows`: classify complexity and route to the right workflow.
-- `analyzing-cybernetic-requirements`: analyze human intent and create a requirements analysis brief.
+- `analyzing-cybernetic-requirements`: analyze human intent and create `requirements.control.json`.
 - `clarifying-cybernetic-tasks`: deprecated compatibility alias for `analyzing-cybernetic-requirements`.
 - `designing-cybernetic-solutions`: create a general solution/system model when Design Gate is required.
 - `orchestrating-cybernetic-pregoal`: orchestrate the pre-goal compilation chain after requirements analysis, including design dispatch when required.
@@ -103,7 +115,7 @@ For simple work, the router should reject the full pipeline and recommend an inl
 - `writing-cybernetic-goals`: create a control contract, not a runtime `/goal`, for complex work.
 - `writing-cybernetic-execution-policies`: create an execution policy / plan as a control law.
 - `reviewing-cybernetic-control-structures`: review requirements analysis, design when required, goal, and plan as a coherent control system.
-- `compiling-cybernetic-runtime-goals`: compile the final runtime `/goal` command only after approval gates pass.
+- `compiling-cybernetic-runtime-goals`: compile `runtime.control.json` and a short runtime `/goal` pointer only after approval gates pass.
 
 ## Observability / meta-control
 
@@ -129,10 +141,10 @@ When adding or changing an invariant, update that matrix in the same change so t
 
 The scripts are intentionally small and deterministic. They check structure and phase gates; they do not decide requirement semantics.
 
-- `control_artifact_lint.py`: lint requirements analysis/design/goal/plan/review artifacts.
+- `control_artifact_lint.py`: lint requirements analysis/design/goal/plan/review control artifacts.
 - `check_pregoal_inputs.py`: check that orchestration starts from the expected requirements analysis input.
 - `control_chain_guard.py`: block premature runtime goal compilation.
-- `compile_runtime_goal.py`: compile the final executable `/goal` command from approved artifacts.
+- `compile_runtime_goal.py`: compile approved runtime control JSON and the short `/goal` pointer.
 - `validate_run_events.py`: validate metadata-only run-event files and taxonomy codes.
 - `record_run_event.py`: write or dry-run local metadata-only JSONL run events.
 - `redact_run_event.py`: remove unsafe fields before export.

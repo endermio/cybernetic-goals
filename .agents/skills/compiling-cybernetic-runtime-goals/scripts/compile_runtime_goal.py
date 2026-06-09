@@ -1,332 +1,142 @@
 #!/usr/bin/env python3
-"""Compile a pointer-only runtime /goal and a runtime goal file artifact."""
+"""Compile runtime.control.json and a short /goal pointer from a JSON run directory."""
 from __future__ import annotations
 
 import argparse
-import re
-import subprocess
+import json
 import sys
 from pathlib import Path
 
-
-HEADING_RE = re.compile(r"^(#{1,6})\s+(.+?)\s*$", re.MULTILINE)
-
-
-def section_body(text: str, heading: str) -> str | None:
-    target = heading.casefold()
-    for match in HEADING_RE.finditer(text):
-        title = match.group(2).strip().rstrip("#").strip()
-        if title.casefold() != target:
-            continue
-
-        level = len(match.group(1))
-        start = match.end()
-        end = len(text)
-        for next_match in HEADING_RE.finditer(text, start):
-            if len(next_match.group(1)) <= level:
-                end = next_match.start()
-                break
-        return text[start:end]
-    return None
+from control_chain_guard import (
+    ControlJsonValidationError,
+    read_json_object,
+    reject_markdown_control_artifacts,
+    validate_json_control_run,
+)
 
 
-def selected_execution_work_assignment(plan_path: str) -> str | None:
-    plan = Path(plan_path).read_text(encoding="utf-8")
-    body = section_body(plan, "Who Does The Work / Context Use")
-    if body is None:
-        return None
-
-    match = re.search(r"(?im)^\s*Who does the work\s*:\s*`?([^`\n]+?)`?\s*$", body)
-    if not match:
-        return None
-
-    value = match.group(1).strip().strip("`")
-    lowered = value.casefold()
-    if "/" in value:
-        return None
-    if "parallel" in lowered and "subagent" in lowered:
-        return "Parallel subagent-driven"
-    if "serial" in lowered and "subagent" in lowered:
-        return "Serial subagent-driven"
-    if "main-only" in lowered or "main only" in lowered:
-        return "Main-only"
-    return None
+APPROVED_CONTROL_FILES = [
+    "requirements.control.json",
+    "design.control.json",
+    "goal.control.json",
+    "plan.control.json",
+    "review.control.json",
+    "runtime.control.json",
+]
+WRITABLE_FILES = ["progress.jsonl", "runtime-status.json", "final-report.json"]
 
 
-def work_assignment_section(plan_path: str) -> str:
-    plan = Path(plan_path).read_text(encoding="utf-8")
-    return section_body(plan, "Who Does The Work / Context Use") or ""
-
-
-def selected_delegation_workflow(plan_path: str) -> str | None:
-    body = work_assignment_section(plan_path)
-    match = re.search(r"(?im)^\s*Selected agent workflow\s*:\s*`?([^`\n]+?)`?\s*$", body)
-    if not match:
-        return None
-
-    value = match.group(1).strip().strip("`").casefold()
-    if "/" in value:
-        return None
-    if value in {"bounded-protocol", "bounded protocol"}:
-        return "bounded-protocol"
-    if value in {"superpowers-subagent-driven-development", "$superpowers:subagent-driven-development"}:
-        return "superpowers-subagent-driven-development"
-    if value in {"superpowers-dispatching-parallel-agents", "$superpowers:dispatching-parallel-agents"}:
-        return "superpowers-dispatching-parallel-agents"
-    if value in {"adapter-specific", "adapter specific"}:
-        return "adapter-specific"
-    if value == "none":
-        return "none"
-    return None
-
-
-def selected_subagent_execution_mode(plan_path: str) -> str | None:
-    body = work_assignment_section(plan_path)
-    match = re.search(r"(?im)^\s*Subagent execution mode\s*:\s*`?([^`\n]+?)`?\s*$", body)
-    if not match:
-        return None
-
-    value = match.group(1).strip().strip("`").casefold()
-    if "/" in value:
-        return None
-    if value in {"none", "not applicable", "n/a"}:
-        return "none"
-    if value in {"serial-single-active", "serial single active"}:
-        return "serial-single-active"
-    if value in {"parallel-max-safe", "parallel max safe"}:
-        return "parallel-max-safe"
-    return None
-
-
-def max_concurrent_subagents(plan_path: str) -> str | None:
-    body = work_assignment_section(plan_path)
-    match = re.search(r"(?im)^\s*Max concurrent subagents\s*:\s*`?([^`\n]+?)`?\s*$", body)
-    if not match:
-        return None
-    value = match.group(1).strip().strip("`")
-    if "/" in value:
-        return None
-    return value
-
-
-def normalize_expected_work_assignment(value: str) -> str | None:
-    lowered = value.strip().strip("`").casefold()
-    if lowered in {"main-only", "main only"}:
-        return "Main-only"
-    if lowered in {"serial-subagent-driven", "serial subagent-driven", "serial"}:
-        return "Serial subagent-driven"
-    if lowered in {"parallel-subagent-driven", "parallel subagent-driven", "parallel"}:
-        return "Parallel subagent-driven"
-    return None
-
-
-def normalize_expected_subagent_mode(value: str) -> str | None:
-    lowered = value.strip().strip("`").casefold()
-    if lowered in {"none", "not applicable", "n/a"}:
-        return "none"
-    if lowered in {"serial-single-active", "serial single active", "serial"}:
-        return "serial-single-active"
-    if lowered in {"parallel-max-safe", "parallel max safe", "parallel"}:
-        return "parallel-max-safe"
-    return None
-
-
-def derive_runtime_goal_path(requirements_path: str) -> Path:
-    path = Path(requirements_path)
-    stem = path.stem
-    parts = list(path.parts)
-    if "requirements" in parts:
-        parts[parts.index("requirements")] = "runtime-goals"
-        return Path(*parts).with_name(f"{stem}.goal.md")
-    return path.with_name(f"{stem}.goal.md")
-
-
-def validate_runtime_contract_path(path: Path) -> bool:
-    return path.name.endswith(".goal.md")
-
-
-def pointer_command(runtime_contract_path: Path) -> str:
+def runtime_control_pointer(runtime_control_path: Path) -> str:
     return (
-        f"/goal Execute the runtime goal file at {runtime_contract_path}. "
-        "Read it first and follow it exactly. "
-        "If any referenced artifact is missing, not approved, or inconsistent, "
-        "stop and report the smallest required human decision."
+        f"/goal Execute the runtime control JSON at {runtime_control_path} "
+        "using .agents/skills/using-control-json. Read it first; if required JSON is missing, "
+        "invalid, or inconsistent, stop and report the smallest required human decision."
     )
 
 
-def runtime_goal_contract(
-    *,
-    requirements: str,
-    design: str | None,
-    goal: str,
-    plan: str,
-    review: str,
-) -> str:
-    design_line = f"- Design: `{design}`" if design else "- Design: `not required`"
-    design_required_line = (
-        f"- Design `{design}`: `Answer Method Check`, `Final Answer Format Design`, `Design-to-Goal Mapping`, `Design-to-Execution Mapping`."
-        if design
-        else "- Design: `not required`."
-    )
-    work_assignment = selected_execution_work_assignment(plan) or "read from approved execution policy"
-    workflow = selected_delegation_workflow(plan) or "read from approved execution policy"
-    subagent_mode = selected_subagent_execution_mode(plan) or "read from approved execution policy"
-    max_concurrent = max_concurrent_subagents(plan) or "read from approved execution policy"
-    if workflow == "superpowers-subagent-driven-development":
-        workflow_line = (
-            "- Because the selected agent workflow is `superpowers-subagent-driven-development`, use `$superpowers:subagent-driven-development` only in `serial-single-active` mode for approved current-session implementation-plan work packages."
-        )
-    elif workflow == "superpowers-dispatching-parallel-agents":
-        workflow_line = (
-            "- Because the selected agent workflow is `superpowers-dispatching-parallel-agents`, use `$superpowers:dispatching-parallel-agents` only for the approved independent work packages in the current wave, under the plan's required-step frontier, lock, barrier, failure, and main-agent integration rules."
-        )
-    else:
-        workflow_line = "- Use only the selected agent workflow recorded in the approved execution policy."
+def compile_runtime_control(run_dir: Path) -> Path:
+    if not run_dir.exists() or not run_dir.is_dir():
+        raise ControlJsonValidationError(f"run directory does not exist: {run_dir}")
+    reject_markdown_control_artifacts(run_dir)
 
-    return "\n".join(
-        [
-            "# Runtime Goal",
-            "",
-            "## Approved Control Chain",
-            "",
-            f"- Requirements: `{requirements}`",
-            design_line,
-            f"- Goal: `{goal}`",
-            f"- Execution policy: `{plan}`",
-            f"- Review: `{review}`",
-            "",
-            "## Runtime Execution Rule",
-            "",
-            "Execute the approved execution policy under the approved control chain. Do not reinterpret what the user approved, how this should be answered, what counts as done, final answer format, who does the work, checks, or control strategy.",
-            "Treat What the User Approved as the source for primary object, requested transformation, non-goals, how this should be answered, what is not enough, work covered in this run, what the agent may do, forbidden actions, purpose feedback, where the result must show up, what counts as done, final answer format, why this process is needed, and known assumptions.",
-            "",
-            f"- Who does the work: `{work_assignment}`",
-            f"- Selected agent workflow: `{workflow}`",
-            f"- Subagent execution mode: `{subagent_mode}`",
-            f"- Max concurrent subagents: `{max_concurrent}`",
-            "",
-            "## Required Sections To Read",
-            "",
-            f"- Requirements `{requirements}`: `What the User Approved`, `How We Know The User Purpose Was Met`, `Where The Result Must Show Up`, `Final Answer Format`.",
-            design_required_line,
-            f"- Goal `{goal}`: `Success Condition`, `What Counts As Done`, `Work Covered And Allowed Actions Contract`, `How We Know The User Purpose Was Met`, `Where The Result Must Show Up`, `Final Answer Format`.",
-            f"- Execution policy `{plan}`: `Work Coverage And Action Limits Matrix`, `Steps That Make The Result True`, `Action That Can Make It Done`, `Candidate Plan Tasks`, `Who Does The Work / Context Use`, `Subagent execution mode`, `Parallel wave matrix`, `Conflict / lock model`, `Failure policy`, `Phase Checks`, `Progress Log Rules`, `User Purpose Strategy`, `Where The Result Must Show Up`, `Check / Evidence Rules`.",
-            f"- Review `{review}`: `Design Answer Method Check`, `Work Covered And Allowed Actions Check`, `Parallel Agent Safety Check`, `Answer Path Check`, `What Counts As Done Check`, `User Purpose Evidence Check`, `Result Placement Check`, `Who Does The Work / Context Use`, `Final Observer Check`.",
-            "",
-            "## Runtime Discipline",
-            "",
-            "- Use `$superpowers:executing-plans` discipline against the approved execution policy.",
-            "- Use `$superpowers:systematic-debugging` for unclear or repeated failures.",
-            "- Use `$superpowers:verification-before-completion` before claiming completion.",
-            "- Follow the approved work assignment and agent workflow recorded in the execution policy.",
-            workflow_line,
-            "- If `Subagent execution mode` is `serial-single-active`, run exactly one execution subagent at a time and integrate before launching the next.",
-            "- If `Subagent execution mode` is `parallel-max-safe`, launch only the current approved wave up to the approved cap, after dependencies are satisfied and conflict locks are disjoint; integrate at the approved barrier before launching the next wave.",
-            "- Treat subagent work as governed by the execution policy's bounded delegation protocol and integration checks.",
-            "- Treat approved evidence checks, checks, and evidence channels as evidence, not objectives.",
-            "",
-            "## Final Report Required Fields",
-            "",
-            "- goal achieved: yes/no",
-            "- what counts as done met: yes/no",
-            "- evidence needed to call it done",
-            "- required answer path coverage and step evidence",
-            "- answer method completion evidence when requirements/design define how this should be answered",
-            "- if no: not done reason",
-            "- if no: action that can make it done attempted or proof of impossibility",
-            "- if no: smallest next action that can make it done",
-            "- work covered in this run",
-            "- work coverage: complete / partial / unavailable / explicitly bounded by what the user approved",
-            "- executed",
-            "- prepared-only",
-            "- forbidden-not-executed",
-            "- explicitly out-of-scope by what the user approved",
-            "- user purpose evidence status and highest purpose-relevant evidence observed",
-            "- result places covered, actions completed or justified, old behavior checked, and pending or unknown places when result placement applies",
-            "",
-            "## Stop Rule",
-            "",
-            "If any referenced artifact is missing, not approved, inconsistent, or insufficient for runtime execution, stop and report the smallest required human decision.",
-            "",
-        ]
-    )
+    runtime_path = run_dir / "runtime.control.json"
+    if not runtime_path.exists():
+        goal = read_json_object(run_dir / "goal.control.json")
+        plan = read_json_object(run_dir / "plan.control.json")
+        review = read_json_object(run_dir / "review.control.json")
+
+        plan_bindings = plan.get("registry_bindings", {})
+        runtime = {
+            "artifact_type": "runtime.control",
+            "schema_version": goal.get("schema_version", "1"),
+            "status": "compiled",
+            "control_chain": {
+                "requirements": "requirements.control.json",
+                "design": "design.control.json",
+                "goal": "goal.control.json",
+                "plan": "plan.control.json",
+                "review": "review.control.json",
+            },
+            "approved_control": {
+                "objective": goal.get("approved_control", {}).get("objective", "Execute the approved JSON control chain."),
+                "what_counts_as_done": goal.get("approved_control", {}).get("what_counts_as_done", "Verifier permits the final report."),
+            },
+            "registry_bindings": {
+                "answer_method_key": plan_bindings.get("answer_method_key") or review.get("registry_bindings", {}).get("answer_method_key"),
+                "selected_agent_workflow": plan_bindings.get("selected_agent_workflow") or review.get("registry_bindings", {}).get("selected_agent_workflow"),
+            },
+            "runtime": {
+                "readonly_files": APPROVED_CONTROL_FILES,
+                "writable_files": WRITABLE_FILES,
+            },
+            "required_steps": plan.get("required_steps", []),
+            "progress": plan.get("progress", {"event_schema": "progress-event.schema.json", "append_only": True}),
+            "verifier": {
+                "required_before_goal_achieved": True,
+                "command": "python3 .agents/skills/using-control-json/scripts/verify_runtime_progress.py",
+                "output_schema": plan.get("verifier", {}).get("output_schema", "final-report.schema.json"),
+            },
+        }
+        runtime_path.write_text(json.dumps(runtime, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+
+    validate_json_control_run(run_dir)
+    return runtime_path
 
 
 def main() -> int:
-    ap = argparse.ArgumentParser()
-    ap.add_argument("--requirements", dest="requirements")
-    ap.add_argument("--clarification", dest="requirements", help="Deprecated alias for --requirements")
-    ap.add_argument("--design")
-    ap.add_argument("--goal", required=True)
-    ap.add_argument("--plan", required=True)
-    ap.add_argument("--review", required=True)
-    ap.add_argument("--out")
-    ap.add_argument("--expect-work-assignment", help="Optional compile-time assertion; validates the approved plan work assignment but does not override it.")
-    ap.add_argument("--expect-subagent-mode", help="Optional compile-time assertion; validates the approved plan subagent execution mode but does not override it.")
-    ap.add_argument("--skip-guard", action="store_true", help="Internal validation only. Bypasses phase-check checks and must not be used for official runtime goal compilation.")
-    ap.add_argument("--i-understand-this-bypasses-phase-checks", action="store_true", help="Required with --skip-guard to make phase-check bypass explicit.")
-    args = ap.parse_args()
-    if not args.requirements:
-        ap.error("--requirements is required")
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--run-dir", help="Official JSON control run directory containing *.control.json files.")
+    parser.add_argument("--requirements", help=argparse.SUPPRESS)
+    parser.add_argument("--clarification", help=argparse.SUPPRESS)
+    parser.add_argument("--design", help=argparse.SUPPRESS)
+    parser.add_argument("--goal", help=argparse.SUPPRESS)
+    parser.add_argument("--plan", help=argparse.SUPPRESS)
+    parser.add_argument("--review", help=argparse.SUPPRESS)
+    parser.add_argument("--out", help=argparse.SUPPRESS)
+    parser.add_argument("--expect-work-assignment", help=argparse.SUPPRESS)
+    parser.add_argument("--expect-subagent-mode", help=argparse.SUPPRESS)
+    parser.add_argument("--skip-guard", action="store_true", help=argparse.SUPPRESS)
+    parser.add_argument("--i-understand-this-bypasses-phase-checks", action="store_true", help=argparse.SUPPRESS)
+    args = parser.parse_args()
 
-    here = Path(__file__).resolve().parent
-    guard = here / "control_chain_guard.py"
-    if args.skip_guard and not args.i_understand_this_bypasses_phase_checks:
-        print("ERROR: --skip-guard is for internal validation only and requires --i-understand-this-bypasses-phase-checks", file=sys.stderr)
-        return 2
-    if not args.skip_guard:
-        cmd = [sys.executable, str(guard), "--requirements", args.requirements, "--goal", args.goal, "--plan", args.plan, "--review", args.review]
-        if args.design:
-            cmd.extend(["--design", args.design])
-        result = subprocess.run(cmd, text=True, capture_output=True)
-        if result.returncode != 0:
-            sys.stdout.write(result.stdout)
-            sys.stderr.write(result.stderr)
-            return result.returncode
-
-    if args.expect_work_assignment:
-        expected = normalize_expected_work_assignment(args.expect_work_assignment)
-        actual = selected_execution_work_assignment(args.plan)
-        if expected is None:
-            print(f"ERROR: invalid expected work assignment: {args.expect_work_assignment}", file=sys.stderr)
-            return 2
-        if actual != expected:
-            print(f"ERROR: expected work assignment {expected}, got {actual}", file=sys.stderr)
-            return 2
-
-    if args.expect_subagent_mode:
-        expected_mode = normalize_expected_subagent_mode(args.expect_subagent_mode)
-        actual_mode = selected_subagent_execution_mode(args.plan)
-        if expected_mode is None:
-            print(f"ERROR: invalid expected subagent execution mode: {args.expect_subagent_mode}", file=sys.stderr)
-            return 2
-        if actual_mode != expected_mode:
-            print(f"ERROR: expected subagent execution mode {expected_mode}, got {actual_mode}", file=sys.stderr)
-            return 2
-
-    out_path = Path(args.out) if args.out else derive_runtime_goal_path(args.requirements)
-    if not validate_runtime_contract_path(out_path):
+    if not args.run_dir:
         print(
-            f"Runtime goal file output path must end with .goal.md: {out_path}",
+            "ERROR: official control input is JSON-only; use --run-dir with docs/cybernetics/runs/<slug>/",
             file=sys.stderr,
         )
         return 2
-    contract = runtime_goal_contract(
-        requirements=args.requirements,
-        design=args.design,
-        goal=args.goal,
-        plan=args.plan,
-        review=args.review,
-    )
-    out_path.parent.mkdir(parents=True, exist_ok=True)
-    out_path.write_text(contract, encoding="utf-8")
+    if any(
+        (
+            args.requirements,
+            args.clarification,
+            args.design,
+            args.goal,
+            args.plan,
+            args.review,
+            args.out,
+            args.expect_work_assignment,
+            args.expect_subagent_mode,
+            args.skip_guard,
+            args.i_understand_this_bypasses_phase_checks,
+        )
+    ):
+        print(
+            "ERROR: --run-dir is the official JSON control input; do not combine it with Markdown artifact inputs, .goal.md output, or legacy assertions",
+            file=sys.stderr,
+        )
+        return 2
 
-    command = pointer_command(out_path)
-    print("Runtime goal file written:")
-    print(out_path)
+    try:
+        runtime_path = compile_runtime_control(Path(args.run_dir))
+    except ControlJsonValidationError as exc:
+        print(f"ERROR: {exc}", file=sys.stderr)
+        return 2
+
+    print("Runtime control JSON ready:")
+    print(runtime_path)
     print()
     print("Use this /goal:")
-    print(command)
+    print(runtime_control_pointer(runtime_path))
     return 0
 
 

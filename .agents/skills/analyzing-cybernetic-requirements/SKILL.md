@@ -7,7 +7,7 @@ description: 'Use when a formed task or task candidate has ambiguous requirement
 
 ## Overview
 
-Turn a formed task or task candidate into a requirements analysis brief before it becomes a solution design, Codex `/goal`, execution policy, or target-work change.
+Turn a formed task or task candidate into requirements control JSON before it becomes a solution design, Codex `/goal`, execution policy, or target-work change.
 
 This skill is a pre-goal control loop:
 
@@ -17,12 +17,14 @@ formed task -> AI context scan -> requirement meaning -> rubric/output/check ana
 
 Requirements analysis is broader than asking clarifying questions. Clarifying questions are one tool inside this skill. The output is not just answers to questions; it is the analyzed approved target, constraints, evaluation function, and required checks.
 
+Official persistent control facts are JSON only. Historical Markdown may be read as non-authoritative background, but do not create or compile Markdown as official guard, compiler, runtime, or long-term dual-path control input.
+
 Output:
 
-- a concise requirements analysis response in chat, or
-- a requirements analysis brief at `docs/cybernetics/requirements/YYYY-MM-DD-<slug>.md`.
+- a short requirements analysis confirmation in chat, or
+- `docs/cybernetics/runs/<slug>/requirements.control.json`.
 
-Use `assets/requirements-analysis-template.md`.
+Use the approved requirements control JSON shape for the run directory. Do not use Markdown templates as official control input.
 
 ## What This Skill Owns
 
@@ -43,7 +45,7 @@ Owned analysis:
 - identify the path that makes the result true for implementation work: one actor-centered path from initial state to the what counts as done;
 - identify the approved answering method for tasks where merely running a plausible path would not answer the question, including what is not enough;
 - prepare the What the User Approved compact control commitment for Level 3/4 or full pre-goal work: Human purpose, Input role binding, Primary object, Requested transformation, Non-goals, how we know the user's purpose was met, where the result must show up, What counts as done, Evidence needed to call it done, If it is not done, what should be reported, Required answer path, How this should be answered, What is not enough, Work covered in this run, What the agent may do, Forbidden live / irreversible actions, Required handling for unauthorized actions, Explicitly out-of-scope items, Agent delegation preference, Agent workflow preference, Parallel execution authority, Maximum parallel agents, Final answer format, Why this process is needed, and Known assumptions;
-- when How this should be answered or What is not enough maps to an internal answer-method registry entry, write a sibling machine-readable file at `docs/cybernetics/requirements/YYYY-MM-DD-<slug>.control.json` with the internal keys needed by guards. Do not put those keys in the Markdown brief;
+- when How this should be answered or What is not enough maps to an internal answer-method registry entry, record the internal keys needed by guards in `requirements.control.json`; do not expose internal registry labels in chat;
 - identify constraints, rules that cannot change, assumptions, and stop conditions;
 - decide whether Meaning, Rubric, Output Contract, Design, Goal, Execution Plan, Review, or Risk checks are required;
 - ask high-value human questions;
@@ -53,7 +55,7 @@ Owned analysis:
 Routed elsewhere:
 
 - solution structure, interfaces, object structures, mechanism architecture, flows, report structures, output schemas, and lifecycle models go to `$designing-cybernetic-solutions`;
-- goal files go to `$writing-cybernetic-goals`;
+- goal control JSON goes to `$writing-cybernetic-goals`;
 - execution policies go to `$writing-cybernetic-execution-policies`;
 - whole-chain review goes to `$reviewing-cybernetic-control-structures`;
 - runtime `/goal` compilation goes to `$compiling-cybernetic-runtime-goals`;
@@ -272,11 +274,11 @@ For Level 3/4 or full pre-goal work, pass design check to `$orchestrating-cybern
 7. Identify where the result must show up when intended-result realization spans places.
 8. Identify output-contract needs and whether a safe default is sufficient.
 9. For Level 3/4 or full pre-goal work, build or update the What the User Approved compact control commitment.
-10. If the commitment includes How this should be answered or What is not enough, map the plain-language commitment to the internal answer-method registry and write the sibling `.control.json`. The Markdown stays plain; the sidecar carries machine keys.
+10. If the commitment includes How this should be answered or What is not enough, map the plain-language commitment to the internal answer-method registry and record the machine keys in `requirements.control.json`.
 11. Identify required checks: Meaning, Rubric, Output Contract, Design, Goal, Execution Plan, Review, Risk.
 12. Classify uncertainty as blocking human decision, safe default assumption, or deferred design/planning/execution detail.
 13. Ask 3-7 high-value questions, preferably no more than 5.
-14. Create or update the requirements analysis brief.
+14. Create or update `requirements.control.json`.
 15. If the human answers, update `Confirmed Requirement Decisions`, `Requirements Analysis Status`, and the What the User Approved record without treating answers as approval.
 16. Do not create a solution design, goal, plan, review, runtime `/goal`, or target-work artifacts.
 17. If analysis is complete and the brief path deterministically identifies a date/slug, output the approval request or queue-friendly next commands as described below.
@@ -293,38 +295,43 @@ Instead, output only the compact approval request:
 What the User Approved is Pending. Please approve or revise the compact control commitment before orchestration.
 ```
 
-For Level 3/4 or full pre-goal work, when `What the User Approved: Approved` is recorded and the requirements path is deterministic, output:
+For Level 3/4 or full pre-goal work, when `What the User Approved: Approved` is recorded and the run directory is deterministic, output:
 
-1. A pre-goal orchestration command using the concrete requirements path.
-2. The predicted runtime goal file path and pointer-only `/goal` shape using the expected artifact paths for the same date/slug.
+1. A pre-goal orchestration command using the concrete run directory.
+2. The predicted `runtime.control.json` path and pointer-only `/goal` shape for the same slug.
 
 When available, generate both with:
 
 ```bash
 python3 .agents/skills/analyzing-cybernetic-requirements/scripts/predict_pregoal_handoff.py \
-  --requirements docs/cybernetics/requirements/YYYY-MM-DD-<slug>.md
+  --run-dir docs/cybernetics/runs/YYYY-MM-DD-<slug>
 ```
 
-Use the script output instead of hand-writing predicted runtime commands. The script checks `Requirements Analysis Status: Complete`, `What the User Approved: Approved`, required answer-method sidecar presence, deterministic path shape, design check, and same-slug artifact paths.
+Use the script output instead of hand-writing predicted runtime commands when the script supports JSON run directories. The script checks `Requirements Analysis Status: Complete`, `What the User Approved: Approved`, required answer-method data, deterministic path shape, design check, and same-slug control paths.
 
 If `design check: required`, still output the predicted runtime contract path and pointer-only `/goal` shape. State that `$orchestrating-cybernetic-pregoal` must invoke or request `$designing-cybernetic-solutions` before goal writing, and make the predicted downstream artifact paths include the expected solution design path. design check dispatch note must not replace the predicted pointer-only `/goal`. Do not output `$designing-cybernetic-solutions` as a standalone command before orchestration for Level 3/4 or full pre-goal work.
 
-The predicted pointer-only `/goal` is not the final approved runtime command. Label it as predicted or queue-friendly, and make it point to the runtime goal file that the pre-goal compiler must create after downstream artifacts are approved.
+The predicted pointer-only `/goal` is not the final approved runtime command. Label it as predicted or queue-friendly, and make it point to `runtime.control.json` that the pre-goal compiler must create after downstream artifacts are approved.
 
 Derive expected paths from:
 
 ```text
-docs/cybernetics/requirements/YYYY-MM-DD-<slug>.md
+docs/cybernetics/runs/YYYY-MM-DD-<slug>/
 ```
 
-Use the same `YYYY-MM-DD-<slug>` for:
+Use that run directory for:
 
 ```text
-docs/cybernetics/designs/YYYY-MM-DD-<slug>.md
-docs/cybernetics/goals/YYYY-MM-DD-<slug>.md
-docs/cybernetics/plans/YYYY-MM-DD-<slug>.md
-docs/cybernetics/control-reviews/YYYY-MM-DD-<slug>.md
-docs/cybernetics/runtime-goals/YYYY-MM-DD-<slug>.goal.md
+requirements.control.json
+design.control.json
+goal.control.json
+plan.control.json
+review.control.json
+runtime.control.json
+progress.jsonl
+runtime-status.json
+final-report.json
+evidence/
 ```
 
 The predicted pointer-only `/goal` shape must include this precondition:
@@ -338,7 +345,7 @@ Predicted commands and handoff prompts are response-only. Do not write them into
 For Level 1/2 work with `rubric check: required`, do not output the pre-goal orchestration command by default after rubric-only analysis. Output the next bounded goal-writing command instead:
 
 ```text
-$writing-cybernetic-goals 使用 docs/cybernetics/requirements/YYYY-MM-DD-slug.md 中确认的评价口径，为这个 Level 2 有界审计/评估任务创建小型文件 goal，并在完成后给出直接 /goal 执行命令，不要默认建议 execution policy。
+$writing-cybernetic-goals 使用 docs/cybernetics/runs/YYYY-MM-DD-slug/requirements.control.json 中确认的评价口径，为这个 Level 2 有界审计/评估任务创建 goal.control.json 和 runtime.control.json，并在完成后给出指向 runtime.control.json 的短 /goal，不要默认建议 execution policy。
 ```
 
 ## Requirements Analysis Status
@@ -354,7 +361,7 @@ Mark `Complete` only when:
 - all blocking human decisions are resolved;
 - confirmed requirement decisions are recorded;
 - remaining assumptions are low-risk and explicit;
-- the next step can safely create a solution design or goal file.
+- the next step can safely create solution design control JSON or goal control JSON.
 
 For Level 3/4 or full pre-goal work, `Complete` only means requirement meaning are sufficiently analyzed. Downstream orchestration still requires `What the User Approved: Approved`.
 
@@ -381,8 +388,8 @@ If `What the User Approved` is not `Approved`, output only:
 ```markdown
 Requirements analysis is complete, but What the User Approved is pending.
 
-Updated requirements analysis brief:
-`docs/cybernetics/requirements/YYYY-MM-DD-slug.md`
+Updated requirements control JSON:
+`docs/cybernetics/runs/YYYY-MM-DD-slug/requirements.control.json`
 
 Approve or revise the compact control commitment in the brief before orchestration.
 ```
@@ -392,14 +399,14 @@ If `What the User Approved: Approved`, output the predictor invocation and paste
 ````markdown
 Requirements analysis is complete.
 
-Updated requirements analysis brief:
-`docs/cybernetics/requirements/YYYY-MM-DD-slug.md`
+Updated requirements control JSON:
+`docs/cybernetics/runs/YYYY-MM-DD-slug/requirements.control.json`
 
 Generated queue-friendly handoff:
 
 ```bash
 python3 .agents/skills/analyzing-cybernetic-requirements/scripts/predict_pregoal_handoff.py \
-  --requirements docs/cybernetics/requirements/YYYY-MM-DD-slug.md
+  --run-dir docs/cybernetics/runs/YYYY-MM-DD-slug
 ```
 ````
 
@@ -417,7 +424,7 @@ For Level 1/2 work with `rubric check: required`, summarize the confirmed rubric
 - [ ] There are no more than 7 questions.
 - [ ] The brief includes `Requirements Analysis Status`.
 - [ ] Level 3/4 or full pre-goal work includes `What the User Approved`.
-- [ ] If How this should be answered or What is not enough is recorded, the sibling `.control.json` exists and carries internal answer-method keys; the Markdown does not expose those keys.
+- [ ] If How this should be answered or What is not enough is recorded, `requirements.control.json` carries the required internal answer-method keys; chat does not expose those keys.
 - [ ] Human answers to clarification questions are not treated as approval.
 - [ ] If What the User Approved is not `Approved`, the response asks for approval or revision and does not output the orchestration command or predicted `/goal`.
 - [ ] No solution design, goal, plan, review, or approved runtime `/goal` was created.

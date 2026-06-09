@@ -1,0 +1,32 @@
+{
+  "artifact_type": "goal.control",
+  "schema_version": "1",
+  "status": "approved",
+  "source_contracts": {
+    "requirements": "requirements.control.json",
+    "design": "design.control.json"
+  },
+  "approved_control": {
+    "objective": "Operate the cybernetic control chain from JSON control files only.",
+    "success_condition": "The JSON control chain is validated, compiled, executed through the JSON protocol, and verifier-gated.",
+    "what_counts_as_done": "Official Markdown control inputs fail while JSON control files and runtime progress outputs pass their checks.",
+    "rules_that_must_not_change": [
+      "Approved control JSON is read-only during runtime.",
+      "Markdown is not an official guard, compiler, or runtime input.",
+      "The verifier must permit any achieved final report."
+    ]
+  },
+  "registry_bindings": {
+    "answer_method_key": "implementation-spine",
+    "forbidden_substitute_key": "component-inventory-completion"
+  },
+  "required_steps": [
+    {
+      "step_id": "S8",
+      "transition": "new control authoring guidance points to run-directory JSON files",
+      "evidence": [
+        "JSON example files under skill assets"
+      ]
+    }
+  ]
+}

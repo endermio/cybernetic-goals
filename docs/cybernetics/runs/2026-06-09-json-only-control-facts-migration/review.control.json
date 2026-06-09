@@ -1,0 +1,52 @@
+{
+  "artifact_type": "review.control",
+  "schema_version": "1.0.0",
+  "status": "approved",
+  "source_contracts": {
+    "requirements": "requirements.control.json",
+    "design": "design.control.json",
+    "goal": "goal.control.json",
+    "plan": "plan.control.json"
+  },
+  "registry_bindings": {
+    "answer_method_key": "implementation-spine",
+    "selected_agent_workflow": "superpowers-dispatching-parallel-agents"
+  },
+  "review_checks": [
+    {
+      "check_id": "design-answer-method",
+      "status": "pass",
+      "evidence": [
+        "design.control.json preserves implementation-spine answer method and avoids component-inventory-completion"
+      ]
+    },
+    {
+      "check_id": "required-answer-path",
+      "status": "pass",
+      "evidence": [
+        "goal/plan/runtime required steps S1-S10 are aligned and work packages cover every runtime step"
+      ]
+    },
+    {
+      "check_id": "work-assignment",
+      "status": "pass",
+      "evidence": [
+        "plan/control registry binds superpowers-dispatching-parallel-agents with Parallel subagent-driven work"
+      ]
+    },
+    {
+      "check_id": "horizon-authority",
+      "status": "pass",
+      "evidence": [
+        "approved JSON-only migration work remains in this run; Markdown compatibility is explicitly non-goal"
+      ]
+    },
+    {
+      "check_id": "final-observer",
+      "status": "pass",
+      "evidence": [
+        "JSON-only focused tests and full tests pass before runtime verification"
+      ]
+    }
+  ]
+}
