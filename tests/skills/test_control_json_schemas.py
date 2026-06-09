@@ -24,6 +24,15 @@ SCHEMA_FIXTURES = {
             "how_we_know_purpose_was_met": "JSON guard/compiler/runtime path operates without Markdown control inputs",
             "where_result_must_show_up": ["schemas", "registries", "guards"],
             "what_counts_as_done": "official JSON path passes and Markdown control input fails",
+            "required_outcomes": [
+                {
+                    "id": "outcome.schema-validation",
+                    "statement": "JSON control artifacts validate only when required outcomes are preserved",
+                    "blocks_goal_achieved_if_missing": True,
+                    "required_evidence": ["schema validation tests"],
+                    "not_satisfied_by": ["required step completion without outcome coverage"],
+                }
+            ],
             "final_answer_format": {
                 "medium": "chat summary",
                 "required_structure": ["changed files", "verification commands"],
@@ -60,6 +69,7 @@ SCHEMA_FIXTURES = {
                 "step_id": "S2",
                 "transition": "strict JSON schema set exists",
                 "evidence": ["schema validation tests"],
+                "satisfies_outcomes": ["outcome.schema-validation"],
             }
         ],
     },
@@ -89,6 +99,7 @@ SCHEMA_FIXTURES = {
                 "step_id": "S1",
                 "transition": "Markdown dependencies inventoried",
                 "evidence": ["inventory and failing-input list"],
+                "satisfies_outcomes": ["outcome.schema-validation"],
             }
         ],
     },
@@ -111,6 +122,7 @@ SCHEMA_FIXTURES = {
                 "step_id": "S1",
                 "transition": "Markdown dependencies inventoried",
                 "evidence": ["inventory and failing-input list"],
+                "satisfies_outcomes": ["outcome.schema-validation"],
             }
         ],
         "work_packages": [
@@ -201,6 +213,7 @@ SCHEMA_FIXTURES = {
                 "step_id": "S1",
                 "transition": "Markdown dependencies inventoried",
                 "evidence": ["inventory and failing-input list"],
+                "satisfies_outcomes": ["outcome.schema-validation"],
             }
         ],
         "progress": {
@@ -210,6 +223,7 @@ SCHEMA_FIXTURES = {
         "verifier": {
             "required_before_goal_achieved": True,
             "command": "verify-control-run",
+            "required_outcomes": ["outcome.schema-validation"],
             "output_schema": "final-report.schema.json",
         },
     },
@@ -452,6 +466,39 @@ class ControlJsonSchemaTest(unittest.TestCase):
         for schema in (review, runtime):
             self.assertIn("approved_control_hashes", schema["required"])
             self.assertIn("approved_control_hashes", schema["properties"])
+
+    def test_required_outcomes_are_first_class_across_control_chain(self):
+        requirements = load_json(SCHEMA_DIR / "requirements.control.schema.json")
+        approved_control = requirements["properties"]["approved_control"]
+        self.assertIn("required_outcomes", approved_control["required"])
+        outcome_schema = approved_control["properties"]["required_outcomes"]["items"]
+        self.assertEqual(
+            [
+                "id",
+                "statement",
+                "blocks_goal_achieved_if_missing",
+                "required_evidence",
+                "not_satisfied_by",
+            ],
+            outcome_schema["required"],
+        )
+
+        for schema_name in (
+            "design.control.schema.json",
+            "goal.control.schema.json",
+            "plan.control.schema.json",
+            "runtime.control.schema.json",
+        ):
+            with self.subTest(schema=schema_name):
+                schema = load_json(SCHEMA_DIR / schema_name)
+                step_schema = schema["properties"]["required_steps"]["items"]
+                self.assertIn("satisfies_outcomes", step_schema["required"])
+                self.assertIn("satisfies_outcomes", step_schema["properties"])
+
+        runtime = load_json(SCHEMA_DIR / "runtime.control.schema.json")
+        verifier = runtime["properties"]["verifier"]
+        self.assertIn("required_outcomes", verifier["required"])
+        self.assertIn("required_outcomes", verifier["properties"])
 
 
 if __name__ == "__main__":

@@ -190,7 +190,8 @@
         "required": [
           "step_id",
           "transition",
-          "evidence"
+          "evidence",
+          "satisfies_outcomes"
         ],
         "properties": {
           "step_id": {
@@ -202,6 +203,14 @@
             "minLength": 1
           },
           "evidence": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "satisfies_outcomes": {
             "type": "array",
             "minItems": 1,
             "items": {
@@ -235,6 +244,7 @@
       "required": [
         "required_before_goal_achieved",
         "command",
+        "required_outcomes",
         "output_schema"
       ],
       "properties": {
@@ -244,6 +254,14 @@
         "command": {
           "type": "string",
           "minLength": 1
+        },
+        "required_outcomes": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
         },
         "output_schema": {
           "type": "string",
