@@ -1,0 +1,223 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://cybernetic-goals.local/schemas/control-json/bounded-runtime.control.schema.json",
+  "title": "Cybernetic Level 2 Bounded Runtime Control",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "artifact_type",
+    "schema_version",
+    "control_kind",
+    "status",
+    "approved_source",
+    "goal",
+    "objective",
+    "scope",
+    "what_counts_as_done",
+    "runtime",
+    "required_steps",
+    "progress",
+    "verifier",
+    "stop_conditions",
+    "final_report"
+  ],
+  "properties": {
+    "artifact_type": {
+      "const": "bounded-runtime.control"
+    },
+    "schema_version": {
+      "type": "string",
+      "minLength": 1
+    },
+    "control_kind": {
+      "const": "bounded_runtime"
+    },
+    "status": {
+      "const": "compiled"
+    },
+    "approved_source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "source_type",
+        "summary"
+      ],
+      "properties": {
+        "source_type": {
+          "enum": [
+            "user_request",
+            "router_decision",
+            "goal_control"
+          ]
+        },
+        "summary": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "goal": {
+      "const": "goal.control.json"
+    },
+    "objective": {
+      "type": "string",
+      "minLength": 1
+    },
+    "scope": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "work_covered",
+        "allowed_actions",
+        "forbidden_actions"
+      ],
+      "properties": {
+        "work_covered": {
+          "type": "string",
+          "minLength": 1
+        },
+        "allowed_actions": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "forbidden_actions": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    },
+    "what_counts_as_done": {
+      "type": "string",
+      "minLength": 1
+    },
+    "runtime": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "readonly_files",
+        "writable_files"
+      ],
+      "properties": {
+        "readonly_files": {
+          "type": "array",
+          "items": {
+            "enum": [
+              "goal.control.json",
+              "runtime.control.json"
+            ]
+          }
+        },
+        "writable_files": {
+          "type": "array",
+          "items": {
+            "enum": [
+              "progress.jsonl",
+              "runtime-status.json",
+              "final-report.json"
+            ]
+          }
+        }
+      }
+    },
+    "required_steps": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "step_id",
+          "description",
+          "evidence_required",
+          "done_when"
+        ],
+        "properties": {
+          "step_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "description": {
+            "type": "string",
+            "minLength": 1
+          },
+          "evidence_required": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "done_when": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    },
+    "progress": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "path",
+        "append_only"
+      ],
+      "properties": {
+        "path": {
+          "const": "progress.jsonl"
+        },
+        "append_only": {
+          "const": true
+        }
+      }
+    },
+    "verifier": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "required_before_goal_achieved",
+        "command",
+        "output_schema"
+      ],
+      "properties": {
+        "required_before_goal_achieved": {
+          "const": true
+        },
+        "command": {
+          "type": "string",
+          "minLength": 1
+        },
+        "output_schema": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "stop_conditions": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "final_report": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "path"
+      ],
+      "properties": {
+        "path": {
+          "const": "final-report.json"
+        }
+      }
+    }
+  }
+}

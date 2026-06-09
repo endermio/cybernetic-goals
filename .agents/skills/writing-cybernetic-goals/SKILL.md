@@ -37,7 +37,7 @@ If the current user message approves the compact control commitment, update the 
 
 Do not put “first write a plan, then execute it” inside an execution `/goal` for complex work.
 
-For Level 2 bounded goals, create `goal.control.json` and `runtime.control.json`, then output a short `/goal` pointer to `runtime.control.json` using `.agents/skills/using-control-json` only when the task limits and any required evaluation rubric are explicit. Do not recommend `$writing-cybernetic-execution-policies` or `$reviewing-cybernetic-control-structures` by default unless the user explicitly requests them or the task reveals unresolved control decisions.
+For Level 2 bounded goals, create `goal.control.json` and bounded `runtime.control.json`, then output a short `/goal` pointer to `runtime.control.json` using `.agents/skills/using-bounded-control-json` only when the task limits and any required evaluation rubric are explicit. The bounded runtime does not require requirements/design/plan/review control JSON. Do not recommend `$writing-cybernetic-execution-policies` or `$reviewing-cybernetic-control-structures` by default unless the user explicitly requests them or the task reveals unresolved control decisions.
 
 ## Evaluation Function Check
 
@@ -194,9 +194,9 @@ Behavior:
 1. Run the Evaluation Function Check for audit/evaluation/status-classification tasks.
 2. If the rubric is missing or partial, stop with a blocked rubric analysis request.
 3. Create `docs/cybernetics/runs/<slug>/goal.control.json`.
-4. Create `docs/cybernetics/runs/<slug>/runtime.control.json` as the JSON-backed runtime pointer target.
+4. Create `docs/cybernetics/runs/<slug>/runtime.control.json` as the bounded JSON-backed runtime pointer target.
 5. Preserve the rubric inside the goal when the task is evaluative.
-6. Output a short executable `/goal` command that references `runtime.control.json` and names `.agents/skills/using-control-json`.
+6. Output a short executable `/goal` command that references `runtime.control.json` and names `.agents/skills/using-bounded-control-json`.
 7. Do not recommend execution policy or review by default.
 8. If the bounded goal proves insufficient, ambiguous, or dependent on new requirement/control decisions, instruct runtime Codex to stop and report the smallest required human decision.
 
@@ -216,6 +216,8 @@ If the requirements analysis is missing or incomplete, route back to `$analyzing
 If required design is required and no design exists, route to `$designing-cybernetic-solutions`.
 
 For bounded JSON goals, completed `requirements.control.json` is optional when the user request or router decision already fixes the meaning, limits, output path, stop conditions, and any evaluation rubric. Record the user request or router decision as the source of truth.
+
+Bounded runtime control JSON is not a reduced full pre-goal chain. It does not require requirements/design/plan/review control JSON. If those artifacts become necessary to decide or prove the work, stop treating the task as Level 2 and route to full pre-goal orchestration.
 
 ## Goal Control Requirements
 
@@ -315,7 +317,7 @@ Control map:
 Response-only `/goal` command:
 
 ```text
-/goal Use .agents/skills/using-control-json and execute docs/cybernetics/runs/YYYY-MM-DD-slug/runtime.control.json. If the JSON is missing, invalid, inconsistent, or insufficient, stop and report the smallest required human decision.
+/goal Use .agents/skills/using-bounded-control-json and execute docs/cybernetics/runs/YYYY-MM-DD-slug/runtime.control.json. If the bounded JSON is missing, invalid, inconsistent, or insufficient, stop and report the smallest required human decision.
 ```
 ````
 
@@ -379,5 +381,5 @@ If the user explicitly requests a small inline `/goal` and the task is low-risk,
 - [ ] Output-sensitive tasks include a `Final Final Answer Format`.
 - [ ] The goal forbids runtime from substituting another output shape when a final final answer format is specified.
 - [ ] For complex work, no final runtime `/goal` was output unless approved plan and review exist.
-- [ ] For Level 2 bounded goals, the response outputs a short `/goal` pointer to `runtime.control.json` and does not recommend execution policy by default.
+- [ ] For Level 2 bounded goals, the response outputs a short `/goal` pointer to `runtime.control.json` using `.agents/skills/using-bounded-control-json` and does not recommend execution policy by default.
 - [ ] Any bounded `/goal` stops if the runtime control JSON is insufficient, ambiguous, or requires new requirement/control decisions.

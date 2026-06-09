@@ -41,7 +41,7 @@
       "assertions": [
         "Creates or references docs/cybernetics/runs/<slug>/goal.control.json for the bounded audit goal.",
         "Preserves the explicit rubric in the goal.",
-        "Outputs a short executable /goal that points to runtime.control.json and names .agents/skills/using-control-json.",
+        "Outputs a short executable /goal that points to runtime.control.json and names .agents/skills/using-bounded-control-json.",
         "The /goal does not tell Codex to create an execution policy or review unless explicitly instructed.",
         "Does not recommend $writing-cybernetic-execution-policies as the default next step."
       ]

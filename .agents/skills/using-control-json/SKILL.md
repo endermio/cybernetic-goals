@@ -9,6 +9,10 @@ description: 'Use when runtime execution must operate approved cybernetic contro
 
 Use this skill when a runtime `/goal` pointer, `runtime.control.json`, or approved control chain sends Codex into JSON-backed cybernetic execution.
 
+This is not the Level 2 bounded runtime protocol. Level 2 bounded goals use
+`.agents/skills/using-bounded-control-json` and do not require the full
+requirements/design/goal/plan/review control chain.
+
 Read `references/runtime-control-json-protocol.md` before executing, reporting status, or preparing completion evidence.
 
 ## Operating Contract

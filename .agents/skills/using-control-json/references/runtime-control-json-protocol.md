@@ -4,6 +4,11 @@
 
 Before writing runtime files, load the approved control chain from JSON. Parse every required JSON file, check schema or registry validators when available, and confirm the artifacts identify the same run, required steps, work coverage, verifier, and final report contract.
 
+This protocol is not for Level 2 bounded runtime. Level 2 bounded goals use
+`using-bounded-control-json`; a directory with only `goal.control.json` and
+`runtime.control.json` is valid for bounded runtime but invalid for this full
+control-chain protocol.
+
 Stop on missing, invalid, or inconsistent JSON before writing progress or status. Report the exact file or relationship that failed and the smallest human decision needed to continue.
 
 Historical Markdown can remain as background only. A runtime JSON chain that needs Markdown as an official guard, compiler, or runtime control input is inconsistent JSON for this protocol.

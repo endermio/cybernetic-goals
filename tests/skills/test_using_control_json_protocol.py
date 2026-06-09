@@ -39,6 +39,12 @@ class UsingControlJsonProtocolTest(unittest.TestCase):
             re.compile(r"stop[^.\n]*(missing|invalid|inconsistent)[^.\n]*JSON", re.I),
         )
 
+    def test_full_chain_skill_is_not_level2_bounded_runtime_protocol(self):
+        text = combined_protocol_text()
+
+        self.assertRegex(text, re.compile(r"not[^.\n]*Level 2 bounded", re.I))
+        self.assertIn("using-bounded-control-json", text)
+
     def test_runtime_writes_are_limited_to_three_files(self):
         text = combined_protocol_text()
 

@@ -265,7 +265,7 @@ or:
 $writing-cybernetic-goals 为这个有界修正创建 goal.control.json 和 runtime.control.json：<需求>
 ```
 
-For Level 2 bounded JSON goals, the expected next step after goal creation is a short `/goal` pointer to `runtime.control.json` using `.agents/skills/using-control-json`. Do not recommend `$writing-cybernetic-execution-policies` by default unless the user explicitly asks for it or the task exposes unresolved control decisions.
+For Level 2 bounded JSON goals, the expected next step after goal creation is a short `/goal` pointer to `runtime.control.json` using `.agents/skills/using-bounded-control-json`. Do not recommend `$writing-cybernetic-execution-policies` by default unless the user explicitly asks for it or the task exposes unresolved control decisions.
 
 If an audit/evaluation/status-classification task names labels such as `已闭环`, `部分闭环`, `未闭环`, or `不可判定` but does not define the evidence rubric for those labels, keep the route at Level 2 and mark `rubric check: required` before creating the bounded JSON goal.
 
