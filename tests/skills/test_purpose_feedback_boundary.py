@@ -22,7 +22,7 @@ Status: `Approved`
 | How We Know The User Purpose Was Met | dedicated test target |
 | Where The Result Must Show Up | covered by compact fixture |
 | What counts as done | purpose-limit evidence is observed |
-| Evidence needed to call it done | target-producing evidence is observed |
+| Evidence needed to call it done | evidence needed to call it done is observed |
 | Non-achieved terminal report handling | report goal achieved: no |
 | Required answer path | user-purpose evidence guard fixture required answer path |
 | Work covered in this run | user-purpose evidence guard fixture horizon |
@@ -112,7 +112,7 @@ class PurposeFeedbackLimitTest(unittest.TestCase):
                 "| Element | Requirement |",
                 "|---|---|",
                 "| What counts as done | purpose-limit evidence is observed |",
-                    "| Evidence needed to call it done | target-producing evidence is observed |",
+                    "| Evidence needed to call it done | evidence needed to call it done is observed |",
                 "| Allowed achieved claim | only what counts as done supports goal achieved: yes |",
                 "| Steps that make the result true | user-purpose evidence guard fixture required answer path |",
                 "",
@@ -225,7 +225,7 @@ class PurposeFeedbackLimitTest(unittest.TestCase):
                     "",
                     "Transition evidence produced:",
                     "",
-                    "- Fixture target-producing evidence is recorded.",
+                    "- Fixture evidence needed to call it done is recorded.",
                     "",
                     "Integration check:",
                     "",

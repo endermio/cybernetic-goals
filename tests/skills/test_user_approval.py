@@ -25,7 +25,7 @@ Approval applies only to this compact control commitment.
 | How We Know The User Purpose Was Met | user-purpose evidence remains separately calibrated |
 | Where The Result Must Show Up | intended-result_places remain separately calibrated |
 | What counts as done | approved What the User Approved guard target is observed |
-| Evidence needed to call it done | target-producing evidence is observed |
+| Evidence needed to call it done | evidence needed to call it done is observed |
 | Non-achieved terminal report handling | report goal achieved: no |
 | Required answer path | What the User Approved guard fixture required answer path |
 | Work covered in this run | What the User Approved guard fixture horizon |
@@ -117,7 +117,7 @@ class HumanApprovalTest(unittest.TestCase):
                     "| Element | Requirement |",
                     "|---|---|",
                     "| What counts as done | approved What the User Approved guard target is observed |",
-                    "| Evidence needed to call it done | target-producing evidence is observed |",
+                    "| Evidence needed to call it done | evidence needed to call it done is observed |",
                     "| Allowed achieved claim | only what counts as done supports goal achieved: yes |",
                     "| Steps that make the result true | What the User Approved guard fixture required answer path |",
                     "",
@@ -232,7 +232,7 @@ class HumanApprovalTest(unittest.TestCase):
                     "",
                     "Transition evidence produced:",
                     "",
-                    "- Fixture target-producing evidence is recorded.",
+                    "- Fixture evidence needed to call it done is recorded.",
                     "",
                     "Integration check:",
                     "",
@@ -276,6 +276,14 @@ class HumanApprovalTest(unittest.TestCase):
                     "- What counts as done check: `yes`",
                     "- answer path check: `yes`",
                     "- Work covered in this run and authority check: `yes`",
+                    "",
+                    "## Required Check Results",
+                    "",
+                    "- Design Answer Method Check: `Not applicable`",
+                    "- Steps That Make The Result True Check: `PASS`",
+                    "- Work Coverage / Action Limits Check: `PASS`",
+                    "- Done / Purpose / Result Placement Check: `PASS`",
+                    "- Work Assignment / Subagent Check: `PASS`",
                     "",
                     "## What the User Approved Check",
                     "",
@@ -465,7 +473,7 @@ class HumanApprovalTest(unittest.TestCase):
         self.assertIn("orchestration_guard.py", matrix)
         self.assertIn("control_chain_guard.py", matrix)
         self.assertIn("What the User Approved Check", matrix)
-        self.assertIn("tests/skills/test_human_setpoint_approval.py", matrix)
+        self.assertIn("tests/skills/test_user_approval.py", matrix)
 
     def test_orchestrator_evals_do_not_bypass_hsa(self):
         evals = json.loads(

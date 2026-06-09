@@ -269,7 +269,7 @@ Domain adapters own concrete place discovery and verification methods. The core 
 
 ## Steps That Make The Result True
 
-For target-achieving implementation work, decompose by the state transitions that produce the target, not by component inventory.
+For implementation work, decompose by the state transitions that make the result true, not by component inventory.
 
 | Required step | Required state transition | Required evidence |
 |---|---|---|
@@ -505,7 +505,7 @@ Each entry must include:
 - evidence check interpretation
 - user purpose evidence status
 - what counts as done met
-- target-producing evidence
+- evidence needed to call it done
 - required answer path step status
 - required steps satisfied
 - required steps failed / blocked / unobserved

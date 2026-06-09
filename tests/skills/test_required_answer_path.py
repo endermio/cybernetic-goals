@@ -18,7 +18,7 @@ Status: `Approved`
 |---|---|
 | Human purpose | produce a intended result through an actor-centered path |
 | Input role binding | fixture source material is approved background |
-| Primary object | target-producing answer path fixture |
+| Primary object | required answer path fixture |
 | Requested transformation | approved target into required answer path-first execution policy |
 | Non-goals | do not count component-only work as goal progress |
 | How We Know The User Purpose Was Met | user-purpose evidence remains separately calibrated |
@@ -27,7 +27,7 @@ Status: `Approved`
 | Evidence needed to call it done | required step evidence exists |
 | Non-achieved terminal report handling | report goal achieved: no when required steps are unsatisfied |
 | Required answer path | S0 no durable state -> S1 durable state -> S2 observable intended result |
-| Work covered in this run | target-producing answer path fixture horizon |
+| Work covered in this run | required answer path fixture horizon |
 | What the agent may do | local guard fixture checks |
 | Forbidden live / irreversible actions | none |
 | Required handling for unauthorized actions | none |
@@ -39,11 +39,11 @@ Status: `Approved`
 Approval record:
 
 - Approved by: `test fixture`
-- Approval phrase or source: `approved target-producing required answer path`
+- Approval phrase or source: `approved required answer path`
 """
 
 
-class TargetProducingSpineTest(unittest.TestCase):
+class RequiredAnswerPathTest(unittest.TestCase):
     def read(self, path: str) -> str:
         return (ROOT / path).read_text(encoding="utf-8")
 
@@ -94,7 +94,7 @@ class TargetProducingSpineTest(unittest.TestCase):
                     "| Element | Requirement |",
                     "|---|---|",
                     "| Beneficiary / observer | operator |",
-                    "| Purpose-realizing outcome observed | operator observes the target-producing path completed |",
+                    "| Purpose-realizing outcome observed | operator observes the required answer path completed |",
                     "| Supporting Evidence | internal checks support progress only |",
                     "| Sufficient evidence level | purpose-limit |",
                     "| If user-purpose evidence unavailable | report pending and next observation |",
@@ -122,7 +122,7 @@ class TargetProducingSpineTest(unittest.TestCase):
                     "",
                     "| Element | Requirement |",
                     "|---|---|",
-                    "| Work covered in this run | target-producing answer path fixture horizon |",
+                    "| Work covered in this run | required answer path fixture horizon |",
                     "| What the agent may do | local guard fixture checks |",
                     "| Forbidden actions | none |",
                     "| Prepare-only / observe-only actions | none |",
@@ -150,7 +150,7 @@ class TargetProducingSpineTest(unittest.TestCase):
             "",
             "| Work item / place | In work covered in this run? | What the agent may do | Required runtime handling | Counts as achieved? |",
             "|---|---|---|---|---|",
-            "| target-producing answer path fixture | yes | execute | run guard / compiler fixture checks | yes if fixture passes |",
+            "| required answer path fixture | yes | execute | run guard / compiler fixture checks | yes if fixture passes |",
             "",
         ]
         if include_plan_required_answer_path:
@@ -251,7 +251,7 @@ class TargetProducingSpineTest(unittest.TestCase):
             [
                 "Goal:",
                 "",
-                "- Drive the fixture through the approved target-producing required answer path.",
+                "- Drive the fixture through the approved required answer path.",
                 "",
                 "Batch-end check:",
                 "",
@@ -288,6 +288,14 @@ class TargetProducingSpineTest(unittest.TestCase):
             f"- answer path check: `{review_required_answer_path_independence}`",
             "- Work covered in this run and authority check: `yes`",
             "",
+            "## Required Check Results",
+            "",
+            "- Design Answer Method Check: `Not applicable`",
+            "- Steps That Make The Result True Check: `PASS`",
+            "- Work Coverage / Action Limits Check: `PASS`",
+            "- Done / Purpose / Result Placement Check: `PASS`",
+            "- Work Assignment / Subagent Check: `PASS`",
+            "",
             "## Who Does The Work / Context Use",
             "",
             "Findings:",
@@ -298,7 +306,7 @@ class TargetProducingSpineTest(unittest.TestCase):
             "Findings:",
             "- Purpose feedback waits for purpose-limit evidence.",
             "",
-                "## Result Placement Check",
+            "## Result Placement Check",
             "",
             "Findings:",
             "- not applicable is justified for this fixture.",
@@ -362,7 +370,7 @@ class TargetProducingSpineTest(unittest.TestCase):
             capture_output=True,
         )
 
-    def test_templates_include_target_producing_required_answer_path(self):
+    def test_templates_include_required_answer_path(self):
         requirements = self.read(".agents/skills/analyzing-cybernetic-requirements/assets/requirements-analysis-template.md")
         goal = self.read(".agents/skills/writing-cybernetic-goals/assets/goal-contract-template.md")
         plan = self.read(".agents/skills/writing-cybernetic-execution-policies/assets/execution-policy-template.md")
@@ -375,7 +383,7 @@ class TargetProducingSpineTest(unittest.TestCase):
         self.assertIn("Answer Path Check", review)
         self.assertIn("answer path check", review)
 
-    def test_guard_accepts_complete_target_producing_required_answer_path_chain(self):
+    def test_guard_accepts_complete_required_answer_path_chain(self):
         with tempfile.TemporaryDirectory() as tmpdir:
             requirements, goal, plan, review = self.write_chain(Path(tmpdir))
             result = self.guard(requirements, goal, plan, review)
@@ -383,7 +391,7 @@ class TargetProducingSpineTest(unittest.TestCase):
         self.assertEqual(0, result.returncode, result.stdout + result.stderr)
         self.assertIn("NEXT: CompileRuntimeGoal", result.stdout)
 
-    def test_guard_rejects_goal_missing_target_producing_required_answer_path_reference(self):
+    def test_guard_rejects_goal_missing_required_answer_path_reference(self):
         with tempfile.TemporaryDirectory() as tmpdir:
             requirements, goal, plan, review = self.write_chain(Path(tmpdir), include_goal_required_answer_path=False)
             result = self.guard(requirements, goal, plan, review)
@@ -393,7 +401,7 @@ class TargetProducingSpineTest(unittest.TestCase):
         self.assertIn("NEXT: RunGoalWriting", output)
         self.assertIn("Steps that make the result true", output)
 
-    def test_guard_rejects_plan_missing_target_producing_required_answer_path(self):
+    def test_guard_rejects_plan_missing_required_answer_path(self):
         with tempfile.TemporaryDirectory() as tmpdir:
             requirements, goal, plan, review = self.write_chain(Path(tmpdir), include_plan_required_answer_path=False)
             result = self.guard(requirements, goal, plan, review)
@@ -443,7 +451,7 @@ class TargetProducingSpineTest(unittest.TestCase):
         self.assertIn("Answer Path Check", output)
         self.assertIn("answer path check: yes", output)
 
-    def test_runtime_contract_indexes_target_producing_required_answer_path(self):
+    def test_runtime_contract_indexes_required_answer_path(self):
         compiler = self.read(".agents/skills/compiling-cybernetic-runtime-goals/scripts/compile_runtime_goal.py")
         template = self.read(".agents/skills/compiling-cybernetic-runtime-goals/assets/runtime-goal-template.txt")
         skill = self.read(".agents/skills/compiling-cybernetic-runtime-goals/SKILL.md")

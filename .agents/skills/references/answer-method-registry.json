@@ -28,7 +28,7 @@
   "implementation-spine": {
     "mandatory_nodes": [
       "initial state",
-      "target-producing state transition",
+      "state transition that makes the result true",
       "observable target state"
     ],
     "forbidden_substitutions": [

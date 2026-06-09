@@ -269,7 +269,7 @@ Flag as Major or Blocking when:
 - there is more than one what counts as done;
 - any partial, diagnostic, blocked, invalid, unavailable, fallback, or not done report appears in Success Condition;
 - any report-when-not-done status is listed under target-achieved states;
-- the execution policy lacks a target-producing action or proof-of-impossibility path;
+- the execution policy lacks an action that can make it done or a proof-of-impossibility path;
 - the plan can terminate with `goal achieved: yes` without satisfying the what counts as done;
 - "valid final status" is used without separating `goal achieved: yes` from `goal achieved: no`.
 

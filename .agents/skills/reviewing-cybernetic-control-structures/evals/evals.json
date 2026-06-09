@@ -198,7 +198,7 @@
       "assertions": [
         "Identifies the what counts as done.",
         "Flags partial, diagnostic, blocked, unavailable, or invalid being treated as goal achieved.",
-        "Requires a target-producing action or proof-of-impossibility path.",
+        "Requires an action that can make it done or proof-of-impossibility path.",
         "Allows honest reporting not done only as goal achieved: no.",
         "Does not let valid final status replace the what counts as done."
       ]
@@ -218,9 +218,9 @@
     {
       "id": "component-labelled-answer path-is-not-valid-answer path",
       "prompt": "Review an implementation plan whose Steps That Make The Result True says S1 implement ledger, S2 implement runner, S3 implement CLI, and Candidate Plan Tasks map component work to those labels. There is no actor-centered state transition from initial state to what counts as done.",
-      "expected_output": "The review marks Answer Path Check as inadequate because the plan renamed component inventory as a answer path instead of modeling target-producing state transitions.",
+      "expected_output": "The review marks Answer Path Check as inadequate because the plan renamed component inventory as an answer path instead of modeling state transitions that make the result true.",
       "assertions": [
-        "Identifies S1/S2/S3 as component inventory rather than target-producing state transitions.",
+        "Identifies S1/S2/S3 as component inventory rather than state transitions that make the result true.",
         "Requires an actor-centered path from initial state to what counts as done.",
         "Flags component evidence replacing answer path transition evidence.",
         "Does not approve merely because Candidate Plan Tasks have Required step(s).",

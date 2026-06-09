@@ -1084,7 +1084,7 @@ def check_plan_target_producing_strategy(plan: str, errors: list[str]) -> None:
             errors.append(f"execution policy Action That Can Make It Done missing {field}")
 
 
-def check_plan_target_producing_spine(plan: str, errors: list[str]) -> None:
+def check_plan_required_answer_path(plan: str, errors: list[str]) -> None:
     body = section_body(plan, "Steps That Make The Result True")
     if body is None:
         errors.append("execution policy missing ## Steps That Make The Result True")
@@ -1252,7 +1252,7 @@ def check_review_target_achievement_condition(review: str, errors: list[str]) ->
         errors.append("review What Counts As Done Check section has no meaningful findings")
 
 
-def check_review_target_producing_spine(review: str, errors: list[str]) -> None:
+def check_review_required_answer_path(review: str, errors: list[str]) -> None:
     independence = section_body(review, "Review Independence")
     if independence is None:
         errors.append("review missing ## Review Independence for Answer Path Check")
@@ -1284,6 +1284,38 @@ def check_review_execution_horizon_authority(review: str, errors: list[str]) -> 
         return
     if not labeled_block_has_content(body, "Findings"):
         errors.append("review Work Covered And Allowed Actions Check section has no meaningful findings")
+
+
+REQUIRED_REVIEW_CHECK_LABELS = (
+    "Design Answer Method Check",
+    "Steps That Make The Result True Check",
+    "Work Coverage / Action Limits Check",
+    "Done / Purpose / Result Placement Check",
+    "Work Assignment / Subagent Check",
+)
+
+
+def required_review_check_value(body: str, label: str) -> str | None:
+    value = labeled_value(body, label)
+    return value.strip().strip("`") if value else None
+
+
+def check_review_required_check_results(review: str, errors: list[str]) -> None:
+    body = section_body(review, "Required Check Results")
+    if body is None:
+        errors.append("review missing ## Required Check Results")
+        return
+
+    for label in REQUIRED_REVIEW_CHECK_LABELS:
+        value = required_review_check_value(body, label)
+        if value is None:
+            errors.append(f"review Required Check Results missing {label}")
+            continue
+        lowered = value.casefold()
+        if "/" in value:
+            errors.append(f"review Required Check Results has unresolved enum for {label}: {value!r}")
+        if lowered == "fail":
+            errors.append(f"review Required Check Results marks {label}: FAIL; Review Status cannot be Approved")
 
 
 def suggest_next_action(errors: list[str]) -> str:
@@ -1492,7 +1524,7 @@ def main() -> int:
             errors.append(f"execution policy status under ## Execution Policy Status must be Candidate: {plan_status!r}")
         check_plan_realization_place(plan, errors)
         check_plan_target_producing_strategy(plan, errors)
-        check_plan_target_producing_spine(plan, errors)
+        check_plan_required_answer_path(plan, errors)
         check_candidate_plan_tasks_spine_nodes(plan, errors)
         check_plan_horizon_authority(plan, errors)
         check_execution_work_assignment(plan, errors)
@@ -1504,6 +1536,7 @@ def main() -> int:
         review_status = section_status(review, "Review Status")
         if review_status != "Approved":
             errors.append(f"review status under ## Review Status is not Approved: {review_status!r}")
+        check_review_required_check_results(review, errors)
         check_final_observer(review, errors)
         check_review_design_answer_path(requirements, review, errors)
         check_review_context_work_assignment(review, errors)
@@ -1512,7 +1545,7 @@ def main() -> int:
         check_review_purpose_feedback(review, errors)
         check_review_realization_place(review, errors)
         check_review_target_achievement_condition(review, errors)
-        check_review_target_producing_spine(review, errors)
+        check_review_required_answer_path(review, errors)
         check_review_execution_horizon_authority(review, errors)
 
     for path, text, label in [

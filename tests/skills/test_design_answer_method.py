@@ -164,6 +164,7 @@ def write_runtime_chain(
     *,
     include_review_design_answer_path: bool = True,
     review_design_answer_path_independence: str = "yes",
+    design_answer_method_verdict: str = "PASS",
 ) -> tuple[Path, Path, Path, Path, Path]:
     requirements = write_requirements(tmp)
     design = write_design(
@@ -381,6 +382,14 @@ def write_runtime_chain(
         "- What counts as done check: `yes`",
         "- answer path check: `yes`",
         "- Work covered in this run and authority check: `yes`",
+        "",
+        "## Required Check Results",
+        "",
+        f"- Design Answer Method Check: `{design_answer_method_verdict}`",
+        "- Steps That Make The Result True Check: `PASS`",
+        "- Work Coverage / Action Limits Check: `PASS`",
+        "- Done / Purpose / Result Placement Check: `PASS`",
+        "- Work Assignment / Subagent Check: `PASS`",
         "",
     ]
     if include_review_design_answer_path:
@@ -718,6 +727,72 @@ class DesignAnswerPathCheckTest(unittest.TestCase):
         self.assertEqual(2, result.returncode, output)
         self.assertIn("NEXT: ReturnToRequirementsAnalysis", output)
         self.assertIn("requirements control sidecar missing", output)
+
+    def test_control_chain_guard_rejects_approved_review_with_failed_required_check(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            requirements, design, goal, plan, review = write_runtime_chain(
+                Path(tmpdir),
+                design_answer_method_verdict="FAIL",
+            )
+            result = subprocess.run(
+                [
+                    sys.executable,
+                    str(CONTROL_CHAIN_GUARD),
+                    "--requirements",
+                    str(requirements),
+                    "--design",
+                    str(design),
+                    "--goal",
+                    str(goal),
+                    "--plan",
+                    str(plan),
+                    "--review",
+                    str(review),
+                ],
+                cwd=ROOT,
+                text=True,
+                capture_output=True,
+            )
+
+        output = result.stdout + result.stderr
+        self.assertEqual(2, result.returncode, output)
+        self.assertIn("NEXT: RunReview", output)
+        self.assertIn("Required Check Results", output)
+        self.assertIn("Design Answer Method Check", output)
+
+    def test_orchestration_guard_rejects_approved_review_with_failed_required_check(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            requirements, design, goal, plan, review = write_runtime_chain(
+                Path(tmpdir),
+                design_answer_method_verdict="FAIL",
+            )
+            result = subprocess.run(
+                [
+                    sys.executable,
+                    str(ORCHESTRATION_GUARD),
+                    "--state",
+                    "before-runtime-compile",
+                    "--requirements",
+                    str(requirements),
+                    "--design",
+                    str(design),
+                    "--goal",
+                    str(goal),
+                    "--plan",
+                    str(plan),
+                    "--review",
+                    str(review),
+                ],
+                cwd=ROOT,
+                text=True,
+                capture_output=True,
+            )
+
+        output = result.stdout + result.stderr
+        self.assertEqual(2, result.returncode, output)
+        self.assertIn("NEXT: RunReview", output)
+        self.assertIn("Required Check Results", output)
+        self.assertIn("Design Answer Method Check", output)
 
     def test_runtime_contract_indexes_design_answer_path_check(self):
         with tempfile.TemporaryDirectory() as tmpdir:

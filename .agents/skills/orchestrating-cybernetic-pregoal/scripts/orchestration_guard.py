@@ -54,6 +54,8 @@ def blocked_next_action(errors: list[str]) -> str:
         return "ReturnToRequirementsAnalysis"
     if "$designing-cybernetic-solutions is unavailable" in joined:
         return "Blocked"
+    if "required check results" in joined:
+        return "RunReview"
     if "design artifact is missing" in joined:
         return "RunDesign"
     if (
@@ -635,7 +637,7 @@ def check_plan_target_producing_strategy(plan: str | None, errors: list[str]) ->
             errors.append(f"execution policy Action That Can Make It Done missing {label}")
 
 
-def check_plan_target_producing_spine(plan: str | None, errors: list[str]) -> None:
+def check_plan_required_answer_path(plan: str | None, errors: list[str]) -> None:
     body = section_body(plan or "", "Steps That Make The Result True")
     if body is None:
         errors.append("execution policy missing ## Steps That Make The Result True")
@@ -1010,7 +1012,7 @@ def check_plan_ready(
     check_max_safe_parallel_preference(requirements, plan, errors)
     check_delegation_workflow_preference(requirements, plan, errors)
     check_plan_target_producing_strategy(plan, errors)
-    check_plan_target_producing_spine(plan, errors)
+    check_plan_required_answer_path(plan, errors)
     check_candidate_plan_tasks_spine_nodes(plan, errors)
     check_plan_horizon_authority(plan, errors)
 
@@ -1031,6 +1033,39 @@ def check_review_ready(
     require_reference(review, design_path, "review", errors)
     require_reference(review, goal_path, "review", errors)
     require_reference(review, plan_path, "review", errors)
+    check_review_required_check_results(review, errors)
+
+
+REQUIRED_REVIEW_CHECK_LABELS = (
+    "Design Answer Method Check",
+    "Steps That Make The Result True Check",
+    "Work Coverage / Action Limits Check",
+    "Done / Purpose / Result Placement Check",
+    "Work Assignment / Subagent Check",
+)
+
+
+def required_review_check_value(body: str, label: str) -> str | None:
+    value = labeled_value(body, label)
+    return value.strip().strip("`") if value else None
+
+
+def check_review_required_check_results(review: str, errors: list[str]) -> None:
+    body = section_body(review, "Required Check Results")
+    if body is None:
+        errors.append("review missing ## Required Check Results")
+        return
+
+    for label in REQUIRED_REVIEW_CHECK_LABELS:
+        value = required_review_check_value(body, label)
+        if value is None:
+            errors.append(f"review Required Check Results missing {label}")
+            continue
+        lowered = value.casefold()
+        if "/" in value:
+            errors.append(f"review Required Check Results has unresolved enum for {label}: {value!r}")
+        if lowered == "fail":
+            errors.append(f"review Required Check Results marks {label}: FAIL; Review Status cannot be Approved")
 
 
 def main() -> int:

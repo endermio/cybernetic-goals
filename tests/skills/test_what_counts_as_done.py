@@ -270,6 +270,14 @@ class TargetAchievementConditionCheckTest(unittest.TestCase):
             "- answer path check: `yes`",
             "- Work covered in this run and authority check: `yes`",
             "",
+            "## Required Check Results",
+            "",
+            "- Design Answer Method Check: `Not applicable`",
+            "- Steps That Make The Result True Check: `PASS`",
+            "- Work Coverage / Action Limits Check: `PASS`",
+            f"- Done / Purpose / Result Placement Check: `{'PASS' if review_tap_independence == 'yes' else 'FAIL'}`",
+            "- Work Assignment / Subagent Check: `PASS`",
+            "",
             "## Who Does The Work / Context Use",
             "",
             "Findings:",
@@ -607,7 +615,7 @@ class TargetAchievementConditionCheckTest(unittest.TestCase):
 
         self.assertIn("INV-what-counts-as-done-001", matrix)
         self.assertIn("What Counts As Done Check", matrix)
-        self.assertIn("tests/skills/test_target_achievement_predicate_fidelity.py", matrix)
+        self.assertIn("tests/skills/test_what_counts_as_done.py", matrix)
         self.assertNotIn("INV-CPF-001", matrix)
 
         review_ids = {item["id"] for item in review_evals["evals"]}

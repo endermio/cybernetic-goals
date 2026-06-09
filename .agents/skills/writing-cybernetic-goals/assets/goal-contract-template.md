@@ -206,10 +206,10 @@ When complete, report:
 
 - goal achieved: yes/no
 - what counts as done met: yes/no
-- target-producing evidence
+- evidence needed to call it done
 - if no: not done reason
-- if no: target-producing action attempted or proof of impossibility
-- if no: smallest next target-producing attempt
+- if no: action that can make it done attempted or proof of impossibility
+- if no: smallest next action that can make it done
 - work covered in this run
 - work covered in this run coverage: complete / partial / unavailable / explicitly bounded by requirements approval
 - executed

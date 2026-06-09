@@ -168,7 +168,7 @@ For serial or parallel subagent-driven work assignment, `Selected agent workflow
 
 For serial subagent-driven work assignment, record `Ordered work package sequence` and `Integration check after each package`.
 
-For parallel subagent-driven work assignment, record `Concurrency frontier rule`, `Conflict / lock model`, `Parallel wave matrix`, `Failure policy`, and `Main-agent integration rule`. The `Parallel wave matrix` must include a `Required-step frontier` column so parallel waves are based on target-producing frontier state, not only component work package independence.
+For parallel subagent-driven work assignment, record `Concurrency frontier rule`, `Conflict / lock model`, `Parallel wave matrix`, `Failure policy`, and `Main-agent integration rule`. The `Parallel wave matrix` must include a `Required-step frontier` column so parallel waves are based on currently available required steps, not only component work package independence.
 
 For `Main-only` Level 3/4 work, include a meaningful `Main-only context-load justification` explaining why the main agent will not become an overloaded coordinator, worker, integrator, and verifier.
 
@@ -221,7 +221,7 @@ Domain adapters own concrete place discovery and verification methods. The core 
 
 ## Steps That Make The Result True
 
-For target-achieving implementation work, decompose by the actor-centered state transitions that produce the what counts as done before decomposing by components, modules, files, or teams.
+For implementation work, decompose by the actor-centered state transitions that make the what counts as done true before decomposing by components, modules, files, or teams.
 
 The execution policy must define:
 
@@ -237,9 +237,9 @@ Each `Candidate Plan Task` must record `Required step(s)`, `Role`, `State transi
 
 The execution policy must define:
 
-- Target-producing action required: the action, probe, experiment, change, or observation that must be attempted to satisfy the what counts as done;
-- Proof of impossibility, if any: what would prove the target-producing action cannot be attempted in this environment;
-- If it is not done, what should be reported: a not done report may be produced only after the target-producing action is attempted and fails, or after impossibility is proven.
+- Action that can make it done: the action, probe, experiment, change, or observation that must be attempted to satisfy the what counts as done;
+- Proof of impossibility, if any: what would prove the action that can make it done cannot be attempted in this environment;
+- If it is not done, what should be reported: a not done report may be produced only after the action that can make it done is attempted and fails, or after impossibility is proven.
 
 ## Work Size And Evidence Check Budget
 

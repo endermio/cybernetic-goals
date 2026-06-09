@@ -24,8 +24,8 @@ Status: `Approved`
 | Non-goals | do not test semantic adequacy |
 | How We Know The User Purpose Was Met | user-purpose evidence remains separately calibrated |
 | Where The Result Must Show Up | result placement remains separately calibrated |
-| What counts as done | artifact hygiene target-producing evidence is observed |
-| Evidence needed to call it done | target-producing evidence is observed |
+| What counts as done | artifact hygiene evidence needed to call it done is observed |
+| Evidence needed to call it done | evidence needed to call it done is observed |
 | Non-achieved terminal report handling | report goal achieved: no |
 | Required answer path | artifact hygiene guard fixture required answer path |
 | Work covered in this run | artifact hygiene guard fixture horizon |
@@ -121,8 +121,8 @@ class ArtifactHygieneTest(unittest.TestCase):
                     "",
                     "| Element | Requirement |",
                     "|---|---|",
-                    "| What counts as done | artifact hygiene target-producing evidence is observed |",
-                    "| Evidence needed to call it done | target-producing evidence is observed |",
+                    "| What counts as done | artifact hygiene evidence needed to call it done is observed |",
+                    "| Evidence needed to call it done | evidence needed to call it done is observed |",
                     "| Allowed achieved claim | only what counts as done supports goal achieved: yes |",
                     "| Steps that make the result true | artifact hygiene guard fixture required answer path |",
                     "",
@@ -239,7 +239,7 @@ class ArtifactHygieneTest(unittest.TestCase):
                     "",
                     "Transition evidence produced:",
                     "",
-                    "- Fixture target-producing evidence is recorded.",
+                    "- Fixture evidence needed to call it done is recorded.",
                     "",
                     "Integration check:",
                     "",
@@ -438,6 +438,8 @@ class ArtifactHygieneTest(unittest.TestCase):
             "Invariant",
             "Gate",
             "Sensor",
+            "target-achieving",
+            "target-producing",
         ):
             self.assertIn(f'term: "{term}"', policy)
         self.assertIn("allowed_internal_paths", policy)
@@ -509,6 +511,8 @@ class ArtifactHygieneTest(unittest.TestCase):
             "Invariant",
             "Gate",
             "Sensor",
+            "target-achieving",
+            "target-producing",
         )
         for path in template_paths:
             text = path.read_text(encoding="utf-8")

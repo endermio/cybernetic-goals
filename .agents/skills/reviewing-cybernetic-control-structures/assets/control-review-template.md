@@ -224,7 +224,7 @@ Check:
 - there is exactly one what counts as done;
 - no partial, diagnostic, blocked, invalid, unavailable, fallback, or not done report appears in Success Condition;
 - no report-when-not-done status is listed under done states;
-- execution policy includes a target-producing action or proof-of-impossibility path;
+- execution policy includes an action that can make it done or proof-of-impossibility path;
 - the plan cannot terminate with `goal achieved: yes` without satisfying the what counts as done;
 - any use of "valid final status" separates `goal achieved: yes` from `goal achieved: no`.
 

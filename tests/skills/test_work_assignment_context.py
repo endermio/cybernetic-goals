@@ -21,7 +21,7 @@ Status: `Approved`
 | How We Know The User Purpose Was Met | covered by dedicated user-purpose evidence tests |
 | Where The Result Must Show Up | covered by dedicated result placement tests |
 | What counts as done | context-work assignment guard fixture is structurally ready |
-| Evidence needed to call it done | target-producing evidence is observed |
+| Evidence needed to call it done | evidence needed to call it done is observed |
 | Non-achieved terminal report handling | report goal achieved: no |
 | Required answer path | context work assignment guard fixture required answer path |
 | Work covered in this run | context work assignment guard fixture horizon |
@@ -305,7 +305,7 @@ class ContextWorkAssignmentSkillTest(unittest.TestCase):
                     "| Element | Requirement |",
                     "|---|---|",
                     "| What counts as done | context-work assignment guard fixture is structurally ready |",
-                    "| Evidence needed to call it done | target-producing evidence is observed |",
+                    "| Evidence needed to call it done | evidence needed to call it done is observed |",
                     "| Allowed achieved claim | only what counts as done supports goal achieved: yes |",
                     "| Steps that make the result true | context work assignment guard fixture required answer path |",
                     "",
@@ -404,7 +404,7 @@ class ContextWorkAssignmentSkillTest(unittest.TestCase):
                     "",
                     "Transition evidence produced:",
                     "",
-                    "- Fixture target-producing evidence is recorded.",
+                    "- Fixture evidence needed to call it done is recorded.",
                     "",
                     "Integration check:",
                     "",
@@ -449,6 +449,14 @@ class ContextWorkAssignmentSkillTest(unittest.TestCase):
                     "- answer path check: `yes`",
                     "- Work covered in this run and authority check: `yes`",
                     "- Subagent concurrency check: `yes`",
+                    "",
+                    "## Required Check Results",
+                    "",
+                    "- Design Answer Method Check: `Not applicable`",
+                    "- Steps That Make The Result True Check: `PASS`",
+                    "- Work Coverage / Action Limits Check: `PASS`",
+                    "- Done / Purpose / Result Placement Check: `PASS`",
+                    f"- Work Assignment / Subagent Check: `{'PASS' if review_work_assignment_independence == 'yes' else 'FAIL'}`",
                     "",
                     "## Who Does The Work / Context Use",
                     "",

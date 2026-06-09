@@ -107,14 +107,14 @@
     {
       "id": "runtime-calibrates-what-counts-as-done-claims",
       "prompt": "requirements analysis Complete, goal includes Target Achievement Contract, execution policy includes Target-Producing Action Strategy, and review Approved says reports when not done are goal achieved: no. Compile runtime /goal.",
-      "expected_output": "The runtime goal file indexes target-achievement sections and requires final reporting of goal achieved yes/no, done rule met yes/no, target-producing evidence, not done reason, target-producing action attempted or proof of impossibility, and smallest next target-producing attempt.",
+      "expected_output": "The runtime goal file indexes done-claim sections and requires final reporting of goal achieved yes/no, done rule met yes/no, evidence needed to call it done, not done reason, action that can make it done attempted or proof of impossibility, and smallest next action that can make it done.",
       "assertions": [
         "Runtime goal file indexes Target Achievement Contract.",
         "Runtime goal file indexes Target-Producing Action Strategy.",
         "Runtime goal file indexes Target Achievement Done Rule Match.",
         "Runtime goal file requires goal achieved: yes/no in the final report.",
         "Runtime goal file requires what counts as done met: yes/no.",
-        "Runtime goal file requires target-producing evidence, not done reason, target-producing action attempted or proof of impossibility, and smallest next target-producing attempt.",
+        "Runtime goal file requires evidence needed to call it done, not done reason, action that can make it done attempted or proof of impossibility, and smallest next action that can make it done.",
         "Pointer /goal does not inline target-achievement final-report fields."
       ]
     },
