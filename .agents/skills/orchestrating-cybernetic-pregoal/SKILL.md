@@ -265,6 +265,42 @@ Regression example: a required `/api/v2` implementation must not be accepted
 as legacy Drogon compatibility readiness. That is `NeedsRevision`, routed to
 the first artifact that converted implementation into compatibility readiness.
 
+## Finalize Approved Control Chain
+
+Before `ReviewApproved -> RunRuntimeCompile`, all control JSON that enters
+runtime must be in final approved state:
+
+```text
+requirements.control.json status == approved
+design.control.json status == approved
+goal.control.json status == approved
+plan.control.json status == approved
+review.control.json status == approved
+runtime.control.json status == compiled
+```
+
+`Candidate`, `Reviewed`, `NeedsRevision`, `Needs Revision`, `Dirty`, and
+`Needs Re-review` artifacts may enter downstream drafting or review loops, but
+may not enter runtime compilation.
+
+If subagent or independent review approves a candidate design, goal, or plan,
+the orchestrator must perform an approved control-chain commit before runtime
+compile:
+
+1. set the approved artifacts to `status == approved`;
+2. recompute `review.control.json` `approved_control_hashes`;
+3. delete or rebuild stale `runtime.control.json`;
+4. compile `runtime.control.json`;
+5. run both:
+
+```bash
+control_chain_guard.py --run-dir docs/cybernetics/runs/<slug>
+python3 .agents/skills/using-control-json/scripts/validate_control_chain.py docs/cybernetics/runs/<slug>
+```
+
+The second command must return `ok: true`. If either command fails, stay in
+pre-goal revision/repair. Do not output the runtime `/goal`.
+
 ## Workflow
 
 Read `references/orchestration-protocol.md` for the control-layer map, then use

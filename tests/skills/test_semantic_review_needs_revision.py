@@ -64,6 +64,32 @@ class SemanticReviewNeedsRevisionTest(unittest.TestCase):
                 self.assertIn("NeedsRevision", text)
                 self.assertIn("must not be accepted", text)
 
+    def test_runtime_compile_requires_approved_control_statuses_and_runtime_validator(self):
+        combined = "\n".join(
+            [
+                read(ORCHESTRATION_SKILL),
+                read(ROOT / ".agents/skills/orchestrating-cybernetic-pregoal/references/output-and-final-checks.md"),
+            ]
+        )
+
+        for phrase in (
+            "design.control.json status == approved",
+            "goal.control.json status == approved",
+            "plan.control.json status == approved",
+            "review.control.json status == approved",
+            "runtime.control.json status == compiled",
+        ):
+            with self.subTest(phrase=phrase):
+                self.assertIn(phrase, combined)
+
+        self.assertIn(
+            "python3 .agents/skills/using-control-json/scripts/validate_control_chain.py",
+            combined,
+        )
+        self.assertIn("ok: true", combined)
+        self.assertIn("Candidate", combined)
+        self.assertIn("may not enter runtime compilation", combined)
+
 
 if __name__ == "__main__":
     unittest.main()

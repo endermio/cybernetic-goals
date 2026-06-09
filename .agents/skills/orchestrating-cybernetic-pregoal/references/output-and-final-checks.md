@@ -90,6 +90,14 @@ Before responding, verify:
 - [ ] Any substantive post-review artifact mutation had final independent re-review before approval.
 - [ ] Lint PASS was not used as a substitute for meaning/control-policy re-review.
 - [ ] Review status is `Approved` before final runtime `/goal` is emitted.
+- [ ] `design.control.json status == approved`.
+- [ ] `goal.control.json status == approved`.
+- [ ] `plan.control.json status == approved`.
+- [ ] `review.control.json status == approved`.
+- [ ] `runtime.control.json status == compiled`.
+- [ ] Candidate / Reviewed / NeedsRevision artifacts did not enter runtime compilation.
+- [ ] `control_chain_guard.py --run-dir docs/cybernetics/runs/<slug>` returned PASS.
+- [ ] `python3 .agents/skills/using-control-json/scripts/validate_control_chain.py docs/cybernetics/runs/<slug>` returned `ok: true`.
 - [ ] If not approved, the response is blocked and asks for the smallest necessary decision.
 - [ ] If blocked, the response includes `Next allowed action` and a response-only next step.
 - [ ] `runtime.control.json` references requirements analysis, required design, goal, plan, and review control JSON files.
