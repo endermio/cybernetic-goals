@@ -31,7 +31,7 @@
     },
     "semantic_base": {
       "id": "semantic-base:control-example",
-      "hash": "sha256:c012b8f869390414051a8c583f3032f32f7fa8be19cdf81364e2c39c32eafa2e"
+      "hash": "sha256:590db16fc03d0916bce0274b53d441350e15bb7bef8251ca3268982fdc83ba3c"
     },
     "required_outcomes": [
       {
@@ -39,7 +39,11 @@
         "statement": "Example control chain demonstrates JSON-only control facts.",
         "blocks_goal_achieved_if_missing": true,
         "required_evidence": [
-          "example guard passes"
+          {
+            "evidence_id": "evidence.example-guard-passes",
+            "kind": "progress_event",
+            "description": "example guard passes"
+          }
         ],
         "not_satisfied_by": [
           "Markdown template authority"

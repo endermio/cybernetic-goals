@@ -42,14 +42,26 @@ def outcome_covered_control_run_files() -> dict[str, dict]:
             "id": outcome_id,
             "statement": "blocking required outcomes stay covered through runtime verification",
             "blocks_goal_achieved_if_missing": True,
-            "required_evidence": ["mainline completed progress event"],
+            "required_evidence": [
+                {
+                    "evidence_id": "evidence.required-outcome-mainline",
+                    "kind": "progress_event",
+                    "description": "mainline completed progress event",
+                }
+            ],
             "not_satisfied_by": ["supporting-only progress"],
         },
         {
             "id": "O-nonblocking-support",
             "statement": "supporting work may be present but cannot replace the blocking outcome",
             "blocks_goal_achieved_if_missing": False,
-            "required_evidence": ["supporting evidence"],
+            "required_evidence": [
+                {
+                    "evidence_id": "evidence.supporting-only",
+                    "kind": "progress_event",
+                    "description": "supporting evidence",
+                }
+            ],
             "not_satisfied_by": ["claiming support as the required outcome"],
         }
     ]
@@ -116,6 +128,43 @@ class JsonOfficialGuardCompilerPathTest(unittest.TestCase):
             payload = json.loads(result.stdout)
             self.assertTrue(payload["ok"])
             self.assertEqual(payload["next_allowed_action"], "RunRuntimeCompile")
+
+    def test_orchestration_guard_routes_needs_revision_to_return_stage(self):
+        fixture_by_file = outcome_covered_control_run_files()
+        fixture_by_file["review.control.json"]["status"] = "needs_revision"
+        fixture_by_file["review.control.json"]["review_checks"][0]["status"] = "needs_revision"
+        fixture_by_file["review.control.json"]["review_checks"][0]["verdict"] = "needs_revision"
+        fixture_by_file["review.control.json"]["review_checks"][0]["return_to_stage"] = "plan"
+        fixture_by_file["review.control.json"]["review_checks"][0]["findings"] = [
+            "plan downgraded required implementation to readiness"
+        ]
+        fixture_by_file["review.control.json"]["review_checks"][0]["required_changes"] = [
+            "regenerate plan.control.json from approved required outcome"
+        ]
+        apply_integrity_metadata(fixture_by_file)
+        with tempfile.TemporaryDirectory() as tmpdir:
+            run_dir = Path(tmpdir)
+            write_control_run(run_dir, fixture_by_file=fixture_by_file)
+
+            result = subprocess.run(
+                [
+                    "python3",
+                    str(ORCHESTRATION_GUARD),
+                    "--state",
+                    "before-runtime-compile",
+                    "--run-dir",
+                    str(run_dir),
+                    "--json",
+                ],
+                text=True,
+                capture_output=True,
+            )
+
+            self.assertNotEqual(result.returncode, 0, result.stdout + result.stderr)
+            payload = json.loads(result.stdout)
+            self.assertFalse(payload["ok"])
+            self.assertEqual(payload["next_allowed_action"], "RunExecutionPolicy")
+            self.assertIn("plan downgraded required implementation", "\n".join(payload["errors"]))
 
     def test_control_chain_guard_rejects_candidate_design_or_plan_before_runtime_compile(self):
         with tempfile.TemporaryDirectory() as tmpdir:

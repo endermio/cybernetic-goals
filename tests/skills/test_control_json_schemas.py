@@ -43,7 +43,13 @@ SCHEMA_FIXTURES = {
                     "id": "outcome.schema-validation",
                     "statement": "JSON control artifacts validate only when required outcomes are preserved",
                     "blocks_goal_achieved_if_missing": True,
-                    "required_evidence": ["schema validation tests"],
+                    "required_evidence": [
+                        {
+                            "evidence_id": "evidence.schema-validation-tests",
+                            "kind": "progress_event",
+                            "description": "schema validation tests passed",
+                        }
+                    ],
                     "not_satisfied_by": ["required step completion without outcome coverage"],
                 }
             ],
@@ -480,6 +486,15 @@ class ControlJsonSchemaTest(unittest.TestCase):
             ],
             outcome_schema["required"],
         )
+        evidence_schema = outcome_schema["properties"]["required_evidence"]["items"]
+        self.assertEqual(
+            ["evidence_id", "kind", "description"],
+            evidence_schema["required"],
+        )
+        self.assertIn("progress_event", evidence_schema["properties"]["kind"]["enum"])
+        self.assertIn("file_exists", evidence_schema["properties"]["kind"]["enum"])
+        self.assertIn("json_file", evidence_schema["properties"]["kind"]["enum"])
+        self.assertIn("command_result", evidence_schema["properties"]["kind"]["enum"])
 
         for schema_name in (
             "design.control.schema.json",

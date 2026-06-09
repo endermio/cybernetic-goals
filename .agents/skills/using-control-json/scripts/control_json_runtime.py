@@ -47,6 +47,7 @@ EVENT_TYPES = {
 }
 EVENT_STATUSES = {"pass", "fail", "blocked", "partial"}
 PROGRESS_ROLES = {"mainline", "supporting_only"}
+REQUIRED_EVIDENCE_KINDS = {"progress_event", "file_exists", "json_file", "command_result"}
 
 
 class ControlJsonError(Exception):
@@ -167,9 +168,62 @@ def required_outcome_sets(requirements: dict[str, Any]) -> tuple[set[str], set[s
                 f"requirements.control.json required_outcomes[{index}].blocks_goal_achieved_if_missing must be boolean"
             )
             continue
+        required_evidence = outcome.get("required_evidence")
+        if not isinstance(required_evidence, list) or not required_evidence:
+            errors.append(f"requirements.control.json required_outcomes[{index}].required_evidence must be a non-empty list")
+            continue
+        seen_evidence: set[str] = set()
+        for evidence_index, evidence in enumerate(required_evidence):
+            if not isinstance(evidence, dict):
+                errors.append(
+                    f"requirements.control.json required_outcomes[{index}].required_evidence[{evidence_index}] must be an object"
+                )
+                continue
+            evidence_id = evidence.get("evidence_id")
+            if not isinstance(evidence_id, str) or not evidence_id:
+                errors.append(
+                    f"requirements.control.json required_outcomes[{index}].required_evidence[{evidence_index}].evidence_id must be a non-empty string"
+                )
+                continue
+            if evidence_id in seen_evidence:
+                errors.append(
+                    f"requirements.control.json required_outcomes[{index}] duplicate required_evidence id: {evidence_id}"
+                )
+                continue
+            seen_evidence.add(evidence_id)
+            kind = evidence.get("kind")
+            if kind not in REQUIRED_EVIDENCE_KINDS:
+                errors.append(
+                    f"requirements.control.json required_outcomes[{index}].required_evidence[{evidence_index}].kind is not recognized"
+                )
+            description = evidence.get("description")
+            if not isinstance(description, str) or not description:
+                errors.append(
+                    f"requirements.control.json required_outcomes[{index}].required_evidence[{evidence_index}].description must be a non-empty string"
+                )
         if blocks:
             blocking_outcomes.add(outcome_id)
     return all_outcomes, blocking_outcomes, errors
+
+
+def required_evidence_by_outcome(requirements: dict[str, Any]) -> dict[str, set[str]]:
+    outcomes = requirements.get("approved_control", {}).get("required_outcomes")
+    if not isinstance(outcomes, list):
+        return {}
+    evidence_by_outcome: dict[str, set[str]] = {}
+    for outcome in outcomes:
+        if not isinstance(outcome, dict) or not isinstance(outcome.get("id"), str):
+            continue
+        required_evidence = outcome.get("required_evidence")
+        if not isinstance(required_evidence, list):
+            continue
+        evidence_ids = {
+            evidence.get("evidence_id")
+            for evidence in required_evidence
+            if isinstance(evidence, dict) and isinstance(evidence.get("evidence_id"), str) and evidence.get("evidence_id")
+        }
+        evidence_by_outcome[outcome["id"]] = evidence_ids
+    return evidence_by_outcome
 
 
 def blocking_required_outcomes(requirements: dict[str, Any]) -> set[str]:

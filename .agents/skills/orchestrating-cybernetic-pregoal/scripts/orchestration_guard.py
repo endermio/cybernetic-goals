@@ -23,6 +23,20 @@ NEXT_ACTION = {
     "before-review": "RunReview",
     "before-runtime-compile": "RunRuntimeCompile",
 }
+RETURN_STAGE_ACTION = {
+    "requirements": "ReturnToRequirementsAnalysis",
+    "design": "RunDesign",
+    "goal": "RunGoalWriting",
+    "plan": "RunExecutionPolicy",
+    "review": "RunReview",
+}
+RETURN_STAGE_ORDER = {
+    "requirements": 0,
+    "design": 1,
+    "goal": 2,
+    "plan": 3,
+    "review": 4,
+}
 
 
 def payload(ok: bool, state: str, next_action: str, errors: list[str]) -> dict[str, object]:
@@ -56,6 +70,66 @@ def legacy_args_present(args: argparse.Namespace) -> bool:
             args.review,
         )
     )
+
+
+def read_json_object(path: Path) -> dict[str, object] | None:
+    try:
+        value = json.loads(path.read_text(encoding="utf-8"))
+    except (FileNotFoundError, json.JSONDecodeError):
+        return None
+    return value if isinstance(value, dict) else None
+
+
+def review_revision_route(run_dir: Path) -> tuple[str, list[str]] | None:
+    review = read_json_object(run_dir / "review.control.json")
+    if not review:
+        return None
+
+    checks = review.get("review_checks")
+    if not isinstance(checks, list):
+        return None
+
+    revision_checks: list[dict[str, object]] = []
+    blocked_checks: list[dict[str, object]] = []
+    for check in checks:
+        if not isinstance(check, dict):
+            continue
+        verdict = check.get("verdict")
+        status = check.get("status")
+        if verdict == "blocked":
+            blocked_checks.append(check)
+        elif verdict == "needs_revision" or status == "needs_revision":
+            revision_checks.append(check)
+
+    if blocked_checks:
+        errors = []
+        for check in blocked_checks:
+            check_id = check.get("check_id", "unknown-check")
+            errors.append(f"{check_id}: blocked")
+            for finding in check.get("findings", []) if isinstance(check.get("findings"), list) else []:
+                if isinstance(finding, str):
+                    errors.append(f"{check_id}: {finding}")
+        return "Blocked", errors or ["review is blocked"]
+
+    if not revision_checks:
+        return None
+
+    def stage_rank(check: dict[str, object]) -> int:
+        stage = check.get("return_to_stage")
+        return RETURN_STAGE_ORDER.get(stage, RETURN_STAGE_ORDER["review"]) if isinstance(stage, str) else RETURN_STAGE_ORDER["review"]
+
+    selected = min(revision_checks, key=stage_rank)
+    stage = selected.get("return_to_stage")
+    next_action = RETURN_STAGE_ACTION.get(stage, "RunReview") if isinstance(stage, str) else "RunReview"
+    check_id = selected.get("check_id", "unknown-check")
+    errors = [f"{check_id}: needs_revision -> {next_action}"]
+    for key in ("findings", "required_changes"):
+        values = selected.get(key)
+        if isinstance(values, list):
+            for value in values:
+                if isinstance(value, str):
+                    errors.append(f"{check_id}: {value}")
+    return next_action, errors
 
 
 def main() -> int:
@@ -97,7 +171,13 @@ def main() -> int:
     )
     if guard.returncode != 0:
         errors = [line for line in (guard.stdout + guard.stderr).splitlines() if line.strip()]
-        data = payload(False, args.state, "FixJsonControlRun", errors)
+        route = review_revision_route(Path(args.run_dir))
+        if route:
+            next_action, route_errors = route
+            errors = route_errors + errors
+        else:
+            next_action = "FixJsonControlRun"
+        data = payload(False, args.state, next_action, errors)
         print_result(data, args.json)
         return 2
 

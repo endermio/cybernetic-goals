@@ -105,8 +105,46 @@
                 "type": "array",
                 "minItems": 1,
                 "items": {
-                  "type": "string",
-                  "minLength": 1
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "evidence_id",
+                    "kind",
+                    "description"
+                  ],
+                  "properties": {
+                    "evidence_id": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "kind": {
+                      "enum": [
+                        "progress_event",
+                        "file_exists",
+                        "json_file",
+                        "command_result"
+                      ]
+                    },
+                    "description": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "path": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "schema": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "command": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "must_pass": {
+                      "type": "boolean"
+                    }
+                  }
                 }
               },
               "not_satisfied_by": {

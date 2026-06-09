@@ -31,14 +31,26 @@ def outcome_covered_fixture() -> dict:
             "id": "O-runtime-progress",
             "statement": "runtime writes evidence-backed progress events",
             "blocks_goal_achieved_if_missing": True,
-            "required_evidence": ["mainline progress event for S7"],
+            "required_evidence": [
+                {
+                    "evidence_id": "evidence.runtime-progress",
+                    "kind": "progress_event",
+                    "description": "mainline progress event for S7",
+                }
+            ],
             "not_satisfied_by": ["supporting-only progress"],
         },
         {
             "id": "O-json-regressions",
             "statement": "old accident regressions are covered by JSON runtime verification",
             "blocks_goal_achieved_if_missing": True,
-            "required_evidence": ["mainline progress event for S9"],
+            "required_evidence": [
+                {
+                    "evidence_id": "evidence.json-regressions",
+                    "kind": "progress_event",
+                    "description": "mainline progress event for S9",
+                }
+            ],
             "not_satisfied_by": ["supporting-only progress"],
         },
     ]
@@ -51,6 +63,13 @@ def outcome_covered_fixture() -> dict:
         "O-runtime-progress",
         "O-json-regressions",
     ]
+    step_evidence = {
+        "S7": ["evidence.runtime-progress"],
+        "S9": ["evidence.json-regressions"],
+    }
+    for event in fixture.get("progress_events", []):
+        if event.get("required_step") in step_evidence:
+            event["evidence"] = step_evidence[event["required_step"]]
     apply_integrity_metadata(control_files)
     return fixture
 
@@ -312,6 +331,21 @@ class RuntimeJsonProgressVerifierTest(unittest.TestCase):
             self.assertNotEqual(result.returncode, 0, result.stdout + result.stderr)
             self.assertIn(
                 "missing mainline evidence-backed progress for blocking required outcomes: O-json-regressions",
+                result.stdout + result.stderr,
+            )
+
+    def test_verify_runtime_progress_rejects_missing_required_evidence_id(self):
+        fixture = outcome_covered_fixture()
+        fixture["progress_events"][1]["evidence"] = ["some-other-evidence"]
+        with tempfile.TemporaryDirectory() as tmpdir:
+            run_dir = Path(tmpdir)
+            write_run(run_dir, fixture)
+
+            result = run_script(VERIFY, str(run_dir))
+
+            self.assertNotEqual(result.returncode, 0, result.stdout + result.stderr)
+            self.assertIn(
+                "missing required evidence for blocking required outcomes: O-json-regressions: evidence.json-regressions",
                 result.stdout + result.stderr,
             )
 

@@ -29,8 +29,8 @@
             ]
           },
           "semantic_base": {
-            "id": "semantic-base:runtime-verifier-fixture",
-            "hash": "sha256:b7ec41ffca3c10e047b0cc9a3e66c3c4d5fc31ecd4e762484ea520e1b0f674e8"
+            "id": "semantic-base:test-fixture",
+            "hash": "sha256:dc6fe73b1fb608254d4879a00d46411ad17452926dd26d2a8b3758fd522786ee"
           },
           "required_outcomes": [
             {
@@ -38,7 +38,11 @@
               "statement": "Runtime writes evidence-backed mainline progress before completion.",
               "blocks_goal_achieved_if_missing": true,
               "required_evidence": [
-                "S7 progress event"
+                {
+                  "evidence_id": "evidence.s7-progress-event",
+                  "kind": "progress_event",
+                  "description": "S7 progress event"
+                }
               ],
               "not_satisfied_by": [
                 "supporting-only progress"
@@ -49,7 +53,11 @@
               "statement": "JSON regressions are represented and completed before claim done.",
               "blocks_goal_achieved_if_missing": true,
               "required_evidence": [
-                "S9 progress event"
+                {
+                  "evidence_id": "evidence.s9-progress-event",
+                  "kind": "progress_event",
+                  "description": "S9 progress event"
+                }
               ],
               "not_satisfied_by": [
                 "old Markdown-only regression"
@@ -108,8 +116,8 @@
           }
         ],
         "semantic_base_ref": {
-          "id": "semantic-base:runtime-verifier-fixture",
-          "hash": "sha256:b7ec41ffca3c10e047b0cc9a3e66c3c4d5fc31ecd4e762484ea520e1b0f674e8"
+          "id": "semantic-base:test-fixture",
+          "hash": "sha256:dc6fe73b1fb608254d4879a00d46411ad17452926dd26d2a8b3758fd522786ee"
         }
       },
       "goal.control.json": {
@@ -157,8 +165,8 @@
           }
         ],
         "semantic_base_ref": {
-          "id": "semantic-base:runtime-verifier-fixture",
-          "hash": "sha256:b7ec41ffca3c10e047b0cc9a3e66c3c4d5fc31ecd4e762484ea520e1b0f674e8"
+          "id": "semantic-base:test-fixture",
+          "hash": "sha256:dc6fe73b1fb608254d4879a00d46411ad17452926dd26d2a8b3758fd522786ee"
         }
       },
       "plan.control.json": {
@@ -247,8 +255,8 @@
           ]
         },
         "semantic_base_ref": {
-          "id": "semantic-base:runtime-verifier-fixture",
-          "hash": "sha256:b7ec41ffca3c10e047b0cc9a3e66c3c4d5fc31ecd4e762484ea520e1b0f674e8"
+          "id": "semantic-base:test-fixture",
+          "hash": "sha256:dc6fe73b1fb608254d4879a00d46411ad17452926dd26d2a8b3758fd522786ee"
         }
       },
       "review.control.json": {
@@ -404,14 +412,14 @@
           }
         ],
         "semantic_base_ref": {
-          "id": "semantic-base:runtime-verifier-fixture",
-          "hash": "sha256:b7ec41ffca3c10e047b0cc9a3e66c3c4d5fc31ecd4e762484ea520e1b0f674e8"
+          "id": "semantic-base:test-fixture",
+          "hash": "sha256:dc6fe73b1fb608254d4879a00d46411ad17452926dd26d2a8b3758fd522786ee"
         },
         "approved_control_hashes": {
-          "requirements.control.json": "sha256:bcb92d0ea72b6ade58725e228e7c4455bf3fc9700845f1bce80e39e5164440a9",
-          "design.control.json": "sha256:ccff7b571653609550e19126823bf300bb039734c5553e50eb284ad56c210061",
-          "goal.control.json": "sha256:a907fb6c552a045ccb143049a4c7735a0aaf0d50e4034fd13649c0084cab7df8",
-          "plan.control.json": "sha256:da3a66440891a04676958c45209dbac5419963cba4005a3caeed17ea3a7310c3"
+          "requirements.control.json": "sha256:7dd997dc6c57b8d8d9341b7143dcaab0cf3590ddc9b14b1da8a65535424c2e2f",
+          "design.control.json": "sha256:09ea7bff8c88ee3fa36ec410955017fcc0363721014c6be094d7e1295f67cb38",
+          "goal.control.json": "sha256:2041b7114ae875d10f96f7f814b2c3645edc817e7b5bb7100df75fa738caad9e",
+          "plan.control.json": "sha256:a1156a33e92d182d720c35f89882d8295266da1ca34b2e85b7ee5dd233ff1ecf"
         }
       },
       "runtime.control.json": {
@@ -484,16 +492,16 @@
           ]
         },
         "semantic_base_ref": {
-          "id": "semantic-base:runtime-verifier-fixture",
-          "hash": "sha256:b7ec41ffca3c10e047b0cc9a3e66c3c4d5fc31ecd4e762484ea520e1b0f674e8"
+          "id": "semantic-base:test-fixture",
+          "hash": "sha256:dc6fe73b1fb608254d4879a00d46411ad17452926dd26d2a8b3758fd522786ee"
         },
         "approved_control_hashes": {
-          "requirements.control.json": "sha256:bcb92d0ea72b6ade58725e228e7c4455bf3fc9700845f1bce80e39e5164440a9",
-          "design.control.json": "sha256:ccff7b571653609550e19126823bf300bb039734c5553e50eb284ad56c210061",
-          "goal.control.json": "sha256:a907fb6c552a045ccb143049a4c7735a0aaf0d50e4034fd13649c0084cab7df8",
-          "plan.control.json": "sha256:da3a66440891a04676958c45209dbac5419963cba4005a3caeed17ea3a7310c3",
-          "review.control.json": "sha256:bbee0cd4e95dd4c7c3e2f963f393e3fcbff09740a3e0830c3cccec94bb72d41e",
-          "runtime.control.json": "sha256:5e176888358e808fd8522e38e99db2c55098f450c19971462ae8e1209cbd5e74"
+          "requirements.control.json": "sha256:7dd997dc6c57b8d8d9341b7143dcaab0cf3590ddc9b14b1da8a65535424c2e2f",
+          "design.control.json": "sha256:09ea7bff8c88ee3fa36ec410955017fcc0363721014c6be094d7e1295f67cb38",
+          "goal.control.json": "sha256:2041b7114ae875d10f96f7f814b2c3645edc817e7b5bb7100df75fa738caad9e",
+          "plan.control.json": "sha256:a1156a33e92d182d720c35f89882d8295266da1ca34b2e85b7ee5dd233ff1ecf",
+          "review.control.json": "sha256:6160610a12ef57a43ba0439bff1f0154b91bdaeb428e09532e104188a55424bd",
+          "runtime.control.json": "sha256:b4cded24a849516ae3eabab76c1aac5bbe71c424fd6f917bb04b94eb30d49e3d"
         }
       }
     },
@@ -508,7 +516,7 @@
         "progress_role": "mainline",
         "counts_as_goal_progress": true,
         "evidence": [
-          "append_progress_event test passed"
+          "evidence.s7-progress-event"
         ]
       },
       {
@@ -521,7 +529,7 @@
         "progress_role": "mainline",
         "counts_as_goal_progress": true,
         "evidence": [
-          "old accident JSON regression tests passed"
+          "evidence.s9-progress-event"
         ]
       }
     ],

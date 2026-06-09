@@ -8,6 +8,7 @@ from pathlib import Path
 from control_json_runtime import (
     blocking_required_outcomes,
     covered_outcomes_by_steps,
+    required_evidence_by_outcome,
     result_payload,
     read_progress_events,
     step_outcome_map,
@@ -31,6 +32,24 @@ def mainline_completed_steps(events: list[dict]) -> set[str]:
         ):
             completed.add(event["required_step"])
     return completed
+
+
+def mainline_evidence_by_completed_step(events: list[dict]) -> dict[str, set[str]]:
+    evidence_by_step: dict[str, set[str]] = {}
+    for event in events:
+        role = event.get("progress_role", "mainline")
+        counts = event.get("counts_as_goal_progress", role == "mainline")
+        evidence = event.get("evidence")
+        if (
+            event.get("event_type") == "step.completed"
+            and event.get("status") == "pass"
+            and role == "mainline"
+            and counts is True
+            and isinstance(evidence, list)
+            and all(isinstance(item, str) and item for item in evidence)
+        ):
+            evidence_by_step.setdefault(event["required_step"], set()).update(evidence)
+    return evidence_by_step
 
 
 def final_report_errors(final_report: dict) -> list[str]:
@@ -74,9 +93,11 @@ def main() -> int:
     errors.extend(event_errors)
 
     required_steps = step_ids(artifacts["runtime"])
-    completed_steps = mainline_completed_steps(events)
+    evidence_by_step = mainline_evidence_by_completed_step(events)
+    completed_steps = set(evidence_by_step)
     required_outcomes = blocking_required_outcomes(artifacts["requirements"])
-    completed_outcomes = covered_outcomes_by_steps(step_outcome_map(artifacts["runtime"]), completed_steps)
+    runtime_step_outcomes = step_outcome_map(artifacts["runtime"])
+    completed_outcomes = covered_outcomes_by_steps(runtime_step_outcomes, completed_steps)
     missing_steps = sorted(required_steps - completed_steps)
     if missing_steps:
         errors.append(
@@ -88,6 +109,21 @@ def main() -> int:
         errors.append(
             "missing mainline evidence-backed progress for blocking required outcomes: "
             + ", ".join(missing_outcomes)
+        )
+    required_evidence = required_evidence_by_outcome(artifacts["requirements"])
+    evidence_by_outcome: dict[str, set[str]] = {}
+    for step_id, evidence_ids in evidence_by_step.items():
+        for outcome_id in runtime_step_outcomes.get(step_id, set()):
+            evidence_by_outcome.setdefault(outcome_id, set()).update(evidence_ids)
+    missing_evidence_messages = []
+    for outcome_id in sorted(required_outcomes):
+        missing_evidence = sorted(required_evidence.get(outcome_id, set()) - evidence_by_outcome.get(outcome_id, set()))
+        if missing_evidence:
+            missing_evidence_messages.append(f"{outcome_id}: " + ", ".join(missing_evidence))
+    if missing_evidence_messages:
+        errors.append(
+            "missing required evidence for blocking required outcomes: "
+            + "; ".join(missing_evidence_messages)
         )
 
     final_report_path = run_dir / "final-report.json"
