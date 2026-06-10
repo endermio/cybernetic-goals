@@ -3,6 +3,7 @@ from __future__ import annotations
 import copy
 import hashlib
 import json
+import re
 from pathlib import Path
 from typing import Any
 
@@ -53,6 +54,8 @@ ACCEPTABLE_EVIDENCE_STRENGTHS = {
     "decide_or_classify": {"analysis_report"},
 }
 SOURCE_REQUIREMENT_REVIEW_CHECK = "source-requirement-preservation"
+MEASUREMENT_VARIABLE_RE = re.compile(r"(?<![A-Za-z0-9_])(?:E|S|A|M|Q|K|Se|Nout|Cckpt)(?![A-Za-z0-9_])")
+API_V2_FAMILY_RE = re.compile(r"(?<![A-Za-z])(?:download|extract|preview)(?![A-Za-z])", re.IGNORECASE)
 REQUIRED_REVIEW_CHECKS = {
     "required-answer-path",
     "intent-preservation",
@@ -462,19 +465,88 @@ def source_requirement_map(requirements: dict[str, Any]) -> tuple[dict[str, dict
 
 def source_requirement_preservation_errors(source_requirement: dict[str, Any], label: str) -> list[str]:
     source = source_requirement.get("source")
-    quote = source.get("quote") if isinstance(source, dict) else None
-    if not isinstance(quote, str):
+    source_text = source_requirement_source_text(source)
+    if not source_text:
         return []
-    normalized_quote = quote.lower()
     requirement_type = source_requirement.get("requirement_type")
     evidence_strength = source_requirement.get("required_evidence_strength")
-    if ("measure" in normalized_quote or "测" in quote) and requirement_type == "define_framework_or_plan":
+    if source_text_is_measurement_curve_request(source_text) and source_requirement_is_weakened_to_framework(
+        source_requirement, requirement_type, evidence_strength
+    ):
         return [f"{label} source requirement appears weaker than source quote"]
-    if ("implement" in normalized_quote or "实现" in quote) and (
-        requirement_type == "define_framework_or_plan" or evidence_strength == "framework_document"
+    if source_text_is_api_v2_family_implementation(source_text) and source_requirement_is_weakened_to_readiness(
+        source_requirement, requirement_type, evidence_strength
     ):
         return [f"{label} source requirement appears weaker than source quote"]
     return []
+
+
+def source_requirement_source_text(source: Any) -> str:
+    if not isinstance(source, dict):
+        return ""
+    parts = []
+    for field in ("quote", "reference"):
+        value = source.get(field)
+        if isinstance(value, str):
+            parts.append(value)
+    return "\n".join(parts)
+
+
+def source_requirement_requirement_text(source_requirement: dict[str, Any]) -> str:
+    parts = []
+    for field in ("required_action", "completion_checks", "target_objects"):
+        value = source_requirement.get(field)
+        if isinstance(value, str):
+            parts.append(value)
+        elif isinstance(value, list):
+            parts.extend(item for item in value if isinstance(item, str))
+    return "\n".join(parts).lower()
+
+
+def source_text_is_measurement_curve_request(source_text: str) -> bool:
+    normalized = source_text.lower()
+    asks_to_measure = "measure" in normalized or "测" in source_text
+    mentions_curve_or_growth_scale_variable = (
+        "curve" in normalized or "曲线" in source_text or bool(MEASUREMENT_VARIABLE_RE.search(source_text))
+    )
+    return asks_to_measure and mentions_curve_or_growth_scale_variable
+
+
+def source_text_is_api_v2_family_implementation(source_text: str) -> bool:
+    normalized = source_text.lower()
+    asks_to_implement = "implement" in normalized or "实现" in source_text
+    return asks_to_implement and "/api/v2" in normalized and bool(API_V2_FAMILY_RE.search(source_text))
+
+
+def source_requirement_is_weakened_to_framework(
+    source_requirement: dict[str, Any],
+    requirement_type: Any,
+    evidence_strength: Any,
+) -> bool:
+    requirement_text = source_requirement_requirement_text(source_requirement)
+    return (
+        requirement_type == "define_framework_or_plan"
+        or evidence_strength == "framework_document"
+        or "framework" in requirement_text
+        or "scan" in requirement_text
+    )
+
+
+def source_requirement_is_weakened_to_readiness(
+    source_requirement: dict[str, Any],
+    requirement_type: Any,
+    evidence_strength: Any,
+) -> bool:
+    requirement_text = source_requirement_requirement_text(source_requirement)
+    return (
+        requirement_type == "define_framework_or_plan"
+        or evidence_strength == "framework_document"
+        or "future" in requirement_text
+        or "compat" in requirement_text
+        or "readiness" in requirement_text
+        or "ready" in requirement_text
+        or "framework" in requirement_text
+    )
 
 
 def required_outcome_source_map(requirements: dict[str, Any], errors: list[str]) -> dict[str, set[str]]:

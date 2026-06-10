@@ -8,8 +8,10 @@ from pathlib import Path
 
 from tests.skills.test_control_json_schemas import validate
 from tests.skills.test_reviewed_replanning_control import (
+    apply_hashes,
     final_report,
     progress_event,
+    refresh_semantic_base,
     write_lean_run,
 )
 
@@ -58,6 +60,71 @@ class RuntimeJsonProgressVerifierTest(unittest.TestCase):
             payload = json.loads(result.stdout)
             self.assertTrue(payload["ok"])
             self.assertEqual(payload["run_dir"], str(run_dir))
+
+    def test_validate_control_chain_rejects_api_v2_source_requirement_weakened_to_readiness(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            run_dir = Path(tmpdir)
+            write_lean_run(run_dir)
+            req = json.loads((run_dir / "requirements.control.json").read_text(encoding="utf-8"))
+            sr = req["approved_control"]["source_requirements"][0]
+            sr["source"] = {
+                "kind": "user_message",
+                "quote": "implement /api/v2 download/extract/preview API family",
+            }
+            sr["required_action"] = "document future v2 compatibility readiness"
+            sr["requirement_type"] = "define_framework_or_plan"
+            sr["required_evidence_strength"] = "framework_document"
+            sr["completion_checks"] = ["future v2 exposure remains compatible"]
+            outcome = req["approved_control"]["required_outcomes"][0]
+            outcome["completion_claim"] = "Documents readiness for future v2 exposure."
+            evidence = outcome["required_evidence"][0]
+            evidence["evidence_strength"] = "framework_document"
+            evidence["evidence_claim"] = "The framework document records compatibility readiness."
+            run = json.loads((run_dir / "run.control.json").read_text(encoding="utf-8"))
+            runtime = json.loads((run_dir / "gen-000/runtime.control.json").read_text(encoding="utf-8"))
+            review = json.loads((run_dir / "gen-000/review.control.json").read_text(encoding="utf-8"))
+            refresh_semantic_base(req)
+            apply_hashes(req, run, runtime, "gen-000/runtime.control.json", review, "gen-000/review.control.json")
+            (run_dir / "requirements.control.json").write_text(json.dumps(req, indent=2), encoding="utf-8")
+            (run_dir / "run.control.json").write_text(json.dumps(run, indent=2), encoding="utf-8")
+            (run_dir / "gen-000/runtime.control.json").write_text(json.dumps(runtime, indent=2), encoding="utf-8")
+
+            result = run_script(VALIDATE, str(run_dir))
+
+            self.assertNotEqual(result.returncode, 0, result.stdout + result.stderr)
+            self.assertIn("source requirement appears weaker than source quote", result.stdout + result.stderr)
+
+    def test_validate_control_chain_accepts_legitimate_framework_source_requirement(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            run_dir = Path(tmpdir)
+            write_lean_run(run_dir)
+            req = json.loads((run_dir / "requirements.control.json").read_text(encoding="utf-8"))
+            sr = req["approved_control"]["source_requirements"][0]
+            sr["source"] = {"kind": "user_message", "quote": "implement a framework for measurement planning"}
+            sr["required_action"] = "define a framework for measurement planning"
+            sr["requirement_type"] = "define_framework_or_plan"
+            sr["required_evidence_strength"] = "framework_document"
+            sr["target_objects"] = ["measurement planning framework"]
+            sr["completion_checks"] = ["framework document covers measurement planning"]
+            outcome = req["approved_control"]["required_outcomes"][0]
+            outcome["completion_claim"] = "Defines the measurement planning framework."
+            outcome["completed_target_objects"] = ["measurement planning framework"]
+            evidence = outcome["required_evidence"][0]
+            evidence["evidence_strength"] = "framework_document"
+            evidence["evidence_claim"] = "The framework document covers measurement planning."
+            evidence["completed_target_objects"] = ["measurement planning framework"]
+            run = json.loads((run_dir / "run.control.json").read_text(encoding="utf-8"))
+            runtime = json.loads((run_dir / "gen-000/runtime.control.json").read_text(encoding="utf-8"))
+            review = json.loads((run_dir / "gen-000/review.control.json").read_text(encoding="utf-8"))
+            refresh_semantic_base(req)
+            apply_hashes(req, run, runtime, "gen-000/runtime.control.json", review, "gen-000/review.control.json")
+            (run_dir / "requirements.control.json").write_text(json.dumps(req, indent=2), encoding="utf-8")
+            (run_dir / "run.control.json").write_text(json.dumps(run, indent=2), encoding="utf-8")
+            (run_dir / "gen-000/runtime.control.json").write_text(json.dumps(runtime, indent=2), encoding="utf-8")
+
+            result = run_script(VALIDATE, str(run_dir))
+
+            self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
 
     def test_append_progress_event_appends_jsonl_and_rejects_invalid_basics(self):
         event = progress_event("new evidence pointer")
