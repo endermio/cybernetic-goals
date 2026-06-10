@@ -460,6 +460,23 @@ def source_requirement_map(requirements: dict[str, Any]) -> tuple[dict[str, dict
     return mapped, blocking, errors
 
 
+def source_requirement_preservation_errors(source_requirement: dict[str, Any], label: str) -> list[str]:
+    source = source_requirement.get("source")
+    quote = source.get("quote") if isinstance(source, dict) else None
+    if not isinstance(quote, str):
+        return []
+    normalized_quote = quote.lower()
+    requirement_type = source_requirement.get("requirement_type")
+    evidence_strength = source_requirement.get("required_evidence_strength")
+    if ("measure" in normalized_quote or "测" in quote) and requirement_type == "define_framework_or_plan":
+        return [f"{label} source requirement appears weaker than source quote"]
+    if ("implement" in normalized_quote or "实现" in quote) and (
+        requirement_type == "define_framework_or_plan" or evidence_strength == "framework_document"
+    ):
+        return [f"{label} source requirement appears weaker than source quote"]
+    return []
+
+
 def required_outcome_source_map(requirements: dict[str, Any], errors: list[str]) -> dict[str, set[str]]:
     outcomes = requirements.get("approved_control", {}).get("required_outcomes")
     if not isinstance(outcomes, list):
@@ -528,6 +545,8 @@ def validate_source_requirement_coverage(
     has_source_requirements = bool(source_map) or bool(errors)
     if not has_source_requirements and str(requirements.get("schema_version", "")) < "1.1.0":
         return blocking_sources, {}, {}, errors
+    for source_id, source in sorted(source_map.items()):
+        errors.extend(source_requirement_preservation_errors(source, f"source requirement {source_id}"))
 
     outcome_sources = required_outcome_source_map(requirements, errors)
     evidence_sources = required_evidence_source_map(requirements, errors)

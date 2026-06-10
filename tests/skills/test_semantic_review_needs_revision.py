@@ -64,6 +64,24 @@ class SemanticReviewNeedsRevisionTest(unittest.TestCase):
                 self.assertIn("NeedsRevision", text)
                 self.assertIn("must not be accepted", text)
 
+    def test_source_requirement_extraction_cannot_weaken_measurement_to_framework(self):
+        review_text = read(REVIEW_SKILL)
+
+        self.assertIn("source-requirement-preservation", review_text)
+        self.assertIn("measure E, S, A, M, Q, K, Se, Nout, Cckpt growth curves", review_text)
+        self.assertIn("define scan framework and dominance rules", review_text)
+        self.assertIn("NeedsRevision", review_text)
+        self.assertIn("ReturnToRequirementsAnalysis", review_text)
+
+    def test_source_requirement_extraction_cannot_weaken_api_v2_implementation_to_compatibility(self):
+        review_text = read(REVIEW_SKILL)
+
+        self.assertIn("source-requirement-preservation", review_text)
+        self.assertIn("implement /api/v2 download/extract/preview API family", review_text)
+        self.assertIn("compatible with future v2 exposure", review_text)
+        self.assertIn("NeedsRevision", review_text)
+        self.assertIn("ReturnToRequirementsAnalysis", review_text)
+
     def test_runtime_compile_requires_approved_control_statuses_and_runtime_validator(self):
         combined = "\n".join(
             [

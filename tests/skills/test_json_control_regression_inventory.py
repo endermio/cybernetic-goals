@@ -17,6 +17,8 @@ EXPECTED_FAILURE_MODES = {
     "not_done_report_treated_as_success",
     "authority_shrink",
     "missing_review_checks",
+    "source-requirement-measurement-to-framework",
+    "source-requirement-api-v2-to-readiness",
 }
 
 EXPECTED_OLD_ACCIDENT_SURFACES = {

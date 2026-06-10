@@ -197,6 +197,13 @@ For JSON control runs with `source_requirements`, review must first compare the 
 
 Then review `source_requirements -> required_outcomes -> required_evidence -> runtime.required_steps -> verifier`. Each blocking source requirement must be covered by equal or stronger evidence. This is not keyword lint: judge whether the proposed outcome and evidence actually complete the original requested item.
 
+Record this check as `source-requirement-preservation`. Historical regressions
+that must be `NeedsRevision` and route to `ReturnToRequirementsAnalysis`
+include:
+
+- source quote says to measure E, S, A, M, Q, K, Se, Nout, Cckpt growth curves, but the source requirement says only to define scan framework and dominance rules;
+- source quote says to implement /api/v2 download/extract/preview API family, but the source requirement says only compatible with future v2 exposure.
+
 ### 3. Goal Check
 
 The goal must not add, remove, downscope, or reinterpret requirement meaning.

@@ -876,6 +876,36 @@ class ReviewedReplanningControlTest(unittest.TestCase):
                 result.stdout + result.stderr,
             )
 
+    def test_guard_rejects_source_requirement_weakened_from_quote(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            run_dir = Path(tmpdir)
+            write_lean_run(run_dir)
+            req = json.loads((run_dir / "requirements.control.json").read_text(encoding="utf-8"))
+            sr = req["approved_control"]["source_requirements"][0]
+            sr["source"] = {"kind": "user_message", "quote": "measure scale curves for E and S"}
+            sr["required_action"] = "define scan framework for E and S"
+            sr["requirement_type"] = "define_framework_or_plan"
+            sr["required_evidence_strength"] = "framework_document"
+            sr["completion_checks"] = ["scan variables are listed"]
+            outcome = req["approved_control"]["required_outcomes"][0]
+            outcome["completion_claim"] = "Completes the request by defining scan variables."
+            evidence = outcome["required_evidence"][0]
+            evidence["evidence_strength"] = "framework_document"
+            evidence["evidence_claim"] = "The document lists scan variables."
+            run = json.loads((run_dir / "run.control.json").read_text(encoding="utf-8"))
+            runtime = json.loads((run_dir / "gen-000/runtime.control.json").read_text(encoding="utf-8"))
+            review = json.loads((run_dir / "gen-000/review.control.json").read_text(encoding="utf-8"))
+            refresh_semantic_base(req)
+            apply_hashes(req, run, runtime, "gen-000/runtime.control.json", review, "gen-000/review.control.json")
+            (run_dir / "requirements.control.json").write_text(json.dumps(req, indent=2), encoding="utf-8")
+            (run_dir / "run.control.json").write_text(json.dumps(run, indent=2), encoding="utf-8")
+            (run_dir / "gen-000/runtime.control.json").write_text(json.dumps(runtime, indent=2), encoding="utf-8")
+
+            result = run_script(CONTROL_GUARD, "--run-dir", str(run_dir))
+
+            self.assertNotEqual(result.returncode, 0, result.stdout + result.stderr)
+            self.assertIn("source requirement appears weaker than source quote", result.stdout + result.stderr)
+
     def test_guard_rejects_generation_history_over_auto_amendment_limit(self):
         generations = [
             {"id": "gen-000", "strategy_kind": "discovery", "status": "superseded", "runtime": "gen-000/runtime.control.json"},

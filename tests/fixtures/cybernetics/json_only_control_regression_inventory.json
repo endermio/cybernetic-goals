@@ -328,6 +328,42 @@
         "Failing path: review status says approved while a required check is absent, failed, stale, or not rerun after mutation.",
         "Passing path: review JSON records all required checks and final observer state as approved."
       ]
+    },
+    {
+      "id": "source-requirement-measurement-to-framework",
+      "failure_class": "A user measurement request is weakened into framework definition in source requirements.",
+      "required_step": "S9",
+      "legacy_sources": [
+        "historical source requirement accident: measurement curves weakened to scan framework/rules"
+      ],
+      "control_sources": [
+        "requirements.control.json approved_control.source_requirements",
+        "review.control.json source-requirement-preservation check",
+        "control_chain_guard.py source requirement validation"
+      ],
+      "json_regression_requirement": "Future JSON guard and runtime tests must reject source requirements where a user request to measure curves is recorded only as framework definition.",
+      "future_assertions": [
+        "Failing path: source quote asks to measure curves but requirement_type is define_framework_or_plan with framework_document evidence.",
+        "Passing path: measurement source quotes remain produce_empirical_measurement requirements with measured_curve_data or benchmark_result evidence."
+      ]
+    },
+    {
+      "id": "source-requirement-api-v2-to-readiness",
+      "failure_class": "A user implementation request is weakened into future compatibility or readiness in source requirements.",
+      "required_step": "S9",
+      "legacy_sources": [
+        "historical source requirement accident: /api/v2 implementation weakened to future v2 compatibility/readiness"
+      ],
+      "control_sources": [
+        "requirements.control.json approved_control.source_requirements",
+        "review.control.json source-requirement-preservation check",
+        "control_chain_guard.py source requirement validation"
+      ],
+      "json_regression_requirement": "Future JSON guard and runtime tests must reject source requirements where a user request to implement /api/v2 is recorded only as future compatibility or readiness.",
+      "future_assertions": [
+        "Failing path: source quote asks to implement /api/v2 but requirement_type is define_framework_or_plan or evidence strength is framework_document.",
+        "Passing path: implementation source quotes remain implement_behavior requirements with behavior_exists, code_change, test_result, or command_result evidence."
+      ]
     }
   ],
   "s9_s10_support": {
