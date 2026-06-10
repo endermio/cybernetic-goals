@@ -102,8 +102,14 @@ Amendment events use `control.amendment.proposed`,
 
 The schemas preserve v1.0 parse compatibility for historical amendment events.
 Current runtime execution policy requires `affected_source_requirements` on
-every `control.amendment.proposed` event so source-owned obligations can be
+every `control.amendment.proposed` event so affected source requirements can be
 reviewed before a new generation is approved.
+
+When runtime observes that current strategy can only produce weaker evidence
+for a blocking source requirement, append `control.amendment.proposed` with
+`affected_source_requirements`. Do not claim completion from substitute
+evidence. Amendment may change derived strategy only; it may not weaken source
+requirements, required outcomes, approved authority, or semantic base.
 
 If any of `semantic_base_change`, `required_outcomes_changed`, or
 `authority_expanded` is true, that amendment is a request for human decision,

@@ -191,6 +191,12 @@ Check that design, goal, and execution policy preserve the approved compact cont
 
 Flag as Major or Blocking when downstream artifacts reinterpret, expand, remove, or contradict the approved compact control commitment. If a downstream artifact changes the primary object, requested transformation, non-goals, user-purpose evidence, result-placement, what-counts-as-done condition, final answer format, or why this process is needed, require what the user approved revision or explicit human reapproval before approval.
 
+### Source Requirement Preservation Check
+
+For JSON control runs with `source_requirements`, review must first compare the approved user request text or approved compact summary to `source_requirements`. Reject or return to requirements when a source requirement weakens the requested action, changes the target object, lowers the required evidence strength, omits completion checks, or converts current-run required work into future work.
+
+Then review `source_requirements -> required_outcomes -> required_evidence -> runtime.required_steps -> verifier`. Each blocking source requirement must be covered by equal or stronger evidence. This is not keyword lint: judge whether the proposed outcome and evidence actually complete the original requested item.
+
 ### 3. Goal Check
 
 The goal must not add, remove, downscope, or reinterpret requirement meaning.

@@ -68,6 +68,14 @@ Do not reduce, simplify, postpone, or replace the requested behavior merely beca
 
 Execution complexity may be recorded as execution risk, planning concern, evidence concern, or future realization challenge. It must not become the recommended default unless the human explicitly asks for a lower-risk scope.
 
+## Preserve Original Request Items
+
+For Level 3/4 JSON control work, extract `source_requirements` before writing `required_outcomes`. A source requirement is one must-do item from the approved user request. It must include the user's quote or source reference, required action, requirement type, required evidence strength, target objects when applicable, completion checks, and whether missing it blocks `goal_achieved`.
+
+Do not weaken the user's request while extracting source requirements. If the user asks to measure, implement, decide, repair, or diagnose, the source requirement must preserve that action. A framework, plan, readiness result, compatibility result, or decision rule may support the work, but it cannot replace the requested action unless the user gives a new approval for the weaker target.
+
+The compact approval summary must show each source requirement in plain language: original quote/reference, required action, evidence needed, and completion checks.
+
 ## Ask Only High-Value Human Questions
 
 Ask the human a question only if all are true:

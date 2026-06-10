@@ -1,6 +1,6 @@
 {
   "artifact_type": "requirements.control",
-  "schema_version": "1",
+  "schema_version": "1.1.0",
   "status": "approved",
   "approved_control": {
     "human_purpose": "Move official cybernetic control facts to strict JSON.",
@@ -33,16 +33,51 @@
       "id": "semantic-base:control-example",
       "hash": "sha256:590db16fc03d0916bce0274b53d441350e15bb7bef8251ca3268982fdc83ba3c"
     },
+    "source_requirements": [
+      {
+        "id": "SR-json-control-example",
+        "source": {
+          "kind": "user_message",
+          "quote": "Replace prose-backed control artifacts with schema-backed JSON control files."
+        },
+        "required_action": "Replace prose-backed control artifacts with schema-backed JSON control files.",
+        "requirement_type": "implement_behavior",
+        "required_evidence_strength": "test_result",
+        "target_objects": [
+          "cybernetic control chain"
+        ],
+        "completion_checks": [
+          "Official JSON control files pass validation.",
+          "Markdown control inputs are rejected for official guard, compiler, and runtime use."
+        ],
+        "blocks_goal_achieved_if_missing": true
+      }
+    ],
     "required_outcomes": [
       {
         "id": "O-json-control-example",
         "statement": "Example control chain demonstrates JSON-only control facts.",
+        "source_requirements": [
+          "SR-json-control-example"
+        ],
+        "completion_claim": "Completes the request by making JSON control files authoritative and rejecting Markdown control inputs.",
+        "completed_target_objects": [
+          "cybernetic control chain"
+        ],
         "blocks_goal_achieved_if_missing": true,
         "required_evidence": [
           {
             "evidence_id": "evidence.example-guard-passes",
             "kind": "progress_event",
-            "description": "example guard passes"
+            "description": "example guard passes",
+            "evidence_strength": "test_result",
+            "satisfies_source_requirements": [
+              "SR-json-control-example"
+            ],
+            "evidence_claim": "The guard result proves JSON control files pass and Markdown control inputs are rejected.",
+            "completed_target_objects": [
+              "cybernetic control chain"
+            ]
           }
         ],
         "not_satisfied_by": [

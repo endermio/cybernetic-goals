@@ -64,6 +64,22 @@
       ]
     },
     {
+      "check_id": "source-requirement-preservation",
+      "status": "pass",
+      "evidence": [
+        "source requirements preserve the approved request text and are covered by equal-or-stronger outcomes and evidence"
+      ],
+      "verdict": "approved",
+      "return_to_stage": null,
+      "findings": [],
+      "required_changes": [],
+      "checked_transformations": [
+        "approved-request->source-requirements",
+        "source-requirements->required-outcomes",
+        "required-outcomes->runtime"
+      ]
+    },
+    {
       "check_id": "required-outcome-coverage",
       "status": "pass",
       "evidence": [

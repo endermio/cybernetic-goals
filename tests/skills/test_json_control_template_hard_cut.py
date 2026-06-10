@@ -68,8 +68,9 @@ class JsonControlTemplateHardCutTest(unittest.TestCase):
                 data = json.loads(path.read_text(encoding="utf-8"))
                 observed_artifact_types.add(data["artifact_type"])
                 serialized = json.dumps(data, sort_keys=True)
+                expected_schema_version = "1.1.0" if data["artifact_type"] == "requirements.control" else "1"
 
-                self.assertEqual("1", data["schema_version"])
+                self.assertEqual(expected_schema_version, data["schema_version"])
                 self.assertNotRegex(serialized, re.compile("|".join(re.escape(name) for name in OFFICIAL_MARKDOWN_CONTROL_FILENAMES)))
 
         self.assertEqual(expected_artifact_types, observed_artifact_types)

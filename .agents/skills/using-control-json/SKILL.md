@@ -27,7 +27,8 @@ Read `references/runtime-control-json-protocol.md` before executing, reporting s
 3. runtime writes control-output files only to `progress.jsonl`, `runtime-status.json`, and `final-report.json`. Non-control evidence artifacts may be written only under paths named in `runtime.control.json.runtime.writable_evidence_paths`.
 4. Append to `progress.jsonl` for runtime observations, using one JSON object per line. Record discoveries, commands, evidence, blockers, required-step state, generation state, and amendment proposals there; do not mutate approved JSON to match execution.
 5. Run the verifier before `goal_achieved: true`; only a verifier result that permits the claim allows `final-report.json` to contain `goal_achieved: true`.
-6. `/goal` is a short pointer and adapter, not a control fact. It should point to `runtime.control.json` and name `using-control-json`, leaving approved facts in JSON.
+6. Source requirements are approved original-request items. Runtime may not treat weaker substitute evidence as completion. If strategy cannot complete a blocking source requirement, propose an amendment with `affected_source_requirements`.
+7. `/goal` is a short pointer and adapter, not a control fact. It should point to `runtime.control.json` and name `using-control-json`, leaving approved facts in JSON.
 
 ## Reviewed Replanning
 
