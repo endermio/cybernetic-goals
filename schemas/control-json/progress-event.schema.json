@@ -178,12 +178,28 @@
           "reason",
           "triggering_observation",
           "affected_stages",
-          "affected_source_requirements",
           "semantic_base_change",
           "required_outcomes_changed",
           "authority_expanded",
           "proposed_changes",
           "review_required"
+        ]
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "event_type": {
+            "const": "control.amendment.proposed"
+          },
+          "schema_version": {
+            "const": "1.1.0"
+          }
+        }
+      },
+      "then": {
+        "required": [
+          "affected_source_requirements"
         ]
       }
     },

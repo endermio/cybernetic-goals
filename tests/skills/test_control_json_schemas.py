@@ -815,6 +815,64 @@ class ControlJsonSchemaTest(unittest.TestCase):
 
         validate(event, schema)
 
+    def test_progress_event_schema_rejects_missing_affected_source_requirements_for_v1_1_amendment(self):
+        schema = json.loads((SCHEMA_DIR / "progress-event.schema.json").read_text(encoding="utf-8"))
+        event = {
+            "event_type": "control.amendment.proposed",
+            "schema_version": "1.1.0",
+            "occurred_at": "2026-06-10T00:00:00Z",
+            "runtime_generation": "gen-000",
+            "amendment_id": "A1",
+            "reason": "current strategy cannot complete source requirement",
+            "triggering_observation": "only framework evidence exists for a measurement request",
+            "affected_stages": ["plan", "runtime"],
+            "semantic_base_change": False,
+            "required_outcomes_changed": False,
+            "authority_expanded": False,
+            "proposed_changes": ["add measured curve producing step"],
+            "review_required": ["source-requirement-preservation", "obligation-preservation"],
+        }
+
+        with self.assertRaises(AssertionError):
+            validate(event, schema)
+
+    def test_progress_event_schema_accepts_missing_affected_source_requirements_for_v1_0_amendment(self):
+        schema = json.loads((SCHEMA_DIR / "progress-event.schema.json").read_text(encoding="utf-8"))
+        event = {
+            "event_type": "control.amendment.proposed",
+            "schema_version": "1.0.0",
+            "occurred_at": "2026-06-10T00:00:00Z",
+            "runtime_generation": "gen-000",
+            "amendment_id": "A1",
+            "reason": "current strategy cannot produce required outcome evidence",
+            "triggering_observation": "readiness evidence does not prove implementation",
+            "affected_stages": ["plan", "runtime"],
+            "semantic_base_change": False,
+            "required_outcomes_changed": False,
+            "authority_expanded": False,
+            "proposed_changes": ["replace readiness-only work package with implementation work"],
+            "review_required": ["intent-preservation", "obligation-preservation"],
+        }
+
+        validate(event, schema)
+
+    def test_amendment_proposal_schema_rejects_missing_affected_source_requirements_for_v1_1(self):
+        schema = json.loads((SCHEMA_DIR / "amendment-proposal.schema.json").read_text(encoding="utf-8"))
+        proposal = copy.deepcopy(SCHEMA_FIXTURES["amendment-proposal.schema.json"])
+        proposal["schema_version"] = "1.1.0"
+        del proposal["affected_source_requirements"]
+
+        with self.assertRaises(AssertionError):
+            validate(proposal, schema)
+
+    def test_amendment_proposal_schema_accepts_missing_affected_source_requirements_for_v1_0(self):
+        schema = json.loads((SCHEMA_DIR / "amendment-proposal.schema.json").read_text(encoding="utf-8"))
+        proposal = copy.deepcopy(SCHEMA_FIXTURES["amendment-proposal.schema.json"])
+        proposal["schema_version"] = "1.0.0"
+        del proposal["affected_source_requirements"]
+
+        validate(proposal, schema)
+
     def test_review_checks_are_structured_certificates(self):
         review = load_json(SCHEMA_DIR / "review.control.schema.json")
         check_schema = review["properties"]["review_checks"]["items"]
