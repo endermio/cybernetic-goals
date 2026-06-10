@@ -37,16 +37,41 @@ SCHEMA_FIXTURES = {
             "how_we_know_purpose_was_met": "JSON guard/compiler/runtime path operates without Markdown control inputs",
             "where_result_must_show_up": ["schemas", "registries", "guards"],
             "what_counts_as_done": "official JSON path passes and Markdown control input fails",
+            "source_requirements": [
+                {
+                    "id": "SR-schema-validation",
+                    "source": {
+                        "kind": "user_message",
+                        "quote": "replace Markdown authority with strict JSON control files",
+                    },
+                    "required_action": "replace Markdown authority with strict JSON control files",
+                    "requirement_type": "implement_behavior",
+                    "required_evidence_strength": "test_result",
+                    "target_objects": ["JSON control files", "Markdown control inputs"],
+                    "completion_checks": [
+                        "JSON control files validate through schema tests.",
+                        "Markdown control inputs are rejected by official guard/compiler/runtime paths.",
+                    ],
+                    "blocks_goal_achieved_if_missing": True,
+                }
+            ],
             "required_outcomes": [
                 {
                     "id": "outcome.schema-validation",
                     "statement": "JSON control artifacts validate only when required outcomes are preserved",
+                    "source_requirements": ["SR-schema-validation"],
+                    "completion_claim": "Completes the request by making JSON control files pass and Markdown control inputs fail.",
+                    "completed_target_objects": ["JSON control files", "Markdown control inputs"],
                     "blocks_goal_achieved_if_missing": True,
                     "required_evidence": [
                         {
                             "evidence_id": "evidence.schema-validation-tests",
                             "kind": "progress_event",
                             "description": "schema validation tests passed",
+                            "evidence_strength": "test_result",
+                            "satisfies_source_requirements": ["SR-schema-validation"],
+                            "evidence_claim": "The schema validation tests prove JSON control files pass and Markdown control inputs fail.",
+                            "completed_target_objects": ["JSON control files", "Markdown control inputs"],
                         }
                     ],
                     "not_satisfied_by": ["required step completion without outcome coverage"],
@@ -298,6 +323,7 @@ SCHEMA_FIXTURES = {
         "reason": "Current strategy cannot produce required outcome evidence.",
         "triggering_observation": "The current evidence proves readiness, not implementation.",
         "affected_stages": ["design", "plan", "runtime"],
+        "affected_source_requirements": ["SR-schema-validation"],
         "semantic_base_change": False,
         "required_outcomes_changed": False,
         "authority_expanded": False,
@@ -565,6 +591,8 @@ class ControlJsonSchemaTest(unittest.TestCase):
             [
                 "id",
                 "statement",
+                "source_requirements",
+                "completion_claim",
                 "blocks_goal_achieved_if_missing",
                 "required_evidence",
                 "not_satisfied_by",
@@ -573,7 +601,14 @@ class ControlJsonSchemaTest(unittest.TestCase):
         )
         evidence_schema = outcome_schema["properties"]["required_evidence"]["items"]
         self.assertEqual(
-            ["evidence_id", "kind", "description"],
+            [
+                "evidence_id",
+                "kind",
+                "description",
+                "evidence_strength",
+                "satisfies_source_requirements",
+                "evidence_claim",
+            ],
             evidence_schema["required"],
         )
         self.assertIn("progress_event", evidence_schema["properties"]["kind"]["enum"])
@@ -660,6 +695,36 @@ class ControlJsonSchemaTest(unittest.TestCase):
 
         self.assertIn("runtime_generation", final_report_schema["properties"])
         self.assertIn("unresolved_amendments", final_report_schema["properties"])
+
+    def test_requirements_schema_rejects_missing_source_requirement_fields_for_v1_1(self):
+        schema = json.loads((SCHEMA_DIR / "requirements.control.schema.json").read_text(encoding="utf-8"))
+        fixture = copy.deepcopy(SCHEMA_FIXTURES["requirements.control.schema.json"])
+        fixture["schema_version"] = "1.1.0"
+        del fixture["approved_control"]["source_requirements"][0]["completion_checks"]
+
+        with self.assertRaises(AssertionError):
+            validate(fixture, schema)
+
+    def test_progress_event_schema_accepts_affected_source_requirements_on_amendment(self):
+        schema = json.loads((SCHEMA_DIR / "progress-event.schema.json").read_text(encoding="utf-8"))
+        event = {
+            "event_type": "control.amendment.proposed",
+            "schema_version": "1.1.0",
+            "occurred_at": "2026-06-10T00:00:00Z",
+            "runtime_generation": "gen-000",
+            "amendment_id": "A1",
+            "reason": "current strategy cannot complete source requirement",
+            "triggering_observation": "only framework evidence exists for a measurement request",
+            "affected_stages": ["plan", "runtime"],
+            "affected_source_requirements": ["SR-measure-scale-curves"],
+            "semantic_base_change": False,
+            "required_outcomes_changed": False,
+            "authority_expanded": False,
+            "proposed_changes": ["add measured curve producing step"],
+            "review_required": ["source-requirement-preservation", "obligation-preservation"],
+        }
+
+        validate(event, schema)
 
     def test_review_checks_are_structured_certificates(self):
         review = load_json(SCHEMA_DIR / "review.control.schema.json")

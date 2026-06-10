@@ -86,6 +86,14 @@
         ]
       }
     },
+    "affected_source_requirements": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
     "semantic_base_change": {
       "type": "boolean"
     },
@@ -170,6 +178,7 @@
           "reason",
           "triggering_observation",
           "affected_stages",
+          "affected_source_requirements",
           "semantic_base_change",
           "required_outcomes_changed",
           "authority_expanded",

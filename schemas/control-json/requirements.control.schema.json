@@ -75,6 +75,112 @@
           "type": "string",
           "minLength": 1
         },
+        "source_requirements": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "id",
+              "source",
+              "required_action",
+              "requirement_type",
+              "required_evidence_strength",
+              "completion_checks",
+              "blocks_goal_achieved_if_missing"
+            ],
+            "properties": {
+              "id": {
+                "type": "string",
+                "minLength": 1
+              },
+              "source": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "kind"
+                ],
+                "properties": {
+                  "kind": {
+                    "enum": [
+                      "user_message",
+                      "approved_summary",
+                      "requirements_review"
+                    ]
+                  },
+                  "quote": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "reference": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                },
+                "anyOf": [
+                  {
+                    "required": [
+                      "quote"
+                    ]
+                  },
+                  {
+                    "required": [
+                      "reference"
+                    ]
+                  }
+                ]
+              },
+              "required_action": {
+                "type": "string",
+                "minLength": 1
+              },
+              "requirement_type": {
+                "enum": [
+                  "implement_behavior",
+                  "produce_empirical_measurement",
+                  "analyze_existing_evidence",
+                  "define_framework_or_plan",
+                  "write_documentation",
+                  "verify_or_review",
+                  "diagnose_root_cause",
+                  "decide_or_classify"
+                ]
+              },
+              "required_evidence_strength": {
+                "enum": [
+                  "behavior_exists",
+                  "measured_curve_data",
+                  "benchmark_result",
+                  "analysis_report",
+                  "framework_document",
+                  "review_report",
+                  "command_result",
+                  "code_change",
+                  "test_result"
+                ]
+              },
+              "target_objects": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "completion_checks": {
+                "type": "array",
+                "minItems": 1,
+                "items": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "blocks_goal_achieved_if_missing": {
+                "type": "boolean"
+              }
+            }
+          }
+        },
         "required_outcomes": {
           "type": "array",
           "minItems": 1,
@@ -84,6 +190,8 @@
             "required": [
               "id",
               "statement",
+              "source_requirements",
+              "completion_claim",
               "blocks_goal_achieved_if_missing",
               "required_evidence",
               "not_satisfied_by"
@@ -97,6 +205,25 @@
                 "type": "string",
                 "minLength": 1
               },
+              "source_requirements": {
+                "type": "array",
+                "minItems": 1,
+                "items": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "completion_claim": {
+                "type": "string",
+                "minLength": 1
+              },
+              "completed_target_objects": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
               "blocks_goal_achieved_if_missing": {
                 "type": "boolean"
               },
@@ -109,7 +236,10 @@
                   "required": [
                     "evidence_id",
                     "kind",
-                    "description"
+                    "description",
+                    "evidence_strength",
+                    "satisfies_source_requirements",
+                    "evidence_claim"
                   ],
                   "properties": {
                     "evidence_id": {
@@ -127,6 +257,38 @@
                     "description": {
                       "type": "string",
                       "minLength": 1
+                    },
+                    "evidence_strength": {
+                      "enum": [
+                        "behavior_exists",
+                        "measured_curve_data",
+                        "benchmark_result",
+                        "analysis_report",
+                        "framework_document",
+                        "review_report",
+                        "command_result",
+                        "code_change",
+                        "test_result"
+                      ]
+                    },
+                    "satisfies_source_requirements": {
+                      "type": "array",
+                      "minItems": 1,
+                      "items": {
+                        "type": "string",
+                        "minLength": 1
+                      }
+                    },
+                    "evidence_claim": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "completed_target_objects": {
+                      "type": "array",
+                      "items": {
+                        "type": "string",
+                        "minLength": 1
+                      }
                     },
                     "path": {
                       "type": "string",
@@ -199,5 +361,25 @@
         }
       }
     }
-  }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "schema_version": {
+            "const": "1.1.0"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "approved_control": {
+            "required": [
+              "source_requirements"
+            ]
+          }
+        }
+      }
+    }
+  ]
 }
