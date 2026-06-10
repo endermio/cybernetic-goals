@@ -100,19 +100,22 @@ class RuntimeJsonProgressVerifierTest(unittest.TestCase):
             write_lean_run(run_dir)
             req = json.loads((run_dir / "requirements.control.json").read_text(encoding="utf-8"))
             sr = req["approved_control"]["source_requirements"][0]
-            sr["source"] = {"kind": "user_message", "quote": "implement a framework for measurement planning"}
-            sr["required_action"] = "define a framework for measurement planning"
+            sr["source"] = {
+                "kind": "user_message",
+                "quote": "implement a framework for measurement planning for E and S",
+            }
+            sr["required_action"] = "define a framework for measurement planning for E and S"
             sr["requirement_type"] = "define_framework_or_plan"
             sr["required_evidence_strength"] = "framework_document"
-            sr["target_objects"] = ["measurement planning framework"]
-            sr["completion_checks"] = ["framework document covers measurement planning"]
+            sr["target_objects"] = ["E", "S"]
+            sr["completion_checks"] = ["framework document covers measurement planning for E and S"]
             outcome = req["approved_control"]["required_outcomes"][0]
-            outcome["completion_claim"] = "Defines the measurement planning framework."
-            outcome["completed_target_objects"] = ["measurement planning framework"]
+            outcome["completion_claim"] = "Defines the measurement planning framework for E and S."
+            outcome["completed_target_objects"] = ["E", "S"]
             evidence = outcome["required_evidence"][0]
             evidence["evidence_strength"] = "framework_document"
-            evidence["evidence_claim"] = "The framework document covers measurement planning."
-            evidence["completed_target_objects"] = ["measurement planning framework"]
+            evidence["evidence_claim"] = "The framework document covers measurement planning for E and S."
+            evidence["completed_target_objects"] = ["E", "S"]
             run = json.loads((run_dir / "run.control.json").read_text(encoding="utf-8"))
             runtime = json.loads((run_dir / "gen-000/runtime.control.json").read_text(encoding="utf-8"))
             review = json.loads((run_dir / "gen-000/review.control.json").read_text(encoding="utf-8"))
@@ -125,6 +128,39 @@ class RuntimeJsonProgressVerifierTest(unittest.TestCase):
             result = run_script(VALIDATE, str(run_dir))
 
             self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+
+    def test_validate_control_chain_rejects_measurement_source_requirement_weakened_to_framework(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            run_dir = Path(tmpdir)
+            write_lean_run(run_dir)
+            req = json.loads((run_dir / "requirements.control.json").read_text(encoding="utf-8"))
+            sr = req["approved_control"]["source_requirements"][0]
+            sr["source"] = {"kind": "user_message", "quote": "measure scale curves for E and S"}
+            sr["required_action"] = "define scan framework for E and S"
+            sr["requirement_type"] = "define_framework_or_plan"
+            sr["required_evidence_strength"] = "framework_document"
+            sr["target_objects"] = ["E", "S"]
+            sr["completion_checks"] = ["scan variables are listed"]
+            outcome = req["approved_control"]["required_outcomes"][0]
+            outcome["completion_claim"] = "Completes the request by defining scan variables."
+            outcome["completed_target_objects"] = ["E", "S"]
+            evidence = outcome["required_evidence"][0]
+            evidence["evidence_strength"] = "framework_document"
+            evidence["evidence_claim"] = "The document lists scan variables."
+            evidence["completed_target_objects"] = ["E", "S"]
+            run = json.loads((run_dir / "run.control.json").read_text(encoding="utf-8"))
+            runtime = json.loads((run_dir / "gen-000/runtime.control.json").read_text(encoding="utf-8"))
+            review = json.loads((run_dir / "gen-000/review.control.json").read_text(encoding="utf-8"))
+            refresh_semantic_base(req)
+            apply_hashes(req, run, runtime, "gen-000/runtime.control.json", review, "gen-000/review.control.json")
+            (run_dir / "requirements.control.json").write_text(json.dumps(req, indent=2), encoding="utf-8")
+            (run_dir / "run.control.json").write_text(json.dumps(run, indent=2), encoding="utf-8")
+            (run_dir / "gen-000/runtime.control.json").write_text(json.dumps(runtime, indent=2), encoding="utf-8")
+
+            result = run_script(VALIDATE, str(run_dir))
+
+            self.assertNotEqual(result.returncode, 0, result.stdout + result.stderr)
+            self.assertIn("source requirement appears weaker than source quote", result.stdout + result.stderr)
 
     def test_append_progress_event_appends_jsonl_and_rejects_invalid_basics(self):
         event = progress_event("new evidence pointer")

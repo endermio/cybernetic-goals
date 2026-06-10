@@ -54,7 +54,8 @@ ACCEPTABLE_EVIDENCE_STRENGTHS = {
     "decide_or_classify": {"analysis_report"},
 }
 SOURCE_REQUIREMENT_REVIEW_CHECK = "source-requirement-preservation"
-MEASUREMENT_VARIABLE_RE = re.compile(r"(?<![A-Za-z0-9_])(?:E|S|A|M|Q|K|Se|Nout|Cckpt)(?![A-Za-z0-9_])")
+MEASUREMENT_ACTION_RE = re.compile(r"\b(?:measure|measuring|measured)\b", re.IGNORECASE)
+MEASUREMENT_CURVE_LANGUAGE_RE = re.compile(r"\b(?:curve|curves|growth)\b", re.IGNORECASE)
 API_V2_FAMILY_RE = re.compile(r"(?<![A-Za-z])(?:download|extract|preview)(?![A-Za-z])", re.IGNORECASE)
 REQUIRED_REVIEW_CHECKS = {
     "required-answer-path",
@@ -504,12 +505,11 @@ def source_requirement_requirement_text(source_requirement: dict[str, Any]) -> s
 
 
 def source_text_is_measurement_curve_request(source_text: str) -> bool:
-    normalized = source_text.lower()
-    asks_to_measure = "measure" in normalized or "测" in source_text
-    mentions_curve_or_growth_scale_variable = (
-        "curve" in normalized or "曲线" in source_text or bool(MEASUREMENT_VARIABLE_RE.search(source_text))
+    english_measurement_curve = bool(MEASUREMENT_ACTION_RE.search(source_text)) and bool(
+        MEASUREMENT_CURVE_LANGUAGE_RE.search(source_text)
     )
-    return asks_to_measure and mentions_curve_or_growth_scale_variable
+    chinese_measurement_curve = "测" in source_text and ("曲线" in source_text or "增长" in source_text)
+    return english_measurement_curve or chinese_measurement_curve
 
 
 def source_text_is_api_v2_family_implementation(source_text: str) -> bool:

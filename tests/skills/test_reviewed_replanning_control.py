@@ -946,19 +946,22 @@ class ReviewedReplanningControlTest(unittest.TestCase):
             write_lean_run(run_dir)
             req = json.loads((run_dir / "requirements.control.json").read_text(encoding="utf-8"))
             sr = req["approved_control"]["source_requirements"][0]
-            sr["source"] = {"kind": "user_message", "quote": "implement a framework for measurement planning"}
-            sr["required_action"] = "define a framework for measurement planning"
+            sr["source"] = {
+                "kind": "user_message",
+                "quote": "implement a framework for measurement planning for E and S",
+            }
+            sr["required_action"] = "define a framework for measurement planning for E and S"
             sr["requirement_type"] = "define_framework_or_plan"
             sr["required_evidence_strength"] = "framework_document"
-            sr["target_objects"] = ["measurement planning framework"]
-            sr["completion_checks"] = ["framework document covers measurement planning"]
+            sr["target_objects"] = ["E", "S"]
+            sr["completion_checks"] = ["framework document covers measurement planning for E and S"]
             outcome = req["approved_control"]["required_outcomes"][0]
-            outcome["completion_claim"] = "Defines the measurement planning framework."
-            outcome["completed_target_objects"] = ["measurement planning framework"]
+            outcome["completion_claim"] = "Defines the measurement planning framework for E and S."
+            outcome["completed_target_objects"] = ["E", "S"]
             evidence = outcome["required_evidence"][0]
             evidence["evidence_strength"] = "framework_document"
-            evidence["evidence_claim"] = "The framework document covers measurement planning."
-            evidence["completed_target_objects"] = ["measurement planning framework"]
+            evidence["evidence_claim"] = "The framework document covers measurement planning for E and S."
+            evidence["completed_target_objects"] = ["E", "S"]
             run = json.loads((run_dir / "run.control.json").read_text(encoding="utf-8"))
             runtime = json.loads((run_dir / "gen-000/runtime.control.json").read_text(encoding="utf-8"))
             review = json.loads((run_dir / "gen-000/review.control.json").read_text(encoding="utf-8"))
