@@ -592,6 +592,33 @@ class ReviewedReplanningControlTest(unittest.TestCase):
                     result.stdout + result.stderr,
                 )
 
+    def test_guard_and_runtime_validator_reject_source_requirement_evidence_below_required_strength(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            run_dir = Path(tmpdir)
+            write_lean_run(run_dir)
+            req = json.loads((run_dir / "requirements.control.json").read_text(encoding="utf-8"))
+            evidence = req["approved_control"]["required_outcomes"][0]["required_evidence"][0]
+            evidence["evidence_strength"] = "behavior_exists"
+            run = json.loads((run_dir / "run.control.json").read_text(encoding="utf-8"))
+            runtime = json.loads((run_dir / "gen-000/runtime.control.json").read_text(encoding="utf-8"))
+            review = json.loads((run_dir / "gen-000/review.control.json").read_text(encoding="utf-8"))
+            refresh_semantic_base(req)
+            apply_hashes(req, run, runtime, "gen-000/runtime.control.json", review, "gen-000/review.control.json")
+            (run_dir / "requirements.control.json").write_text(json.dumps(req, indent=2), encoding="utf-8")
+            (run_dir / "run.control.json").write_text(json.dumps(run, indent=2), encoding="utf-8")
+            (run_dir / "gen-000/runtime.control.json").write_text(json.dumps(runtime, indent=2), encoding="utf-8")
+
+            guard = run_script(CONTROL_GUARD, "--run-dir", str(run_dir))
+            validate = run_script(VALIDATE, str(run_dir))
+
+            for result in (guard, validate):
+                self.assertNotEqual(result.returncode, 0, result.stdout + result.stderr)
+                self.assertIn(
+                    "evidence strength behavior_exists does not meet required evidence strength "
+                    "test_result for source requirement SR-lean-startup",
+                    result.stdout + result.stderr,
+                )
+
     def test_guard_and_runtime_validator_reject_amendment_review_missing_source_requirement_preservation(self):
         generations = [
             {

@@ -556,6 +556,12 @@ def validate_source_requirement_coverage(
                         errors.append(
                             f"evidence strength {evidence_strength} is too weak for source requirement {source_id}"
                         )
+                    required_strength = source.get("required_evidence_strength")
+                    if evidence_strength != required_strength:
+                        errors.append(
+                            f"evidence strength {evidence_strength} does not meet required evidence strength "
+                            f"{required_strength} for source requirement {source_id}"
+                        )
                     source_targets = set(string_list(source.get("target_objects")))
                     completed_targets = set(string_list(evidence.get("completed_target_objects")))
                     if source_targets and not source_targets.issubset(completed_targets):
