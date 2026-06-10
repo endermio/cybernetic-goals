@@ -1,4 +1,4 @@
-# Source Obligation Preservation Design
+# Original Request Preservation Design
 
 ## Purpose
 
@@ -10,11 +10,11 @@ The recent failure mode was:
 - requirements translated that into defining scan rules and a framework document;
 - review, runtime, and verifier then correctly completed the weaker internal target.
 
-This design adds a source-level obligation layer before `required_outcomes`. The goal is not keyword linting. The goal is a truth-making check: each downstream outcome and evidence item must explain how it makes the original user obligation true.
+This design adds an original-request layer before `required_outcomes`. The goal is not keyword linting. The goal is a completion check: each downstream outcome and evidence item must explain which part of the user's original request it completes and what proof shows that part is complete.
 
 ## Scope
 
-This implementation covers source obligation preservation across:
+This implementation covers original-request preservation across:
 
 - `analyzing-cybernetic-requirements`;
 - `requirements.control.json` examples and validation;
@@ -27,51 +27,51 @@ This implementation does not cover global skill installation or `.agents` deploy
 
 ## Core Model
 
-Add `approved_control.source_obligations` to `requirements.control.json`.
+Add `approved_control.source_requirements` to `requirements.control.json`.
 
-Each source obligation records an approved user-level obligation:
+Each source requirement records one must-do item from the approved user request:
 
 ```json
 {
-  "id": "SO-measure-scale-curves",
+  "id": "SR-measure-scale-curves",
   "source": {
     "kind": "user_message",
     "quote": "测 E、S、A、M、Q、K、Se、Nout、Cckpt 增长时的曲线"
   },
   "required_action": "measure scale curves for the named variables",
-  "obligation_type": "produce_empirical_measurement",
+  "requirement_type": "produce_empirical_measurement",
   "required_evidence_strength": "measured_curve_data",
   "blocks_goal_achieved_if_missing": true
 }
 ```
 
-`required_outcomes[*]` must link to source obligations:
+`required_outcomes[*]` must link to source requirements:
 
 ```json
 {
   "id": "O-measured-scale-curves",
   "statement": "Produce measured scale curves for E, S, A, M, Q, K, Se, Nout, and Cckpt.",
-  "source_obligations": ["SO-measure-scale-curves"],
-  "makes_true": "The named variables have actual measured curve data, not just scan definitions.",
+  "source_requirements": ["SR-measure-scale-curves"],
+  "completion_claim": "Completes the request by producing actual measured curve data for the named variables, not just scan definitions.",
   "blocks_goal_achieved_if_missing": true
 }
 ```
 
-`required_evidence[*]` must also describe the source obligation it proves:
+`required_evidence[*]` must also describe the source requirement it proves:
 
 ```json
 {
   "evidence_id": "E-measured-scale-curves-json",
   "kind": "json_file",
   "evidence_strength": "measured_curve_data",
-  "satisfies_source_obligations": ["SO-measure-scale-curves"],
-  "proves_true": "The file contains measured curves for the named variables with recorded runs and metrics."
+  "satisfies_source_requirements": ["SR-measure-scale-curves"],
+  "evidence_claim": "The file contains measured curves for the named variables with recorded runs and metrics."
 }
 ```
 
 ## No Downgrade Rule
 
-The pipeline must not accept weaker translations of source obligations.
+The pipeline must not accept weaker translations of source requirements.
 
 Allowed:
 
@@ -86,7 +86,7 @@ Not allowed:
 - root-cause diagnosis becoming a list of possible causes;
 - current-run required work becoming future work.
 
-This is not a keyword rule. Words such as "define", "plan", "rule", or "readiness" are not automatically invalid. They are invalid only when they are used as substitutes for an obligation that requires actual measurement, implementation, decision, repair, or diagnosis.
+This is not a keyword rule. Words such as "define", "plan", "rule", or "readiness" are not automatically invalid. They are invalid only when they are used as substitutes for a source requirement that asks for actual measurement, implementation, decision, repair, or diagnosis.
 
 If a weaker target is desired, it must be a new user-approved requirements object. The current run must not auto-generate a scope-reduction path.
 
@@ -104,7 +104,7 @@ Use a small evidence-strength vocabulary for structural checks:
 - `code_change`
 - `test_result`
 
-Use a small obligation-type vocabulary:
+Use a small requirement-type vocabulary:
 
 - `implement_behavior`
 - `produce_empirical_measurement`
@@ -119,31 +119,31 @@ The guard enforces obvious structural mismatches, for example:
 
 - `framework_document` alone cannot satisfy `produce_empirical_measurement`;
 - `review_report` cannot satisfy `implement_behavior`;
-- `analysis_report` alone cannot satisfy `benchmark_result` when the source obligation requires new benchmark evidence.
+- `analysis_report` alone cannot satisfy `benchmark_result` when the source requirement requires new benchmark evidence.
 
-Semantic equivalence is not decided by this vocabulary alone. Review must still check the truth-making explanation.
+Semantic equivalence is not decided by this vocabulary alone. Review must still check the plain-language completion explanation.
 
 ## Review Requirements
 
 Add a required review check:
 
 ```text
-source-obligation-preservation
+source-requirement-preservation
 ```
 
 The review must compare:
 
 ```text
-source_obligations -> required_outcomes -> required_evidence -> runtime.required_steps -> verifier
+source_requirements -> required_outcomes -> required_evidence -> runtime.required_steps -> verifier
 ```
 
-For each blocking source obligation, review must answer:
+For each blocking source requirement, review must answer:
 
-- What state must become true?
-- Which required outcome makes that state true?
-- Which evidence proves it true?
+- What did the user ask to be done?
+- Which required outcome completes that request?
+- Which evidence proves that request was completed?
 - Is any downstream artifact only preparing, explaining, defining, or scheduling the work instead of making it true?
-- Is the coverage equal or stronger than the original obligation?
+- Is the coverage equal or stronger than the original request?
 
 If the answer is not defensible, the review returns `needs_revision` to requirements or the earliest downstream artifact that introduced the weakening.
 
@@ -151,26 +151,26 @@ If the answer is not defensible, the review returns `needs_revision` to requirem
 
 `control_chain_guard.py` and `control_json_runtime.py` must validate:
 
-- `approved_control.source_obligations` is present for official Level 3/4 runs;
-- each blocking source obligation has a unique id and required fields;
-- every blocking source obligation is covered by at least one blocking `required_outcome`;
-- every blocking `required_outcome` links to known source obligations;
-- required evidence that claims a source obligation uses an allowed `evidence_strength`;
-- runtime required steps preserve source obligation coverage through their satisfied outcomes;
-- verifier required outcomes cover all blocking outcomes that carry blocking source obligations.
+- `approved_control.source_requirements` is present for official Level 3/4 runs;
+- each blocking source requirement has a unique id and required fields;
+- every blocking source requirement is covered by at least one blocking `required_outcome`;
+- every blocking `required_outcome` links to known source requirements;
+- required evidence that claims a source requirement uses an allowed `evidence_strength`;
+- runtime required steps preserve source requirement coverage through their satisfied outcomes;
+- verifier required outcomes cover all blocking outcomes that carry blocking source requirements.
 
-These checks are structural. They prevent missing links and obviously weaker evidence, but they do not replace review's semantic truth-making judgment.
+These checks are structural. They prevent missing links and obviously weaker evidence, but they do not replace review's plain-language judgment about whether the original request is actually completed.
 
 ## Verifier Behavior
 
 `verify_runtime_progress.py` must reject final completion when:
 
-- a blocking source obligation has no completed evidence;
-- completed evidence only satisfies a required outcome but not the linked source obligation;
-- evidence strength is weaker than the source obligation's required strength;
-- an unresolved amendment says current strategy cannot make a source obligation true.
+- a blocking source requirement has no completed evidence;
+- completed evidence only satisfies a required outcome but not the linked source requirement;
+- evidence strength is weaker than the source requirement's required strength;
+- an unresolved amendment says current strategy cannot complete a source requirement.
 
-The final report should include completed and missing source obligations alongside completed required outcomes.
+The final report should include completed and missing source requirements alongside completed required outcomes.
 
 ## Runtime Amendment Interaction
 
@@ -188,7 +188,7 @@ This must become:
 control.amendment.proposed
 ```
 
-The amendment may revise design, plan, runtime steps, instrumentation, or verifier configuration if source obligations, required outcomes, authority, and semantic base remain unchanged. It may not change the source obligation into a weaker target.
+The amendment may revise design, plan, runtime steps, instrumentation, or verifier configuration if source requirements, required outcomes, authority, and semantic base remain unchanged. It may not change the source requirement into a weaker target.
 
 ## Regression Coverage
 
@@ -202,11 +202,11 @@ Add fixtures/evals for:
 
 ## Acceptance Criteria
 
-- New requirements examples include source obligations and source-linked outcomes/evidence.
-- Review examples include `source-obligation-preservation`.
-- Guard rejects missing source obligation coverage.
+- New requirements examples include source requirements and source-linked outcomes/evidence.
+- Review examples include `source-requirement-preservation`.
+- Guard rejects missing source requirement coverage.
 - Guard rejects weaker evidence-strength substitutions.
-- Verifier rejects final completion when source obligations are not completed.
+- Verifier rejects final completion when source requirements are not completed.
 - Historical regression fixtures reproduce the two known failures and fail before the fix, pass after the fix.
 - No keyword-only lint is introduced.
-- Existing pure documentation tasks still pass when their source obligations are documentation or framework-definition obligations.
+- Existing pure documentation tasks still pass when their source requirements are documentation or framework-definition requirements.
