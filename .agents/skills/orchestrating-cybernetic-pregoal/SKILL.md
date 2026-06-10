@@ -312,6 +312,34 @@ python3 .agents/skills/using-control-json/scripts/validate_control_chain.py docs
 The second command must return `ok: true`. If either command fails, stay in
 pre-goal revision/repair. Do not output the runtime `/goal`.
 
+## Runtime Amendment Orchestration
+
+When a running generation writes `control.amendment.proposed`, the orchestrator
+must not treat the event as completion evidence. It must either apply the
+reviewed amendment or stop for human approval.
+
+Use:
+
+```bash
+python3 .agents/skills/orchestrating-cybernetic-pregoal/scripts/amendment_orchestrator.py --run-dir docs/cybernetics/runs/<slug>
+```
+
+The amendment orchestrator:
+
+1. validates the current JSON control chain;
+2. reads unresolved amendment proposals for `run.control.json.current_generation`;
+3. stops with `HumanApprovalRequired` if the proposal changes semantic base,
+   required outcomes, or authority;
+4. refuses to exceed `max_auto_amendment_rounds`;
+5. creates a reviewed `gen-N+1` amendment generation for anchor-preserving
+   proposals;
+6. updates `run.control.json.current_generation`;
+7. compiles the new generation runtime;
+8. appends `control.amendment.approved`.
+
+Generation selection comes only from `run.control.json.current_generation`.
+Do not pass a separate generation override that can diverge from the manifest.
+
 ## Workflow
 
 Read `references/orchestration-protocol.md` for the control-layer map, then use

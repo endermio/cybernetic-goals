@@ -56,11 +56,22 @@ EVENT_TYPES = {
 EVENT_STATUSES = {"pass", "fail", "blocked", "partial"}
 PROGRESS_ROLES = {"mainline", "supporting_only"}
 REQUIRED_EVIDENCE_KINDS = {"progress_event", "file_exists", "json_file", "command_result"}
+STEP_EVENT_TYPES = {"step.started", "step.completed", "step.blocked", "step.failed"}
+AMENDMENT_EVENT_TYPES = {
+    "control.amendment.proposed",
+    "control.amendment.approved",
+    "control.amendment.rejected",
+    "control.amendment.blocked",
+}
+GENERATION_EVENT_TYPES = {"runtime.generation.started", "runtime.generation.superseded"}
 AMENDMENT_ANCHOR_FIELDS = ("semantic_base_change", "required_outcomes_changed", "authority_expanded")
 AMENDMENT_PROPOSAL_REQUIRED_FIELDS = (
+    "reason",
     "triggering_observation",
     "affected_stages",
     *AMENDMENT_ANCHOR_FIELDS,
+    "proposed_changes",
+    "review_required",
 )
 
 
@@ -418,37 +429,43 @@ def validate_event(event: dict[str, Any]) -> list[str]:
         "event_type",
         "schema_version",
         "occurred_at",
-        "work_package_id",
-        "required_step",
-        "status",
-        "evidence",
+        "runtime_generation",
     ):
         if field not in event:
-            errors.append(f"event missing required field: {field}")
+            if field == "runtime_generation":
+                errors.append("all progress events must include runtime_generation")
+            else:
+                errors.append(f"event missing required field: {field}")
 
     if event.get("event_type") not in EVENT_TYPES:
         errors.append("event_type is not recognized")
     event_type = event.get("event_type")
-    if event.get("status") not in EVENT_STATUSES:
-        errors.append("status is not recognized")
-    if not isinstance(event.get("required_step"), str) or not event.get("required_step"):
-        errors.append("required_step must be a non-empty string")
-    evidence = event.get("evidence")
-    if not isinstance(evidence, list) or not evidence or not all(isinstance(item, str) and item for item in evidence):
-        errors.append("evidence must be a non-empty list")
+    if "runtime_generation" in event and (
+        not isinstance(event.get("runtime_generation"), str) or not event.get("runtime_generation")
+    ):
+        errors.append("runtime_generation must be a non-empty string")
 
-    role = event.get("progress_role", "mainline")
-    if role not in PROGRESS_ROLES:
-        errors.append("progress_role is not recognized")
-    counts = event.get("counts_as_goal_progress", role == "mainline")
-    if not isinstance(counts, bool):
-        errors.append("counts_as_goal_progress must be boolean when present")
-    if role == "supporting_only" and counts:
-        errors.append("supporting-only progress cannot count as goal progress")
-    if isinstance(event_type, str) and (event_type.startswith("control.amendment.") or event_type.startswith("runtime.generation.")):
-        if not isinstance(event.get("runtime_generation"), str) or not event.get("runtime_generation"):
-            errors.append("generation and amendment events must include runtime_generation")
-    if isinstance(event_type, str) and event_type.startswith("control.amendment."):
+    if event_type in STEP_EVENT_TYPES:
+        for field in ("work_package_id", "required_step", "status", "evidence"):
+            if field not in event:
+                errors.append(f"event missing required field: {field}")
+        if event.get("status") not in EVENT_STATUSES:
+            errors.append("status is not recognized")
+        if not isinstance(event.get("required_step"), str) or not event.get("required_step"):
+            errors.append("required_step must be a non-empty string")
+        evidence = event.get("evidence")
+        if not isinstance(evidence, list) or not evidence or not all(isinstance(item, str) and item for item in evidence):
+            errors.append("evidence must be a non-empty list")
+
+        role = event.get("progress_role", "mainline")
+        if role not in PROGRESS_ROLES:
+            errors.append("progress_role is not recognized")
+        counts = event.get("counts_as_goal_progress", role == "mainline")
+        if not isinstance(counts, bool):
+            errors.append("counts_as_goal_progress must be boolean when present")
+        if role == "supporting_only" and counts:
+            errors.append("supporting-only progress cannot count as goal progress")
+    elif event_type in AMENDMENT_EVENT_TYPES:
         if not isinstance(event.get("amendment_id"), str) or not event.get("amendment_id"):
             errors.append("amendment events must include amendment_id")
         for field in AMENDMENT_ANCHOR_FIELDS:
@@ -462,12 +479,28 @@ def validate_event(event: dict[str, Any]) -> list[str]:
                 not isinstance(event.get("triggering_observation"), str) or not event.get("triggering_observation")
             ):
                 errors.append("control.amendment.proposed triggering_observation must be a non-empty string")
+            if "reason" in event and (
+                not isinstance(event.get("reason"), str) or not event.get("reason")
+            ):
+                errors.append("control.amendment.proposed reason must be a non-empty string")
             if "affected_stages" in event and (
                 not isinstance(event.get("affected_stages"), list)
                 or not event.get("affected_stages")
                 or not all(isinstance(stage, str) and stage for stage in event.get("affected_stages", []))
             ):
                 errors.append("control.amendment.proposed affected_stages must be a non-empty list")
+            for field in ("proposed_changes", "review_required"):
+                if field in event and (
+                    not isinstance(event.get(field), list)
+                    or not event.get(field)
+                    or not all(isinstance(item, str) and item for item in event.get(field, []))
+                ):
+                    errors.append(f"control.amendment.proposed {field} must be a non-empty list")
+    elif event_type in GENERATION_EVENT_TYPES:
+        if event_type == "runtime.generation.superseded" and (
+            not isinstance(event.get("reason"), str) or not event.get("reason")
+        ):
+            errors.append("runtime.generation.superseded events must include reason")
     return errors
 
 

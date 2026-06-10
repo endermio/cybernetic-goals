@@ -8,10 +8,7 @@
     "event_type",
     "schema_version",
     "occurred_at",
-    "work_package_id",
-    "required_step",
-    "status",
-    "evidence"
+    "runtime_generation"
   ],
   "properties": {
     "event_type": {
@@ -98,6 +95,34 @@
     "authority_expanded": {
       "type": "boolean"
     },
+    "proposed_changes": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "review_required": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "parent_generation": {
+      "type": "string",
+      "minLength": 1
+    },
+    "next_generation": {
+      "type": "string",
+      "minLength": 1
+    },
+    "reason": {
+      "type": "string",
+      "minLength": 1
+    },
     "evidence": {
       "type": "array",
       "minItems": 1,
@@ -112,6 +137,28 @@
       "if": {
         "properties": {
           "event_type": {
+            "enum": [
+              "step.started",
+              "step.completed",
+              "step.blocked",
+              "step.failed"
+            ]
+          }
+        }
+      },
+      "then": {
+        "required": [
+          "work_package_id",
+          "required_step",
+          "status",
+          "evidence"
+        ]
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "event_type": {
             "const": "control.amendment.proposed"
           }
         }
@@ -120,11 +167,28 @@
         "required": [
           "runtime_generation",
           "amendment_id",
+          "reason",
           "triggering_observation",
           "affected_stages",
           "semantic_base_change",
           "required_outcomes_changed",
-          "authority_expanded"
+          "authority_expanded",
+          "proposed_changes",
+          "review_required"
+        ]
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "event_type": {
+            "const": "runtime.generation.superseded"
+          }
+        }
+      },
+      "then": {
+        "required": [
+          "reason"
         ]
       }
     }

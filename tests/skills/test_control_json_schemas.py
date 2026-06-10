@@ -304,6 +304,7 @@ SCHEMA_FIXTURES = {
         "event_type": "step.completed",
         "schema_version": "1.0.0",
         "occurred_at": "2026-06-09T00:00:00Z",
+        "runtime_generation": "gen-000",
         "work_package_id": "WP1",
         "required_step": "S2",
         "status": "pass",
@@ -642,7 +643,14 @@ class ControlJsonSchemaTest(unittest.TestCase):
         event_types = progress_schema["properties"]["event_type"]["enum"]
         self.assertIn("control.amendment.proposed", event_types)
         self.assertIn("runtime.generation.started", event_types)
+        self.assertIn("runtime_generation", progress_schema["required"])
+        self.assertNotIn("work_package_id", progress_schema["required"])
+        self.assertNotIn("required_step", progress_schema["required"])
+        self.assertNotIn("status", progress_schema["required"])
         self.assertIn("runtime_generation", progress_schema["properties"])
+        self.assertIn("proposed_changes", progress_schema["properties"])
+        self.assertIn("next_generation", progress_schema["properties"])
+        self.assertIn("allOf", progress_schema)
 
         self.assertIn("runtime_generation", final_report_schema["properties"])
         self.assertIn("unresolved_amendments", final_report_schema["properties"])

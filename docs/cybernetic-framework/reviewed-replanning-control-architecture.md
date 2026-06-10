@@ -439,13 +439,15 @@ Review must answer:
 Make runtime compilation generation-aware:
 
 ```bash
-compile_runtime_goal.py --run-dir docs/cybernetics/runs/<slug> --generation gen-001
+compile_runtime_goal.py --run-dir docs/cybernetics/runs/<slug>
 ```
 
-The compiler may output a short `/goal` pointer to either:
+The compiler selects the active generation only from
+`run.control.json.current_generation`. Do not use a command-line generation
+override; the run manifest is the control fact.
 
-- `run.control.json` and its `current_generation`; or
-- `gen-001/runtime.control.json`.
+The compiler may output a short `/goal` pointer to the current generation
+runtime named by `run.control.json`.
 
 The compiler must not assume that a run root contains exactly one control
 chain.
@@ -460,7 +462,6 @@ emitting the initial pointer, unless the selected mode is full.
 
 ```text
 --run-dir <run-root>
---generation gen-001
 ```
 
 Guard checks:
@@ -485,8 +486,11 @@ Guard checks:
 `verify_runtime_progress.py` must be generation-aware:
 
 ```bash
-verify_runtime_progress.py <run-root> --generation gen-001
+verify_runtime_progress.py <run-root>
 ```
+
+The verifier also selects the active generation only from
+`run.control.json.current_generation`.
 
 Rules:
 

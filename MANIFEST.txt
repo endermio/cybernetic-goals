@@ -39,6 +39,7 @@
 .agents/skills/orchestrating-cybernetic-pregoal/references/orchestration-protocol.md
 .agents/skills/orchestrating-cybernetic-pregoal/references/output-and-final-checks.md
 .agents/skills/orchestrating-cybernetic-pregoal/references/subagent-review-roles.md
+.agents/skills/orchestrating-cybernetic-pregoal/scripts/amendment_orchestrator.py
 .agents/skills/orchestrating-cybernetic-pregoal/scripts/check_pregoal_inputs.py
 .agents/skills/orchestrating-cybernetic-pregoal/scripts/orchestration_guard.py
 .agents/skills/recording-cybernetic-run-outcomes/SKILL.md

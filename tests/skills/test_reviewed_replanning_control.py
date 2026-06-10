@@ -12,6 +12,7 @@ CONTROL_GUARD = ROOT / ".agents/skills/compiling-cybernetic-runtime-goals/script
 COMPILER = ROOT / ".agents/skills/compiling-cybernetic-runtime-goals/scripts/compile_runtime_goal.py"
 VALIDATE = ROOT / ".agents/skills/using-control-json/scripts/validate_control_chain.py"
 VERIFY = ROOT / ".agents/skills/using-control-json/scripts/verify_runtime_progress.py"
+AMENDMENT_ORCHESTRATOR = ROOT / ".agents/skills/orchestrating-cybernetic-pregoal/scripts/amendment_orchestrator.py"
 
 
 def canonical_json_hash(value: dict, omit_top_level: set[str] | None = None) -> str:
@@ -192,11 +193,14 @@ def progress_event(
     }
     if amendment_id:
         event["amendment_id"] = amendment_id
+        event["reason"] = "current strategy cannot produce required evidence"
         event["triggering_observation"] = "current strategy produced substitute evidence"
         event["affected_stages"] = ["plan", "runtime"]
         event["semantic_base_change"] = False
         event["required_outcomes_changed"] = False
         event["authority_expanded"] = False
+        event["proposed_changes"] = ["replace substitute evidence with producing strategy"]
+        event["review_required"] = ["intent-preservation", "required-outcome-coverage"]
     return event
 
 
@@ -283,6 +287,140 @@ class ReviewedReplanningControlTest(unittest.TestCase):
             self.assertFalse((run_dir / "design.control.json").exists())
             self.assertIn("PASS", guard.stdout)
             self.assertTrue(json.loads(validate.stdout)["ok"])
+
+    def test_runtime_validator_requires_runtime_generation_for_step_events(self):
+        event = progress_event("evidence.lean-startup")
+        del event["runtime_generation"]
+        events = [event]
+        report = final_report("gen-000", "evidence.lean-startup")
+        with tempfile.TemporaryDirectory() as tmpdir:
+            run_dir = Path(tmpdir)
+            write_lean_run(run_dir, progress_events=events, report=report)
+
+            result = run_script(VERIFY, str(run_dir))
+
+            self.assertNotEqual(result.returncode, 0, result.stdout + result.stderr)
+            self.assertIn("all progress events must include runtime_generation", result.stdout + result.stderr)
+
+    def test_amendment_proposal_event_does_not_require_step_event_fields(self):
+        event = {
+            "event_type": "control.amendment.proposed",
+            "schema_version": "1.0.0",
+            "occurred_at": "2026-06-10T00:00:00Z",
+            "runtime_generation": "gen-000",
+            "amendment_id": "A1",
+            "reason": "current strategy cannot produce required evidence",
+            "triggering_observation": "current strategy produced substitute evidence",
+            "affected_stages": ["plan", "runtime"],
+            "semantic_base_change": False,
+            "required_outcomes_changed": False,
+            "authority_expanded": False,
+            "proposed_changes": ["replace substitute evidence with producing strategy"],
+            "review_required": ["intent-preservation", "required-outcome-coverage"],
+        }
+        report = final_report("gen-000", "evidence.lean-startup")
+        with tempfile.TemporaryDirectory() as tmpdir:
+            run_dir = Path(tmpdir)
+            write_lean_run(run_dir, progress_events=[event], report=report)
+
+            result = run_script(VERIFY, str(run_dir))
+            payload = json.loads(result.stdout)
+            combined = "\n".join(payload["errors"])
+
+            self.assertNotEqual(result.returncode, 0, result.stdout + result.stderr)
+            self.assertNotIn("event missing required field: work_package_id", combined)
+            self.assertNotIn("event missing required field: required_step", combined)
+            self.assertNotIn("event missing required field: status", combined)
+            self.assertNotIn("event missing required field: evidence", combined)
+            self.assertIn("A1", payload["unresolved_amendments"])
+
+    def test_generation_event_does_not_require_step_event_fields(self):
+        generation_event = {
+            "event_type": "runtime.generation.started",
+            "schema_version": "1.0.0",
+            "occurred_at": "2026-06-10T00:00:00Z",
+            "runtime_generation": "gen-000",
+            "reason": "initial generation started",
+        }
+        events = [generation_event, progress_event("evidence.lean-startup")]
+        report = final_report("gen-000", "evidence.lean-startup")
+        with tempfile.TemporaryDirectory() as tmpdir:
+            run_dir = Path(tmpdir)
+            write_lean_run(run_dir, progress_events=events, report=report)
+
+            result = run_script(VERIFY, str(run_dir))
+
+            self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+            self.assertTrue(json.loads(result.stdout)["goal_achieved_permitted"])
+
+    def test_amendment_orchestrator_creates_reviewed_next_generation_for_anchor_preserving_proposal(self):
+        event = {
+            "event_type": "control.amendment.proposed",
+            "schema_version": "1.0.0",
+            "occurred_at": "2026-06-10T00:00:00Z",
+            "runtime_generation": "gen-000",
+            "amendment_id": "A1",
+            "reason": "current strategy cannot produce required evidence",
+            "triggering_observation": "current strategy cannot produce required evidence",
+            "affected_stages": ["plan", "runtime"],
+            "semantic_base_change": False,
+            "required_outcomes_changed": False,
+            "authority_expanded": False,
+            "proposed_changes": ["create reviewed amendment generation"],
+            "review_required": ["intent-preservation", "required-outcome-coverage"],
+        }
+        with tempfile.TemporaryDirectory() as tmpdir:
+            run_dir = Path(tmpdir)
+            write_lean_run(run_dir, progress_events=[event])
+
+            result = run_script(AMENDMENT_ORCHESTRATOR, "--run-dir", str(run_dir))
+
+            self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+            payload = json.loads(result.stdout)
+            self.assertEqual("gen-001", payload["new_generation"])
+            run = json.loads((run_dir / "run.control.json").read_text(encoding="utf-8"))
+            self.assertEqual("gen-001", run["current_generation"])
+            generations = {generation["id"]: generation for generation in run["generations"]}
+            self.assertEqual("superseded", generations["gen-000"]["status"])
+            self.assertEqual("active", generations["gen-001"]["status"])
+            self.assertEqual("amendment", generations["gen-001"]["strategy_kind"])
+            self.assertEqual("gen-000", generations["gen-001"]["parent"])
+            self.assertTrue((run_dir / "gen-001/review.control.json").exists())
+            self.assertTrue((run_dir / "gen-001/runtime.control.json").exists())
+            self.assertEqual(0, run_script(CONTROL_GUARD, "--run-dir", str(run_dir)).returncode)
+            progress = [
+                json.loads(line)
+                for line in (run_dir / "progress.jsonl").read_text(encoding="utf-8").splitlines()
+                if line.strip()
+            ]
+            self.assertTrue(any(event.get("event_type") == "control.amendment.approved" for event in progress))
+
+    def test_amendment_orchestrator_blocks_anchor_changing_proposal(self):
+        event = {
+            "event_type": "control.amendment.proposed",
+            "schema_version": "1.0.0",
+            "occurred_at": "2026-06-10T00:00:00Z",
+            "runtime_generation": "gen-000",
+            "amendment_id": "A-anchor",
+            "reason": "current strategy would require changing approved anchors",
+            "triggering_observation": "required outcome must change",
+            "affected_stages": ["plan", "runtime"],
+            "semantic_base_change": True,
+            "required_outcomes_changed": False,
+            "authority_expanded": False,
+            "proposed_changes": ["change approved meaning"],
+            "review_required": ["intent-preservation"],
+        }
+        with tempfile.TemporaryDirectory() as tmpdir:
+            run_dir = Path(tmpdir)
+            write_lean_run(run_dir, progress_events=[event])
+
+            result = run_script(AMENDMENT_ORCHESTRATOR, "--run-dir", str(run_dir))
+
+            self.assertNotEqual(result.returncode, 0, result.stdout + result.stderr)
+            payload = json.loads(result.stdout)
+            self.assertEqual("HumanApprovalRequired", payload["next_allowed_action"])
+            self.assertFalse((run_dir / "gen-001/runtime.control.json").exists())
 
     def test_runtime_validator_rejects_incomplete_amendment_proposal_event(self):
         event = progress_event(

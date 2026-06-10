@@ -72,18 +72,32 @@ evidence artifacts. Do not add evidence artifact paths to `writable_files`;
 
 `progress.jsonl` is the append-only event log. Append to `progress.jsonl` as one JSON object per line. Each event should be a small observation about a command, evidence item, required-step state, blocker, deviation, amendment proposal, generation switch, or verifier result. Progress observations are additive; do not mutate approved JSON to make the contract match the run.
 
-Generation-aware progress events include `runtime_generation`. Amendment events
-use `control.amendment.proposed`, `control.amendment.approved`,
-`control.amendment.rejected`, or `control.amendment.blocked` and must include
-an `amendment_id`.
+Every progress event includes `runtime_generation`. Event families are validated
+separately:
+
+- step events require `work_package_id`, `required_step`, `status`, and
+  `evidence`;
+- amendment events require `amendment_id` and amendment-specific fields;
+- generation events require generation-specific fields such as `reason` when a
+  generation is superseded.
+
+Do not add fake `work_package_id`, `required_step`, `status`, or `evidence`
+fields just to make amendment or generation events look like step events.
+
+Amendment events use `control.amendment.proposed`,
+`control.amendment.approved`, `control.amendment.rejected`, or
+`control.amendment.blocked`.
 
 `control.amendment.proposed` must also include:
 
+- `reason`
 - `triggering_observation`
 - `affected_stages`
 - `semantic_base_change`
 - `required_outcomes_changed`
 - `authority_expanded`
+- `proposed_changes`
+- `review_required`
 
 If any of `semantic_base_change`, `required_outcomes_changed`, or
 `authority_expanded` is true, that amendment is a request for human decision,

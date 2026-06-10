@@ -232,6 +232,7 @@ class RuntimeJsonProgressVerifierTest(unittest.TestCase):
             "event_type": "step.completed",
             "schema_version": "1.0.0",
             "occurred_at": "2026-06-09T00:02:00Z",
+            "runtime_generation": "legacy-full",
             "work_package_id": "WP5",
             "required_step": "S7",
             "status": "pass",
