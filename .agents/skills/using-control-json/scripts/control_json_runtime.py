@@ -21,11 +21,44 @@ CONTROL_FILES = {
 READONLY_FILES = tuple(CONTROL_FILES.values())
 WRITABLE_FILES = ("progress.jsonl", "runtime-status.json", "final-report.json")
 DEFAULT_WRITABLE_EVIDENCE_PATHS = ("evidence/",)
+SOURCE_REQUIREMENT_TYPES = {
+    "implement_behavior",
+    "produce_empirical_measurement",
+    "analyze_existing_evidence",
+    "define_framework_or_plan",
+    "write_documentation",
+    "verify_or_review",
+    "diagnose_root_cause",
+    "decide_or_classify",
+}
+EVIDENCE_STRENGTHS = {
+    "behavior_exists",
+    "measured_curve_data",
+    "benchmark_result",
+    "analysis_report",
+    "framework_document",
+    "review_report",
+    "command_result",
+    "code_change",
+    "test_result",
+}
+ACCEPTABLE_EVIDENCE_STRENGTHS = {
+    "implement_behavior": {"behavior_exists", "code_change", "test_result", "command_result"},
+    "produce_empirical_measurement": {"measured_curve_data", "benchmark_result"},
+    "analyze_existing_evidence": {"analysis_report"},
+    "define_framework_or_plan": {"framework_document", "analysis_report"},
+    "write_documentation": {"framework_document", "analysis_report"},
+    "verify_or_review": {"review_report", "test_result", "command_result"},
+    "diagnose_root_cause": {"analysis_report"},
+    "decide_or_classify": {"analysis_report"},
+}
+SOURCE_REQUIREMENT_REVIEW_CHECK = "source-requirement-preservation"
 REQUIRED_REVIEW_CHECKS = {
     "required-answer-path",
     "intent-preservation",
     "obligation-preservation",
     "required-outcome-coverage",
+    SOURCE_REQUIREMENT_REVIEW_CHECK,
     "producing-action-alignment",
     "work-assignment",
     "horizon-authority",
@@ -35,6 +68,7 @@ GENERATION_REVIEW_CHECKS = {
     "intent-preservation",
     "obligation-preservation",
     "required-outcome-coverage",
+    SOURCE_REQUIREMENT_REVIEW_CHECK,
     "horizon-authority",
 }
 REVIEW_HASH_FILES = (
@@ -376,6 +410,160 @@ def required_evidence_by_outcome(requirements: dict[str, Any]) -> dict[str, set[
     return evidence_by_outcome
 
 
+def source_requirement_map(requirements: dict[str, Any]) -> tuple[dict[str, dict[str, Any]], set[str], list[str]]:
+    approved = requirements.get("approved_control", {})
+    raw = approved.get("source_requirements") if isinstance(approved, dict) else None
+    schema_version = str(requirements.get("schema_version", ""))
+    if raw is None:
+        if schema_version >= "1.1.0":
+            return {}, set(), [
+                "requirements.control.json approved_control.source_requirements is required for schema_version >= 1.1.0"
+            ]
+        return {}, set(), []
+    if not isinstance(raw, list) or not raw:
+        return {}, set(), ["requirements.control.json approved_control.source_requirements must be a non-empty list"]
+    mapped: dict[str, dict[str, Any]] = {}
+    blocking: set[str] = set()
+    errors: list[str] = []
+    for index, item in enumerate(raw):
+        label = f"requirements.control.json source_requirements[{index}]"
+        if not isinstance(item, dict):
+            errors.append(f"{label} must be an object")
+            continue
+        source_id = item.get("id")
+        if not isinstance(source_id, str) or not source_id:
+            errors.append(f"{label}.id must be a non-empty string")
+            continue
+        if source_id in mapped:
+            errors.append(f"requirements.control.json duplicate source_requirements id: {source_id}")
+            continue
+        source = item.get("source")
+        if not isinstance(source, dict) or not (source.get("quote") or source.get("reference")):
+            errors.append(f"{label}.source must include quote or reference")
+        requirement_type = item.get("requirement_type")
+        if requirement_type not in SOURCE_REQUIREMENT_TYPES:
+            errors.append(f"{label}.requirement_type is not recognized")
+        strength = item.get("required_evidence_strength")
+        if strength not in EVIDENCE_STRENGTHS:
+            errors.append(f"{label}.required_evidence_strength is not recognized")
+        checks = item.get("completion_checks")
+        if not isinstance(checks, list) or not checks or not all(isinstance(check, str) and check for check in checks):
+            errors.append(f"{label}.completion_checks must be a non-empty list of strings")
+        if not isinstance(item.get("required_action"), str) or not item.get("required_action"):
+            errors.append(f"{label}.required_action must be a non-empty string")
+        if not isinstance(item.get("blocks_goal_achieved_if_missing"), bool):
+            errors.append(f"{label}.blocks_goal_achieved_if_missing must be boolean")
+        mapped[source_id] = item
+        if item.get("blocks_goal_achieved_if_missing") is True:
+            blocking.add(source_id)
+    return mapped, blocking, errors
+
+
+def required_outcome_source_map(requirements: dict[str, Any], errors: list[str]) -> dict[str, set[str]]:
+    outcomes = requirements.get("approved_control", {}).get("required_outcomes")
+    if not isinstance(outcomes, list):
+        return {}
+    mapped: dict[str, set[str]] = {}
+    for index, outcome in enumerate(outcomes):
+        if not isinstance(outcome, dict) or not isinstance(outcome.get("id"), str):
+            continue
+        raw_sources = outcome.get("source_requirements", [])
+        if not isinstance(raw_sources, list) or not all(isinstance(item, str) and item for item in raw_sources):
+            errors.append(
+                f"requirements.control.json required_outcomes[{index}].source_requirements must be a list of non-empty strings"
+            )
+            mapped[outcome["id"]] = set()
+            continue
+        if not isinstance(outcome.get("completion_claim"), str) or not outcome.get("completion_claim"):
+            errors.append(f"requirements.control.json required_outcomes[{index}].completion_claim must be a non-empty string")
+        mapped[outcome["id"]] = set(raw_sources)
+    return mapped
+
+
+def required_evidence_source_map(requirements: dict[str, Any], errors: list[str]) -> dict[str, dict[str, Any]]:
+    evidence_map: dict[str, dict[str, Any]] = {}
+    outcomes = requirements.get("approved_control", {}).get("required_outcomes")
+    if not isinstance(outcomes, list):
+        return evidence_map
+    for outcome_index, outcome in enumerate(outcomes):
+        required_evidence = outcome.get("required_evidence") if isinstance(outcome, dict) else None
+        if not isinstance(required_evidence, list):
+            continue
+        for evidence_index, evidence in enumerate(required_evidence):
+            if not isinstance(evidence, dict) or not isinstance(evidence.get("evidence_id"), str):
+                continue
+            evidence_id = evidence["evidence_id"]
+            label = f"requirements.control.json required_outcomes[{outcome_index}].required_evidence[{evidence_index}]"
+            if evidence.get("evidence_strength") not in EVIDENCE_STRENGTHS:
+                errors.append(f"{label}.evidence_strength is not recognized")
+            raw_sources = evidence.get("satisfies_source_requirements", [])
+            if not isinstance(raw_sources, list) or not all(isinstance(item, str) and item for item in raw_sources):
+                errors.append(f"{label}.satisfies_source_requirements must be a list of non-empty strings")
+            if not isinstance(evidence.get("evidence_claim"), str) or not evidence.get("evidence_claim"):
+                errors.append(f"{label}.evidence_claim must be a non-empty string")
+            evidence_map[evidence_id] = evidence
+    return evidence_map
+
+
+def validate_source_requirement_coverage(
+    requirements: dict[str, Any],
+) -> tuple[set[str], dict[str, set[str]], dict[str, dict[str, Any]], list[str]]:
+    source_map, blocking_sources, errors = source_requirement_map(requirements)
+    has_source_requirements = bool(source_map) or bool(errors)
+    if not has_source_requirements and str(requirements.get("schema_version", "")) < "1.1.0":
+        return blocking_sources, {}, {}, errors
+
+    outcome_sources = required_outcome_source_map(requirements, errors)
+    evidence_sources = required_evidence_source_map(requirements, errors)
+    known_sources = set(source_map)
+    outcome_covered_sources: set[str] = set()
+    outcomes = requirements.get("approved_control", {}).get("required_outcomes")
+    if isinstance(outcomes, list):
+        for outcome in outcomes:
+            if not isinstance(outcome, dict):
+                continue
+            outcome_id = outcome.get("id")
+            sources = outcome_sources.get(outcome_id, set()) if isinstance(outcome_id, str) else set()
+            unknown = sorted(sources - known_sources)
+            if unknown:
+                errors.append("required outcome references unknown source requirements: " + ", ".join(unknown))
+            if outcome.get("blocks_goal_achieved_if_missing") is True:
+                outcome_covered_sources.update(sources & known_sources)
+            required_evidence = outcome.get("required_evidence")
+            if not isinstance(required_evidence, list):
+                continue
+            for evidence in required_evidence:
+                if not isinstance(evidence, dict):
+                    continue
+                evidence_id = evidence.get("evidence_id")
+                evidence_strength = evidence.get("evidence_strength")
+                evidence_source_ids = set(string_list(evidence.get("satisfies_source_requirements")))
+                unknown_evidence_sources = sorted(evidence_source_ids - known_sources)
+                if unknown_evidence_sources:
+                    errors.append(
+                        "required evidence references unknown source requirements: "
+                        + ", ".join(unknown_evidence_sources)
+                    )
+                for source_id in sorted(evidence_source_ids & known_sources):
+                    source = source_map[source_id]
+                    requirement_type = source.get("requirement_type")
+                    allowed = ACCEPTABLE_EVIDENCE_STRENGTHS.get(requirement_type, set())
+                    if evidence_strength not in allowed:
+                        errors.append(
+                            f"evidence strength {evidence_strength} is too weak for source requirement {source_id}"
+                        )
+                    source_targets = set(string_list(source.get("target_objects")))
+                    completed_targets = set(string_list(evidence.get("completed_target_objects")))
+                    if source_targets and not source_targets.issubset(completed_targets):
+                        errors.append(
+                            f"evidence {evidence_id} completed_target_objects do not cover source requirement {source_id}"
+                        )
+    missing = sorted(blocking_sources - outcome_covered_sources)
+    if missing:
+        errors.append("source requirements not covered by blocking required outcomes: " + ", ".join(missing))
+    return blocking_sources, outcome_sources, evidence_sources, errors
+
+
 def blocking_required_outcomes(requirements: dict[str, Any]) -> set[str]:
     _, blocking_outcomes, _ = required_outcome_sets(requirements)
     return blocking_outcomes
@@ -653,6 +841,8 @@ def validate_generation_control_chain(run_dir: Path) -> tuple[dict[str, dict[str
 
     all_required_outcomes, required_outcomes, outcome_errors = required_outcome_sets(requirements)
     errors.extend(outcome_errors)
+    _, _, _, source_errors = validate_source_requirement_coverage(requirements)
+    errors.extend(source_errors)
     runtime_step_outcomes = step_outcome_map(
         runtime,
         known_outcomes=all_required_outcomes if all_required_outcomes else None,

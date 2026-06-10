@@ -29,10 +29,19 @@ def control_hash(filename: str, artifact: dict) -> str:
     return canonical_json_hash(artifact, omit)
 
 
+def refresh_semantic_base(req: dict) -> None:
+    approved = copy.deepcopy(req["approved_control"])
+    approved.pop("semantic_base", None)
+    req["approved_control"]["semantic_base"] = {
+        "id": "semantic-base:lean-test",
+        "hash": canonical_json_hash(approved),
+    }
+
+
 def requirements(outcome_id: str = "O-lean-startup", evidence_id: str = "evidence.lean-startup") -> dict:
     req = {
         "artifact_type": "requirements.control",
-        "schema_version": "1.0.0",
+        "schema_version": "1.1.0",
         "status": "approved",
         "approved_control": {
             "human_purpose": "exercise lean pre-goal reviewed replanning",
@@ -42,16 +51,35 @@ def requirements(outcome_id: str = "O-lean-startup", evidence_id: str = "evidenc
             "how_we_know_purpose_was_met": "current generation verifier permits completion",
             "where_result_must_show_up": ["run.control.json", "gen-000/runtime.control.json"],
             "what_counts_as_done": "current generation has required evidence and no unresolved amendment",
+            "source_requirements": [
+                {
+                    "id": "SR-lean-startup",
+                    "source": {"kind": "user_message", "quote": "run a lean current generation"},
+                    "required_action": "run a lean current generation to completion",
+                    "requirement_type": "implement_behavior",
+                    "required_evidence_strength": "test_result",
+                    "target_objects": ["lean current generation"],
+                    "completion_checks": ["current generation verifier permits completion"],
+                    "blocks_goal_achieved_if_missing": True,
+                }
+            ],
             "required_outcomes": [
                 {
                     "id": outcome_id,
                     "statement": f"{outcome_id} is implemented, not merely prepared",
                     "blocks_goal_achieved_if_missing": True,
+                    "source_requirements": ["SR-lean-startup"],
+                    "completion_claim": "Completes the lean current generation.",
+                    "completed_target_objects": ["lean current generation"],
                     "required_evidence": [
                         {
                             "evidence_id": evidence_id,
                             "kind": "progress_event",
                             "description": "mainline current-generation evidence",
+                            "evidence_strength": "test_result",
+                            "satisfies_source_requirements": ["SR-lean-startup"],
+                            "evidence_claim": "The current generation verifier permits completion.",
+                            "completed_target_objects": ["lean current generation"],
                         }
                     ],
                     "not_satisfied_by": ["readiness or partial candidate evidence"],
@@ -179,6 +207,7 @@ def approved_generation_review() -> dict:
         "intent-preservation",
         "obligation-preservation",
         "required-outcome-coverage",
+        "source-requirement-preservation",
         "horizon-authority",
     ):
         checks.append(
@@ -609,6 +638,79 @@ class ReviewedReplanningControlTest(unittest.TestCase):
 
             self.assertNotEqual(result.returncode, 0, result.stdout + result.stderr)
             self.assertIn("max_auto_amendment_rounds", result.stdout + result.stderr)
+
+    def test_guard_rejects_blocking_source_requirement_without_outcome_coverage(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            run_dir = Path(tmpdir)
+            write_lean_run(run_dir)
+            req = json.loads((run_dir / "requirements.control.json").read_text(encoding="utf-8"))
+            req["approved_control"]["source_requirements"].append(
+                {
+                    "id": "SR-api-v2",
+                    "source": {"kind": "user_message", "quote": "implement /api/v2 routes"},
+                    "required_action": "implement /api/v2 routes",
+                    "requirement_type": "implement_behavior",
+                    "required_evidence_strength": "behavior_exists",
+                    "target_objects": ["/api/v2 routes"],
+                    "completion_checks": ["/api/v2 routes return non-404 behavior under tests"],
+                    "blocks_goal_achieved_if_missing": True,
+                }
+            )
+            run = json.loads((run_dir / "run.control.json").read_text(encoding="utf-8"))
+            runtime = json.loads((run_dir / "gen-000/runtime.control.json").read_text(encoding="utf-8"))
+            review = json.loads((run_dir / "gen-000/review.control.json").read_text(encoding="utf-8"))
+            refresh_semantic_base(req)
+            apply_hashes(req, run, runtime, "gen-000/runtime.control.json", review, "gen-000/review.control.json")
+            (run_dir / "requirements.control.json").write_text(json.dumps(req, indent=2), encoding="utf-8")
+            (run_dir / "run.control.json").write_text(json.dumps(run, indent=2), encoding="utf-8")
+            (run_dir / "gen-000/runtime.control.json").write_text(json.dumps(runtime, indent=2), encoding="utf-8")
+
+            result = run_script(CONTROL_GUARD, "--run-dir", str(run_dir))
+
+            self.assertNotEqual(result.returncode, 0, result.stdout + result.stderr)
+            self.assertIn(
+                "source requirements not covered by blocking required outcomes: SR-api-v2",
+                result.stdout + result.stderr,
+            )
+
+    def test_guard_rejects_framework_evidence_for_measurement_source_requirement(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            run_dir = Path(tmpdir)
+            write_lean_run(run_dir)
+            req = json.loads((run_dir / "requirements.control.json").read_text(encoding="utf-8"))
+            sr = req["approved_control"]["source_requirements"][0]
+            sr["id"] = "SR-measure-curves"
+            sr["source"] = {"kind": "user_message", "quote": "measure scale curves"}
+            sr["required_action"] = "measure scale curves"
+            sr["requirement_type"] = "produce_empirical_measurement"
+            sr["required_evidence_strength"] = "measured_curve_data"
+            sr["target_objects"] = ["E", "S"]
+            sr["completion_checks"] = ["measured data exists for E", "measured data exists for S"]
+            outcome = req["approved_control"]["required_outcomes"][0]
+            outcome["source_requirements"] = ["SR-measure-curves"]
+            outcome["completion_claim"] = "Defines a scan framework for E and S."
+            outcome["completed_target_objects"] = ["E", "S"]
+            evidence = outcome["required_evidence"][0]
+            evidence["evidence_strength"] = "framework_document"
+            evidence["satisfies_source_requirements"] = ["SR-measure-curves"]
+            evidence["evidence_claim"] = "The file defines scan rules."
+            evidence["completed_target_objects"] = ["E", "S"]
+            run = json.loads((run_dir / "run.control.json").read_text(encoding="utf-8"))
+            runtime = json.loads((run_dir / "gen-000/runtime.control.json").read_text(encoding="utf-8"))
+            review = json.loads((run_dir / "gen-000/review.control.json").read_text(encoding="utf-8"))
+            refresh_semantic_base(req)
+            apply_hashes(req, run, runtime, "gen-000/runtime.control.json", review, "gen-000/review.control.json")
+            (run_dir / "requirements.control.json").write_text(json.dumps(req, indent=2), encoding="utf-8")
+            (run_dir / "run.control.json").write_text(json.dumps(run, indent=2), encoding="utf-8")
+            (run_dir / "gen-000/runtime.control.json").write_text(json.dumps(runtime, indent=2), encoding="utf-8")
+
+            result = run_script(CONTROL_GUARD, "--run-dir", str(run_dir))
+
+            self.assertNotEqual(result.returncode, 0, result.stdout + result.stderr)
+            self.assertIn(
+                "evidence strength framework_document is too weak for source requirement SR-measure-curves",
+                result.stdout + result.stderr,
+            )
 
     def test_guard_rejects_generation_history_over_auto_amendment_limit(self):
         generations = [
