@@ -35,8 +35,9 @@ When execution observes that the current strategy cannot produce a blocking
 required outcome, do not silently fill the slot with readiness, compatibility,
 or substitute evidence. Do not edit approved JSON in place. Append a
 `control.amendment.proposed` event with the current `runtime_generation`,
-reason, triggering observation, affected strategy stages, and whether
-`semantic_base`, required outcomes, or authority would change.
+reason, triggering observation, affected strategy stages,
+`affected_source_requirements`, and whether `semantic_base`, required outcomes,
+or authority would change.
 
 Anchor-preserving amendments may be reviewed into a new generation by the
 orchestrator. Amendments that change `requirements.control.json`,

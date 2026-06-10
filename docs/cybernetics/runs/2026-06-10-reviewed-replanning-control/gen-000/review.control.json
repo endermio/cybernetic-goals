@@ -101,6 +101,26 @@
       ]
     },
     {
+      "check_id": "source-requirement-preservation",
+      "status": "pass",
+      "verdict": "approved",
+      "return_to_stage": null,
+      "evidence": [
+        "The generation preserves the approved source-owned requested transformation: lean pre-goal startup, reviewed amendment proposals, generation-aware run control, explicit evidence lifecycle, and historical regression protection.",
+        "No generation review change alters the semantic base, required outcomes, what counts as done, work coverage, authority, or forbidden actions."
+      ],
+      "findings": [
+        "This run predates explicit source_requirements arrays, so preservation is checked against the approved requirements control anchors and blocking outcomes."
+      ],
+      "required_changes": [],
+      "checked_transformations": [
+        "requirements->design",
+        "design->goal",
+        "goal->plan",
+        "plan->runtime"
+      ]
+    },
+    {
       "check_id": "producing-action-alignment",
       "status": "pass",
       "verdict": "approved",

@@ -16,7 +16,7 @@
   "approved_control_hashes": {
     "requirements.control.json": "sha256:45bfdcfe46f371792135ddaba09b0b58d0b1c26e44ed8986fb883fa80a8d7dfb",
     "run.control.json": "sha256:0c849a2e32deae23382ffa74d1dd90c72c1648c2b4d4697393ee1b595562632d",
-    "gen-000/review.control.json": "sha256:aea877c0d156deddcee85551f495f8ff87cb136b9c732771eb597025c795e518",
+    "gen-000/review.control.json": "sha256:c80236c0ff8253fe6c9746caa7bebfb06928a01a648a081c1e67e0f3a83a683d",
     "gen-000/runtime.control.json": "sha256:c57081665e650abfdfb0fcb0b046b9f78e95f4e178cb8415e2a5d7b1165b60f4"
   },
   "runtime": {

@@ -68,6 +68,13 @@ class UsingControlJsonProtocolTest(unittest.TestCase):
         self.assertIn("observations", text)
         self.assertIn("do not mutate approved JSON", text)
 
+    def test_amendment_proposal_documents_source_requirements_and_compatibility_split(self):
+        text = combined_protocol_text()
+
+        self.assertIn("affected_source_requirements", text)
+        self.assertRegex(text, re.compile(r"v1\.0[^.\n]*compatibility", re.I))
+        self.assertRegex(text, re.compile(r"runtime[^.\n]*policy[^.\n]*requires[^.\n]*affected_source_requirements", re.I))
+
     def test_goal_achieved_true_requires_verifier_permission(self):
         text = combined_protocol_text()
 

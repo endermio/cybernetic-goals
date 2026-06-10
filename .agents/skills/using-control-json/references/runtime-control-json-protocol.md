@@ -93,11 +93,17 @@ Amendment events use `control.amendment.proposed`,
 - `reason`
 - `triggering_observation`
 - `affected_stages`
+- `affected_source_requirements`
 - `semantic_base_change`
 - `required_outcomes_changed`
 - `authority_expanded`
 - `proposed_changes`
 - `review_required`
+
+The schemas preserve v1.0 parse compatibility for historical amendment events.
+Current runtime execution policy requires `affected_source_requirements` on
+every `control.amendment.proposed` event so source-owned obligations can be
+reviewed before a new generation is approved.
 
 If any of `semantic_base_change`, `required_outcomes_changed`, or
 `authority_expanded` is true, that amendment is a request for human decision,

@@ -25,7 +25,7 @@
     "design.control.json": "sha256:97a9fa2569f4da473a167c01d7a969f5c44e1359cf5ef7b6f6ee65f4f29a5feb",
     "goal.control.json": "sha256:fa1dc04c44025cb9e063aee8ebe4c79f241c7b925e6d0998c7a0a09baa6b5e0d",
     "plan.control.json": "sha256:a83412ff1084cc8b60bf6dc0430d7d45bc4419c866f57728902155ae2c7302ef",
-    "review.control.json": "sha256:a5d328eb2afd17f7a870e6cd23160403dde5f200dfd4f61f65d955d1beedfacb",
+    "review.control.json": "sha256:640a88da3db9cbcf730486dcf808c7cb0417dd2d83611a959fd6d5507f7048f9",
     "runtime.control.json": "sha256:fc5111e1cfc783d40811befd6713c02897b230cb7299bcb1e966459dc539e6f1"
   },
   "runtime": {
