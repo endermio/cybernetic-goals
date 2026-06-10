@@ -71,7 +71,23 @@ ACCEPTABLE_EVIDENCE_STRENGTHS = {
 SOURCE_REQUIREMENT_REVIEW_CHECK = "source-requirement-preservation"
 MEASUREMENT_ACTION_RE = re.compile(r"\b(?:measure|measuring|measured)\b", re.IGNORECASE)
 MEASUREMENT_CURVE_LANGUAGE_RE = re.compile(r"\b(?:curve|curves|growth)\b", re.IGNORECASE)
-API_V2_FAMILY_RE = re.compile(r"(?<![A-Za-z])(?:download|extract|preview)(?![A-Za-z])", re.IGNORECASE)
+API_V2_IMPLEMENT_ACTION_RE = re.compile(r"\b(?:implement|implementing)\b", re.IGNORECASE)
+API_V2_FAMILY_RE = re.compile(
+    r"(?<![A-Za-z])(?:download|extract|preview|route|routes|endpoint|endpoints|api\s+family)(?![A-Za-z])",
+    re.IGNORECASE,
+)
+FRAMEWORK_WEAKENING_LANGUAGE_RE = re.compile(
+    r"\b(?:define|document|draft|list|outline|plan|prepare|describe|catalog|enumerate)\b"
+    r".*\b(?:framework|scan|variables?|rules?|plan|readiness|compatibility|compatible)\b"
+    r"|"
+    r"\b(?:framework|scan)\b"
+    r".*\b(?:document|plan|readiness|compatibility|compatible|variables?|rules?|listing|list)\b",
+    re.IGNORECASE,
+)
+READINESS_WEAKENING_LANGUAGE_RE = re.compile(
+    r"\b(?:future|compat(?:ibility|ible)?|readiness|ready|framework)\b",
+    re.IGNORECASE,
+)
 REQUIRED_REVIEW_CHECKS = {
     "required-answer-path",
     "intent-preservation",
@@ -377,7 +393,7 @@ def source_text_is_measurement_curve_request(source_text: str) -> bool:
 
 def source_text_is_api_v2_family_implementation(source_text: str) -> bool:
     normalized = source_text.lower()
-    asks_to_implement = "implement" in normalized or "实现" in source_text
+    asks_to_implement = bool(API_V2_IMPLEMENT_ACTION_RE.search(source_text)) or "实现" in source_text
     return asks_to_implement and "/api/v2" in normalized and bool(API_V2_FAMILY_RE.search(source_text))
 
 
@@ -390,8 +406,7 @@ def source_requirement_is_weakened_to_framework(
     return (
         requirement_type == "define_framework_or_plan"
         or evidence_strength == "framework_document"
-        or "framework" in requirement_text
-        or "scan" in requirement_text
+        or bool(FRAMEWORK_WEAKENING_LANGUAGE_RE.search(requirement_text))
     )
 
 
@@ -404,11 +419,7 @@ def source_requirement_is_weakened_to_readiness(
     return (
         requirement_type == "define_framework_or_plan"
         or evidence_strength == "framework_document"
-        or "future" in requirement_text
-        or "compat" in requirement_text
-        or "readiness" in requirement_text
-        or "ready" in requirement_text
-        or "framework" in requirement_text
+        or bool(READINESS_WEAKENING_LANGUAGE_RE.search(requirement_text))
     )
 
 

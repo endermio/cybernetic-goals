@@ -940,6 +940,103 @@ class ReviewedReplanningControlTest(unittest.TestCase):
             self.assertNotEqual(result.returncode, 0, result.stdout + result.stderr)
             self.assertIn("source requirement appears weaker than source quote", result.stdout + result.stderr)
 
+    def test_guard_rejects_api_v2_routes_source_requirement_weakened_to_readiness(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            run_dir = Path(tmpdir)
+            write_lean_run(run_dir)
+            req = json.loads((run_dir / "requirements.control.json").read_text(encoding="utf-8"))
+            sr = req["approved_control"]["source_requirements"][0]
+            sr["source"] = {"kind": "user_message", "quote": "implement /api/v2 routes"}
+            sr["required_action"] = "document future v2 compatibility readiness"
+            sr["requirement_type"] = "define_framework_or_plan"
+            sr["required_evidence_strength"] = "framework_document"
+            sr["target_objects"] = ["/api/v2 routes"]
+            sr["completion_checks"] = ["future v2 route exposure remains compatible"]
+            outcome = req["approved_control"]["required_outcomes"][0]
+            outcome["completion_claim"] = "Documents readiness for future v2 route exposure."
+            outcome["completed_target_objects"] = ["/api/v2 routes"]
+            evidence = outcome["required_evidence"][0]
+            evidence["evidence_strength"] = "framework_document"
+            evidence["evidence_claim"] = "The framework document records compatibility readiness."
+            evidence["completed_target_objects"] = ["/api/v2 routes"]
+            run = json.loads((run_dir / "run.control.json").read_text(encoding="utf-8"))
+            runtime = json.loads((run_dir / "gen-000/runtime.control.json").read_text(encoding="utf-8"))
+            review = json.loads((run_dir / "gen-000/review.control.json").read_text(encoding="utf-8"))
+            refresh_semantic_base(req)
+            apply_hashes(req, run, runtime, "gen-000/runtime.control.json", review, "gen-000/review.control.json")
+            (run_dir / "requirements.control.json").write_text(json.dumps(req, indent=2), encoding="utf-8")
+            (run_dir / "run.control.json").write_text(json.dumps(run, indent=2), encoding="utf-8")
+            (run_dir / "gen-000/runtime.control.json").write_text(json.dumps(runtime, indent=2), encoding="utf-8")
+
+            result = run_script(CONTROL_GUARD, "--run-dir", str(run_dir))
+
+            self.assertNotEqual(result.returncode, 0, result.stdout + result.stderr)
+            self.assertIn("source requirement appears weaker than source quote", result.stdout + result.stderr)
+
+    def test_guard_accepts_preserved_measurement_source_requirement_with_framework_words(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            run_dir = Path(tmpdir)
+            write_lean_run(run_dir)
+            req = json.loads((run_dir / "requirements.control.json").read_text(encoding="utf-8"))
+            sr = req["approved_control"]["source_requirements"][0]
+            sr["source"] = {"kind": "user_message", "quote": "measure framework adoption growth curves"}
+            sr["required_action"] = "measure framework adoption growth curves"
+            sr["requirement_type"] = "produce_empirical_measurement"
+            sr["required_evidence_strength"] = "measured_curve_data"
+            sr["target_objects"] = ["framework adoption"]
+            sr["completion_checks"] = ["measured curve data exists for framework adoption growth"]
+            outcome = req["approved_control"]["required_outcomes"][0]
+            outcome["completion_claim"] = "Produces measured framework adoption growth curves."
+            outcome["completed_target_objects"] = ["framework adoption"]
+            evidence = outcome["required_evidence"][0]
+            evidence["evidence_strength"] = "measured_curve_data"
+            evidence["evidence_claim"] = "The evidence contains measured curve data for framework adoption growth."
+            evidence["completed_target_objects"] = ["framework adoption"]
+            run = json.loads((run_dir / "run.control.json").read_text(encoding="utf-8"))
+            runtime = json.loads((run_dir / "gen-000/runtime.control.json").read_text(encoding="utf-8"))
+            review = json.loads((run_dir / "gen-000/review.control.json").read_text(encoding="utf-8"))
+            refresh_semantic_base(req)
+            apply_hashes(req, run, runtime, "gen-000/runtime.control.json", review, "gen-000/review.control.json")
+            (run_dir / "requirements.control.json").write_text(json.dumps(req, indent=2), encoding="utf-8")
+            (run_dir / "run.control.json").write_text(json.dumps(run, indent=2), encoding="utf-8")
+            (run_dir / "gen-000/runtime.control.json").write_text(json.dumps(runtime, indent=2), encoding="utf-8")
+
+            result = run_script(CONTROL_GUARD, "--run-dir", str(run_dir))
+
+            self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+
+    def test_guard_accepts_api_v2_already_implemented_wording_as_preserved_behavior(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            run_dir = Path(tmpdir)
+            write_lean_run(run_dir)
+            req = json.loads((run_dir / "requirements.control.json").read_text(encoding="utf-8"))
+            sr = req["approved_control"]["source_requirements"][0]
+            sr["source"] = {"kind": "user_message", "quote": "implement /api/v2 routes"}
+            sr["required_action"] = "verify /api/v2 already implemented behavior"
+            sr["requirement_type"] = "implement_behavior"
+            sr["required_evidence_strength"] = "behavior_exists"
+            sr["target_objects"] = ["/api/v2 routes"]
+            sr["completion_checks"] = ["/api/v2 already implemented behavior remains covered"]
+            outcome = req["approved_control"]["required_outcomes"][0]
+            outcome["completion_claim"] = "Verifies /api/v2 already implemented behavior."
+            outcome["completed_target_objects"] = ["/api/v2 routes"]
+            evidence = outcome["required_evidence"][0]
+            evidence["evidence_strength"] = "behavior_exists"
+            evidence["evidence_claim"] = "Behavior exists for the /api/v2 already implemented route."
+            evidence["completed_target_objects"] = ["/api/v2 routes"]
+            run = json.loads((run_dir / "run.control.json").read_text(encoding="utf-8"))
+            runtime = json.loads((run_dir / "gen-000/runtime.control.json").read_text(encoding="utf-8"))
+            review = json.loads((run_dir / "gen-000/review.control.json").read_text(encoding="utf-8"))
+            refresh_semantic_base(req)
+            apply_hashes(req, run, runtime, "gen-000/runtime.control.json", review, "gen-000/review.control.json")
+            (run_dir / "requirements.control.json").write_text(json.dumps(req, indent=2), encoding="utf-8")
+            (run_dir / "run.control.json").write_text(json.dumps(run, indent=2), encoding="utf-8")
+            (run_dir / "gen-000/runtime.control.json").write_text(json.dumps(runtime, indent=2), encoding="utf-8")
+
+            result = run_script(CONTROL_GUARD, "--run-dir", str(run_dir))
+
+            self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+
     def test_guard_accepts_legitimate_framework_source_requirement(self):
         with tempfile.TemporaryDirectory() as tmpdir:
             run_dir = Path(tmpdir)
