@@ -517,6 +517,7 @@ def validate_source_requirement_coverage(
     evidence_sources = required_evidence_source_map(requirements, errors)
     known_sources = set(source_map)
     outcome_covered_sources: set[str] = set()
+    evidence_covered_sources: set[str] = set()
     outcomes = requirements.get("approved_control", {}).get("required_outcomes")
     if isinstance(outcomes, list):
         for outcome in outcomes:
@@ -527,7 +528,8 @@ def validate_source_requirement_coverage(
             unknown = sorted(sources - known_sources)
             if unknown:
                 errors.append("required outcome references unknown source requirements: " + ", ".join(unknown))
-            if outcome.get("blocks_goal_achieved_if_missing") is True:
+            outcome_blocks = outcome.get("blocks_goal_achieved_if_missing") is True
+            if outcome_blocks:
                 outcome_covered_sources.update(sources & known_sources)
             required_evidence = outcome.get("required_evidence")
             if not isinstance(required_evidence, list):
@@ -544,6 +546,8 @@ def validate_source_requirement_coverage(
                         "required evidence references unknown source requirements: "
                         + ", ".join(unknown_evidence_sources)
                     )
+                if outcome_blocks:
+                    evidence_covered_sources.update(evidence_source_ids & known_sources)
                 for source_id in sorted(evidence_source_ids & known_sources):
                     source = source_map[source_id]
                     requirement_type = source.get("requirement_type")
@@ -561,6 +565,9 @@ def validate_source_requirement_coverage(
     missing = sorted(blocking_sources - outcome_covered_sources)
     if missing:
         errors.append("source requirements not covered by blocking required outcomes: " + ", ".join(missing))
+    missing_evidence = sorted((blocking_sources & outcome_covered_sources) - evidence_covered_sources)
+    if missing_evidence:
+        errors.append("source requirements not covered by required evidence: " + ", ".join(missing_evidence))
     return blocking_sources, outcome_sources, evidence_sources, errors
 
 

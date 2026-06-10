@@ -73,6 +73,7 @@ REQUIRED_REVIEW_CHECKS = {
     "intent-preservation",
     "obligation-preservation",
     "required-outcome-coverage",
+    SOURCE_REQUIREMENT_REVIEW_CHECK,
     "producing-action-alignment",
     "work-assignment",
     "horizon-authority",
@@ -82,6 +83,7 @@ GENERATION_REVIEW_CHECKS = {
     "intent-preservation",
     "obligation-preservation",
     "required-outcome-coverage",
+    SOURCE_REQUIREMENT_REVIEW_CHECK,
     "horizon-authority",
 }
 REVIEW_HASH_FILES = [
@@ -379,6 +381,7 @@ def validate_source_requirement_coverage(
     evidence_sources = required_evidence_source_map(requirements, errors)
     known_sources = set(source_map)
     outcome_covered_sources: set[str] = set()
+    evidence_covered_sources: set[str] = set()
     outcomes = requirements.get("approved_control", {}).get("required_outcomes")
     if isinstance(outcomes, list):
         for outcome in outcomes:
@@ -389,7 +392,8 @@ def validate_source_requirement_coverage(
             unknown = sorted(sources - known_sources)
             if unknown:
                 errors.append("required outcome references unknown source requirements: " + ", ".join(unknown))
-            if outcome.get("blocks_goal_achieved_if_missing") is True:
+            outcome_blocks = outcome.get("blocks_goal_achieved_if_missing") is True
+            if outcome_blocks:
                 outcome_covered_sources.update(sources & known_sources)
             required_evidence = outcome.get("required_evidence")
             if not isinstance(required_evidence, list):
@@ -406,6 +410,8 @@ def validate_source_requirement_coverage(
                         "required evidence references unknown source requirements: "
                         + ", ".join(unknown_evidence_sources)
                     )
+                if outcome_blocks:
+                    evidence_covered_sources.update(evidence_source_ids & known_sources)
                 for source_id in sorted(evidence_source_ids & known_sources):
                     source = source_map[source_id]
                     requirement_type = source.get("requirement_type")
@@ -423,6 +429,9 @@ def validate_source_requirement_coverage(
     missing = sorted(blocking_sources - outcome_covered_sources)
     if missing:
         errors.append("source requirements not covered by blocking required outcomes: " + ", ".join(missing))
+    missing_evidence = sorted((blocking_sources & outcome_covered_sources) - evidence_covered_sources)
+    if missing_evidence:
+        errors.append("source requirements not covered by required evidence: " + ", ".join(missing_evidence))
     return blocking_sources, outcome_sources, evidence_sources, errors
 
 
@@ -583,6 +592,9 @@ def reject_markdown_control_artifacts(run_dir: Path) -> None:
 def validate_generation_control_run(run_dir: Path) -> dict[str, dict[str, Any]]:
     requirements = read_json_object(run_dir / "requirements.control.json")
     run_control = read_json_object(run_dir / "run.control.json")
+    _, _, _, source_errors = validate_source_requirement_coverage(requirements)
+    if source_errors:
+        raise ControlJsonValidationError("; ".join(source_errors))
     validate_json_schema(requirements, read_json_object(SCHEMA_DIR / "requirements.control.schema.json"), "$requirements.control.json")
     validate_json_schema(run_control, read_json_object(SCHEMA_DIR / RUN_CONTROL_SCHEMA), "$run.control.json")
 
@@ -673,9 +685,6 @@ def validate_generation_control_run(run_dir: Path) -> dict[str, dict[str, Any]]:
     require_hashes(f"{runtime_rel}", runtime.get("approved_control_hashes"), expected_runtime_hashes)
 
     required_outcomes = blocking_required_outcomes(requirements)
-    _, _, _, source_errors = validate_source_requirement_coverage(requirements)
-    if source_errors:
-        raise ControlJsonValidationError("; ".join(source_errors))
     runtime_step_map = step_outcome_map(runtime)
     if strategy_kind != "discovery" and synthetic_step_ids(runtime):
         raise ControlJsonValidationError(f"{runtime_rel}: synthetic required_steps are only allowed in discovery generations")

@@ -26,6 +26,7 @@ AMENDMENT_REVIEW_CHECKS = (
     "intent-preservation",
     "obligation-preservation",
     "required-outcome-coverage",
+    "source-requirement-preservation",
     "horizon-authority",
 )
 
@@ -110,6 +111,9 @@ def approved_review(amendment: dict[str, Any], parent_generation: str) -> dict[s
         "intent-preservation": f"amendment {amendment_id} preserves the approved semantic base and target intent",
         "obligation-preservation": f"amendment {amendment_id} keeps required outcomes and completion obligations unchanged",
         "required-outcome-coverage": f"amendment {amendment_id} carries current required steps into the reviewed generation",
+        "source-requirement-preservation": (
+            f"amendment {amendment_id} preserves source requirement coverage from parent generation {parent_generation}"
+        ),
         "horizon-authority": f"amendment {amendment_id} does not expand authority or approved runtime horizon",
     }
     return {

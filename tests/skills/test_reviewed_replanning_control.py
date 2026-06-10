@@ -565,6 +565,86 @@ class ReviewedReplanningControlTest(unittest.TestCase):
             self.assertNotEqual(result.returncode, 0, result.stdout + result.stderr)
             self.assertIn("amendment generation review missing required review checks", result.stdout + result.stderr)
 
+    def test_guard_and_runtime_validator_reject_missing_evidence_source_requirement_coverage(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            run_dir = Path(tmpdir)
+            write_lean_run(run_dir)
+            req = json.loads((run_dir / "requirements.control.json").read_text(encoding="utf-8"))
+            req["approved_control"]["required_outcomes"][0]["required_evidence"][0][
+                "satisfies_source_requirements"
+            ] = []
+            run = json.loads((run_dir / "run.control.json").read_text(encoding="utf-8"))
+            runtime = json.loads((run_dir / "gen-000/runtime.control.json").read_text(encoding="utf-8"))
+            review = json.loads((run_dir / "gen-000/review.control.json").read_text(encoding="utf-8"))
+            refresh_semantic_base(req)
+            apply_hashes(req, run, runtime, "gen-000/runtime.control.json", review, "gen-000/review.control.json")
+            (run_dir / "requirements.control.json").write_text(json.dumps(req, indent=2), encoding="utf-8")
+            (run_dir / "run.control.json").write_text(json.dumps(run, indent=2), encoding="utf-8")
+            (run_dir / "gen-000/runtime.control.json").write_text(json.dumps(runtime, indent=2), encoding="utf-8")
+
+            guard = run_script(CONTROL_GUARD, "--run-dir", str(run_dir))
+            validate = run_script(VALIDATE, str(run_dir))
+
+            for result in (guard, validate):
+                self.assertNotEqual(result.returncode, 0, result.stdout + result.stderr)
+                self.assertIn(
+                    "source requirements not covered by required evidence: SR-lean-startup",
+                    result.stdout + result.stderr,
+                )
+
+    def test_guard_and_runtime_validator_reject_amendment_review_missing_source_requirement_preservation(self):
+        generations = [
+            {
+                "id": "gen-000",
+                "strategy_kind": "execution",
+                "status": "superseded",
+                "runtime": "gen-000/runtime.control.json",
+                "review": "gen-000/review.control.json",
+            },
+            {
+                "id": "gen-001",
+                "strategy_kind": "amendment",
+                "status": "active",
+                "parent": "gen-000",
+                "runtime": "gen-001/runtime.control.json",
+                "review": "gen-001/review.control.json",
+                "amendment_source": "progress.jsonl#A1",
+                "required_steps": [
+                    {
+                        "step_id": "S1",
+                        "transition": "current generation produces required evidence",
+                        "evidence": ["evidence.lean-startup"],
+                        "satisfies_outcomes": ["O-lean-startup"],
+                    }
+                ],
+            },
+        ]
+        with tempfile.TemporaryDirectory() as tmpdir:
+            run_dir = Path(tmpdir)
+            write_lean_run(run_dir, generations=generations, current_generation="gen-001")
+            review = approved_generation_review()
+            review["review_checks"] = [
+                check
+                for check in review["review_checks"]
+                if check["check_id"] != "source-requirement-preservation"
+            ]
+            (run_dir / "gen-001/review.control.json").write_text(json.dumps(review, indent=2), encoding="utf-8")
+            req = json.loads((run_dir / "requirements.control.json").read_text(encoding="utf-8"))
+            run = json.loads((run_dir / "run.control.json").read_text(encoding="utf-8"))
+            runtime = json.loads((run_dir / "gen-001/runtime.control.json").read_text(encoding="utf-8"))
+            apply_hashes(req, run, runtime, "gen-001/runtime.control.json", review, "gen-001/review.control.json")
+            (run_dir / "gen-001/runtime.control.json").write_text(json.dumps(runtime, indent=2), encoding="utf-8")
+
+            guard = run_script(CONTROL_GUARD, "--run-dir", str(run_dir))
+            validate = run_script(VALIDATE, str(run_dir))
+
+            for result in (guard, validate):
+                self.assertNotEqual(result.returncode, 0, result.stdout + result.stderr)
+                self.assertIn(
+                    "amendment generation review missing required review checks: source-requirement-preservation",
+                    result.stdout + result.stderr,
+                )
+
     def test_runtime_validator_rejects_incomplete_amendment_proposal_event(self):
         event = progress_event(
             "evidence.api-v2-readiness",
