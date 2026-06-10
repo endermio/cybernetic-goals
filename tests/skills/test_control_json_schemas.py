@@ -8,6 +8,10 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[2]
 SCHEMA_DIR = ROOT / "schemas/control-json"
 DELEGATION_WORKFLOW_REGISTRY = ROOT / ".agents/skills/references/delegation-workflow-registry.json"
+LEGACY_REQUIREMENTS_ARTIFACT = (
+    ROOT
+    / "docs/cybernetics/runs/2026-06-09-json-only-control-facts-migration/requirements.control.json"
+)
 
 
 def review_check(check_id: str, evidence: list[str], checked_transformations: list[str] | None = None) -> dict:
@@ -464,6 +468,13 @@ def validate(instance, schema, path="$"):
     if "if" in schema and matches_schema(instance, schema["if"], f"{path}.if"):
         if "then" in schema:
             validate(instance, schema["then"], f"{path}.then")
+    if "anyOf" in schema:
+        matched = any(
+            matches_schema(instance, subschema, f"{path}.anyOf[{index}]")
+            for index, subschema in enumerate(schema["anyOf"])
+        )
+        if not matched:
+            raise SchemaValidationError(f"{path}: expected at least one anyOf schema to match")
 
     expected_type = schema.get("type")
     if expected_type == "object":
@@ -606,26 +617,22 @@ class ControlJsonSchemaTest(unittest.TestCase):
             [
                 "id",
                 "statement",
-                "source_requirements",
-                "completion_claim",
                 "blocks_goal_achieved_if_missing",
                 "required_evidence",
                 "not_satisfied_by",
             ],
             outcome_schema["required"],
         )
+        self.assertIn("source_requirements", outcome_schema["properties"])
+        self.assertIn("completion_claim", outcome_schema["properties"])
         evidence_schema = outcome_schema["properties"]["required_evidence"]["items"]
         self.assertEqual(
-            [
-                "evidence_id",
-                "kind",
-                "description",
-                "evidence_strength",
-                "satisfies_source_requirements",
-                "evidence_claim",
-            ],
+            ["evidence_id", "kind", "description"],
             evidence_schema["required"],
         )
+        self.assertIn("evidence_strength", evidence_schema["properties"])
+        self.assertIn("satisfies_source_requirements", evidence_schema["properties"])
+        self.assertIn("evidence_claim", evidence_schema["properties"])
         self.assertIn("progress_event", evidence_schema["properties"]["kind"]["enum"])
         self.assertIn("file_exists", evidence_schema["properties"]["kind"]["enum"])
         self.assertIn("json_file", evidence_schema["properties"]["kind"]["enum"])
@@ -720,13 +727,72 @@ class ControlJsonSchemaTest(unittest.TestCase):
         with self.assertRaises(AssertionError):
             validate(fixture, schema)
 
+    def test_requirements_schema_rejects_missing_nested_source_fields_for_v1_1(self):
+        schema = json.loads((SCHEMA_DIR / "requirements.control.schema.json").read_text(encoding="utf-8"))
+        cases = (
+            ("outcome source requirement", ("approved_control", "required_outcomes", 0, "source_requirements")),
+            ("outcome completion claim", ("approved_control", "required_outcomes", 0, "completion_claim")),
+            (
+                "evidence strength",
+                ("approved_control", "required_outcomes", 0, "required_evidence", 0, "evidence_strength"),
+            ),
+            (
+                "evidence source requirement",
+                (
+                    "approved_control",
+                    "required_outcomes",
+                    0,
+                    "required_evidence",
+                    0,
+                    "satisfies_source_requirements",
+                ),
+            ),
+            ("evidence claim", ("approved_control", "required_outcomes", 0, "required_evidence", 0, "evidence_claim")),
+        )
+        for name, path in cases:
+            with self.subTest(field=name):
+                fixture = copy.deepcopy(SCHEMA_FIXTURES["requirements.control.schema.json"])
+                fixture["schema_version"] = "1.1.0"
+                target = fixture
+                for key in path[:-1]:
+                    target = target[key]
+                del target[path[-1]]
+
+                with self.assertRaises(AssertionError):
+                    validate(fixture, schema)
+
     def test_requirements_schema_accepts_missing_source_requirements_for_v1_0(self):
         schema = json.loads((SCHEMA_DIR / "requirements.control.schema.json").read_text(encoding="utf-8"))
         fixture = copy.deepcopy(SCHEMA_FIXTURES["requirements.control.schema.json"])
         fixture["schema_version"] = "1.0.0"
         del fixture["approved_control"]["source_requirements"]
+        outcome = fixture["approved_control"]["required_outcomes"][0]
+        del outcome["source_requirements"]
+        del outcome["completion_claim"]
+        del outcome["completed_target_objects"]
+        evidence = outcome["required_evidence"][0]
+        del evidence["evidence_strength"]
+        del evidence["satisfies_source_requirements"]
+        del evidence["evidence_claim"]
+        del evidence["completed_target_objects"]
 
         validate(fixture, schema)
+
+    def test_requirements_schema_accepts_checked_in_v1_0_requirements_artifact(self):
+        schema = json.loads((SCHEMA_DIR / "requirements.control.schema.json").read_text(encoding="utf-8"))
+        fixture = json.loads(LEGACY_REQUIREMENTS_ARTIFACT.read_text(encoding="utf-8"))
+
+        validate(fixture, schema)
+
+    def test_requirements_schema_rejects_source_without_quote_or_reference(self):
+        schema = json.loads((SCHEMA_DIR / "requirements.control.schema.json").read_text(encoding="utf-8"))
+        fixture = copy.deepcopy(SCHEMA_FIXTURES["requirements.control.schema.json"])
+        fixture["schema_version"] = "1.1.0"
+        source = fixture["approved_control"]["source_requirements"][0]["source"]
+        del source["quote"]
+
+        with self.assertRaises(AssertionError):
+            validate(fixture, schema)
 
     def test_progress_event_schema_accepts_affected_source_requirements_on_amendment(self):
         schema = json.loads((SCHEMA_DIR / "progress-event.schema.json").read_text(encoding="utf-8"))

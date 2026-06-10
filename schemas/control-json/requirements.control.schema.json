@@ -190,8 +190,6 @@
             "required": [
               "id",
               "statement",
-              "source_requirements",
-              "completion_claim",
               "blocks_goal_achieved_if_missing",
               "required_evidence",
               "not_satisfied_by"
@@ -236,10 +234,7 @@
                   "required": [
                     "evidence_id",
                     "kind",
-                    "description",
-                    "evidence_strength",
-                    "satisfies_source_requirements",
-                    "evidence_claim"
+                    "description"
                   ],
                   "properties": {
                     "evidence_id": {
@@ -376,7 +371,30 @@
           "approved_control": {
             "required": [
               "source_requirements"
-            ]
+            ],
+            "properties": {
+              "required_outcomes": {
+                "type": "array",
+                "items": {
+                  "required": [
+                    "source_requirements",
+                    "completion_claim"
+                  ],
+                  "properties": {
+                    "required_evidence": {
+                      "type": "array",
+                      "items": {
+                        "required": [
+                          "evidence_strength",
+                          "satisfies_source_requirements",
+                          "evidence_claim"
+                        ]
+                      }
+                    }
+                  }
+                }
+              }
+            }
           }
         }
       }
