@@ -148,7 +148,7 @@ Example:
   "control_mode": "lean",
   "current_generation": "gen-001",
   "max_auto_amendment_rounds": 2,
-  "semantic_base": {
+  "semantic_base_ref": {
     "id": "semantic-base:...",
     "hash": "sha256:..."
   },
@@ -174,18 +174,38 @@ Example:
   "generations": [
     {
       "id": "gen-000",
+      "strategy_kind": "discovery",
       "status": "superseded",
+      "runtime": "gen-000/runtime.control.json",
       "reason": "plan strategy did not produce required evidence"
     },
     {
       "id": "gen-001",
-      "status": "active"
+      "strategy_kind": "amendment",
+      "status": "active",
+      "parent": "gen-000",
+      "runtime": "gen-001/runtime.control.json",
+      "review": "gen-001/review.control.json",
+      "amendment_source": "progress.jsonl#A1"
     }
   ]
 }
 ```
 
 The manifest is the authoritative index for the active control generation.
+Each generation declares a strategy kind:
+
+- `discovery`: first-horizon exploration. It may use synthetic steps derived
+  from required outcomes, but it cannot be used for final success.
+- `execution`: reviewed executable strategy. It can be the current completion
+  generation only when it has an approved review and non-synthetic required
+  steps.
+- `amendment`: reviewed replacement strategy created from an amendment. It must
+  name a parent generation, an amendment source, an approved review, and
+  non-synthetic required steps.
+
+`max_auto_amendment_rounds` is mandatory and is enforced against the generation
+history. Exceeding it stops automatic replanning and requires a human decision.
 
 ## 3. Progress Events
 
@@ -214,6 +234,8 @@ Every event must include:
 
 ```json
 {
+  "amendment_id": "A1",
+  "runtime_generation": "gen-000",
   "reason": "...",
   "triggering_observation": "...",
   "affected_stages": ["design", "plan", "runtime"],
@@ -229,6 +251,10 @@ Every event must include:
   ]
 }
 ```
+
+If `semantic_base_change`, `required_outcomes_changed`, or
+`authority_expanded` is true, the event records a need for human decision. It
+cannot be auto-approved into the next generation.
 
 ## 4. Schema Changes
 
@@ -444,9 +470,13 @@ Guard checks:
 - `control_mode` is valid and full-only artifacts are required only in full
   mode;
 - current generation is fully approved/compiled;
+- execution and amendment generations declare an approved review;
+- discovery generations cannot be treated as final completion generations;
+- synthetic required steps are allowed only in discovery generations;
 - semantic base matches the root manifest;
 - parent generation, when present, has an amendment source;
 - amendment does not change anchors unless human reapproval exists;
+- automatic amendment rounds do not exceed `max_auto_amendment_rounds`;
 - review hashes match generation files;
 - superseded generations cannot be used as the current final verifier target.
 
@@ -465,6 +495,10 @@ Rules:
 - old evidence counts only when the current generation explicitly imports it;
 - final report must declare the current generation;
 - unresolved amendment proposals prevent `goal_achieved: true`.
+- anchor-changing amendment proposals prevent `goal_achieved: true` and require
+  a human decision.
+- discovery generations and synthetic required steps prevent `goal_achieved:
+  true`.
 
 ## 12. Evidence Model
 
@@ -526,6 +560,11 @@ Add regressions for:
   can produce required outcomes;
 - guard rejects a root run whose `current_generation` points to a stale or
   unreviewed generation.
+- guard rejects a run whose automatic amendment history exceeds
+  `max_auto_amendment_rounds`;
+- verifier rejects a discovery generation or synthetic required step as final
+  completion;
+- verifier rejects an anchor-changing amendment as automatic completion.
 
 ## 15. Delete The Old Assumption
 

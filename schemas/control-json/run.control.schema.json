@@ -11,6 +11,7 @@
     "run_id",
     "control_mode",
     "current_generation",
+    "max_auto_amendment_rounds",
     "semantic_base_ref",
     "amendment_policy",
     "generations"
@@ -99,6 +100,7 @@
         "additionalProperties": false,
         "required": [
           "id",
+          "strategy_kind",
           "status",
           "runtime"
         ],
@@ -106,6 +108,13 @@
           "id": {
             "type": "string",
             "minLength": 1
+          },
+          "strategy_kind": {
+            "enum": [
+              "discovery",
+              "execution",
+              "amendment"
+            ]
           },
           "status": {
             "enum": [
@@ -166,6 +175,9 @@
                     "type": "string",
                     "minLength": 1
                   }
+                },
+                "synthetic": {
+                  "type": "boolean"
                 }
               }
             }

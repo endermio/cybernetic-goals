@@ -58,6 +58,38 @@ def unresolved_amendment_ids(events: list[dict], current_generation: str | None)
     return proposed - resolved
 
 
+def anchor_changing_amendment_ids(events: list[dict], current_generation: str | None) -> set[str]:
+    anchor_changing: set[str] = set()
+    for event in events:
+        if current_generation is not None and event.get("runtime_generation") != current_generation:
+            continue
+        if event.get("event_type") != "control.amendment.proposed":
+            continue
+        amendment_id = event.get("amendment_id")
+        if not isinstance(amendment_id, str) or not amendment_id:
+            continue
+        if (
+            event.get("semantic_base_change") is True
+            or event.get("required_outcomes_changed") is True
+            or event.get("authority_expanded") is True
+        ):
+            anchor_changing.add(amendment_id)
+    return anchor_changing
+
+
+def synthetic_required_step_ids(runtime: dict) -> set[str]:
+    steps = runtime.get("required_steps")
+    if not isinstance(steps, list):
+        return set()
+    return {
+        step["step_id"]
+        for step in steps
+        if isinstance(step, dict)
+        and step.get("synthetic") is True
+        and isinstance(step.get("step_id"), str)
+    }
+
+
 def mainline_completed_steps(
     events: list[dict],
     *,
@@ -125,6 +157,9 @@ def final_report_errors(
     *,
     current_generation: str | None = None,
     unresolved_amendments: set[str] | None = None,
+    anchor_changing_amendments: set[str] | None = None,
+    strategy_kind: str | None = None,
+    synthetic_required_steps: set[str] | None = None,
 ) -> list[str]:
     errors: list[str] = []
     if final_report.get("goal_achieved") is not True:
@@ -146,10 +181,18 @@ def final_report_errors(
         errors.append("final-report.json must include evidence")
     if current_generation is not None and final_report.get("runtime_generation") != current_generation:
         errors.append("final-report.json runtime_generation must match current_generation")
+    if strategy_kind == "discovery":
+        errors.append("discovery generation cannot permit goal_achieved true")
+    synthetic_required_steps = synthetic_required_steps or set()
+    if synthetic_required_steps:
+        errors.append("synthetic required_steps cannot permit goal_achieved true: " + ", ".join(sorted(synthetic_required_steps)))
     unresolved_amendments = unresolved_amendments or set()
+    anchor_changing_amendments = anchor_changing_amendments or set()
     reported_unresolved = final_report.get("unresolved_amendments")
     if unresolved_amendments:
         errors.append("unresolved amendments block goal_achieved true: " + ", ".join(sorted(unresolved_amendments)))
+    if anchor_changing_amendments:
+        errors.append("anchor-changing amendments require human decision: " + ", ".join(sorted(anchor_changing_amendments)))
     if reported_unresolved:
         errors.append("final-report.json unresolved_amendments must be empty before goal_achieved true")
     return errors
@@ -178,6 +221,13 @@ def main() -> int:
     current_generation = run_control.get("current_generation") if isinstance(run_control, dict) else None
     if not isinstance(current_generation, str):
         current_generation = None
+    generation = None
+    if isinstance(run_control, dict) and current_generation is not None:
+        for candidate in run_control.get("generations", []):
+            if isinstance(candidate, dict) and candidate.get("id") == current_generation:
+                generation = candidate
+                break
+    strategy_kind = generation.get("strategy_kind") if isinstance(generation, dict) else None
     runtime = artifacts["runtime"]
     imported_evidence = set(
         item for item in runtime.get("imported_evidence", []) if isinstance(item, str)
@@ -186,6 +236,8 @@ def main() -> int:
         item for item in runtime.get("invalidated_evidence", []) if isinstance(item, str)
     )
     unresolved = unresolved_amendment_ids(events, current_generation)
+    anchor_changing = anchor_changing_amendment_ids(events, current_generation)
+    synthetic_steps = synthetic_required_step_ids(runtime)
     evidence_by_step = mainline_evidence_by_completed_step(
         events,
         current_generation=current_generation,
@@ -239,6 +291,9 @@ def main() -> int:
                 final_report,
                 current_generation=current_generation,
                 unresolved_amendments=unresolved,
+                anchor_changing_amendments=anchor_changing,
+                strategy_kind=strategy_kind if isinstance(strategy_kind, str) else None,
+                synthetic_required_steps=synthetic_steps,
             )
         )
     else:
@@ -257,6 +312,7 @@ def main() -> int:
                 required_outcomes=sorted(required_outcomes),
                 current_generation=current_generation,
                 unresolved_amendments=sorted(unresolved),
+                anchor_changing_amendments=sorted(anchor_changing),
             ),
             indent=2,
         )

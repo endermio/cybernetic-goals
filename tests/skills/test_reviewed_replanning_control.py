@@ -75,8 +75,10 @@ def run_control(current_generation: str = "gen-000", generations: list[dict] | N
         generations = [
             {
                 "id": "gen-000",
+                "strategy_kind": "execution",
                 "status": "active",
                 "runtime": "gen-000/runtime.control.json",
+                "review": "gen-000/review.control.json",
                 "required_steps": [
                     {
                         "step_id": "S1",
@@ -282,11 +284,188 @@ class ReviewedReplanningControlTest(unittest.TestCase):
             self.assertIn("PASS", guard.stdout)
             self.assertTrue(json.loads(validate.stdout)["ok"])
 
+    def test_runtime_validator_rejects_incomplete_amendment_proposal_event(self):
+        event = progress_event(
+            "evidence.api-v2-readiness",
+            event_type="control.amendment.proposed",
+            amendment_id="A-api-v2-readiness",
+        )
+        del event["triggering_observation"]
+        del event["affected_stages"]
+        del event["semantic_base_change"]
+        del event["required_outcomes_changed"]
+        del event["authority_expanded"]
+        events = [event]
+        report = final_report("gen-000", "evidence.api-v2-readiness")
+        with tempfile.TemporaryDirectory() as tmpdir:
+            run_dir = Path(tmpdir)
+            write_lean_run(run_dir, progress_events=events, report=report)
+
+            result = run_script(VERIFY, str(run_dir))
+
+            self.assertNotEqual(result.returncode, 0, result.stdout + result.stderr)
+            self.assertIn("control.amendment.proposed events must include triggering_observation", result.stdout + result.stderr)
+            self.assertIn("control.amendment.proposed events must include affected_stages", result.stdout + result.stderr)
+            self.assertIn("control.amendment.proposed events must include semantic_base_change", result.stdout + result.stderr)
+
+    def test_verifier_rejects_anchor_changing_amendment_as_automatic_goal_completion(self):
+        event = progress_event(
+            "evidence.api-v2-readiness",
+            event_type="control.amendment.proposed",
+            amendment_id="A-api-v2-readiness",
+        )
+        event["semantic_base_change"] = True
+        events = [
+            progress_event("evidence.lean-startup"),
+            event,
+            progress_event(
+                "evidence.api-v2-readiness",
+                event_type="control.amendment.blocked",
+                amendment_id="A-api-v2-readiness",
+            ),
+        ]
+        events[-1]["semantic_base_change"] = True
+        report = final_report("gen-000", "evidence.lean-startup")
+        with tempfile.TemporaryDirectory() as tmpdir:
+            run_dir = Path(tmpdir)
+            write_lean_run(run_dir, progress_events=events, report=report)
+
+            result = run_script(VERIFY, str(run_dir))
+
+            self.assertNotEqual(result.returncode, 0, result.stdout + result.stderr)
+            self.assertIn("anchor-changing amendments require human decision", result.stdout + result.stderr)
+
+    def test_guard_rejects_run_control_without_max_auto_amendment_rounds(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            run_dir = Path(tmpdir)
+            write_lean_run(run_dir)
+            run = json.loads((run_dir / "run.control.json").read_text(encoding="utf-8"))
+            del run["max_auto_amendment_rounds"]
+            runtime = json.loads((run_dir / "gen-000/runtime.control.json").read_text(encoding="utf-8"))
+            apply_hashes(
+                json.loads((run_dir / "requirements.control.json").read_text(encoding="utf-8")),
+                run,
+                runtime,
+                "gen-000/runtime.control.json",
+                json.loads((run_dir / "gen-000/review.control.json").read_text(encoding="utf-8")),
+                "gen-000/review.control.json",
+            )
+            (run_dir / "run.control.json").write_text(json.dumps(run, indent=2), encoding="utf-8")
+            (run_dir / "gen-000/runtime.control.json").write_text(json.dumps(runtime, indent=2), encoding="utf-8")
+
+            result = run_script(CONTROL_GUARD, "--run-dir", str(run_dir))
+
+            self.assertNotEqual(result.returncode, 0, result.stdout + result.stderr)
+            self.assertIn("max_auto_amendment_rounds", result.stdout + result.stderr)
+
+    def test_guard_rejects_generation_history_over_auto_amendment_limit(self):
+        generations = [
+            {"id": "gen-000", "strategy_kind": "discovery", "status": "superseded", "runtime": "gen-000/runtime.control.json"},
+            {
+                "id": "gen-001",
+                "strategy_kind": "amendment",
+                "status": "superseded",
+                "parent": "gen-000",
+                "runtime": "gen-001/runtime.control.json",
+                "review": "gen-001/review.control.json",
+                "amendment_source": "progress.jsonl#A1",
+            },
+            {
+                "id": "gen-002",
+                "strategy_kind": "amendment",
+                "status": "superseded",
+                "parent": "gen-001",
+                "runtime": "gen-002/runtime.control.json",
+                "review": "gen-002/review.control.json",
+                "amendment_source": "progress.jsonl#A2",
+            },
+            {
+                "id": "gen-003",
+                "strategy_kind": "amendment",
+                "status": "active",
+                "parent": "gen-002",
+                "runtime": "gen-003/runtime.control.json",
+                "review": "gen-003/review.control.json",
+                "amendment_source": "progress.jsonl#A3",
+            },
+        ]
+        with tempfile.TemporaryDirectory() as tmpdir:
+            run_dir = Path(tmpdir)
+            write_lean_run(run_dir, generations=generations, current_generation="gen-003")
+
+            result = run_script(CONTROL_GUARD, "--run-dir", str(run_dir))
+
+            self.assertNotEqual(result.returncode, 0, result.stdout + result.stderr)
+            self.assertIn("auto amendment rounds exceed max_auto_amendment_rounds", result.stdout + result.stderr)
+
+    def test_guard_rejects_execution_generation_without_review(self):
+        generations = [
+            {
+                "id": "gen-000",
+                "strategy_kind": "execution",
+                "status": "active",
+                "runtime": "gen-000/runtime.control.json",
+                "required_steps": [
+                    {
+                        "step_id": "S1",
+                        "transition": "current generation produces required evidence",
+                        "evidence": ["current generation evidence"],
+                        "satisfies_outcomes": ["O-lean-startup"],
+                    }
+                ],
+            }
+        ]
+        with tempfile.TemporaryDirectory() as tmpdir:
+            run_dir = Path(tmpdir)
+            write_lean_run(run_dir, generations=generations)
+
+            result = run_script(CONTROL_GUARD, "--run-dir", str(run_dir))
+
+            self.assertNotEqual(result.returncode, 0, result.stdout + result.stderr)
+            self.assertIn("execution generations must declare review", result.stdout + result.stderr)
+
+    def test_verifier_rejects_discovery_generation_goal_achieved(self):
+        generations = [
+            {
+                "id": "gen-000",
+                "strategy_kind": "discovery",
+                "status": "active",
+                "runtime": "gen-000/runtime.control.json",
+                "required_steps": [
+                    {
+                        "step_id": "S1",
+                        "transition": "current generation discovers required evidence path",
+                        "evidence": ["current generation evidence"],
+                        "satisfies_outcomes": ["O-lean-startup"],
+                    }
+                ],
+            }
+        ]
+        events = [progress_event("evidence.lean-startup")]
+        report = final_report("gen-000", "evidence.lean-startup")
+        with tempfile.TemporaryDirectory() as tmpdir:
+            run_dir = Path(tmpdir)
+            write_lean_run(run_dir, generations=generations, progress_events=events, report=report)
+
+            result = run_script(VERIFY, str(run_dir))
+
+            self.assertNotEqual(result.returncode, 0, result.stdout + result.stderr)
+            self.assertIn("discovery generation cannot permit goal_achieved true", result.stdout + result.stderr)
+
     def test_compiler_creates_initial_generation_runtime_from_lean_run_manifest(self):
         with tempfile.TemporaryDirectory() as tmpdir:
             run_dir = Path(tmpdir)
             req = requirements()
-            run = run_control()
+            run = run_control(
+                generations=[
+                    {
+                        "id": "gen-000",
+                        "strategy_kind": "discovery",
+                        "status": "active",
+                        "runtime": "gen-000/runtime.control.json",
+                    }
+                ]
+            )
             run["semantic_base_ref"] = copy.deepcopy(req["approved_control"]["semantic_base"])
             (run_dir / "requirements.control.json").write_text(json.dumps(req, indent=2), encoding="utf-8")
             (run_dir / "run.control.json").write_text(json.dumps(run, indent=2), encoding="utf-8")
@@ -299,8 +478,8 @@ class ReviewedReplanningControlTest(unittest.TestCase):
 
     def test_guard_rejects_stale_current_generation(self):
         generations = [
-            {"id": "gen-000", "status": "active", "runtime": "gen-000/runtime.control.json"},
-            {"id": "gen-001", "status": "active", "runtime": "gen-001/runtime.control.json"},
+            {"id": "gen-000", "strategy_kind": "discovery", "status": "active", "runtime": "gen-000/runtime.control.json"},
+            {"id": "gen-001", "strategy_kind": "discovery", "status": "active", "runtime": "gen-001/runtime.control.json"},
         ]
         with tempfile.TemporaryDirectory() as tmpdir:
             run_dir = Path(tmpdir)
@@ -365,9 +544,10 @@ class ReviewedReplanningControlTest(unittest.TestCase):
 
     def test_verifier_does_not_reuse_old_generation_evidence_without_explicit_import(self):
         generations = [
-            {"id": "gen-000", "status": "superseded", "runtime": "gen-000/runtime.control.json"},
+            {"id": "gen-000", "strategy_kind": "discovery", "status": "superseded", "runtime": "gen-000/runtime.control.json"},
             {
                 "id": "gen-001",
+                "strategy_kind": "amendment",
                 "status": "active",
                 "parent": "gen-000",
                 "runtime": "gen-001/runtime.control.json",
@@ -394,9 +574,10 @@ class ReviewedReplanningControlTest(unittest.TestCase):
 
     def test_verifier_accepts_explicitly_imported_old_generation_evidence(self):
         generations = [
-            {"id": "gen-000", "status": "superseded", "runtime": "gen-000/runtime.control.json"},
+            {"id": "gen-000", "strategy_kind": "discovery", "status": "superseded", "runtime": "gen-000/runtime.control.json"},
             {
                 "id": "gen-001",
+                "strategy_kind": "amendment",
                 "status": "active",
                 "parent": "gen-000",
                 "runtime": "gen-001/runtime.control.json",

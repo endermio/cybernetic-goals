@@ -270,8 +270,10 @@ SCHEMA_FIXTURES = {
         "generations": [
             {
                 "id": "gen-000",
+                "strategy_kind": "execution",
                 "status": "active",
                 "runtime": "gen-000/runtime.control.json",
+                "review": "gen-000/review.control.json",
                 "required_steps": [
                     {
                         "step_id": "S1",
@@ -627,8 +629,10 @@ class ControlJsonSchemaTest(unittest.TestCase):
         final_report_schema = load_json(SCHEMA_DIR / "final-report.schema.json")
 
         self.assertIn("current_generation", run_schema["required"])
+        self.assertIn("max_auto_amendment_rounds", run_schema["required"])
         self.assertEqual(["lean", "full"], run_schema["properties"]["control_mode"]["enum"])
         self.assertIn("must_not_change_without_human", run_schema["properties"]["amendment_policy"]["required"])
+        self.assertIn("strategy_kind", run_schema["properties"]["generations"]["items"]["required"])
         self.assertIn("runtime", run_schema["properties"]["generations"]["items"]["required"])
 
         self.assertEqual("control.amendment.proposal", amendment_schema["properties"]["artifact_type"]["const"])

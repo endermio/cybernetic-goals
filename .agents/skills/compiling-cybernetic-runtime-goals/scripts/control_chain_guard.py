@@ -287,9 +287,30 @@ def synthetic_steps_from_requirements(requirements: dict[str, Any]) -> list[dict
                 ]
                 or ["required evidence"],
                 "satisfies_outcomes": [outcome_id],
+                "synthetic": True,
             }
         )
     return steps
+
+
+def amendment_generation_count(run_control: dict[str, Any]) -> int:
+    generations = run_control.get("generations")
+    if not isinstance(generations, list):
+        return 0
+    return sum(1 for generation in generations if isinstance(generation, dict) and generation.get("parent"))
+
+
+def synthetic_step_ids(artifact: dict[str, Any]) -> set[str]:
+    steps = artifact.get("required_steps")
+    if not isinstance(steps, list):
+        return set()
+    return {
+        step.get("step_id")
+        for step in steps
+        if isinstance(step, dict)
+        and step.get("synthetic") is True
+        and isinstance(step.get("step_id"), str)
+    }
 
 
 def step_outcome_map(artifact: dict[str, Any]) -> dict[str, set[str]]:
@@ -371,11 +392,21 @@ def validate_generation_control_run(run_dir: Path) -> dict[str, dict[str, Any]]:
     active_ids = active_generation_ids(run_control)
     if active_ids != [current_generation]:
         raise ControlJsonValidationError("run.control.json: exactly current_generation must be active")
+    max_auto_amendment_rounds = run_control.get("max_auto_amendment_rounds")
+    if not isinstance(max_auto_amendment_rounds, int) or isinstance(max_auto_amendment_rounds, bool) or max_auto_amendment_rounds < 0:
+        raise ControlJsonValidationError("run.control.json: max_auto_amendment_rounds must be a non-negative integer")
+    if amendment_generation_count(run_control) > max_auto_amendment_rounds:
+        raise ControlJsonValidationError("run.control.json: auto amendment rounds exceed max_auto_amendment_rounds")
     generation = generation_entry(run_control, current_generation)
     if not generation:
         raise ControlJsonValidationError("run.control.json: current_generation is not declared in generations")
     if not isinstance(generation.get("runtime"), str):
         raise ControlJsonValidationError("run.control.json: current_generation must name runtime")
+    strategy_kind = generation.get("strategy_kind")
+    if strategy_kind not in {"discovery", "execution", "amendment"}:
+        raise ControlJsonValidationError("run.control.json: current generation strategy_kind must be discovery, execution, or amendment")
+    if strategy_kind == "amendment" and not generation.get("parent"):
+        raise ControlJsonValidationError("run.control.json: amendment generations must declare parent")
 
     runtime_rel = generation["runtime"]
     runtime = read_json_object(run_dir / runtime_rel)
@@ -396,8 +427,12 @@ def validate_generation_control_run(run_dir: Path) -> dict[str, dict[str, Any]]:
         review = read_json_object(run_dir / review_rel)
         if review.get("artifact_type") != "review.control" or review.get("status") != "approved":
             raise ControlJsonValidationError(f"{review_rel}: amendment generation review must be approved")
+    if strategy_kind in {"execution", "amendment"} and not review_rel:
+        raise ControlJsonValidationError(f"run.control.json: {strategy_kind} generations must declare review")
     if generation.get("parent") and (not review_rel or not generation.get("amendment_source")):
         raise ControlJsonValidationError("run.control.json: amendment generations must declare review and amendment_source")
+    if generation.get("parent") and strategy_kind != "amendment":
+        raise ControlJsonValidationError("run.control.json: generations with parent must use strategy_kind amendment")
 
     readonly_files = generation_runtime_readonly_files(generation)
     runtime_files = runtime.get("runtime", {})
@@ -426,6 +461,8 @@ def validate_generation_control_run(run_dir: Path) -> dict[str, dict[str, Any]]:
 
     required_outcomes = blocking_required_outcomes(requirements)
     runtime_step_map = step_outcome_map(runtime)
+    if strategy_kind != "discovery" and synthetic_step_ids(runtime):
+        raise ControlJsonValidationError(f"{runtime_rel}: synthetic required_steps are only allowed in discovery generations")
     if required_outcomes:
         require_outcome_coverage(
             f"{runtime_rel} required_steps do not satisfy blocking required outcomes",

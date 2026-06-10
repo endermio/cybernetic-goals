@@ -37,6 +37,14 @@ Use approved JSON to decide what work is authorized, what counts as done, where 
 
 If the approved target, plan, review, or runtime contract appears wrong, stale, or insufficient, append an observation when `progress.jsonl` is available and valid. If the current strategy cannot produce a blocking required outcome but the approved anchors can remain unchanged, append a `control.amendment.proposed` event instead of hard-completing with substitute evidence. If the needed change would alter approved anchors or authority, stop and report the smallest required human decision.
 
+Generation-aware runs declare a generation `strategy_kind`:
+
+- `discovery`: may start from a lean horizon and may use synthetic steps from requirements, but cannot permit `goal_achieved: true`.
+- `execution`: may permit final completion only when the generation has an approved review and non-synthetic executable steps.
+- `amendment`: must have a parent, amendment source, approved review, and non-synthetic executable steps.
+
+`max_auto_amendment_rounds` in `run.control.json` limits automatic reviewed replanning. When the generation history exceeds that limit, stop instead of continuing another automatic amendment.
+
 ## Approved Hashes
 
 `review.control.json` binds the approved pre-runtime inputs by hash.
@@ -69,6 +77,18 @@ use `control.amendment.proposed`, `control.amendment.approved`,
 `control.amendment.rejected`, or `control.amendment.blocked` and must include
 an `amendment_id`.
 
+`control.amendment.proposed` must also include:
+
+- `triggering_observation`
+- `affected_stages`
+- `semantic_base_change`
+- `required_outcomes_changed`
+- `authority_expanded`
+
+If any of `semantic_base_change`, `required_outcomes_changed`, or
+`authority_expanded` is true, that amendment is a request for human decision,
+not an automatically reviewable strategy change.
+
 `runtime-status.json` is the current bounded status snapshot. It can summarize active step state, blockers, next action, and last evidence pointer.
 
 `final-report.json` is the terminal report. Write it after progress evidence exists and after verifier evaluation. If the verifier does not permit completion, the final report must carry `goal_achieved: false` plus the unmet step, missing evidence, or blocker.
@@ -83,7 +103,9 @@ In generation-aware mode, verifier permission is scoped to
 `run.control.json.current_generation`. Progress from superseded generations does
 not satisfy current generation steps unless the current runtime explicitly
 imports that evidence and does not invalidate it. Unresolved amendment proposals
-block `goal_achieved: true`.
+block `goal_achieved: true`. Discovery generations and synthetic required steps
+also block `goal_achieved: true`; they are for finding or refining the strategy,
+not for final completion.
 
 When the verifier fails, append the verifier result to `progress.jsonl`, update `runtime-status.json`, and write a non-achieved final report only if the runtime contract calls for a terminal report.
 

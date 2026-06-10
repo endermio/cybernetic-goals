@@ -80,8 +80,31 @@ def read_json_object(path: Path) -> dict[str, object] | None:
     return value if isinstance(value, dict) else None
 
 
+def current_generation_review_path(run_dir: Path) -> Path | None:
+    run_control = read_json_object(run_dir / "run.control.json")
+    if not run_control:
+        legacy_review = run_dir / "review.control.json"
+        return legacy_review if legacy_review.exists() else None
+
+    current_generation = run_control.get("current_generation")
+    generations = run_control.get("generations")
+    if not isinstance(current_generation, str) or not isinstance(generations, list):
+        return None
+    for generation in generations:
+        if not isinstance(generation, dict) or generation.get("id") != current_generation:
+            continue
+        review_rel = generation.get("review")
+        if isinstance(review_rel, str) and review_rel:
+            return run_dir / review_rel
+        return None
+    return None
+
+
 def review_revision_route(run_dir: Path) -> tuple[str, list[str]] | None:
-    review = read_json_object(run_dir / "review.control.json")
+    review_path = current_generation_review_path(run_dir)
+    if review_path is None:
+        return None
+    review = read_json_object(review_path)
     if not review:
         return None
 

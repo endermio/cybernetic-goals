@@ -14,22 +14,22 @@
     "evidence"
   ],
   "properties": {
-        "event_type": {
-            "enum": [
-                "step.started",
-                "step.completed",
-                "step.blocked",
-                "step.failed",
-                "observation.recorded",
-                "runtime.generation.started",
-                "runtime.generation.superseded",
-                "control.amendment.proposed",
-                "control.amendment.approved",
-                "control.amendment.rejected",
-                "control.amendment.blocked",
-                "verification.completed",
-                "final_report.written"
-            ]
+    "event_type": {
+      "enum": [
+        "step.started",
+        "step.completed",
+        "step.blocked",
+        "step.failed",
+        "observation.recorded",
+        "runtime.generation.started",
+        "runtime.generation.superseded",
+        "control.amendment.proposed",
+        "control.amendment.approved",
+        "control.amendment.rejected",
+        "control.amendment.blocked",
+        "verification.completed",
+        "final_report.written"
+      ]
     },
     "schema_version": {
       "type": "string",
@@ -61,49 +61,72 @@
         "supporting_only"
       ]
     },
-        "counts_as_goal_progress": {
-            "type": "boolean"
-        },
-        "runtime_generation": {
-            "type": "string",
-            "minLength": 1
-        },
-        "amendment_id": {
-            "type": "string",
-            "minLength": 1
-        },
-        "triggering_observation": {
-            "type": "string",
-            "minLength": 1
-        },
-        "affected_stages": {
-            "type": "array",
-            "items": {
-                "enum": [
-                    "design",
-                    "goal",
-                    "plan",
-                    "runtime",
-                    "verifier"
-                ]
-            }
-        },
-        "semantic_base_change": {
-            "type": "boolean"
-        },
-        "required_outcomes_changed": {
-            "type": "boolean"
-        },
-        "authority_expanded": {
-            "type": "boolean"
-        },
-        "evidence": {
-            "type": "array",
-            "minItems": 1,
+    "counts_as_goal_progress": {
+      "type": "boolean"
+    },
+    "runtime_generation": {
+      "type": "string",
+      "minLength": 1
+    },
+    "amendment_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "triggering_observation": {
+      "type": "string",
+      "minLength": 1
+    },
+    "affected_stages": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "enum": [
+          "design",
+          "goal",
+          "plan",
+          "runtime",
+          "verifier"
+        ]
+      }
+    },
+    "semantic_base_change": {
+      "type": "boolean"
+    },
+    "required_outcomes_changed": {
+      "type": "boolean"
+    },
+    "authority_expanded": {
+      "type": "boolean"
+    },
+    "evidence": {
+      "type": "array",
+      "minItems": 1,
       "items": {
         "type": "string",
         "minLength": 1
       }
     }
-  }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "event_type": {
+            "const": "control.amendment.proposed"
+          }
+        }
+      },
+      "then": {
+        "required": [
+          "runtime_generation",
+          "amendment_id",
+          "triggering_observation",
+          "affected_stages",
+          "semantic_base_change",
+          "required_outcomes_changed",
+          "authority_expanded"
+        ]
+      }
+    }
+  ]
 }

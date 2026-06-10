@@ -56,6 +56,12 @@ EVENT_TYPES = {
 EVENT_STATUSES = {"pass", "fail", "blocked", "partial"}
 PROGRESS_ROLES = {"mainline", "supporting_only"}
 REQUIRED_EVIDENCE_KINDS = {"progress_event", "file_exists", "json_file", "command_result"}
+AMENDMENT_ANCHOR_FIELDS = ("semantic_base_change", "required_outcomes_changed", "authority_expanded")
+AMENDMENT_PROPOSAL_REQUIRED_FIELDS = (
+    "triggering_observation",
+    "affected_stages",
+    *AMENDMENT_ANCHOR_FIELDS,
+)
 
 
 class ControlJsonError(Exception):
@@ -139,6 +145,13 @@ def active_generation_ids(run_control: dict[str, Any]) -> list[str]:
         and generation.get("status") == "active"
         and isinstance(generation.get("id"), str)
     ]
+
+
+def amendment_generation_count(run_control: dict[str, Any]) -> int:
+    generations = run_control.get("generations")
+    if not isinstance(generations, list):
+        return 0
+    return sum(1 for generation in generations if isinstance(generation, dict) and generation.get("parent"))
 
 
 def generation_runtime_readonly_files(generation: dict[str, Any]) -> list[str]:
@@ -438,9 +451,23 @@ def validate_event(event: dict[str, Any]) -> list[str]:
     if isinstance(event_type, str) and event_type.startswith("control.amendment."):
         if not isinstance(event.get("amendment_id"), str) or not event.get("amendment_id"):
             errors.append("amendment events must include amendment_id")
-        for field in ("semantic_base_change", "required_outcomes_changed", "authority_expanded"):
+        for field in AMENDMENT_ANCHOR_FIELDS:
             if field in event and not isinstance(event[field], bool):
                 errors.append(f"{field} must be boolean when present")
+        if event_type == "control.amendment.proposed":
+            for field in AMENDMENT_PROPOSAL_REQUIRED_FIELDS:
+                if field not in event:
+                    errors.append(f"control.amendment.proposed events must include {field}")
+            if "triggering_observation" in event and (
+                not isinstance(event.get("triggering_observation"), str) or not event.get("triggering_observation")
+            ):
+                errors.append("control.amendment.proposed triggering_observation must be a non-empty string")
+            if "affected_stages" in event and (
+                not isinstance(event.get("affected_stages"), list)
+                or not event.get("affected_stages")
+                or not all(isinstance(stage, str) and stage for stage in event.get("affected_stages", []))
+            ):
+                errors.append("control.amendment.proposed affected_stages must be a non-empty list")
     return errors
 
 
@@ -502,10 +529,19 @@ def validate_generation_control_chain(run_dir: Path) -> tuple[dict[str, dict[str
         current_generation = ""
     if active_ids != [current_generation]:
         errors.append("run.control.json exactly current_generation must be active")
+    max_auto_amendment_rounds = run_control.get("max_auto_amendment_rounds")
+    if not isinstance(max_auto_amendment_rounds, int) or isinstance(max_auto_amendment_rounds, bool) or max_auto_amendment_rounds < 0:
+        errors.append("run.control.json max_auto_amendment_rounds must be a non-negative integer")
+        max_auto_amendment_rounds = 0
+    if amendment_generation_count(run_control) > max_auto_amendment_rounds:
+        errors.append("run.control.json auto amendment rounds exceed max_auto_amendment_rounds")
     generation = generation_entry(run_control, current_generation) if current_generation else None
     if not generation:
         errors.append("run.control.json current_generation is not declared in generations")
         generation = {}
+    strategy_kind = generation.get("strategy_kind")
+    if strategy_kind not in {"discovery", "execution", "amendment"}:
+        errors.append("run.control.json current generation strategy_kind must be discovery, execution, or amendment")
     runtime_rel = generation.get("runtime")
     if not isinstance(runtime_rel, str) or not runtime_rel:
         errors.append("run.control.json current_generation must name runtime")
@@ -515,8 +551,14 @@ def validate_generation_control_chain(run_dir: Path) -> tuple[dict[str, dict[str
         errors.append("runtime.control.json generation.id must match run.control.json current_generation")
     if runtime.get("control_mode") != run_control.get("control_mode"):
         errors.append("runtime.control.json control_mode must match run.control.json")
+    if strategy_kind == "amendment" and not generation.get("parent"):
+        errors.append("run.control.json amendment generations must declare parent")
     if generation.get("parent") and (not generation.get("review") or not generation.get("amendment_source")):
         errors.append("run.control.json amendment generations must declare review and amendment_source")
+    if generation.get("parent") and strategy_kind != "amendment":
+        errors.append("run.control.json generations with parent must use strategy_kind amendment")
+    if strategy_kind in {"execution", "amendment"} and not generation.get("review"):
+        errors.append(f"run.control.json {strategy_kind} generations must declare review")
     if generation.get("review"):
         review = artifacts.get("review")
         if not isinstance(review, dict) or review.get("artifact_type") != "review.control" or review.get("status") != "approved":
@@ -558,6 +600,15 @@ def validate_generation_control_chain(run_dir: Path) -> tuple[dict[str, dict[str
     runtime_steps = step_ids(runtime)
     if not runtime_steps:
         errors.append("runtime.control.json must declare required_steps")
+    synthetic_steps = {
+        step.get("step_id")
+        for step in runtime.get("required_steps", [])
+        if isinstance(step, dict)
+        and step.get("synthetic") is True
+        and isinstance(step.get("step_id"), str)
+    }
+    if strategy_kind != "discovery" and synthetic_steps:
+        errors.append("runtime.control.json synthetic required_steps are only allowed in discovery generations")
     if required_outcomes:
         missing_runtime = sorted(required_outcomes - covered_outcomes_by_steps(runtime_step_outcomes))
         if missing_runtime:

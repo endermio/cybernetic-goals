@@ -71,6 +71,10 @@ def compile_generation_runtime_control(run_dir: Path) -> Path:
         runtime_path.parent.mkdir(parents=True, exist_ok=True)
         required_steps = generation.get("required_steps")
         if not isinstance(required_steps, list) or not required_steps:
+            if generation.get("strategy_kind") != "discovery":
+                raise ControlJsonValidationError(
+                    "run.control.json: only discovery generations may use synthetic required_steps"
+                )
             required_steps = synthetic_steps_from_requirements(requirements)
         runtime = {
             "artifact_type": "runtime.control",
