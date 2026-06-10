@@ -727,6 +727,15 @@ class ControlJsonSchemaTest(unittest.TestCase):
         with self.assertRaises(AssertionError):
             validate(fixture, schema)
 
+    def test_requirements_schema_rejects_missing_source_requirement_fields_for_v1_1(self):
+        schema = json.loads((SCHEMA_DIR / "requirements.control.schema.json").read_text(encoding="utf-8"))
+        fixture = copy.deepcopy(SCHEMA_FIXTURES["requirements.control.schema.json"])
+        fixture["schema_version"] = "1.1.0"
+        del fixture["approved_control"]["source_requirements"][0]["completion_checks"]
+
+        with self.assertRaises(AssertionError):
+            validate(fixture, schema)
+
     def test_requirements_schema_rejects_missing_nested_source_fields_for_v1_1(self):
         schema = json.loads((SCHEMA_DIR / "requirements.control.schema.json").read_text(encoding="utf-8"))
         cases = (
