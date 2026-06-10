@@ -11,6 +11,8 @@ from control_json_runtime import (
     required_evidence_by_outcome,
     result_payload,
     read_progress_events,
+    source_requirement_map,
+    source_requirements_completed_by_evidence,
     step_outcome_map,
     step_ids,
     validate_control_chain,
@@ -250,6 +252,14 @@ def main() -> int:
     required_outcomes = blocking_required_outcomes(artifacts["requirements"])
     runtime_step_outcomes = step_outcome_map(artifacts["runtime"])
     completed_outcomes = covered_outcomes_by_steps(runtime_step_outcomes, completed_steps)
+    completed_evidence_ids = set()
+    for evidence_ids in evidence_by_step.values():
+        completed_evidence_ids.update(evidence_ids)
+    source_requirements, blocking_source_requirements, _ = source_requirement_map(artifacts["requirements"])
+    completed_source_requirements = source_requirements_completed_by_evidence(
+        artifacts["requirements"],
+        completed_evidence_ids,
+    )
     missing_steps = sorted(required_steps - completed_steps)
     if missing_steps:
         errors.append(
@@ -276,6 +286,12 @@ def main() -> int:
         errors.append(
             "missing required evidence for blocking required outcomes: "
             + "; ".join(missing_evidence_messages)
+        )
+    missing_source_requirements = sorted(blocking_source_requirements - completed_source_requirements)
+    if missing_source_requirements:
+        errors.append(
+            "missing completed evidence for blocking source requirements: "
+            + ", ".join(missing_source_requirements)
         )
 
     final_report_path = run_dir / "final-report.json"
@@ -312,6 +328,8 @@ def main() -> int:
                 required_steps=sorted(required_steps),
                 completed_required_outcomes=sorted(completed_outcomes),
                 required_outcomes=sorted(required_outcomes),
+                completed_source_requirements=sorted(completed_source_requirements),
+                source_requirements=sorted(source_requirements),
                 current_generation=current_generation,
                 unresolved_amendments=sorted(unresolved),
                 anchor_changing_amendments=sorted(anchor_changing),

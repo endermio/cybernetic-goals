@@ -197,6 +197,26 @@ class RuntimeJsonProgressVerifierTest(unittest.TestCase):
                 result.stdout + result.stderr,
             )
 
+    def test_verify_runtime_progress_rejects_missing_completed_source_requirement_evidence(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            run_dir = Path(tmpdir)
+            write_lean_run(
+                run_dir,
+                progress_events=[progress_event("evidence.other")],
+                report=final_report("gen-000", "evidence.other"),
+            )
+
+            result = run_script(VERIFY, str(run_dir))
+
+            self.assertNotEqual(result.returncode, 0, result.stdout + result.stderr)
+            payload = json.loads(result.stdout)
+            self.assertIn(
+                "missing completed evidence for blocking source requirements: SR-lean-startup",
+                result.stdout + result.stderr,
+            )
+            self.assertEqual([], payload["completed_source_requirements"])
+            self.assertEqual(["SR-lean-startup"], payload["source_requirements"])
+
     def test_verify_runtime_progress_permits_complete_mainline_verified_report(self):
         with tempfile.TemporaryDirectory() as tmpdir:
             run_dir = Path(tmpdir)
@@ -213,6 +233,8 @@ class RuntimeJsonProgressVerifierTest(unittest.TestCase):
             self.assertTrue(payload["goal_achieved_permitted"])
             self.assertEqual(["O-lean-startup"], payload["required_outcomes"])
             self.assertEqual(["O-lean-startup"], payload["completed_required_outcomes"])
+            self.assertEqual(["SR-lean-startup"], payload["source_requirements"])
+            self.assertEqual(["SR-lean-startup"], payload["completed_source_requirements"])
 
     def test_build_runtime_prompt_outputs_short_goal_pointer(self):
         with tempfile.TemporaryDirectory() as tmpdir:

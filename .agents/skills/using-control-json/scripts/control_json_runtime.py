@@ -505,6 +505,21 @@ def required_evidence_source_map(requirements: dict[str, Any], errors: list[str]
     return evidence_map
 
 
+def source_requirements_completed_by_evidence(
+    requirements: dict[str, Any],
+    completed_evidence: set[str],
+) -> set[str]:
+    _, _, evidence_sources, validation_errors = validate_source_requirement_coverage(requirements)
+    if validation_errors:
+        return set()
+    completed_sources: set[str] = set()
+    for evidence_id in sorted(completed_evidence):
+        evidence = evidence_sources.get(evidence_id)
+        if isinstance(evidence, dict):
+            completed_sources.update(string_list(evidence.get("satisfies_source_requirements")))
+    return completed_sources
+
+
 def validate_source_requirement_coverage(
     requirements: dict[str, Any],
 ) -> tuple[set[str], dict[str, set[str]], dict[str, dict[str, Any]], list[str]]:
