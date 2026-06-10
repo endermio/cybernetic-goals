@@ -46,6 +46,12 @@ def result_payload(ok: bool, **fields: Any) -> dict[str, Any]:
     return payload
 
 
+def string_list(value: Any) -> list[str]:
+    if not isinstance(value, list):
+        return []
+    return [item for item in value if isinstance(item, str) and item]
+
+
 def active_generation(run_control: dict[str, Any]) -> dict[str, Any] | None:
     current = run_control.get("current_generation")
     generations = run_control.get("generations")
@@ -112,7 +118,10 @@ def approved_review(amendment: dict[str, Any], parent_generation: str) -> dict[s
         "obligation-preservation": f"amendment {amendment_id} keeps required outcomes and completion obligations unchanged",
         "required-outcome-coverage": f"amendment {amendment_id} carries current required steps into the reviewed generation",
         "source-requirement-preservation": (
-            f"amendment {amendment_id} preserves source requirement coverage from parent generation {parent_generation}"
+            "amendment preserves source requirements affected by "
+            + amendment_id
+            + ": "
+            + ", ".join(string_list(amendment.get("affected_source_requirements")))
         ),
         "horizon-authority": f"amendment {amendment_id} does not expand authority or approved runtime horizon",
     }

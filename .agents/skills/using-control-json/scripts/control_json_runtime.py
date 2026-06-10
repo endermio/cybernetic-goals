@@ -109,6 +109,7 @@ AMENDMENT_PROPOSAL_REQUIRED_FIELDS = (
     "reason",
     "triggering_observation",
     "affected_stages",
+    "affected_source_requirements",
     *AMENDMENT_ANCHOR_FIELDS,
     "proposed_changes",
     "review_required",
@@ -732,6 +733,15 @@ def validate_event(event: dict[str, Any]) -> list[str]:
                 or not all(isinstance(stage, str) and stage for stage in event.get("affected_stages", []))
             ):
                 errors.append("control.amendment.proposed affected_stages must be a non-empty list")
+            if "affected_source_requirements" in event and (
+                not isinstance(event.get("affected_source_requirements"), list)
+                or not event.get("affected_source_requirements")
+                or not all(
+                    isinstance(source_requirement, str) and source_requirement
+                    for source_requirement in event.get("affected_source_requirements", [])
+                )
+            ):
+                errors.append("control.amendment.proposed affected_source_requirements must be a non-empty list")
             for field in ("proposed_changes", "review_required"):
                 if field in event and (
                     not isinstance(event.get(field), list)
@@ -839,8 +849,8 @@ def validate_generation_control_chain(run_dir: Path) -> tuple[dict[str, dict[str
         review = artifacts.get("review")
         if not isinstance(review, dict) or review.get("artifact_type") != "review.control" or review.get("status") != "approved":
             errors.append("amendment generation review must be approved")
-        elif strategy_kind == "amendment":
-            errors.extend(generation_review_errors(review, context="amendment generation"))
+        elif strategy_kind in {"execution", "amendment"}:
+            errors.extend(generation_review_errors(review, context=f"{strategy_kind} generation"))
 
     readonly_files = generation_runtime_readonly_files(generation) if generation and runtime_rel else []
     runtime_files = runtime.get("runtime", {})

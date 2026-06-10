@@ -254,6 +254,7 @@ def progress_event(
         event["reason"] = "current strategy cannot produce required evidence"
         event["triggering_observation"] = "current strategy produced substitute evidence"
         event["affected_stages"] = ["plan", "runtime"]
+        event["affected_source_requirements"] = ["SR-lean-startup"]
         event["semantic_base_change"] = False
         event["required_outcomes_changed"] = False
         event["authority_expanded"] = False
@@ -361,6 +362,29 @@ class ReviewedReplanningControlTest(unittest.TestCase):
             self.assertIn("PASS", guard.stdout)
             self.assertTrue(json.loads(validate.stdout)["ok"])
 
+    def test_guard_rejects_generation_review_missing_source_requirement_preservation(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            run_dir = Path(tmpdir)
+            write_lean_run(run_dir)
+            review_path = run_dir / "gen-000/review.control.json"
+            review = json.loads(review_path.read_text(encoding="utf-8"))
+            review["review_checks"] = [
+                check
+                for check in review["review_checks"]
+                if check["check_id"] != "source-requirement-preservation"
+            ]
+            req = json.loads((run_dir / "requirements.control.json").read_text(encoding="utf-8"))
+            run = json.loads((run_dir / "run.control.json").read_text(encoding="utf-8"))
+            runtime = json.loads((run_dir / "gen-000/runtime.control.json").read_text(encoding="utf-8"))
+            apply_hashes(req, run, runtime, "gen-000/runtime.control.json", review, "gen-000/review.control.json")
+            review_path.write_text(json.dumps(review, indent=2), encoding="utf-8")
+            (run_dir / "gen-000/runtime.control.json").write_text(json.dumps(runtime, indent=2), encoding="utf-8")
+
+            result = run_script(CONTROL_GUARD, "--run-dir", str(run_dir))
+
+            self.assertNotEqual(result.returncode, 0, result.stdout + result.stderr)
+            self.assertIn("source-requirement-preservation", result.stdout + result.stderr)
+
     def test_runtime_validator_requires_runtime_generation_for_step_events(self):
         event = progress_event("evidence.lean-startup")
         del event["runtime_generation"]
@@ -385,6 +409,7 @@ class ReviewedReplanningControlTest(unittest.TestCase):
             "reason": "current strategy cannot produce required evidence",
             "triggering_observation": "current strategy produced substitute evidence",
             "affected_stages": ["plan", "runtime"],
+            "affected_source_requirements": ["SR-lean-startup"],
             "semantic_base_change": False,
             "required_outcomes_changed": False,
             "authority_expanded": False,
@@ -436,6 +461,7 @@ class ReviewedReplanningControlTest(unittest.TestCase):
             "reason": "current strategy cannot produce required evidence",
             "triggering_observation": "current strategy cannot produce required evidence",
             "affected_stages": ["plan", "runtime"],
+            "affected_source_requirements": ["SR-lean-startup"],
             "semantic_base_change": False,
             "required_outcomes_changed": False,
             "authority_expanded": False,
@@ -468,9 +494,16 @@ class ReviewedReplanningControlTest(unittest.TestCase):
                     "intent-preservation",
                     "obligation-preservation",
                     "required-outcome-coverage",
+                    "source-requirement-preservation",
                     "horizon-authority",
                 },
             )
+            source_check = next(
+                check
+                for check in review["review_checks"]
+                if check["check_id"] == "source-requirement-preservation"
+            )
+            self.assertIn("SR-lean-startup", "\n".join(source_check["evidence"]))
             self.assertEqual(0, run_script(CONTROL_GUARD, "--run-dir", str(run_dir)).returncode)
             progress = [
                 json.loads(line)
@@ -489,6 +522,7 @@ class ReviewedReplanningControlTest(unittest.TestCase):
             "reason": "current strategy would require changing approved anchors",
             "triggering_observation": "required outcome must change",
             "affected_stages": ["plan", "runtime"],
+            "affected_source_requirements": ["SR-lean-startup"],
             "semantic_base_change": True,
             "required_outcomes_changed": False,
             "authority_expanded": False,
@@ -695,6 +729,29 @@ class ReviewedReplanningControlTest(unittest.TestCase):
             self.assertIn("control.amendment.proposed events must include triggering_observation", result.stdout + result.stderr)
             self.assertIn("control.amendment.proposed events must include affected_stages", result.stdout + result.stderr)
             self.assertIn("control.amendment.proposed events must include semantic_base_change", result.stdout + result.stderr)
+
+    def test_runtime_validator_requires_affected_source_requirements_on_amendment_proposal(self):
+        event = progress_event(
+            "evidence.lean-startup",
+            event_type="control.amendment.proposed",
+            amendment_id="A1",
+        )
+        del event["affected_source_requirements"]
+        with tempfile.TemporaryDirectory() as tmpdir:
+            run_dir = Path(tmpdir)
+            write_lean_run(
+                run_dir,
+                progress_events=[event],
+                report=final_report("gen-000", "evidence.lean-startup"),
+            )
+
+            result = run_script(VERIFY, str(run_dir))
+
+            self.assertNotEqual(result.returncode, 0, result.stdout + result.stderr)
+            self.assertIn(
+                "control.amendment.proposed events must include affected_source_requirements",
+                result.stdout + result.stderr,
+            )
 
     def test_verifier_rejects_anchor_changing_amendment_as_automatic_goal_completion(self):
         event = progress_event(

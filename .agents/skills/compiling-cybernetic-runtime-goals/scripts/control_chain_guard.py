@@ -656,8 +656,8 @@ def validate_generation_control_run(run_dir: Path) -> dict[str, dict[str, Any]]:
         review = read_json_object(run_dir / review_rel)
         if review.get("artifact_type") != "review.control" or review.get("status") != "approved":
             raise ControlJsonValidationError(f"{review_rel}: amendment generation review must be approved")
-        if strategy_kind == "amendment":
-            require_generation_review_checks(review, context="amendment generation")
+        if strategy_kind in {"execution", "amendment"}:
+            require_generation_review_checks(review, context=f"{strategy_kind} generation")
     if strategy_kind in {"execution", "amendment"} and not review_rel:
         raise ControlJsonValidationError(f"run.control.json: {strategy_kind} generations must declare review")
     if generation.get("parent") and (not review_rel or not generation.get("amendment_source")):
