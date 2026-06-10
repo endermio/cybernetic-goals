@@ -236,6 +236,68 @@ SCHEMA_FIXTURES = {
             "output_schema": "final-report.schema.json",
         },
     },
+    "run.control.schema.json": {
+        "artifact_type": "run.control",
+        "schema_version": "1.0.0",
+        "status": "active",
+        "run_id": "2026-06-10-lean-fixture",
+        "control_mode": "lean",
+        "current_generation": "gen-000",
+        "max_auto_amendment_rounds": 2,
+        "semantic_base_ref": {
+            "id": "semantic-base:test-fixture",
+            "hash": "sha256:test-fixture",
+        },
+        "amendment_policy": {
+            "may_change": [
+                "design_strategy",
+                "plan_strategy",
+                "runtime_strategy",
+                "required_step_refinement",
+                "work_packages",
+                "instrumentation",
+                "verifier_config",
+            ],
+            "must_not_change_without_human": [
+                "semantic_base",
+                "required_outcomes",
+                "what_counts_as_done",
+                "work_covered",
+                "authority",
+                "forbidden_actions",
+            ],
+        },
+        "generations": [
+            {
+                "id": "gen-000",
+                "status": "active",
+                "runtime": "gen-000/runtime.control.json",
+                "required_steps": [
+                    {
+                        "step_id": "S1",
+                        "transition": "first lean horizon is executable",
+                        "evidence": ["lean runtime evidence"],
+                        "satisfies_outcomes": ["outcome.schema-validation"],
+                    }
+                ],
+            }
+        ],
+    },
+    "amendment-proposal.schema.json": {
+        "artifact_type": "control.amendment.proposal",
+        "schema_version": "1.0.0",
+        "status": "proposed",
+        "amendment_id": "A1",
+        "runtime_generation": "gen-000",
+        "reason": "Current strategy cannot produce required outcome evidence.",
+        "triggering_observation": "The current evidence proves readiness, not implementation.",
+        "affected_stages": ["design", "plan", "runtime"],
+        "semantic_base_change": False,
+        "required_outcomes_changed": False,
+        "authority_expanded": False,
+        "proposed_changes": ["replace readiness-only work package with implementation work"],
+        "review_required": ["intent-preservation", "obligation-preservation"],
+    },
     "progress-event.schema.json": {
         "event_type": "step.completed",
         "schema_version": "1.0.0",
@@ -250,6 +312,9 @@ SCHEMA_FIXTURES = {
         "schema_version": "1.0.0",
         "goal_achieved": False,
         "what_counts_as_done_met": False,
+        "runtime_generation": "gen-000",
+        "superseded_generations": [],
+        "unresolved_amendments": [],
         "evidence": ["focused schema test"],
         "verification": {
             "verifier_result": "not_run",
@@ -394,7 +459,11 @@ def validate(instance, schema, path="$"):
 
 def assert_all_object_schemas_are_strict(testcase: unittest.TestCase, schema: dict, path: str = "$"):
     if schema.get("type") == "object":
-        testcase.assertFalse(schema.get("additionalProperties"), f"{path} must reject unknown fields")
+        additional = schema.get("additionalProperties")
+        if isinstance(additional, dict):
+            testcase.assertEqual("string", additional.get("type"), f"{path} dynamic keys must be string-valued")
+        else:
+            testcase.assertFalse(additional, f"{path} must reject unknown fields")
         for key, subschema in schema.get("properties", {}).items():
             assert_all_object_schemas_are_strict(testcase, subschema, f"{path}.{key}")
     elif schema.get("type") == "array":
@@ -550,6 +619,29 @@ class ControlJsonSchemaTest(unittest.TestCase):
             verifier = schema["properties"]["verifier"]
             self.assertIn("required_outcomes", verifier["required"])
             self.assertIn("required_outcomes", verifier["properties"])
+
+    def test_generation_and_amendment_schemas_are_first_class(self):
+        run_schema = load_json(SCHEMA_DIR / "run.control.schema.json")
+        amendment_schema = load_json(SCHEMA_DIR / "amendment-proposal.schema.json")
+        progress_schema = load_json(SCHEMA_DIR / "progress-event.schema.json")
+        final_report_schema = load_json(SCHEMA_DIR / "final-report.schema.json")
+
+        self.assertIn("current_generation", run_schema["required"])
+        self.assertEqual(["lean", "full"], run_schema["properties"]["control_mode"]["enum"])
+        self.assertIn("must_not_change_without_human", run_schema["properties"]["amendment_policy"]["required"])
+        self.assertIn("runtime", run_schema["properties"]["generations"]["items"]["required"])
+
+        self.assertEqual("control.amendment.proposal", amendment_schema["properties"]["artifact_type"]["const"])
+        self.assertIn("semantic_base_change", amendment_schema["required"])
+        self.assertIn("authority_expanded", amendment_schema["required"])
+
+        event_types = progress_schema["properties"]["event_type"]["enum"]
+        self.assertIn("control.amendment.proposed", event_types)
+        self.assertIn("runtime.generation.started", event_types)
+        self.assertIn("runtime_generation", progress_schema["properties"])
+
+        self.assertIn("runtime_generation", final_report_schema["properties"])
+        self.assertIn("unresolved_amendments", final_report_schema["properties"])
 
     def test_review_checks_are_structured_certificates(self):
         review = load_json(SCHEMA_DIR / "review.control.schema.json")

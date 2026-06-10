@@ -1,0 +1,93 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://cybernetic-goals.local/schemas/control-json/amendment-proposal.schema.json",
+  "title": "Cybernetic Control Amendment Proposal",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "artifact_type",
+    "schema_version",
+    "status",
+    "amendment_id",
+    "runtime_generation",
+    "reason",
+    "triggering_observation",
+    "affected_stages",
+    "semantic_base_change",
+    "required_outcomes_changed",
+    "authority_expanded",
+    "proposed_changes",
+    "review_required"
+  ],
+  "properties": {
+    "artifact_type": {
+      "const": "control.amendment.proposal"
+    },
+    "schema_version": {
+      "type": "string",
+      "minLength": 1
+    },
+    "status": {
+      "enum": [
+        "proposed",
+        "approved",
+        "rejected",
+        "blocked"
+      ]
+    },
+    "amendment_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "runtime_generation": {
+      "type": "string",
+      "minLength": 1
+    },
+    "reason": {
+      "type": "string",
+      "minLength": 1
+    },
+    "triggering_observation": {
+      "type": "string",
+      "minLength": 1
+    },
+    "affected_stages": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "enum": [
+          "design",
+          "goal",
+          "plan",
+          "runtime",
+          "verifier"
+        ]
+      }
+    },
+    "semantic_base_change": {
+      "type": "boolean"
+    },
+    "required_outcomes_changed": {
+      "type": "boolean"
+    },
+    "authority_expanded": {
+      "type": "boolean"
+    },
+    "proposed_changes": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "review_required": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    }
+  }
+}

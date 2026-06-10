@@ -18,8 +18,56 @@ from control_json_runtime import (
 )
 
 
-def mainline_completed_steps(events: list[dict]) -> set[str]:
+def event_matches_generation(
+    event: dict,
+    *,
+    current_generation: str | None,
+    imported_evidence: set[str],
+    invalidated_evidence: set[str],
+) -> bool:
+    evidence = event.get("evidence")
+    evidence_ids = set(evidence) if isinstance(evidence, list) else set()
+    evidence_ids = {item for item in evidence_ids if isinstance(item, str)}
+    if evidence_ids & invalidated_evidence:
+        return False
+    if current_generation is None:
+        return True
+    if event.get("runtime_generation") == current_generation:
+        return True
+    return bool(evidence_ids & imported_evidence)
+
+
+def unresolved_amendment_ids(events: list[dict], current_generation: str | None) -> set[str]:
+    proposed: set[str] = set()
+    resolved: set[str] = set()
+    for event in events:
+        if current_generation is not None and event.get("runtime_generation") != current_generation:
+            continue
+        amendment_id = event.get("amendment_id")
+        if not isinstance(amendment_id, str) or not amendment_id:
+            continue
+        event_type = event.get("event_type")
+        if event_type == "control.amendment.proposed":
+            proposed.add(amendment_id)
+        elif event_type in {
+            "control.amendment.approved",
+            "control.amendment.rejected",
+            "control.amendment.blocked",
+        }:
+            resolved.add(amendment_id)
+    return proposed - resolved
+
+
+def mainline_completed_steps(
+    events: list[dict],
+    *,
+    current_generation: str | None = None,
+    imported_evidence: set[str] | None = None,
+    invalidated_evidence: set[str] | None = None,
+) -> set[str]:
     completed: set[str] = set()
+    imported_evidence = imported_evidence or set()
+    invalidated_evidence = invalidated_evidence or set()
     for event in events:
         role = event.get("progress_role", "mainline")
         counts = event.get("counts_as_goal_progress", role == "mainline")
@@ -29,13 +77,27 @@ def mainline_completed_steps(events: list[dict]) -> set[str]:
             and role == "mainline"
             and counts is True
             and event.get("evidence")
+            and event_matches_generation(
+                event,
+                current_generation=current_generation,
+                imported_evidence=imported_evidence,
+                invalidated_evidence=invalidated_evidence,
+            )
         ):
             completed.add(event["required_step"])
     return completed
 
 
-def mainline_evidence_by_completed_step(events: list[dict]) -> dict[str, set[str]]:
+def mainline_evidence_by_completed_step(
+    events: list[dict],
+    *,
+    current_generation: str | None = None,
+    imported_evidence: set[str] | None = None,
+    invalidated_evidence: set[str] | None = None,
+) -> dict[str, set[str]]:
     evidence_by_step: dict[str, set[str]] = {}
+    imported_evidence = imported_evidence or set()
+    invalidated_evidence = invalidated_evidence or set()
     for event in events:
         role = event.get("progress_role", "mainline")
         counts = event.get("counts_as_goal_progress", role == "mainline")
@@ -47,12 +109,23 @@ def mainline_evidence_by_completed_step(events: list[dict]) -> dict[str, set[str
             and counts is True
             and isinstance(evidence, list)
             and all(isinstance(item, str) and item for item in evidence)
+            and event_matches_generation(
+                event,
+                current_generation=current_generation,
+                imported_evidence=imported_evidence,
+                invalidated_evidence=invalidated_evidence,
+            )
         ):
             evidence_by_step.setdefault(event["required_step"], set()).update(evidence)
     return evidence_by_step
 
 
-def final_report_errors(final_report: dict) -> list[str]:
+def final_report_errors(
+    final_report: dict,
+    *,
+    current_generation: str | None = None,
+    unresolved_amendments: set[str] | None = None,
+) -> list[str]:
     errors: list[str] = []
     if final_report.get("goal_achieved") is not True:
         errors.append("not-done final report cannot be treated as success")
@@ -71,6 +144,14 @@ def final_report_errors(final_report: dict) -> list[str]:
         errors.append("remaining_gaps must be empty before goal_achieved true")
     if not final_report.get("evidence"):
         errors.append("final-report.json must include evidence")
+    if current_generation is not None and final_report.get("runtime_generation") != current_generation:
+        errors.append("final-report.json runtime_generation must match current_generation")
+    unresolved_amendments = unresolved_amendments or set()
+    reported_unresolved = final_report.get("unresolved_amendments")
+    if unresolved_amendments:
+        errors.append("unresolved amendments block goal_achieved true: " + ", ".join(sorted(unresolved_amendments)))
+    if reported_unresolved:
+        errors.append("final-report.json unresolved_amendments must be empty before goal_achieved true")
     return errors
 
 
@@ -93,7 +174,24 @@ def main() -> int:
     errors.extend(event_errors)
 
     required_steps = step_ids(artifacts["runtime"])
-    evidence_by_step = mainline_evidence_by_completed_step(events)
+    run_control = artifacts.get("run")
+    current_generation = run_control.get("current_generation") if isinstance(run_control, dict) else None
+    if not isinstance(current_generation, str):
+        current_generation = None
+    runtime = artifacts["runtime"]
+    imported_evidence = set(
+        item for item in runtime.get("imported_evidence", []) if isinstance(item, str)
+    )
+    invalidated_evidence = set(
+        item for item in runtime.get("invalidated_evidence", []) if isinstance(item, str)
+    )
+    unresolved = unresolved_amendment_ids(events, current_generation)
+    evidence_by_step = mainline_evidence_by_completed_step(
+        events,
+        current_generation=current_generation,
+        imported_evidence=imported_evidence,
+        invalidated_evidence=invalidated_evidence,
+    )
     completed_steps = set(evidence_by_step)
     required_outcomes = blocking_required_outcomes(artifacts["requirements"])
     runtime_step_outcomes = step_outcome_map(artifacts["runtime"])
@@ -136,7 +234,13 @@ def main() -> int:
         final_report = {}
         errors.append(f"invalid JSON in final-report.json: {exc}")
     if isinstance(final_report, dict):
-        errors.extend(final_report_errors(final_report))
+        errors.extend(
+            final_report_errors(
+                final_report,
+                current_generation=current_generation,
+                unresolved_amendments=unresolved,
+            )
+        )
     else:
         errors.append("final-report.json must contain a JSON object")
 
@@ -151,6 +255,8 @@ def main() -> int:
                 required_steps=sorted(required_steps),
                 completed_required_outcomes=sorted(completed_outcomes),
                 required_outcomes=sorted(required_outcomes),
+                current_generation=current_generation,
+                unresolved_amendments=sorted(unresolved),
             ),
             indent=2,
         )

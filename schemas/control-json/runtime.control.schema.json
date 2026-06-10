@@ -8,9 +8,7 @@
     "artifact_type",
     "schema_version",
     "status",
-    "control_chain",
     "semantic_base_ref",
-    "registry_bindings",
     "approved_control_hashes",
     "runtime",
     "required_steps",
@@ -29,6 +27,33 @@
       "enum": [
         "compiled"
       ]
+    },
+    "control_mode": {
+      "enum": [
+        "lean",
+        "full"
+      ]
+    },
+    "generation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "parent": {
+          "type": "string",
+          "minLength": 1
+        },
+        "amendment_source": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
     },
     "control_chain": {
       "type": "object",
@@ -101,40 +126,9 @@
     },
     "approved_control_hashes": {
       "type": "object",
-      "additionalProperties": false,
-      "required": [
-        "requirements.control.json",
-        "design.control.json",
-        "goal.control.json",
-        "plan.control.json",
-        "review.control.json",
-        "runtime.control.json"
-      ],
-      "properties": {
-        "requirements.control.json": {
-          "type": "string",
-          "minLength": 1
-        },
-        "design.control.json": {
-          "type": "string",
-          "minLength": 1
-        },
-        "goal.control.json": {
-          "type": "string",
-          "minLength": 1
-        },
-        "plan.control.json": {
-          "type": "string",
-          "minLength": 1
-        },
-        "review.control.json": {
-          "type": "string",
-          "minLength": 1
-        },
-        "runtime.control.json": {
-          "type": "string",
-          "minLength": 1
-        }
+      "additionalProperties": {
+        "type": "string",
+        "minLength": 1
       }
     },
     "registry_bindings": {
@@ -148,6 +142,20 @@
           "type": "string",
           "minLength": 1
         }
+      }
+    },
+    "imported_evidence": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "invalidated_evidence": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
       }
     },
     "runtime": {

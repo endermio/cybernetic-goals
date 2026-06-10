@@ -1,0 +1,14 @@
+{
+  "evidence_ids": [
+    "evidence.run-control-schema",
+    "evidence.generation-guard"
+  ],
+  "status": "pass",
+  "summary": "run.control.json is a first-class generation-aware manifest with current_generation, amendment_policy, and generation records. Guard and runtime validation reject stale current_generation state.",
+  "proof": [
+    "Added schemas/control-json/run.control.schema.json.",
+    "Updated control_chain_guard.py with generation-aware validation when run.control.json exists.",
+    "Updated control_json_runtime.py with generation-aware validate_control_chain behavior.",
+    "Added tests/skills/test_reviewed_replanning_control.py::test_guard_rejects_stale_current_generation."
+  ]
+}

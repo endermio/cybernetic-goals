@@ -1,0 +1,13 @@
+{
+  "evidence_ids": [
+    "evidence.orchestrator-amendment-loop",
+    "evidence.anchor-change-human-approval"
+  ],
+  "status": "pass",
+  "summary": "Orchestration and review guidance now treat amendments as reviewed derived-strategy changes. Approved anchors remain non-runtime-mutable and anchor/authority changes require human reapproval.",
+  "proof": [
+    "Updated orchestrating-cybernetic-pregoal to describe lean default and full exception.",
+    "Updated reviewing-cybernetic-control-structures runtime suitability language to require anchor preservation or human reapproval.",
+    "Updated writing-cybernetic-execution-policies to allow generation strategy with reviewed amendment boundaries."
+  ]
+}

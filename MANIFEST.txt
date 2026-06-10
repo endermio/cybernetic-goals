@@ -86,6 +86,7 @@
 .github/workflows/aggregate-cybernetic-outcomes.yml
 AGENTS.md
 docs/cybernetic-framework/invariant-artifact-consumer-matrix.md
+docs/cybernetic-framework/reviewed-replanning-control-architecture.md
 docs/cybernetic-framework/superpowers-infrastructure-policy.md
 MANIFEST.txt
 observability/README.md
@@ -104,6 +105,7 @@ scripts/redact_run_event.py
 scripts/sync_run_events_to_github.py
 scripts/validate_run_events.py
 schemas/control-json/design.control.schema.json
+schemas/control-json/amendment-proposal.schema.json
 schemas/control-json/bounded-runtime.control.schema.json
 schemas/control-json/final-report.schema.json
 schemas/control-json/goal.control.schema.json
@@ -111,6 +113,7 @@ schemas/control-json/plan.control.schema.json
 schemas/control-json/progress-event.schema.json
 schemas/control-json/requirements.control.schema.json
 schemas/control-json/review.control.schema.json
+schemas/control-json/run.control.schema.json
 schemas/control-json/runtime.control.schema.json
 tests/__init__.py
 tests/fixtures/cybernetics/json_only_control_regression_inventory.json
@@ -128,6 +131,7 @@ tests/skills/test_invariant_consumer_matrix.py
 tests/skills/test_json_control_regression_inventory.py
 tests/skills/test_json_control_template_hard_cut.py
 tests/skills/test_json_official_guard_compiler_path.py
+tests/skills/test_reviewed_replanning_control.py
 tests/skills/test_runtime_json_progress_verifier.py
 tests/skills/test_semantic_review_needs_revision.py
 tests/skills/test_skill_repository_integrity.py

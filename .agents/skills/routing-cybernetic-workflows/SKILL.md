@@ -298,7 +298,7 @@ After rubric analysis is complete:
 $writing-cybernetic-goals 为这个 Level 2 有界任务创建 goal.control.json 和 runtime.control.json，并在完成后给出指向 runtime.control.json 的短 /goal，不要默认建议 execution policy：<任务 + confirmed rubric>
 ```
 
-### Level 3: Full Pre-goal Pipeline
+### Level 3: Lean Pre-goal With Reviewed Replanning
 
 Use when the execution agent would otherwise need to invent or revise the approved work chain.
 
@@ -323,10 +323,14 @@ $analyzing-cybernetic-requirements <需求>
 After requirements analysis is complete and What the User Approved is Approved:
 
 ```text
-$orchestrating-cybernetic-pregoal 根据 <requirements-path> 完成 pre-goal 编译，允许使用 subagents review。
+$orchestrating-cybernetic-pregoal 根据 <requirements-path> 启动 lean pre-goal，生成 requirements.control.json, run.control.json, and gen-000/runtime.control.json。允许 goal 中通过 reviewed amendment 生成后续 generation。
 ```
 
-If `required design: required`, do not recommend a standalone design step before orchestration for Level 3/4 work. The orchestrator must invoke or request `$designing-cybernetic-solutions` before goal writing.
+Lean pre-goal is the default for Level 3 exploratory, diagnostic, research, and implementation work where runtime can safely observe and replan. Full pre-goal is an exception, not the default.
+
+Use full pre-goal for Level 3 only when the work has irreversible action, live external-state impact, external contract publication, compliance/security/legal/financial risk, complex multi-team dependency freezing, unsafe runtime replanning, or the user explicitly requests full design/plan review before runtime.
+
+If `required design: required`, do not recommend a standalone design step before orchestration for Level 3/4 work. The orchestrator must either place the design strategy in the initial lean generation or invoke/request `$designing-cybernetic-solutions` when full pre-goal exception criteria require a frozen design before runtime.
 
 If orchestration is unavailable, manually run the downstream sequence. In that manual fallback only, run solution design before goal writing when required design is required:
 
@@ -367,7 +371,7 @@ Signals:
 Recommended next step:
 
 ```text
-Use the full pre-goal pipeline, but require explicit human approval before runtime /goal execution.
+Use the full pre-goal pipeline, and require explicit human approval before runtime /goal execution.
 ```
 
 ## Scoring Heuristic
@@ -485,10 +489,10 @@ Before responding, verify:
 - [ ] A complete object list is not mistaken for a complete evaluation rubric.
 - [ ] A requirement list is not mistaken for a complete solution design.
 - [ ] The recommended next step is the lightest safe workflow.
-- [ ] For Level 3/4, the response recommends `$analyzing-cybernetic-requirements`, then `$orchestrating-cybernetic-pregoal`; required design remains explicit and design dispatch is owned by the orchestrator.
+- [ ] For Level 3/4, the response recommends `$analyzing-cybernetic-requirements`, then `$orchestrating-cybernetic-pregoal`; Level 3 defaults to lean pre-goal and full pre-goal is justified only by exception criteria.
 - [ ] For Level 0/1/2, the response does not recommend full pre-goal pipeline.
 - [ ] For Level 2 bounded file goals, the response does not recommend execution policy by default.
 - [ ] If rubric check is required, the response recommends rubric analysis before execution.
 - [ ] If final-answer-format check is required, the response routes output-contract definition through requirements analysis and solution design only when structure synthesis is needed.
-- [ ] If required design is required for Level 3/4 full pre-goal work, the response says orchestration must invoke or request solution design before goal writing; direct solution design is still valid for Level 2 with required design or manual fallback.
+- [ ] If required design is required for Level 3/4 work, the response says orchestration must either place the design strategy in a lean generation or invoke/request solution design when full pre-goal exception criteria apply; direct solution design is still valid for Level 2 with required design or manual fallback.
 - [ ] The response includes rejected workflow rationale.

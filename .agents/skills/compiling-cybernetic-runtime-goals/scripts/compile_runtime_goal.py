@@ -10,6 +10,9 @@ from pathlib import Path
 from control_chain_guard import (
     ControlJsonValidationError,
     control_file_hash,
+    generation_entry,
+    generation_runtime_readonly_files,
+    synthetic_steps_from_requirements,
     read_json_object,
     reject_markdown_control_artifacts,
     require_approved_control_inputs,
@@ -37,10 +40,91 @@ def runtime_control_pointer(runtime_control_path: Path) -> str:
     )
 
 
+def blocking_required_outcome_ids(requirements: dict) -> list[str]:
+    outcomes = requirements.get("approved_control", {}).get("required_outcomes", [])
+    if not isinstance(outcomes, list):
+        return []
+    return [
+        outcome["id"]
+        for outcome in outcomes
+        if isinstance(outcome, dict)
+        and isinstance(outcome.get("id"), str)
+        and outcome.get("blocks_goal_achieved_if_missing") is True
+    ]
+
+
+def compile_generation_runtime_control(run_dir: Path) -> Path:
+    requirements = read_json_object(run_dir / "requirements.control.json")
+    run_control = read_json_object(run_dir / "run.control.json")
+    current_generation = run_control.get("current_generation")
+    if not isinstance(current_generation, str) or not current_generation:
+        raise ControlJsonValidationError("run.control.json: current_generation must be a non-empty string")
+    generation = generation_entry(run_control, current_generation)
+    if not generation:
+        raise ControlJsonValidationError("run.control.json: current_generation is not declared in generations")
+    runtime_rel = generation.get("runtime")
+    if not isinstance(runtime_rel, str) or not runtime_rel:
+        raise ControlJsonValidationError("run.control.json: current_generation must name runtime")
+
+    runtime_path = run_dir / runtime_rel
+    if not runtime_path.exists():
+        runtime_path.parent.mkdir(parents=True, exist_ok=True)
+        required_steps = generation.get("required_steps")
+        if not isinstance(required_steps, list) or not required_steps:
+            required_steps = synthetic_steps_from_requirements(requirements)
+        runtime = {
+            "artifact_type": "runtime.control",
+            "schema_version": run_control.get("schema_version", "1.0.0"),
+            "status": "compiled",
+            "control_mode": run_control.get("control_mode", "lean"),
+            "generation": {
+                "id": current_generation,
+            },
+            "semantic_base_ref": run_control.get("semantic_base_ref"),
+            "approved_control": {
+                "objective": requirements.get("approved_control", {}).get("requested_transformation", "Execute the current approved generation."),
+                "what_counts_as_done": requirements.get("approved_control", {}).get("what_counts_as_done", "Verifier permits the final report."),
+            },
+            "approved_control_hashes": {},
+            "runtime": {
+                "readonly_files": generation_runtime_readonly_files(generation),
+                "writable_files": WRITABLE_FILES,
+                "writable_evidence_paths": WRITABLE_EVIDENCE_PATHS,
+            },
+            "required_steps": required_steps,
+            "progress": {"event_schema": "progress-event.schema.json", "append_only": True},
+            "verifier": {
+                "required_before_goal_achieved": True,
+                "command": "python3 .agents/skills/using-control-json/scripts/verify_runtime_progress.py",
+                "required_outcomes": blocking_required_outcome_ids(requirements),
+                "output_schema": "final-report.schema.json",
+            },
+            "imported_evidence": [],
+            "invalidated_evidence": [],
+        }
+        review_rel = generation.get("review")
+        if isinstance(review_rel, str) and review_rel:
+            review = read_json_object(run_dir / review_rel)
+            runtime["approved_control_hashes"][review_rel] = control_file_hash(review_rel, review)
+        runtime["approved_control_hashes"].update(
+            {
+                "requirements.control.json": control_file_hash("requirements.control.json", requirements),
+                "run.control.json": control_file_hash("run.control.json", run_control),
+                runtime_rel: control_file_hash(runtime_rel, runtime),
+            }
+        )
+        runtime_path.write_text(json.dumps(runtime, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+
+    validate_json_control_run(run_dir)
+    return runtime_path
+
+
 def compile_runtime_control(run_dir: Path) -> Path:
     if not run_dir.exists() or not run_dir.is_dir():
         raise ControlJsonValidationError(f"run directory does not exist: {run_dir}")
     reject_markdown_control_artifacts(run_dir)
+    if (run_dir / "run.control.json").exists():
+        return compile_generation_runtime_control(run_dir)
 
     runtime_path = run_dir / "runtime.control.json"
     if not runtime_path.exists():

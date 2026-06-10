@@ -1,0 +1,13 @@
+{
+  "evidence_ids": [
+    "evidence.import-invalidation-schema",
+    "evidence.old-evidence-not-auto-reused"
+  ],
+  "status": "pass",
+  "summary": "Runtime supports imported_evidence and invalidated_evidence. Verifier ignores superseded-generation evidence unless explicitly imported and not invalidated.",
+  "proof": [
+    "Added imported_evidence and invalidated_evidence fields to runtime.control schema.",
+    "Updated verify_runtime_progress.py to ignore old generation evidence unless explicitly imported.",
+    "Added tests for old generation evidence not auto-reused and explicit import acceptance."
+  ]
+}

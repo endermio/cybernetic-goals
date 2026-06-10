@@ -1,0 +1,44 @@
+{
+  "artifact_type": "final-report",
+  "schema_version": "1.0.0",
+  "goal_achieved": true,
+  "what_counts_as_done_met": true,
+  "superseded_generations": [],
+  "unresolved_amendments": [],
+  "evidence": [
+    "evidence/lean-pregoal-default.json",
+    "evidence/full-pregoal-exception.json",
+    "evidence/generation-aware-run-control.json",
+    "evidence/runtime-amendment-proposal.json",
+    "evidence/reviewed-amendment-orchestration.json",
+    "evidence/generation-aware-tools.json",
+    "evidence/evidence-import-invalidation.json",
+    "evidence/historical-regression-protection.json",
+    "python3 -m unittest discover tests/skills",
+    "python3 .agents/skills/compiling-cybernetic-runtime-goals/scripts/control_chain_guard.py --run-dir docs/cybernetics/runs/2026-06-10-reviewed-replanning-control",
+    "python3 .agents/skills/using-control-json/scripts/validate_control_chain.py docs/cybernetics/runs/2026-06-10-reviewed-replanning-control"
+  ],
+  "verification": {
+    "verifier_result": "pass",
+    "verifier_permits_goal_achieved": true
+  },
+  "work_coverage": {
+    "status": "complete",
+    "executed": [
+      "WP1-lean-and-generation-schemas",
+      "WP2-amendment-protocol-and-review",
+      "WP3-generation-aware-tools",
+      "WP4-historical-regressions"
+    ],
+    "prepared_only": [],
+    "forbidden_not_executed": [
+      "approved runtime control JSON was not rewritten during runtime execution",
+      "requirements.control.json was not rewritten during runtime execution"
+    ],
+    "out_of_scope": [
+      "launching a new target-work subagent wave",
+      "changing the approved requirements anchor"
+    ]
+  },
+  "remaining_gaps": []
+}

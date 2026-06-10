@@ -432,7 +432,7 @@ Meaning rules that cannot change must be frozen. Tactical execution details must
 
 ### 20. Runtime Suitability
 
-The runtime `/goal` must be able to execute the approved artifacts without inventing new approved work chains. Any required runtime discipline, including approved work assignment, bounded subagent delegation protocol, and conditionally selected Superpowers workflow, must be precompiled into the approved plan, review, or final `/goal`.
+The runtime `/goal` must be able to execute the approved artifacts without inventing new approved anchors. Lean pre-goal may allow runtime to propose reviewed amendments to derived strategy, but review must verify that `semantic_base`, required outcomes, what counts as done, work coverage, authority, and forbidden actions are unchanged unless human reapproval is required. Any required runtime discipline, including approved work assignment, bounded subagent delegation protocol, conditionally selected Superpowers workflow, amendment triggers, and generation switch rules, must be precompiled into the approved plan, run control, review, or final `/goal`.
 
 Runtime completion claims must be calibrated to the highest purpose-relevant evidence actually observed. If user purpose evidence is missing, runtime must report what is verified, what is not yet observed, and the smallest next observation needed. Purpose-achieved wording is reserved for observed or approved user purpose evidence.
 

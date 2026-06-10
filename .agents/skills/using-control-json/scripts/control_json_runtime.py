@@ -42,6 +42,14 @@ EVENT_TYPES = {
     "step.started",
     "step.completed",
     "step.blocked",
+    "step.failed",
+    "observation.recorded",
+    "runtime.generation.started",
+    "runtime.generation.superseded",
+    "control.amendment.proposed",
+    "control.amendment.approved",
+    "control.amendment.rejected",
+    "control.amendment.blocked",
     "verification.completed",
     "final_report.written",
 }
@@ -72,7 +80,7 @@ def semantic_base_hash(requirements: dict[str, Any]) -> str:
 
 
 def control_file_hash(filename: str, artifact: dict[str, Any]) -> str:
-    omit = {"approved_control_hashes"} if filename == "runtime.control.json" else set()
+    omit = {"approved_control_hashes"} if filename.endswith("runtime.control.json") else set()
     return canonical_json_hash(artifact, omit_top_level=omit)
 
 
@@ -108,6 +116,68 @@ def load_control_files(run_dir: Path) -> dict[str, dict[str, Any]]:
     for key, filename in CONTROL_FILES.items():
         artifacts[key] = load_json(run_dir / filename)
     return artifacts
+
+
+def generation_entry(run_control: dict[str, Any], generation_id: str) -> dict[str, Any] | None:
+    generations = run_control.get("generations")
+    if not isinstance(generations, list):
+        return None
+    for generation in generations:
+        if isinstance(generation, dict) and generation.get("id") == generation_id:
+            return generation
+    return None
+
+
+def active_generation_ids(run_control: dict[str, Any]) -> list[str]:
+    generations = run_control.get("generations")
+    if not isinstance(generations, list):
+        return []
+    return [
+        generation["id"]
+        for generation in generations
+        if isinstance(generation, dict)
+        and generation.get("status") == "active"
+        and isinstance(generation.get("id"), str)
+    ]
+
+
+def generation_runtime_readonly_files(generation: dict[str, Any]) -> list[str]:
+    files = ["requirements.control.json", "run.control.json", generation["runtime"]]
+    review = generation.get("review")
+    if isinstance(review, str) and review:
+        files.insert(2, review)
+    return files
+
+
+def load_generation_control_files(run_dir: Path) -> tuple[dict[str, dict[str, Any]] | None, list[str]]:
+    errors: list[str] = []
+    try:
+        requirements = load_json(run_dir / "requirements.control.json")
+        run_control = load_json(run_dir / "run.control.json")
+    except ControlJsonError as exc:
+        return None, [str(exc)]
+    current_generation = run_control.get("current_generation")
+    if not isinstance(current_generation, str) or not current_generation:
+        return None, ["run.control.json current_generation must be a non-empty string"]
+    generation = generation_entry(run_control, current_generation)
+    if not generation or not isinstance(generation.get("runtime"), str):
+        return None, ["run.control.json current_generation must name a generation runtime"]
+    try:
+        runtime = load_json(run_dir / generation["runtime"])
+    except ControlJsonError as exc:
+        return None, [str(exc)]
+    artifacts = {
+        "requirements": requirements,
+        "run": run_control,
+        "runtime": runtime,
+    }
+    review_rel = generation.get("review")
+    if isinstance(review_rel, str) and review_rel:
+        try:
+            artifacts["review"] = load_json(run_dir / review_rel)
+        except ControlJsonError as exc:
+            errors.append(str(exc))
+    return artifacts, errors
 
 
 def require_keys(name: str, value: dict[str, Any], keys: tuple[str, ...], errors: list[str]) -> None:
@@ -345,6 +415,7 @@ def validate_event(event: dict[str, Any]) -> list[str]:
 
     if event.get("event_type") not in EVENT_TYPES:
         errors.append("event_type is not recognized")
+    event_type = event.get("event_type")
     if event.get("status") not in EVENT_STATUSES:
         errors.append("status is not recognized")
     if not isinstance(event.get("required_step"), str) or not event.get("required_step"):
@@ -361,6 +432,15 @@ def validate_event(event: dict[str, Any]) -> list[str]:
         errors.append("counts_as_goal_progress must be boolean when present")
     if role == "supporting_only" and counts:
         errors.append("supporting-only progress cannot count as goal progress")
+    if isinstance(event_type, str) and (event_type.startswith("control.amendment.") or event_type.startswith("runtime.generation.")):
+        if not isinstance(event.get("runtime_generation"), str) or not event.get("runtime_generation"):
+            errors.append("generation and amendment events must include runtime_generation")
+    if isinstance(event_type, str) and event_type.startswith("control.amendment."):
+        if not isinstance(event.get("amendment_id"), str) or not event.get("amendment_id"):
+            errors.append("amendment events must include amendment_id")
+        for field in ("semantic_base_change", "required_outcomes_changed", "authority_expanded"):
+            if field in event and not isinstance(event[field], bool):
+                errors.append(f"{field} must be boolean when present")
     return errors
 
 
@@ -386,8 +466,125 @@ def read_progress_events(path: Path) -> tuple[list[dict[str, Any]], list[str]]:
     return events, errors
 
 
+def validate_generation_control_chain(run_dir: Path) -> tuple[dict[str, dict[str, Any]] | None, list[str]]:
+    artifacts, errors = load_generation_control_files(run_dir)
+    if artifacts is None:
+        return None, errors
+    requirements = artifacts["requirements"]
+    run_control = artifacts["run"]
+    runtime = artifacts["runtime"]
+
+    if requirements.get("artifact_type") != "requirements.control":
+        errors.append("requirements.control.json artifact_type must be requirements.control")
+    if requirements.get("status") != "approved":
+        errors.append("requirements.control.json status must be approved")
+    if run_control.get("artifact_type") != "run.control":
+        errors.append("run.control.json artifact_type must be run.control")
+    if run_control.get("status") != "active":
+        errors.append("run.control.json status must be active")
+    if runtime.get("artifact_type") != "runtime.control":
+        errors.append("runtime.control.json artifact_type must be runtime.control")
+    if runtime.get("status") != "compiled":
+        errors.append("runtime.control.json status must be compiled")
+
+    semantic_base = requirements.get("approved_control", {}).get("semantic_base")
+    if not isinstance(semantic_base, dict) or semantic_base.get("hash") != semantic_base_hash(requirements):
+        errors.append("requirements.control.json semantic_base hash must match approved_control")
+    if run_control.get("semantic_base_ref") != semantic_base:
+        errors.append("run.control.json semantic_base_ref must match requirements approved semantic_base")
+    if runtime.get("semantic_base_ref") != semantic_base:
+        errors.append("runtime.control.json semantic_base_ref must match requirements approved semantic_base")
+
+    current_generation = run_control.get("current_generation")
+    active_ids = active_generation_ids(run_control)
+    if not isinstance(current_generation, str) or not current_generation:
+        errors.append("run.control.json current_generation must be a non-empty string")
+        current_generation = ""
+    if active_ids != [current_generation]:
+        errors.append("run.control.json exactly current_generation must be active")
+    generation = generation_entry(run_control, current_generation) if current_generation else None
+    if not generation:
+        errors.append("run.control.json current_generation is not declared in generations")
+        generation = {}
+    runtime_rel = generation.get("runtime")
+    if not isinstance(runtime_rel, str) or not runtime_rel:
+        errors.append("run.control.json current_generation must name runtime")
+        runtime_rel = "runtime.control.json"
+    runtime_generation = runtime.get("generation")
+    if not isinstance(runtime_generation, dict) or runtime_generation.get("id") != current_generation:
+        errors.append("runtime.control.json generation.id must match run.control.json current_generation")
+    if runtime.get("control_mode") != run_control.get("control_mode"):
+        errors.append("runtime.control.json control_mode must match run.control.json")
+    if generation.get("parent") and (not generation.get("review") or not generation.get("amendment_source")):
+        errors.append("run.control.json amendment generations must declare review and amendment_source")
+    if generation.get("review"):
+        review = artifacts.get("review")
+        if not isinstance(review, dict) or review.get("artifact_type") != "review.control" or review.get("status") != "approved":
+            errors.append("amendment generation review must be approved")
+
+    readonly_files = generation_runtime_readonly_files(generation) if generation and runtime_rel else []
+    runtime_files = runtime.get("runtime", {})
+    if runtime_files.get("readonly_files") != readonly_files:
+        errors.append("runtime.control.json readonly_files must match current generation files")
+    if runtime_files.get("writable_files") != list(WRITABLE_FILES):
+        errors.append("runtime.control.json writable_files must be progress.jsonl, runtime-status.json, final-report.json")
+    writable_evidence_paths = string_list(runtime_files.get("writable_evidence_paths"))
+    if not writable_evidence_paths:
+        errors.append("runtime.control.json writable_evidence_paths must authorize non-control evidence artifacts")
+    for path in required_evidence_paths(requirements):
+        if not path_is_under(path, writable_evidence_paths):
+            errors.append(
+                "requirements.control.json required evidence path is not authorized by runtime writable_evidence_paths: "
+                + path
+            )
+
+    expected = {
+        "requirements.control.json": control_file_hash("requirements.control.json", requirements),
+        "run.control.json": control_file_hash("run.control.json", run_control),
+        runtime_rel: control_file_hash(runtime_rel, runtime),
+    }
+    if generation.get("review") and isinstance(artifacts.get("review"), dict):
+        expected[generation["review"]] = control_file_hash(generation["review"], artifacts["review"])
+    errors.extend(check_hashes("runtime.control.json", runtime.get("approved_control_hashes"), expected))
+
+    all_required_outcomes, required_outcomes, outcome_errors = required_outcome_sets(requirements)
+    errors.extend(outcome_errors)
+    runtime_step_outcomes = step_outcome_map(
+        runtime,
+        known_outcomes=all_required_outcomes if all_required_outcomes else None,
+        errors=errors,
+        label="runtime.control.json",
+    )
+    runtime_steps = step_ids(runtime)
+    if not runtime_steps:
+        errors.append("runtime.control.json must declare required_steps")
+    if required_outcomes:
+        missing_runtime = sorted(required_outcomes - covered_outcomes_by_steps(runtime_step_outcomes))
+        if missing_runtime:
+            errors.append(
+                "runtime.control.json required_steps do not satisfy blocking required outcomes: "
+                + ", ".join(missing_runtime)
+            )
+        raw_verifier_outcomes = runtime.get("verifier", {}).get("required_outcomes")
+        verifier_outcomes = set(string_list(raw_verifier_outcomes))
+        missing_verifier = sorted(required_outcomes - verifier_outcomes)
+        if missing_verifier:
+            errors.append(
+                "runtime.control.json verifier.required_outcomes missing blocking required outcomes: "
+                + ", ".join(missing_verifier)
+            )
+    if runtime.get("verifier", {}).get("required_before_goal_achieved") is not True:
+        errors.append("runtime.control.json verifier must be required before goal_achieved")
+    if not runtime.get("verifier", {}).get("command"):
+        errors.append("runtime.control.json verifier.command is required")
+
+    return artifacts, errors
+
+
 def validate_control_chain(run_dir: Path) -> tuple[dict[str, dict[str, Any]] | None, list[str]]:
     errors: list[str] = []
+    if (run_dir / "run.control.json").exists():
+        return validate_generation_control_chain(run_dir)
     try:
         artifacts = load_control_files(run_dir)
     except ControlJsonError as exc:

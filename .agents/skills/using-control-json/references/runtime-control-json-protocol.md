@@ -2,11 +2,11 @@
 
 ## Validate First
 
-Before writing runtime files, load the approved control chain from JSON. Parse every required JSON file, check schema or registry validators when available, and confirm the artifacts identify the same run, required steps, work coverage, verifier, and final report contract.
+Before writing runtime files, load the approved control chain from JSON. Parse every required JSON file, check schema or registry validators when available, and confirm the artifacts identify the same run, required steps, work coverage, verifier, generation, and final report contract.
 
 This protocol is not for Level 2 bounded runtime. Level 2 bounded goals use
 `using-bounded-control-json`; a directory with only `goal.control.json` and
-`runtime.control.json` is valid for bounded runtime but invalid for this full
+`runtime.control.json` is valid for bounded runtime but invalid for this
 control-chain protocol.
 
 Stop on missing, invalid, or inconsistent JSON before writing progress or status. Report the exact file or relationship that failed and the smallest human decision needed to continue.
@@ -15,7 +15,9 @@ Historical Markdown can remain as background only. A runtime JSON chain that nee
 
 ## Read-Only Approved JSON
 
-approved control JSON is read-only during runtime:
+approved control JSON is read-only during runtime.
+
+Full-chain mode:
 
 - `requirements.control.json`
 - `design.control.json`
@@ -24,9 +26,16 @@ approved control JSON is read-only during runtime:
 - `review.control.json`
 - `runtime.control.json`
 
+Generation-aware mode:
+
+- `requirements.control.json`
+- `run.control.json`
+- the current `gen-N/runtime.control.json`
+- the current generation review file when `run.control.json` names one
+
 Use approved JSON to decide what work is authorized, what counts as done, where results must appear, what evidence is required, and what the final report shape must contain. A runtime executor records facts about execution; it does not edit approved JSON after execution starts.
 
-If the approved target, plan, review, or runtime contract appears wrong, stale, or insufficient, stop and report the inconsistency. Append an observation only when `progress.jsonl` is available and valid.
+If the approved target, plan, review, or runtime contract appears wrong, stale, or insufficient, append an observation when `progress.jsonl` is available and valid. If the current strategy cannot produce a blocking required outcome but the approved anchors can remain unchanged, append a `control.amendment.proposed` event instead of hard-completing with substitute evidence. If the needed change would alter approved anchors or authority, stop and report the smallest required human decision.
 
 ## Approved Hashes
 
@@ -53,7 +62,12 @@ only under `runtime.control.json.runtime.writable_evidence_paths`, such as
 evidence artifacts. Do not add evidence artifact paths to `writable_files`;
 `writable_files` is reserved for the three control-output files above.
 
-`progress.jsonl` is the append-only event log. Append to `progress.jsonl` as one JSON object per line. Each event should be a small observation about a command, evidence item, required-step state, blocker, deviation, or verifier result. Progress observations are additive; do not mutate approved JSON to make the contract match the run.
+`progress.jsonl` is the append-only event log. Append to `progress.jsonl` as one JSON object per line. Each event should be a small observation about a command, evidence item, required-step state, blocker, deviation, amendment proposal, generation switch, or verifier result. Progress observations are additive; do not mutate approved JSON to make the contract match the run.
+
+Generation-aware progress events include `runtime_generation`. Amendment events
+use `control.amendment.proposed`, `control.amendment.approved`,
+`control.amendment.rejected`, or `control.amendment.blocked` and must include
+an `amendment_id`.
 
 `runtime-status.json` is the current bounded status snapshot. It can summarize active step state, blockers, next action, and last evidence pointer.
 
@@ -64,6 +78,12 @@ evidence artifacts. Do not add evidence artifact paths to `writable_files`;
 Run the configured verifier before `goal_achieved: true`. The verifier command or module should come from `runtime.control.json`, the approved plan JSON, or a schema-backed run configuration. If no verifier is configured, stop.
 
 Verifier permission means the verifier output explicitly allows or permits the completion claim for the current control chain and progress evidence. A successful command that checks only one component is supporting evidence, not completion permission.
+
+In generation-aware mode, verifier permission is scoped to
+`run.control.json.current_generation`. Progress from superseded generations does
+not satisfy current generation steps unless the current runtime explicitly
+imports that evidence and does not invalidate it. Unresolved amendment proposals
+block `goal_achieved: true`.
 
 When the verifier fails, append the verifier result to `progress.jsonl`, update `runtime-status.json`, and write a non-achieved final report only if the runtime contract calls for a terminal report.
 

@@ -1,0 +1,14 @@
+{
+  "evidence_ids": [
+    "evidence.api-v2-readiness-regression",
+    "evidence.checkpoint-only-regression",
+    "evidence.unresolved-amendment-regression"
+  ],
+  "status": "pass",
+  "summary": "Historical semantic failure modes are executable regressions. api/v2 readiness cannot satisfy api/v2 implementation evidence, checkpoint-only evidence cannot satisfy full-workflow ceiling evidence, and unresolved amendments block goal_achieved true.",
+  "proof": [
+    "Added tests/skills/test_reviewed_replanning_control.py::test_verifier_rejects_api_v2_readiness_substitution_with_unresolved_amendment.",
+    "Added tests/skills/test_reviewed_replanning_control.py::test_verifier_rejects_checkpoint_only_full_ceiling_substitution.",
+    "verify_runtime_progress.py reports missing required evidence and unresolved amendments."
+  ]
+}

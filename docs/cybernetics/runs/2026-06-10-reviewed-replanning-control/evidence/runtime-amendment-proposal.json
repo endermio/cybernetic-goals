@@ -1,0 +1,14 @@
+{
+  "evidence_ids": [
+    "evidence.amendment-event-schema",
+    "evidence.using-control-json-amendment-rule"
+  ],
+  "status": "pass",
+  "summary": "Runtime progress can record control.amendment.* events with runtime_generation and amendment_id. Runtime protocol instructs executors to propose amendments instead of substituting readiness or compatibility evidence.",
+  "proof": [
+    "Added schemas/control-json/amendment-proposal.schema.json.",
+    "Extended schemas/control-json/progress-event.schema.json with amendment and generation event types.",
+    "Updated .agents/skills/using-control-json/SKILL.md and runtime-control-json-protocol.md with reviewed replanning rules.",
+    "Updated control_json_runtime.py event validation for amendment_id and runtime_generation."
+  ]
+}

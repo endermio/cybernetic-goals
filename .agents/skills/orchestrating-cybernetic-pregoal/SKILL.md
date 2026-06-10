@@ -1,6 +1,6 @@
 ---
 name: orchestrating-cybernetic-pregoal
-description: 'Use when completed requirements analysis exists and routing or requirements explicitly require Level 3/4 full pre-goal orchestration before runtime /goal. Not for pre-task intent, user method preference alone, target execution, or starting /goal.'
+description: 'Use when completed requirements analysis exists and routing or requirements require JSON pre-goal orchestration before runtime /goal. Level 3 defaults to lean pre-goal; full pre-goal is an exception for high-risk, irreversible, externally impactful, non-replannable, or explicitly full workflows.'
 ---
 
 # Orchestrating Cybernetic Pre-goal
@@ -9,7 +9,17 @@ description: 'Use when completed requirements analysis exists and routing or req
 
 This skill orchestrates the **pre-goal compilation chain** after requirements have been analyzed.
 
-It turns completed requirements control JSON into approved JSON control files:
+It turns completed requirements control JSON into approved JSON control files.
+
+Lean default:
+
+```text
+requirements.control.json
+  -> run.control.json
+  -> gen-000/runtime.control.json plus short /goal pointer
+```
+
+Full exception:
 
 ```text
 requirements.control.json
@@ -21,7 +31,7 @@ requirements.control.json
   -> runtime.control.json plus short /goal pointer
 ```
 
-This skill is a thin orchestrator. It does not replace the other cybernetic skills. It coordinates them.
+This skill is a thin orchestrator. It does not replace the other cybernetic skills. It coordinates them. Full-chain orchestration is a safety exception or migration bridge, not the default Level 3 startup path.
 
 Official persistent control facts are JSON only. Historical Markdown may be read as non-authoritative background, but do not create or compile Markdown as official guard, compiler, runtime, or long-term dual-path control input.
 
@@ -81,8 +91,8 @@ If a required workflow is unavailable, stop and report the missing infrastructur
 Use this skill only after completed `requirements.control.json` exists and
 one of these fit checks is satisfied:
 
-- `$routing-cybernetic-workflows` has recommended a Level 3 or Level 4 workflow or full pre-goal pipeline;
-- `$analyzing-cybernetic-requirements` has explicitly recorded that full pre-goal orchestration is required.
+- `$routing-cybernetic-workflows` has recommended Level 3 lean pre-goal, Level 4 full pre-goal, or explicit full pre-goal exception handling;
+- `$analyzing-cybernetic-requirements` has explicitly recorded that JSON pre-goal orchestration is required.
 
 The same requirements brief must record `What the User Approved: Approved`,
 or the current user message must explicitly approve the compact control
@@ -115,8 +125,9 @@ Never emulate required Superpowers workflows. In particular:
 
 ## Process Need Check
 
-Before creating downstream artifacts, confirm full pre-goal orchestration is
-still the lightest workflow that controls the task.
+Before creating downstream artifacts, confirm the lightest workflow that
+controls the task. Level 3 defaults to lean pre-goal. Full pre-goal is selected
+only by exception criteria.
 
 Reject or downgrade when:
 

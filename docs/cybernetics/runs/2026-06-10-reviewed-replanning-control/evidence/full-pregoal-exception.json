@@ -1,0 +1,13 @@
+{
+  "evidence_ids": [
+    "evidence.full-mode-selection-rules",
+    "evidence.full-mode-regression"
+  ],
+  "status": "pass",
+  "summary": "Full pre-goal remains available for high-risk, irreversible, externally impactful, non-replannable, or explicitly full workflows, but is no longer the default Level 3 route.",
+  "proof": [
+    "Updated .agents/skills/routing-cybernetic-workflows/SKILL.md Level 3 route language.",
+    "Updated .agents/skills/orchestrating-cybernetic-pregoal/SKILL.md to distinguish lean default from full exception.",
+    "Existing full-chain tests in tests/skills/test_json_official_guard_compiler_path.py still pass."
+  ]
+}

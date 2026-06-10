@@ -1,0 +1,235 @@
+{
+  "artifact_type": "requirements.control",
+  "schema_version": "1.0.0",
+  "status": "approved",
+  "approved_control": {
+    "human_purpose": "Move the cybernetic goal runtime from heavy frozen pre-goal execution to lean pre-goal startup plus reviewed replanning control so exploratory or research tasks can start with a small approved strategy and revise derived strategy when observations show the current strategy cannot produce the approved result.",
+    "primary_object": "The JSON-only cybernetic control chain for requirements, design, goal, plan, review, runtime, progress, amendment, generation, guard, compiler, verifier, evidence, and runtime status.",
+    "requested_transformation": "Implement lean pre-goal plus generation-aware reviewed replanning control. Lean pre-goal is the default: it creates approved target anchors, run.control.json, and gen-000/runtime.control.json with a first horizon and amendment policy instead of always generating full design/goal/plan/review artifacts. Runtime executes the current generation; when observation proves the strategy cannot produce a blocking required outcome, runtime proposes a control amendment instead of hard-completing, silently filling a slot, or immediately blocking. Reviewed amendment creates the next generation, recomputes hashes, recompiles runtime.control.json, and execution continues under that approved generation. Full pre-goal remains available only when risk, coordination, or user instruction requires it.",
+    "non_goals": [
+      "Do not let runtime edit approved requirements, semantic_base, required_outcomes, what_counts_as_done, work coverage, authority, or forbidden actions in place.",
+      "Do not turn amendment into a way for runtime to change the user-approved target without human reapproval.",
+      "Do not solve this by adding only post-hoc verifier checks while keeping frozen plan execution.",
+      "Do not keep full design/goal/plan/review pre-goal as the default startup path for exploratory or research tasks.",
+      "Do not keep Markdown as official guard, compiler, runtime, or long-term dual-path control input.",
+      "Do not let old-generation evidence automatically satisfy a new generation without explicit import and review."
+    ],
+    "how_we_know_purpose_was_met": "Purpose is met when the control system can demonstrate lean pre-goal startup from requirements.control.json to run.control.json and gen-000/runtime.control.json without mandatory full design/goal/plan/review artifacts, then demonstrate an approved gen-000 runtime that observes strategy failure, writes a structured amendment proposal without changing approved anchors, routes that proposal through review, creates and activates gen-001 with hashes and runtime.control.json, and has guard/verifier/compiler/orchestrator tests proving stale generations, unresolved amendments, unauthorized anchor changes, readiness substitution, checkpoint-only substitution, and accidental full-pre-goal defaulting cannot be accepted as completion.",
+    "where_result_must_show_up": [
+      "schemas/control-json/run.control.schema.json",
+      "schemas/control-json/amendment-proposal.schema.json",
+      "schemas/control-json/progress-event.schema.json",
+      "schemas/control-json/runtime.control.schema.json",
+      "schemas/control-json/review.control.schema.json",
+      "schemas/control-json/final-report.schema.json",
+      ".agents/skills/using-control-json/SKILL.md",
+      ".agents/skills/orchestrating-cybernetic-pregoal/SKILL.md",
+      ".agents/skills/routing-cybernetic-workflows/SKILL.md",
+      ".agents/skills/writing-cybernetic-execution-policies/SKILL.md",
+      ".agents/skills/reviewing-cybernetic-control-structures/SKILL.md",
+      ".agents/skills/compiling-cybernetic-runtime-goals/scripts/compile_runtime_goal.py",
+      ".agents/skills/compiling-cybernetic-runtime-goals/scripts/control_chain_guard.py",
+      ".agents/skills/using-control-json/scripts/verify_runtime_progress.py",
+      "tests/skills reviewed replanning regressions",
+      "docs/cybernetic-framework/reviewed-replanning-control-architecture.md"
+    ],
+    "what_counts_as_done": "Done means JSON-only lean pre-goal and reviewed replanning are implemented end to end: lean pre-goal is the default startup path and can produce requirements.control.json, run.control.json, and gen-000/runtime.control.json without mandatory full design/goal/plan/review artifacts; full pre-goal is selected only for high-risk, irreversible, externally impactful, or explicitly full workflows; run.control.json tracks the active generation; control generations live under gen-N directories; progress events can propose, approve, reject, or block amendments; runtime can request reviewed modification when current strategy cannot produce approved outcomes; orchestrator can create a new reviewed generation without changing anchors; compiler, guard, and verifier are generation-aware; old evidence is imported or invalidated explicitly; final success is judged only by the current approved generation; historical failure regressions pass.",
+    "required_outcomes": [
+      {
+        "id": "O-lean-pregoal-default",
+        "statement": "Lean pre-goal is the default startup path: it creates approved target anchors, run.control.json, and gen-000/runtime.control.json with first-horizon strategy and amendment policy without requiring complete design/goal/plan/review artifacts up front.",
+        "blocks_goal_achieved_if_missing": true,
+        "required_evidence": [
+          {
+            "evidence_id": "evidence.lean-pregoal-schema-and-fixture",
+            "kind": "progress_event",
+            "description": "schemas, fixtures, or tests demonstrate a lean pre-goal run with requirements.control.json, run.control.json, and gen-000/runtime.control.json only"
+          },
+          {
+            "evidence_id": "evidence.lean-pregoal-orchestrator-route",
+            "kind": "progress_event",
+            "description": "orchestrator or routing logic selects lean mode by default and does not require full pre-goal artifacts for exploratory work"
+          }
+        ],
+        "not_satisfied_by": [
+          "full design/goal/plan/review remains the default for all Level 3 work",
+          "lean mode exists only as documentation but compiler/guard/runtime still require a full control chain",
+          "runtime starts without target anchors or amendment policy"
+        ]
+      },
+      {
+        "id": "O-full-pregoal-exception",
+        "statement": "Full pre-goal remains available as an explicit exception for high-risk, irreversible, externally impactful, compliance-sensitive, complex-coordination, non-replannable, or user-requested full workflows.",
+        "blocks_goal_achieved_if_missing": true,
+        "required_evidence": [
+          {
+            "evidence_id": "evidence.full-mode-selection-rules",
+            "kind": "progress_event",
+            "description": "routing/requirements/orchestrator rules define when full mode is required instead of lean mode"
+          },
+          {
+            "evidence_id": "evidence.full-mode-regression",
+            "kind": "progress_event",
+            "description": "tests show high-risk or explicitly full workflows still require full pre-goal artifacts"
+          }
+        ],
+        "not_satisfied_by": [
+          "removing full pre-goal entirely",
+          "using lean mode for irreversible or externally risky target execution",
+          "letting runtime decide after launch whether the work should have been full mode"
+        ]
+      },
+      {
+        "id": "O-generation-aware-run-control",
+        "statement": "The official run model supports generation-aware control facts with run.control.json, current_generation, gen-N directories, per-generation review/hash/runtime, and cross-generation progress.",
+        "blocks_goal_achieved_if_missing": true,
+        "required_evidence": [
+          {
+            "evidence_id": "evidence.run-control-schema",
+            "kind": "progress_event",
+            "description": "run.control schema and example or fixture validate generation metadata"
+          },
+          {
+            "evidence_id": "evidence.generation-guard",
+            "kind": "progress_event",
+            "description": "guard rejects stale, missing, or unreviewed current_generation"
+          }
+        ],
+        "not_satisfied_by": [
+          "single runtime.control.json treated as the permanent final contract",
+          "a root run directory with no active generation index"
+        ]
+      },
+      {
+        "id": "O-runtime-amendment-proposal",
+        "statement": "Runtime can propose a reviewed control amendment when observation shows current strategy cannot produce a required outcome, while approved anchors remain read-only.",
+        "blocks_goal_achieved_if_missing": true,
+        "required_evidence": [
+          {
+            "evidence_id": "evidence.amendment-event-schema",
+            "kind": "progress_event",
+            "description": "progress event schema supports control.amendment.proposed and related amendment events"
+          },
+          {
+            "evidence_id": "evidence.using-control-json-amendment-rule",
+            "kind": "progress_event",
+            "description": "using-control-json instructs runtime to request reviewed modification rather than hard-complete or silently fill a slot"
+          }
+        ],
+        "not_satisfied_by": [
+          "runtime directly edits approved control JSON",
+          "runtime can only complete or block when strategy mismatches are observed"
+        ]
+      },
+      {
+        "id": "O-reviewed-amendment-orchestration",
+        "statement": "Orchestration can turn an anchor-preserving amendment proposal into a reviewed next generation and must stop for human approval when anchors would change.",
+        "blocks_goal_achieved_if_missing": true,
+        "required_evidence": [
+          {
+            "evidence_id": "evidence.orchestrator-amendment-loop",
+            "kind": "progress_event",
+            "description": "orchestrator supports amendment proposal intake, anchor checks, review, guard, runtime compile, and current_generation update"
+          },
+          {
+            "evidence_id": "evidence.anchor-change-human-approval",
+            "kind": "progress_event",
+            "description": "tests show semantic_base, required_outcomes, what_counts_as_done, authority, or work coverage changes require human approval"
+          }
+        ],
+        "not_satisfied_by": [
+          "manual hand-created gen-001 without reviewed amendment",
+          "automatic amendment that changes approved anchors"
+        ]
+      },
+      {
+        "id": "O-generation-aware-guard-compiler-verifier",
+        "statement": "Compiler, guard, and verifier operate on the current approved generation and reject superseded, unresolved, stale, or inconsistent generations.",
+        "blocks_goal_achieved_if_missing": true,
+        "required_evidence": [
+          {
+            "evidence_id": "evidence.compiler-generation-aware",
+            "kind": "progress_event",
+            "description": "compiler accepts run root plus generation or current_generation and emits pointer-only runtime command"
+          },
+          {
+            "evidence_id": "evidence.verifier-generation-aware",
+            "kind": "progress_event",
+            "description": "verifier judges only current generation and rejects unresolved amendments"
+          },
+          {
+            "evidence_id": "evidence.guard-generation-aware",
+            "kind": "progress_event",
+            "description": "guard validates generation completeness, hashes, parent amendment source, and current generation status"
+          }
+        ],
+        "not_satisfied_by": [
+          "guard/compiler/verifier continue assuming one control chain per run root",
+          "final report can claim success while unresolved amendment proposals exist"
+        ]
+      },
+      {
+        "id": "O-evidence-import-and-invalidation",
+        "statement": "New generations explicitly import or invalidate evidence from previous generations, and old completed steps do not automatically satisfy new generation requirements.",
+        "blocks_goal_achieved_if_missing": true,
+        "required_evidence": [
+          {
+            "evidence_id": "evidence.import-invalidation-schema",
+            "kind": "progress_event",
+            "description": "schemas support imported_evidence and invalidated_evidence"
+          },
+          {
+            "evidence_id": "evidence.old-evidence-not-auto-reused",
+            "kind": "progress_event",
+            "description": "tests show gen-000 steps/evidence do not automatically satisfy gen-001"
+          }
+        ],
+        "not_satisfied_by": [
+          "implicit carry-over of old evidence",
+          "old generation progress automatically counts for new generation completion"
+        ]
+      },
+      {
+        "id": "O-historical-regression-protection",
+        "statement": "Regressions cover historical semantic failures: api/v2 readiness cannot replace implementation, checkpoint-only path cannot be wrapped as full workflow ceiling, unresolved amendment blocks success, and stale current_generation is rejected.",
+        "blocks_goal_achieved_if_missing": true,
+        "required_evidence": [
+          {
+            "evidence_id": "evidence.api-v2-readiness-regression",
+            "kind": "progress_event",
+            "description": "regression forces amendment or failure when readiness replaces api/v2 implementation"
+          },
+          {
+            "evidence_id": "evidence.checkpoint-only-regression",
+            "kind": "progress_event",
+            "description": "regression forces amendment or failure when checkpoint-only path is wrapped as full workflow ceiling"
+          },
+          {
+            "evidence_id": "evidence.unresolved-amendment-regression",
+            "kind": "progress_event",
+            "description": "regression rejects goal_achieved true with unresolved amendment"
+          }
+        ],
+        "not_satisfied_by": [
+          "tests cover only schema shape",
+          "tests do not encode the historical failure modes"
+        ]
+      }
+    ],
+    "final_answer_format": {
+      "medium": "chat summary plus JSON control artifacts and test evidence",
+      "required_structure": [
+        "requirements path and approval status",
+        "implemented control-chain changes",
+        "generation-aware behavior demonstrated",
+        "review/guard/compiler/verifier commands",
+        "historical regression results",
+        "known limits or blockers"
+      ]
+    },
+    "semantic_base": {
+      "id": "semantic-base:reviewed-replanning-control",
+      "hash": "sha256:cbeeee91cb90726610f689d95aa2cfc88f62d62830208a0a4b97778cae584c4b"
+    }
+  }
+}

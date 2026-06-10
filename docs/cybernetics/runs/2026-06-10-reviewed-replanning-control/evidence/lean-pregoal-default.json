@@ -1,0 +1,14 @@
+{
+  "evidence_ids": [
+    "evidence.lean-pregoal-schema-and-fixture",
+    "evidence.lean-pregoal-orchestrator-route"
+  ],
+  "status": "pass",
+  "summary": "Lean pre-goal is represented as an executable generation-aware run mode. A run with requirements.control.json, run.control.json, and gen-000/runtime.control.json validates without root-level design/goal/plan/review artifacts.",
+  "proof": [
+    "Added schemas/control-json/run.control.schema.json.",
+    "Updated schemas/control-json/runtime.control.schema.json to support control_mode, generation, imported_evidence, and invalidated_evidence.",
+    "Added tests/skills/test_reviewed_replanning_control.py::test_guard_and_runtime_validator_accept_lean_run_without_full_chain_artifacts.",
+    "Updated routing and orchestration skill docs so Level 3 defaults to lean pre-goal and full pre-goal is an exception."
+  ]
+}

@@ -1,0 +1,16 @@
+{
+  "evidence_ids": [
+    "evidence.compiler-generation-aware",
+    "evidence.verifier-generation-aware",
+    "evidence.guard-generation-aware"
+  ],
+  "status": "pass",
+  "summary": "Compiler, guard, runtime validator, and verifier are generation-aware. Compiler can create gen-000/runtime.control.json from run.control.json; guard/validator validate current_generation; verifier scopes completion to current_generation and rejects unresolved amendments.",
+  "proof": [
+    "Updated compile_runtime_goal.py with compile_generation_runtime_control.",
+    "Updated control_chain_guard.py with validate_generation_control_run.",
+    "Updated control_json_runtime.py with validate_generation_control_chain.",
+    "Updated verify_runtime_progress.py to filter by current_generation and gate unresolved amendments.",
+    "Added tests/skills/test_reviewed_replanning_control.py compiler, guard, validator, and verifier cases."
+  ]
+}
