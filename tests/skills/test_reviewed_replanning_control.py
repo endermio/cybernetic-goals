@@ -8,6 +8,7 @@ from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parents[2]
+LEGACY_FIXTURE = ROOT / "tests/fixtures/cybernetics/runtime_verifier/control_runs.json"
 CONTROL_GUARD = ROOT / ".agents/skills/compiling-cybernetic-runtime-goals/scripts/control_chain_guard.py"
 COMPILER = ROOT / ".agents/skills/compiling-cybernetic-runtime-goals/scripts/compile_runtime_goal.py"
 VALIDATE = ROOT / ".agents/skills/using-control-json/scripts/validate_control_chain.py"
@@ -172,6 +173,34 @@ def apply_hashes(req: dict, run: dict, runtime: dict, runtime_rel: str, review: 
         runtime["approved_control_hashes"][review_rel] = control_hash(review_rel, review)
 
 
+def approved_generation_review() -> dict:
+    checks = []
+    for check_id in (
+        "intent-preservation",
+        "obligation-preservation",
+        "required-outcome-coverage",
+        "horizon-authority",
+    ):
+        checks.append(
+            {
+                "check_id": check_id,
+                "status": "pass",
+                "verdict": "approved",
+                "return_to_stage": None,
+                "evidence": [f"{check_id} passed for current generation"],
+                "findings": [],
+                "required_changes": [],
+                "checked_transformations": ["runtime->generation"],
+            }
+        )
+    return {
+        "artifact_type": "review.control",
+        "schema_version": "1.0.0",
+        "status": "approved",
+        "review_checks": checks,
+    }
+
+
 def progress_event(
     evidence_id: str,
     *,
@@ -249,7 +278,7 @@ def write_lean_run(
     review = None
     review_rel = next((item.get("review") for item in run["generations"] if item["id"] == current_generation), None)
     if review_rel:
-        review = {"artifact_type": "review.control", "schema_version": "1.0.0", "status": "approved"}
+        review = approved_generation_review()
     apply_hashes(req, run, runtime, runtime_rel, review, review_rel)
     (run_dir / "requirements.control.json").write_text(json.dumps(req, indent=2), encoding="utf-8")
     (run_dir / "run.control.json").write_text(json.dumps(run, indent=2), encoding="utf-8")
@@ -274,6 +303,21 @@ def run_script(script: Path, *args: str) -> subprocess.CompletedProcess:
 
 
 class ReviewedReplanningControlTest(unittest.TestCase):
+    def test_official_runtime_entrypoints_reject_full_chain_without_run_control(self):
+        fixture = json.loads(LEGACY_FIXTURE.read_text(encoding="utf-8"))["valid"]
+        with tempfile.TemporaryDirectory() as tmpdir:
+            run_dir = Path(tmpdir)
+            for filename, payload in fixture["control_files"].items():
+                (run_dir / filename).write_text(json.dumps(payload, indent=2), encoding="utf-8")
+
+            compiler = run_script(COMPILER, "--run-dir", str(run_dir))
+            guard = run_script(CONTROL_GUARD, "--run-dir", str(run_dir))
+            validate = run_script(VALIDATE, str(run_dir))
+
+            for result in (compiler, guard, validate):
+                self.assertNotEqual(result.returncode, 0, result.stdout + result.stderr)
+                self.assertIn("missing run.control.json", result.stdout + result.stderr)
+
     def test_guard_and_runtime_validator_accept_lean_run_without_full_chain_artifacts(self):
         with tempfile.TemporaryDirectory() as tmpdir:
             run_dir = Path(tmpdir)
@@ -387,6 +431,17 @@ class ReviewedReplanningControlTest(unittest.TestCase):
             self.assertEqual("gen-000", generations["gen-001"]["parent"])
             self.assertTrue((run_dir / "gen-001/review.control.json").exists())
             self.assertTrue((run_dir / "gen-001/runtime.control.json").exists())
+            review = json.loads((run_dir / "gen-001/review.control.json").read_text(encoding="utf-8"))
+            check_ids = {check["check_id"] for check in review["review_checks"]}
+            self.assertGreaterEqual(
+                check_ids,
+                {
+                    "intent-preservation",
+                    "obligation-preservation",
+                    "required-outcome-coverage",
+                    "horizon-authority",
+                },
+            )
             self.assertEqual(0, run_script(CONTROL_GUARD, "--run-dir", str(run_dir)).returncode)
             progress = [
                 json.loads(line)
@@ -421,6 +476,65 @@ class ReviewedReplanningControlTest(unittest.TestCase):
             payload = json.loads(result.stdout)
             self.assertEqual("HumanApprovalRequired", payload["next_allowed_action"])
             self.assertFalse((run_dir / "gen-001/runtime.control.json").exists())
+
+    def test_guard_rejects_amendment_generation_with_shallow_review(self):
+        generations = [
+            {
+                "id": "gen-000",
+                "strategy_kind": "execution",
+                "status": "superseded",
+                "runtime": "gen-000/runtime.control.json",
+                "review": "gen-000/review.control.json",
+            },
+            {
+                "id": "gen-001",
+                "strategy_kind": "amendment",
+                "status": "active",
+                "parent": "gen-000",
+                "runtime": "gen-001/runtime.control.json",
+                "review": "gen-001/review.control.json",
+                "amendment_source": "progress.jsonl#A1",
+                "required_steps": [
+                    {
+                        "step_id": "S1",
+                        "transition": "current generation produces required evidence",
+                        "evidence": ["evidence.lean-startup"],
+                        "satisfies_outcomes": ["O-lean-startup"],
+                    }
+                ],
+            },
+        ]
+        shallow = {
+            "artifact_type": "review.control",
+            "schema_version": "1.0.0",
+            "status": "approved",
+            "review_checks": [
+                {
+                    "check_id": "anchor-preservation",
+                    "status": "pass",
+                    "verdict": "approved",
+                    "return_to_stage": None,
+                    "evidence": ["anchors unchanged"],
+                    "findings": [],
+                    "required_changes": [],
+                    "checked_transformations": ["runtime->amendment-generation"],
+                }
+            ],
+        }
+        with tempfile.TemporaryDirectory() as tmpdir:
+            run_dir = Path(tmpdir)
+            write_lean_run(run_dir, generations=generations, current_generation="gen-001")
+            (run_dir / "gen-001/review.control.json").write_text(json.dumps(shallow, indent=2), encoding="utf-8")
+            req = json.loads((run_dir / "requirements.control.json").read_text(encoding="utf-8"))
+            run = json.loads((run_dir / "run.control.json").read_text(encoding="utf-8"))
+            runtime = json.loads((run_dir / "gen-001/runtime.control.json").read_text(encoding="utf-8"))
+            apply_hashes(req, run, runtime, "gen-001/runtime.control.json", shallow, "gen-001/review.control.json")
+            (run_dir / "gen-001/runtime.control.json").write_text(json.dumps(runtime, indent=2), encoding="utf-8")
+
+            result = run_script(CONTROL_GUARD, "--run-dir", str(run_dir))
+
+            self.assertNotEqual(result.returncode, 0, result.stdout + result.stderr)
+            self.assertIn("amendment generation review missing required review checks", result.stdout + result.stderr)
 
     def test_runtime_validator_rejects_incomplete_amendment_proposal_event(self):
         event = progress_event(

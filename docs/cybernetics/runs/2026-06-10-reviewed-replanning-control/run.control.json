@@ -1,0 +1,138 @@
+{
+  "artifact_type": "run.control",
+  "schema_version": "1.0.0",
+  "status": "active",
+  "run_id": "2026-06-10-reviewed-replanning-control",
+  "control_mode": "lean",
+  "current_generation": "gen-000",
+  "max_auto_amendment_rounds": 2,
+  "semantic_base_ref": {
+    "id": "semantic-base:reviewed-replanning-control",
+    "hash": "sha256:cbeeee91cb90726610f689d95aa2cfc88f62d62830208a0a4b97778cae584c4b"
+  },
+  "amendment_policy": {
+    "may_change": [
+      "design_strategy",
+      "plan_strategy",
+      "runtime_strategy",
+      "required_step_refinement",
+      "work_packages",
+      "instrumentation",
+      "verifier_config"
+    ],
+    "must_not_change_without_human": [
+      "semantic_base",
+      "required_outcomes",
+      "what_counts_as_done",
+      "work_covered",
+      "authority",
+      "forbidden_actions"
+    ]
+  },
+  "generations": [
+    {
+      "id": "gen-000",
+      "strategy_kind": "execution",
+      "status": "active",
+      "runtime": "gen-000/runtime.control.json",
+      "review": "gen-000/review.control.json",
+      "required_steps": [
+        {
+          "step_id": "S1-lean-pregoal-default",
+          "transition": "Lean pre-goal default is represented in schemas, routing, and fixtures as requirements plus run.control plus gen-000/runtime without mandatory full design/goal/plan/review.",
+          "evidence": [
+            "run.control schema and lean fixture",
+            "routing or orchestrating policy selects lean by default for exploratory work",
+            "tests showing lean startup validates without full-chain artifacts"
+          ],
+          "satisfies_outcomes": [
+            "O-lean-pregoal-default"
+          ]
+        },
+        {
+          "step_id": "S2-full-pregoal-exception",
+          "transition": "Full pre-goal remains available but is selected only by explicit exception criteria.",
+          "evidence": [
+            "routing/orchestrator policy lists full-mode exception triggers",
+            "tests showing high-risk or explicitly full workflows still require full artifacts"
+          ],
+          "satisfies_outcomes": [
+            "O-full-pregoal-exception"
+          ]
+        },
+        {
+          "step_id": "S3-generation-aware-run-control",
+          "transition": "The official run model tracks current_generation and validates complete reviewed gen-N control facts.",
+          "evidence": [
+            "run.control schema",
+            "generation fixture",
+            "guard rejection for stale or unreviewed current_generation"
+          ],
+          "satisfies_outcomes": [
+            "O-generation-aware-run-control"
+          ]
+        },
+        {
+          "step_id": "S4-runtime-amendment-proposal",
+          "transition": "Runtime can emit structured amendment proposals when current strategy cannot produce approved outcomes, while approved anchors stay read-only.",
+          "evidence": [
+            "amendment proposal schema",
+            "progress event schema supports amendment events",
+            "using-control-json runtime protocol documents amendment triggers and anchor immutability"
+          ],
+          "satisfies_outcomes": [
+            "O-runtime-amendment-proposal"
+          ]
+        },
+        {
+          "step_id": "S5-reviewed-amendment-orchestration",
+          "transition": "Orchestrator can review an anchor-preserving amendment into the next generation and stops for human approval when anchors would change.",
+          "evidence": [
+            "orchestrator amendment loop policy",
+            "review rules for amendment approval",
+            "tests for anchor-change human approval"
+          ],
+          "satisfies_outcomes": [
+            "O-reviewed-amendment-orchestration"
+          ]
+        },
+        {
+          "step_id": "S6-generation-aware-tools",
+          "transition": "Compiler, guard, and verifier operate on the current approved generation and reject stale, unresolved, or inconsistent generations.",
+          "evidence": [
+            "compiler generation-aware run root handling",
+            "guard current-generation validation",
+            "verifier rejects unresolved amendment and non-current generation final claims"
+          ],
+          "satisfies_outcomes": [
+            "O-generation-aware-guard-compiler-verifier"
+          ]
+        },
+        {
+          "step_id": "S7-evidence-import-invalidation",
+          "transition": "Evidence reuse across generations is explicit: imported evidence is declared and invalidated evidence cannot satisfy current generation completion.",
+          "evidence": [
+            "schemas for imported_evidence and invalidated_evidence",
+            "verifier tests showing gen-000 evidence does not automatically satisfy gen-001"
+          ],
+          "satisfies_outcomes": [
+            "O-evidence-import-and-invalidation"
+          ]
+        },
+        {
+          "step_id": "S8-historical-regressions",
+          "transition": "Historical semantic failures are encoded as regressions that fail or require amendment instead of allowing false completion.",
+          "evidence": [
+            "api/v2 readiness substitution regression",
+            "checkpoint-only full-ceiling substitution regression",
+            "unresolved amendment success regression",
+            "stale current_generation regression"
+          ],
+          "satisfies_outcomes": [
+            "O-historical-regression-protection"
+          ]
+        }
+      ]
+    }
+  ]
+}

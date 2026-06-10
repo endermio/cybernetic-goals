@@ -2,7 +2,7 @@
   "artifact_type": "runtime-status",
   "schema_version": "1.0.0",
   "status": "complete",
-  "active_runtime": "runtime.control.json",
+  "active_runtime": "gen-000/runtime.control.json",
   "completed_required_steps": [
     "S1-lean-pregoal-default",
     "S2-full-pregoal-exception",
@@ -26,5 +26,6 @@
   "last_verifier_result": "pass",
   "goal_achieved_permitted": true,
   "blockers": [],
-  "next_action": "No runtime action remains; verifier permits goal_achieved true."
+  "next_action": "No runtime action remains; verifier permits goal_achieved true.",
+  "runtime_generation": "gen-000"
 }

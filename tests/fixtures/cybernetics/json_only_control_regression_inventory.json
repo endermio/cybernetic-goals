@@ -32,7 +32,7 @@
         {
           "file": "tests/skills/test_json_official_guard_compiler_path.py",
           "tests": [
-            "test_control_chain_guard_accepts_complete_json_run_directory"
+            "test_control_chain_guard_accepts_generation_run_directory"
           ]
         }
       ],
@@ -49,9 +49,14 @@
       ],
       "json_replacement_tests": [
         {
+          "file": "tests/skills/test_json_official_guard_compiler_path.py",
+          "tests": [
+            "test_generation_guard_rejects_required_outcome_coverage_gap"
+          ]
+        },
+        {
           "file": "tests/skills/test_runtime_json_progress_verifier.py",
           "tests": [
-            "test_validate_control_chain_rejects_required_outcome_coverage_gaps",
             "test_verify_runtime_progress_rejects_verifier_bypass_supporting_only_and_not_done_success"
           ]
         }
@@ -72,16 +77,14 @@
         {
           "file": "tests/skills/test_json_official_guard_compiler_path.py",
           "tests": [
-            "test_control_chain_guard_rejects_blocking_required_outcome_without_required_step_coverage",
-            "test_control_chain_guard_rejects_missing_runtime_verifier_required_outcome",
-            "test_control_chain_guard_requires_intent_obligation_and_outcome_review_checks"
+            "test_generation_guard_rejects_required_outcome_coverage_gap"
           ]
         },
         {
           "file": "tests/skills/test_runtime_json_progress_verifier.py",
           "tests": [
-            "test_validate_control_chain_rejects_required_outcome_coverage_gaps",
-            "test_verify_runtime_progress_permits_required_outcome_covered_progress"
+            "test_verify_runtime_progress_rejects_missing_required_evidence_id",
+            "test_verify_runtime_progress_permits_complete_mainline_verified_report"
           ]
         }
       ],
@@ -118,10 +121,10 @@
       ],
       "json_replacement_tests": [
         {
-          "file": "tests/skills/test_runtime_json_progress_verifier.py",
+          "file": "tests/skills/test_reviewed_replanning_control.py",
           "tests": [
-            "test_validate_control_chain_rejects_missing_review_checks",
-            "test_verify_runtime_progress_rejects_verifier_bypass_supporting_only_and_not_done_success"
+            "test_guard_rejects_amendment_generation_with_shallow_review",
+            "test_amendment_orchestrator_creates_reviewed_next_generation_for_anchor_preserving_proposal"
           ]
         },
         {

@@ -33,6 +33,23 @@ def read_json_object(path: Path) -> dict[str, Any] | None:
     return value
 
 
+def current_generation_runtime(run_dir: Path) -> Path:
+    run_control = read_json_object(run_dir / "run.control.json")
+    if not run_control:
+        return run_dir / "gen-000/runtime.control.json"
+    current_generation = run_control.get("current_generation")
+    generations = run_control.get("generations")
+    if not isinstance(current_generation, str) or not isinstance(generations, list):
+        return run_dir / "gen-000/runtime.control.json"
+    for generation in generations:
+        if not isinstance(generation, dict) or generation.get("id") != current_generation:
+            continue
+        runtime = generation.get("runtime")
+        if isinstance(runtime, str) and runtime:
+            return run_dir / runtime
+    return run_dir / "gen-000/runtime.control.json"
+
+
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--requirements", help="Path to requirements.control.json.")
@@ -56,7 +73,7 @@ def main() -> int:
     if requirements.get("status") != "approved":
         return blocked(f"requirements control JSON status is not approved: {requirements.get('status')!r}")
     run_dir = requirements_path.parent
-    runtime_control = run_dir / "runtime.control.json"
+    runtime_control = current_generation_runtime(run_dir)
     print("Response-only queue suggestions:")
     print()
     print("```text")
@@ -68,10 +85,8 @@ def main() -> int:
     print("```text")
     for filename in (
         "requirements.control.json",
-        "design.control.json",
-        "goal.control.json",
-        "plan.control.json",
-        "review.control.json",
+        "run.control.json",
+        str(runtime_control.relative_to(run_dir)),
     ):
         print(f"{filename}: {run_dir / filename}")
     print("```")
@@ -93,7 +108,7 @@ def main() -> int:
     )
     print("```")
     print()
-    print("Predicted only: compile_runtime_goal.py --run-dir must generate or validate runtime.control.json after approved downstream JSON artifacts exist.")
+    print("Predicted only: compile_runtime_goal.py --run-dir must generate or validate the current generation runtime from run.control.json.")
     return 0
 
 

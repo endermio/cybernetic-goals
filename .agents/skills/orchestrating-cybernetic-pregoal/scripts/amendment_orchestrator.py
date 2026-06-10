@@ -22,6 +22,12 @@ from control_json_runtime import read_progress_events, validate_control_chain  #
 
 
 ANCHOR_FIELDS = ("semantic_base_change", "required_outcomes_changed", "authority_expanded")
+AMENDMENT_REVIEW_CHECKS = (
+    "intent-preservation",
+    "obligation-preservation",
+    "required-outcome-coverage",
+    "horizon-authority",
+)
 
 
 def read_json(path: Path) -> dict[str, Any]:
@@ -100,6 +106,12 @@ def append_progress_event(run_dir: Path, event: dict[str, Any]) -> None:
 
 def approved_review(amendment: dict[str, Any], parent_generation: str) -> dict[str, Any]:
     amendment_id = amendment["amendment_id"]
+    evidence_by_check = {
+        "intent-preservation": f"amendment {amendment_id} preserves the approved semantic base and target intent",
+        "obligation-preservation": f"amendment {amendment_id} keeps required outcomes and completion obligations unchanged",
+        "required-outcome-coverage": f"amendment {amendment_id} carries current required steps into the reviewed generation",
+        "horizon-authority": f"amendment {amendment_id} does not expand authority or approved runtime horizon",
+    }
     return {
         "artifact_type": "review.control",
         "schema_version": amendment.get("schema_version", "1.0.0"),
@@ -109,15 +121,16 @@ def approved_review(amendment: dict[str, Any], parent_generation: str) -> dict[s
         "parent_generation": parent_generation,
         "review_checks": [
             {
-                "check_id": "anchor-preservation",
+                "check_id": check_id,
                 "status": "pass",
                 "verdict": "approved",
                 "return_to_stage": None,
-                "evidence": [f"amendment {amendment_id} does not change approved anchors"],
+                "evidence": [evidence_by_check[check_id]],
                 "findings": [],
                 "required_changes": [],
                 "checked_transformations": ["runtime->amendment-generation"],
             }
+            for check_id in AMENDMENT_REVIEW_CHECKS
         ],
     }
 

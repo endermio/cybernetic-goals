@@ -1,0 +1,223 @@
+{
+  "artifact_type": "review.control",
+  "schema_version": "1.0.0",
+  "status": "approved",
+  "source_contracts": {
+    "requirements": "requirements.control.json",
+    "design": "design.control.json",
+    "goal": "goal.control.json",
+    "plan": "plan.control.json"
+  },
+  "semantic_base_ref": {
+    "id": "semantic-base:reviewed-replanning-control",
+    "hash": "sha256:cbeeee91cb90726610f689d95aa2cfc88f62d62830208a0a4b97778cae584c4b"
+  },
+  "registry_bindings": {
+    "selected_agent_workflow": "none"
+  },
+  "approved_control_hashes": {
+    "requirements.control.json": "sha256:45bfdcfe46f371792135ddaba09b0b58d0b1c26e44ed8986fb883fa80a8d7dfb",
+    "design.control.json": "sha256:97a9fa2569f4da473a167c01d7a969f5c44e1359cf5ef7b6f6ee65f4f29a5feb",
+    "goal.control.json": "sha256:fa1dc04c44025cb9e063aee8ebe4c79f241c7b925e6d0998c7a0a09baa6b5e0d",
+    "plan.control.json": "sha256:a83412ff1084cc8b60bf6dc0430d7d45bc4419c866f57728902155ae2c7302ef"
+  },
+  "review_checks": [
+    {
+      "check_id": "required-answer-path",
+      "status": "pass",
+      "verdict": "approved",
+      "return_to_stage": null,
+      "evidence": [
+        "Design required_answer_path preserves anchors, lean startup, amendment proposal, reviewed next generation, generation-aware tools, explicit evidence lifecycle, and historical regressions.",
+        "Subagent review Harvey confirmed artifacts must not normalize full pre-goal as default and must preserve all eight blocking outcomes."
+      ],
+      "findings": [
+        "Current full-chain orchestration remains a bootstrap necessity because lean mode is not implemented yet; the runtime goal explicitly implements lean mode and does not treat this chain as future default."
+      ],
+      "required_changes": [],
+      "checked_transformations": [
+        "requirements->design",
+        "design->goal",
+        "goal->plan",
+        "plan->runtime"
+      ]
+    },
+    {
+      "check_id": "intent-preservation",
+      "status": "pass",
+      "verdict": "approved",
+      "return_to_stage": null,
+      "evidence": [
+        "Goal objective is to implement lean pre-goal and generation-aware reviewed replanning control, matching the approved requested_transformation.",
+        "Design and goal both state that runtime cannot mutate approved anchors and that full pre-goal remains an exception."
+      ],
+      "findings": [
+        "No artifact converts the target into documentation-only guidance or a post-hoc verifier-only change."
+      ],
+      "required_changes": [],
+      "checked_transformations": [
+        "requirements->design",
+        "design->goal",
+        "goal->plan",
+        "plan->runtime"
+      ]
+    },
+    {
+      "check_id": "obligation-preservation",
+      "status": "pass",
+      "verdict": "approved",
+      "return_to_stage": null,
+      "evidence": [
+        "All eight requirements required_outcomes remain blocking in design, goal, plan, and verifier scope.",
+        "Plan work packages are mainline, producing, and count as goal progress for all blocking outcomes."
+      ],
+      "findings": [
+        "No required outcome is downgraded into permission, readiness, future work, support-only work, or compatibility-only work."
+      ],
+      "required_changes": [],
+      "checked_transformations": [
+        "requirements->design",
+        "design->goal",
+        "goal->plan",
+        "plan->runtime"
+      ]
+    },
+    {
+      "check_id": "required-outcome-coverage",
+      "status": "pass",
+      "verdict": "approved",
+      "return_to_stage": null,
+      "evidence": [
+        "S1 through S8 map one-to-one to O-lean-pregoal-default, O-full-pregoal-exception, O-generation-aware-run-control, O-runtime-amendment-proposal, O-reviewed-amendment-orchestration, O-generation-aware-guard-compiler-verifier, O-evidence-import-and-invalidation, and O-historical-regression-protection.",
+        "Plan verifier.required_outcomes lists every blocking outcome."
+      ],
+      "findings": [],
+      "required_changes": [],
+      "checked_transformations": [
+        "requirements->design",
+        "design->goal",
+        "goal->plan",
+        "plan->runtime"
+      ]
+    },
+    {
+      "check_id": "producing-action-alignment",
+      "status": "pass",
+      "verdict": "approved",
+      "return_to_stage": null,
+      "evidence": [
+        "Each required step has a step_action_alignment describing current state, producing action, allowed authority, evidence after action, and if_not_producible handling.",
+        "Work packages require repository behavior changes to schemas, skills, compiler, guard, verifier, fixtures, and tests rather than merely checking existing files."
+      ],
+      "findings": [
+        "Archimedes flagged that regression tests must be behavioral, not schema-only; WP4 explicitly requires historical semantic failure fixtures."
+      ],
+      "required_changes": [],
+      "checked_transformations": [
+        "requirements->design",
+        "design->goal",
+        "goal->plan",
+        "plan->runtime"
+      ]
+    },
+    {
+      "check_id": "work-assignment",
+      "status": "pass",
+      "verdict": "approved",
+      "return_to_stage": null,
+      "evidence": [
+        "Plan registry_bindings select workflow 'none' and allowed assignment 'Main-only', matching the delegation workflow registry.",
+        "Current user authorized pre-goal review subagents only; target runtime parallel execution is not assumed by the compiled plan."
+      ],
+      "findings": [
+        "Runtime target-work subagents require a separate approved runtime work assignment before launching /goal."
+      ],
+      "required_changes": [],
+      "checked_transformations": [
+        "requirements->design",
+        "design->goal",
+        "goal->plan",
+        "plan->runtime"
+      ]
+    },
+    {
+      "check_id": "horizon-authority",
+      "status": "pass",
+      "verdict": "approved",
+      "return_to_stage": null,
+      "evidence": [
+        "Plan allowed_write_paths cover schemas/control-json, cybernetic skill protocol files, compiler/guard/verifier scripts, tests, fixtures, and the architecture note.",
+        "Plan forbids rewriting the approved requirements.control.json in this run."
+      ],
+      "findings": [
+        "Authority is broad enough to implement the control-system capability rather than only write runtime evidence, while preserving approved anchors."
+      ],
+      "required_changes": [],
+      "checked_transformations": [
+        "requirements->design",
+        "design->goal",
+        "goal->plan",
+        "plan->runtime"
+      ]
+    },
+    {
+      "check_id": "final-observer",
+      "status": "pass",
+      "verdict": "approved",
+      "return_to_stage": null,
+      "evidence": [
+        "Subagent Darwin identified compile-time constraints: statuses must be approved, review hashes must match, all required review checks must pass, and plan/runtime writable_evidence_paths must match.",
+        "All candidate artifacts are approved and prepared for runtime compilation with exact hash binding."
+      ],
+      "findings": [
+        "Final runtime compilation must still run control_chain_guard.py and using-control-json validate_control_chain.py before emitting /goal."
+      ],
+      "required_changes": [],
+      "checked_transformations": [
+        "requirements->design",
+        "design->goal",
+        "goal->plan",
+        "plan->runtime"
+      ]
+    },
+    {
+      "check_id": "lean-startup-sufficiency",
+      "status": "pass",
+      "verdict": "approved",
+      "return_to_stage": null,
+      "evidence": [
+        "Plan includes schema, fixture, routing, orchestration, guard, compiler, verifier, and runtime protocol changes required to make lean startup executable.",
+        "The bootstrapping full-chain artifacts explicitly mark current full-chain use as an implementation bridge, not the target default."
+      ],
+      "findings": [],
+      "required_changes": [],
+      "checked_transformations": [
+        "requirements->design",
+        "design->goal",
+        "goal->plan",
+        "plan->runtime"
+      ]
+    },
+    {
+      "check_id": "historical-regression-coverage",
+      "status": "pass",
+      "verdict": "approved",
+      "return_to_stage": null,
+      "evidence": [
+        "Plan WP4 requires api/v2 readiness substitution, checkpoint-only full-ceiling substitution, unresolved amendment success, stale current_generation, and old-evidence reuse regressions.",
+        "Archimedes independently confirmed these are the needed historical acceptance checks."
+      ],
+      "findings": [
+        "Runtime completion must not be accepted if these regressions are documented but not executable."
+      ],
+      "required_changes": [],
+      "checked_transformations": [
+        "requirements->design",
+        "design->goal",
+        "goal->plan",
+        "plan->runtime"
+      ]
+    }
+  ],
+  "review_scope": "initial_generation"
+}

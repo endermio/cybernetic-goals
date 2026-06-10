@@ -202,6 +202,10 @@ SCHEMA_FIXTURES = {
         "artifact_type": "runtime.control",
         "schema_version": "1.0.0",
         "status": "compiled",
+        "control_mode": "lean",
+        "generation": {
+            "id": "gen-000",
+        },
         "control_chain": {
             "requirements": "requirements.control.json",
             "design": "design.control.json",
@@ -622,6 +626,8 @@ class ControlJsonSchemaTest(unittest.TestCase):
             verifier = schema["properties"]["verifier"]
             self.assertIn("required_outcomes", verifier["required"])
             self.assertIn("required_outcomes", verifier["properties"])
+        self.assertIn("control_mode", runtime["required"])
+        self.assertIn("generation", runtime["required"])
 
     def test_generation_and_amendment_schemas_are_first_class(self):
         run_schema = load_json(SCHEMA_DIR / "run.control.schema.json")

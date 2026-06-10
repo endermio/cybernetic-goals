@@ -31,6 +31,12 @@ REQUIRED_REVIEW_CHECKS = {
     "horizon-authority",
     "final-observer",
 }
+GENERATION_REVIEW_CHECKS = {
+    "intent-preservation",
+    "obligation-preservation",
+    "required-outcome-coverage",
+    "horizon-authority",
+}
 REVIEW_HASH_FILES = (
     "requirements.control.json",
     "design.control.json",
@@ -163,6 +169,27 @@ def amendment_generation_count(run_control: dict[str, Any]) -> int:
     if not isinstance(generations, list):
         return 0
     return sum(1 for generation in generations if isinstance(generation, dict) and generation.get("parent"))
+
+
+def generation_review_errors(review: dict[str, Any], *, context: str) -> list[str]:
+    review_checks = review.get("review_checks")
+    if not isinstance(review_checks, list):
+        return [f"{context} review missing review_checks"]
+    checks_by_id = {check.get("check_id"): check for check in review_checks if isinstance(check, dict)}
+    errors: list[str] = []
+    missing = sorted(GENERATION_REVIEW_CHECKS - set(checks_by_id))
+    if missing:
+        errors.append(f"{context} review missing required review checks: {', '.join(missing)}")
+    for check_id in GENERATION_REVIEW_CHECKS & set(checks_by_id):
+        check = checks_by_id[check_id]
+        if (
+            check.get("status") != "pass"
+            or check.get("verdict") != "approved"
+            or check.get("return_to_stage") is not None
+            or not string_list(check.get("evidence"))
+        ):
+            errors.append(f"{context} required review check did not pass with evidence: {check_id}")
+    return errors
 
 
 def generation_runtime_readonly_files(generation: dict[str, Any]) -> list[str]:
@@ -596,6 +623,8 @@ def validate_generation_control_chain(run_dir: Path) -> tuple[dict[str, dict[str
         review = artifacts.get("review")
         if not isinstance(review, dict) or review.get("artifact_type") != "review.control" or review.get("status") != "approved":
             errors.append("amendment generation review must be approved")
+        elif strategy_kind == "amendment":
+            errors.extend(generation_review_errors(review, context="amendment generation"))
 
     readonly_files = generation_runtime_readonly_files(generation) if generation and runtime_rel else []
     runtime_files = runtime.get("runtime", {})
@@ -666,297 +695,17 @@ def validate_generation_control_chain(run_dir: Path) -> tuple[dict[str, dict[str
 
 
 def validate_control_chain(run_dir: Path) -> tuple[dict[str, dict[str, Any]] | None, list[str]]:
-    errors: list[str] = []
-    if (run_dir / "run.control.json").exists():
-        return validate_generation_control_chain(run_dir)
-    try:
-        artifacts = load_control_files(run_dir)
-    except ControlJsonError as exc:
-        return None, [str(exc)]
-
-    for key, artifact in artifacts.items():
-        require_keys(
-            CONTROL_FILES[key],
-            artifact,
-            ("artifact_type", "schema_version", "status"),
-            errors,
-        )
-
-    expected_artifact_types = {
-        "requirements": "requirements.control",
-        "design": "design.control",
-        "goal": "goal.control",
-        "plan": "plan.control",
-        "review": "review.control",
-        "runtime": "runtime.control",
-    }
-    expected_statuses = {
-        "requirements": "approved",
-        "design": "approved",
-        "goal": "approved",
-        "plan": "approved",
-        "review": "approved",
-        "runtime": "compiled",
-    }
-    for key, expected in expected_artifact_types.items():
-        if artifacts[key].get("artifact_type") != expected:
-            errors.append(f"{CONTROL_FILES[key]} artifact_type must be {expected}")
-    for key, expected in expected_statuses.items():
-        if artifacts[key].get("status") != expected:
-            errors.append(f"{CONTROL_FILES[key]} status must be {expected}")
-
-    runtime_chain = artifacts["runtime"].get("control_chain")
-    if runtime_chain != {key: filename for key, filename in CONTROL_FILES.items() if key != "runtime"}:
-        errors.append("runtime.control.json has inconsistent control chain references")
-
-    semantic_base = artifacts["requirements"].get("approved_control", {}).get("semantic_base")
-    if not isinstance(semantic_base, dict) or semantic_base.get("hash") != semantic_base_hash(artifacts["requirements"]):
-        errors.append("requirements.control.json semantic_base hash must match approved_control")
-    for key in ("design", "goal", "plan", "review", "runtime"):
-        if artifacts[key].get("semantic_base_ref") != semantic_base:
-            errors.append(f"{CONTROL_FILES[key]} semantic_base_ref must match requirements approved semantic_base")
-
-    errors.extend(
-        check_hashes(
-            "review.control.json",
-            artifacts["review"].get("approved_control_hashes"),
-            expected_hashes(artifacts, REVIEW_HASH_FILES),
-        )
-    )
-    errors.extend(
-        check_hashes(
-            "runtime.control.json",
-            artifacts["runtime"].get("approved_control_hashes"),
-            expected_hashes(artifacts, READONLY_FILES),
-        )
-    )
-
-    expected_sources = {
-        "design": {"requirements": "requirements.control.json"},
-        "goal": {"requirements": "requirements.control.json", "design": "design.control.json"},
-        "plan": {
-            "requirements": "requirements.control.json",
-            "design": "design.control.json",
-            "goal": "goal.control.json",
-        },
-        "review": {
-            "requirements": "requirements.control.json",
-            "design": "design.control.json",
-            "goal": "goal.control.json",
-            "plan": "plan.control.json",
-        },
-    }
-    for key, expected in expected_sources.items():
-        source_contracts = artifacts[key].get("source_contracts")
-        if not isinstance(source_contracts, dict):
-            errors.append(f"{CONTROL_FILES[key]} missing source_contracts")
-            continue
-        for source_key, source_file in expected.items():
-            if source_contracts.get(source_key) != source_file:
-                errors.append(f"{CONTROL_FILES[key]} has inconsistent {source_key} source contract")
-
-    readonly = artifacts["runtime"].get("runtime", {}).get("readonly_files")
-    writable = artifacts["runtime"].get("runtime", {}).get("writable_files")
-    if readonly != list(READONLY_FILES):
-        errors.append("runtime.control.json readonly_files must declare approved control JSON as read-only")
-    if writable != list(WRITABLE_FILES):
-        errors.append("runtime.control.json writable_files must be progress.jsonl, runtime-status.json, final-report.json")
-    writable_evidence_paths = string_list(artifacts["runtime"].get("runtime", {}).get("writable_evidence_paths"))
-    if not writable_evidence_paths:
-        errors.append("runtime.control.json writable_evidence_paths must authorize non-control evidence artifacts")
-    plan_runtime = artifacts["plan"].get("runtime", {})
-    if plan_runtime.get("readonly_files") != list(READONLY_FILES):
-        errors.append("plan.control.json readonly_files must match runtime.control.json")
-    if plan_runtime.get("writable_files") != list(WRITABLE_FILES):
-        errors.append("plan.control.json writable_files must match runtime.control.json")
-    if string_list(plan_runtime.get("writable_evidence_paths")) != writable_evidence_paths:
-        errors.append("plan.control.json writable_evidence_paths must match runtime.control.json")
-    for path in required_evidence_paths(artifacts["requirements"]):
-        if not path_is_under(path, writable_evidence_paths):
-            errors.append(
-                "requirements.control.json required evidence path is not authorized by runtime writable_evidence_paths: "
-                + path
-            )
-
-    if artifacts["plan"].get("progress", {}).get("append_only") is not True:
-        errors.append("plan.control.json progress.append_only must be true")
-    if artifacts["runtime"].get("progress", {}).get("append_only") is not True:
-        errors.append("runtime.control.json progress.append_only must be true")
-    if artifacts["plan"].get("verifier", {}).get("required_before_goal_achieved") is not True:
-        errors.append("plan.control.json verifier must be required before goal_achieved")
-    if artifacts["runtime"].get("verifier", {}).get("required_before_goal_achieved") is not True:
-        errors.append("runtime.control.json verifier must be required before goal_achieved")
-    if not artifacts["runtime"].get("verifier", {}).get("command"):
-        errors.append("runtime.control.json verifier.command is required")
-
-    review_checks = artifacts["review"].get("review_checks")
-    if not isinstance(review_checks, list):
-        errors.append("review.control.json missing review_checks")
-    else:
-        checks_by_id = {check.get("check_id"): check for check in review_checks if isinstance(check, dict)}
-        missing = sorted(REQUIRED_REVIEW_CHECKS - set(checks_by_id))
-        if missing:
-            errors.append(f"missing required review checks: {', '.join(missing)}")
-        for check_id in REQUIRED_REVIEW_CHECKS & set(checks_by_id):
-            check = checks_by_id[check_id]
-            if (
-                check.get("status") != "pass"
-                or check.get("verdict") != "approved"
-                or check.get("return_to_stage") is not None
-                or not string_list(check.get("evidence"))
-            ):
-                errors.append(f"required review check did not pass with evidence: {check_id}")
-
-    try:
-        workflow_registry = load_json(DELEGATION_WORKFLOW_REGISTRY)
-    except ControlJsonError as exc:
-        errors.append(str(exc))
-        workflow_registry = {}
-
-    selected_workflow = registry_bindings(artifacts["runtime"]).get("selected_agent_workflow")
-    plan_workflow = registry_bindings(artifacts["plan"]).get("selected_agent_workflow")
-    assignment = registry_bindings(artifacts["plan"]).get("allowed_work_assignment")
-    if not selected_workflow or selected_workflow not in workflow_registry:
-        errors.append("unknown selected agent workflow")
-    if selected_workflow != plan_workflow:
-        errors.append("selected_agent_workflow must be consistent across plan and runtime")
-    if selected_workflow in workflow_registry:
-        allowed_assignments = workflow_registry[selected_workflow].get("allowed_work_assignment", [])
-        if assignment not in allowed_assignments:
-            errors.append("allowed_work_assignment is not permitted by workflow registry")
-
-    plan_steps = step_ids(artifacts["plan"])
-    goal_steps = step_ids(artifacts["goal"])
-    runtime_steps = step_ids(artifacts["runtime"])
-    if not runtime_steps:
-        errors.append("runtime.control.json must declare required_steps")
-    if not runtime_steps <= plan_steps:
-        errors.append("runtime required_steps must be present in plan.control.json")
-    if not runtime_steps <= goal_steps:
-        errors.append("runtime required_steps must be present in goal.control.json")
-    plan_alignment = step_action_alignment_map(artifacts["plan"], errors)
-    missing_runtime_alignment = sorted(runtime_steps - set(plan_alignment))
-    if missing_runtime_alignment:
-        errors.append(
-            "plan.control.json step_action_alignment missing runtime required steps: "
-            + ", ".join(missing_runtime_alignment)
-        )
-
-    all_required_outcomes, required_outcomes, outcome_errors = required_outcome_sets(artifacts["requirements"])
-    errors.extend(outcome_errors)
-    step_outcomes_by_key: dict[str, dict[str, set[str]]] = {}
-    if all_required_outcomes:
-        for key in ("design", "goal", "plan", "runtime"):
-            step_outcomes_by_key[key] = step_outcome_map(
-                artifacts[key],
-                known_outcomes=all_required_outcomes,
-                errors=errors,
-                label=CONTROL_FILES[key],
-            )
-    if required_outcomes:
-        for key in ("design", "goal", "plan", "runtime"):
-            covered = covered_outcomes_by_steps(step_outcomes_by_key.get(key, {}))
-            missing = sorted(required_outcomes - covered)
-            if missing:
-                errors.append(
-                    f"{CONTROL_FILES[key]} required_steps do not satisfy blocking required outcomes: "
-                    + ", ".join(missing)
-                )
-
-        raw_verifier_outcomes = artifacts["runtime"].get("verifier", {}).get("required_outcomes")
-        if not isinstance(raw_verifier_outcomes, list) or not all(
-            isinstance(outcome, str) and outcome for outcome in raw_verifier_outcomes
-        ):
-            verifier_outcomes: set[str] = set()
-            errors.append("runtime.control.json verifier.required_outcomes must be a list of non-empty strings")
-        else:
-            verifier_outcomes = set(raw_verifier_outcomes)
-            unknown_verifier_outcomes = sorted(verifier_outcomes - all_required_outcomes)
-            if unknown_verifier_outcomes:
-                errors.append(
-                    "runtime.control.json verifier.required_outcomes references unknown required outcomes: "
-                    + ", ".join(unknown_verifier_outcomes)
-                )
-        missing_verifier = sorted(required_outcomes - verifier_outcomes)
-        if missing_verifier:
-            errors.append(
-                "runtime.control.json verifier.required_outcomes missing blocking required outcomes: "
-                + ", ".join(missing_verifier)
-            )
-
-    work_packages = artifacts["plan"].get("work_packages")
-    if not isinstance(work_packages, list) or not work_packages:
-        errors.append("plan.control.json must declare work_packages")
-    else:
-        covered_steps: set[str] = set()
-        mainline_producing_steps: set[str] = set()
-        for package in work_packages:
-            if not isinstance(package, dict):
-                errors.append("plan.control.json work_packages entries must be objects")
-                continue
-            if not string_list(package.get("required_tests")):
-                errors.append("work package missing required checks")
-            package_steps = set(string_list(package.get("required_steps")))
-            covered_steps.update(package_steps)
-            used_alignment = set(string_list(package.get("uses_step_action_alignment")))
-            if not package_steps <= used_alignment:
-                errors.append("plan.control.json work package missing producing action alignment for required steps")
-            unknown_alignment = sorted(used_alignment - set(plan_alignment))
-            if unknown_alignment:
-                errors.append(
-                    "plan.control.json work package references unknown producing action alignment: "
-                    + ", ".join(unknown_alignment)
-                )
-            for step_id in used_alignment:
-                alignment = plan_alignment.get(step_id)
-                if not alignment:
-                    continue
-                for write_path in alignment_write_paths(alignment):
-                    if not path_is_under(write_path, string_list(package.get("allowed_write_paths"))):
-                        errors.append(
-                            "plan.control.json producing action write authority is not covered by work package allowed_write_paths"
-                        )
-            package_outcomes = covered_outcomes_by_steps(step_outcomes_by_key.get("plan", {}), package_steps)
-            if package_outcomes & required_outcomes:
-                if (
-                    package.get("role") != "mainline"
-                    or package.get("counts_as_goal_progress") is not True
-                    or package.get("not_merely_verification") is not True
-                ):
-                    errors.append(
-                        "plan.control.json mainline work package required for blocking outcomes must use a producing action"
-                    )
-                else:
-                    mainline_producing_steps.update(package_steps)
-        if not runtime_steps <= covered_steps:
-            errors.append("runtime required_steps must be covered by work packages")
-        if required_outcomes:
-            covered_outcomes = covered_outcomes_by_steps(step_outcomes_by_key.get("plan", {}), covered_steps)
-            missing_outcomes = sorted(required_outcomes - covered_outcomes)
-            if missing_outcomes:
-                errors.append(
-                    "plan.control.json work_packages do not cover blocking required outcomes: "
-                    + ", ".join(missing_outcomes)
-                )
-            producing_outcomes = covered_outcomes_by_steps(
-                step_outcomes_by_key.get("plan", {}),
-                mainline_producing_steps,
-            )
-            missing_producing_outcomes = sorted(required_outcomes - producing_outcomes)
-            if missing_producing_outcomes:
-                errors.append(
-                    "plan.control.json mainline producing work packages do not cover blocking required outcomes: "
-                    + ", ".join(missing_producing_outcomes)
-                )
-
-    return artifacts, errors
+    if not (run_dir / "run.control.json").exists():
+        return None, ["missing run.control.json; official JSON control runs must use run.control.json"]
+    return validate_generation_control_chain(run_dir)
 
 
-def verify_approved_hashes(run_dir: Path, hash_file: Path, readonly_files: tuple[str, ...] = READONLY_FILES) -> list[str]:
+def verify_approved_hashes(run_dir: Path, hash_file: Path, readonly_files: tuple[str, ...] | None = None) -> list[str]:
     try:
         expected = load_json(hash_file)
     except ControlJsonError as exc:
         return [str(exc)]
+    readonly_files = readonly_files or READONLY_FILES
     errors: list[str] = []
     for filename in readonly_files:
         if filename not in expected:

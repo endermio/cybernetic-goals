@@ -8,6 +8,6 @@
   "proof": [
     "Updated .agents/skills/routing-cybernetic-workflows/SKILL.md Level 3 route language.",
     "Updated .agents/skills/orchestrating-cybernetic-pregoal/SKILL.md to distinguish lean default from full exception.",
-    "Existing full-chain tests in tests/skills/test_json_official_guard_compiler_path.py still pass."
+    "Generation-aware official path tests now reject run directories without run.control.json; full mode remains an explicit exception through run.control.json, not the default legacy chain."
   ]
 }

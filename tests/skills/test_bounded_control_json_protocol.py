@@ -166,7 +166,7 @@ class BoundedControlJsonProtocolTest(unittest.TestCase):
             result = run_script(FULL_CHAIN_VALIDATE, str(run_dir))
 
             self.assertNotEqual(result.returncode, 0, result.stdout + result.stderr)
-            self.assertIn("missing JSON file: requirements.control.json", result.stdout + result.stderr)
+            self.assertIn("missing run.control.json", result.stdout + result.stderr)
 
     def test_bounded_verifier_requires_named_step_evidence(self):
         with tempfile.TemporaryDirectory() as tmpdir:

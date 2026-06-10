@@ -127,82 +127,9 @@ def compile_runtime_control(run_dir: Path) -> Path:
     if not run_dir.exists() or not run_dir.is_dir():
         raise ControlJsonValidationError(f"run directory does not exist: {run_dir}")
     reject_markdown_control_artifacts(run_dir)
-    if (run_dir / "run.control.json").exists():
-        return compile_generation_runtime_control(run_dir)
-
-    runtime_path = run_dir / "runtime.control.json"
-    if not runtime_path.exists():
-        requirements = read_json_object(run_dir / "requirements.control.json")
-        design = read_json_object(run_dir / "design.control.json")
-        goal = read_json_object(run_dir / "goal.control.json")
-        plan = read_json_object(run_dir / "plan.control.json")
-        review = read_json_object(run_dir / "review.control.json")
-        require_approved_control_inputs(
-            {
-                "requirements.control.json": requirements,
-                "design.control.json": design,
-                "goal.control.json": goal,
-                "plan.control.json": plan,
-                "review.control.json": review,
-            }
-        )
-
-        plan_bindings = plan.get("registry_bindings", {})
-        required_outcomes = plan.get("verifier", {}).get("required_outcomes")
-        if not required_outcomes:
-            required_outcomes = [
-                outcome.get("id")
-                for outcome in requirements.get("approved_control", {}).get("required_outcomes", [])
-                if isinstance(outcome, dict)
-                and isinstance(outcome.get("id"), str)
-                and outcome.get("blocks_goal_achieved_if_missing") is True
-            ]
-        runtime = {
-            "artifact_type": "runtime.control",
-            "schema_version": goal.get("schema_version", "1"),
-            "status": "compiled",
-            "control_chain": {
-                "requirements": "requirements.control.json",
-                "design": "design.control.json",
-                "goal": "goal.control.json",
-                "plan": "plan.control.json",
-                "review": "review.control.json",
-            },
-            "semantic_base_ref": plan.get("semantic_base_ref") or goal.get("semantic_base_ref"),
-            "approved_control": {
-                "objective": goal.get("approved_control", {}).get("objective", "Execute the approved JSON control chain."),
-                "what_counts_as_done": goal.get("approved_control", {}).get("what_counts_as_done", "Verifier permits the final report."),
-            },
-            "registry_bindings": {
-                "selected_agent_workflow": plan_bindings.get("selected_agent_workflow") or review.get("registry_bindings", {}).get("selected_agent_workflow"),
-            },
-            "approved_control_hashes": {},
-            "runtime": {
-                "readonly_files": APPROVED_CONTROL_FILES,
-                "writable_files": WRITABLE_FILES,
-                "writable_evidence_paths": plan.get("runtime", {}).get("writable_evidence_paths", WRITABLE_EVIDENCE_PATHS),
-            },
-            "required_steps": plan.get("required_steps", []),
-            "progress": plan.get("progress", {"event_schema": "progress-event.schema.json", "append_only": True}),
-            "verifier": {
-                "required_before_goal_achieved": True,
-                "command": "python3 .agents/skills/using-control-json/scripts/verify_runtime_progress.py",
-                "required_outcomes": required_outcomes,
-                "output_schema": plan.get("verifier", {}).get("output_schema", "final-report.schema.json"),
-            },
-        }
-        runtime["approved_control_hashes"] = {
-            "requirements.control.json": control_file_hash("requirements.control.json", requirements),
-            "design.control.json": control_file_hash("design.control.json", design),
-            "goal.control.json": control_file_hash("goal.control.json", goal),
-            "plan.control.json": control_file_hash("plan.control.json", plan),
-            "review.control.json": control_file_hash("review.control.json", review),
-            "runtime.control.json": control_file_hash("runtime.control.json", runtime),
-        }
-        runtime_path.write_text(json.dumps(runtime, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
-
-    validate_json_control_run(run_dir)
-    return runtime_path
+    if not (run_dir / "run.control.json").exists():
+        raise ControlJsonValidationError("missing run.control.json; official JSON control runs must use run.control.json")
+    return compile_generation_runtime_control(run_dir)
 
 
 def main() -> int:

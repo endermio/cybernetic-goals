@@ -8,6 +8,8 @@
     "artifact_type",
     "schema_version",
     "status",
+    "control_mode",
+    "generation",
     "semantic_base_ref",
     "approved_control_hashes",
     "runtime",

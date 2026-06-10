@@ -211,7 +211,9 @@ def main() -> int:
         return 1
 
     if args.approved_hashes:
-        errors.extend(verify_approved_hashes(run_dir, Path(args.approved_hashes)))
+        readonly_files = artifacts["runtime"].get("runtime", {}).get("readonly_files")
+        readonly = tuple(readonly_files) if isinstance(readonly_files, list) else None
+        errors.extend(verify_approved_hashes(run_dir, Path(args.approved_hashes), readonly or None))
 
     events, event_errors = read_progress_events(run_dir / "progress.jsonl")
     errors.extend(event_errors)
