@@ -445,29 +445,44 @@ def load_json(path: Path) -> dict:
     return json.loads(path.read_text(encoding="utf-8"))
 
 
+def matches_schema(instance, schema, path="$") -> bool:
+    try:
+        validate(instance, schema, path)
+    except SchemaValidationError:
+        return False
+    return True
+
+
 def validate(instance, schema, path="$"):
     if "const" in schema and instance != schema["const"]:
         raise SchemaValidationError(f"{path}: expected const {schema['const']!r}, got {instance!r}")
     if "enum" in schema and instance not in schema["enum"]:
         raise SchemaValidationError(f"{path}: expected one of {schema['enum']!r}, got {instance!r}")
 
+    for index, subschema in enumerate(schema.get("allOf", [])):
+        validate(instance, subschema, f"{path}.allOf[{index}]")
+    if "if" in schema and matches_schema(instance, schema["if"], f"{path}.if"):
+        if "then" in schema:
+            validate(instance, schema["then"], f"{path}.then")
+
     expected_type = schema.get("type")
     if expected_type == "object":
         if not isinstance(instance, dict):
             raise SchemaValidationError(f"{path}: expected object")
+    if expected_type == "object" or (expected_type is None and isinstance(instance, dict)):
         required = schema.get("required", [])
         for key in required:
             if key not in instance:
                 raise SchemaValidationError(f"{path}: missing required key {key!r}")
         properties = schema.get("properties", {})
-        if schema.get("additionalProperties") is False:
+        if expected_type == "object" and schema.get("additionalProperties") is False:
             extra = sorted(set(instance) - set(properties))
             if extra:
                 raise SchemaValidationError(f"{path}: unknown keys {extra!r}")
         for key, subschema in properties.items():
             if key in instance:
                 validate(instance[key], subschema, f"{path}.{key}")
-    elif expected_type == "array":
+    if expected_type == "array":
         if not isinstance(instance, list):
             raise SchemaValidationError(f"{path}: expected array")
         if "minItems" in schema and len(instance) < schema["minItems"]:
@@ -696,14 +711,22 @@ class ControlJsonSchemaTest(unittest.TestCase):
         self.assertIn("runtime_generation", final_report_schema["properties"])
         self.assertIn("unresolved_amendments", final_report_schema["properties"])
 
-    def test_requirements_schema_rejects_missing_source_requirement_fields_for_v1_1(self):
+    def test_requirements_schema_rejects_missing_source_requirements_for_v1_1(self):
         schema = json.loads((SCHEMA_DIR / "requirements.control.schema.json").read_text(encoding="utf-8"))
         fixture = copy.deepcopy(SCHEMA_FIXTURES["requirements.control.schema.json"])
         fixture["schema_version"] = "1.1.0"
-        del fixture["approved_control"]["source_requirements"][0]["completion_checks"]
+        del fixture["approved_control"]["source_requirements"]
 
         with self.assertRaises(AssertionError):
             validate(fixture, schema)
+
+    def test_requirements_schema_accepts_missing_source_requirements_for_v1_0(self):
+        schema = json.loads((SCHEMA_DIR / "requirements.control.schema.json").read_text(encoding="utf-8"))
+        fixture = copy.deepcopy(SCHEMA_FIXTURES["requirements.control.schema.json"])
+        fixture["schema_version"] = "1.0.0"
+        del fixture["approved_control"]["source_requirements"]
+
+        validate(fixture, schema)
 
     def test_progress_event_schema_accepts_affected_source_requirements_on_amendment(self):
         schema = json.loads((SCHEMA_DIR / "progress-event.schema.json").read_text(encoding="utf-8"))
