@@ -140,6 +140,7 @@ AMENDMENT_PROPOSAL_REQUIRED_FIELDS = (
     *AMENDMENT_ANCHOR_FIELDS,
     "proposed_changes",
     "review_required",
+    "patch_ref",
 )
 
 
@@ -858,6 +859,8 @@ def validate_event(event: dict[str, Any]) -> list[str]:
                     or not all(isinstance(item, str) and item for item in event.get(field, []))
                 ):
                     errors.append(f"control.amendment.proposed {field} must be a non-empty list")
+            if "patch_ref" in event and (not isinstance(event.get("patch_ref"), str) or not event.get("patch_ref")):
+                errors.append("control.amendment.proposed patch_ref must be a non-empty string")
     elif event_type in GENERATION_EVENT_TYPES:
         if event_type == "runtime.generation.superseded" and (
             not isinstance(event.get("reason"), str) or not event.get("reason")

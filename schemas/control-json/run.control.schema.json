@@ -216,6 +216,63 @@
             "type": "string",
             "minLength": 1
           },
+          "patch_ref": {
+            "type": "string",
+            "minLength": 1
+          },
+          "writable_evidence_paths": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "verifier": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "required_before_goal_achieved",
+              "command",
+              "required_outcomes",
+              "output_schema"
+            ],
+            "properties": {
+              "required_before_goal_achieved": {
+                "type": "boolean"
+              },
+              "command": {
+                "type": "string",
+                "minLength": 1
+              },
+              "required_outcomes": {
+                "type": "array",
+                "minItems": 1,
+                "items": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "output_schema": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          },
+          "imported_evidence": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "invalidated_evidence": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
           "required_steps": {
             "type": "array",
             "items": {

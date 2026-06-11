@@ -160,6 +160,7 @@ Review whether these schemas need related updates:
 - `schemas/control-json/review.control.schema.json`
 - `schemas/control-json/final-report.schema.json`
 - `schemas/control-json/amendment-proposal.schema.json`
+- `schemas/control-json/amendment.patch.schema.json`
 - `schemas/control-json/progress-event.schema.json`
 
 ## 3. Compiler, Guard, And Runtime Changes
@@ -210,6 +211,11 @@ Update `.agents/skills/orchestrating-cybernetic-pregoal/scripts/amendment_orches
 - create new generations only for `strategy_policy: reviewed_replanning`
 - for `strategy_policy: frozen_strategy`, treat amendment requests as
   blocked or human-decision events, not as automatic continuation
+- require `control.amendment.proposed.patch_ref`
+- apply only a validated amendment patch, not a copied old strategy
+- require an approved amendment review before switching
+  `run.control.json.current_generation`
+- never synthesize or auto-approve the amendment review inside the orchestrator
 
 ## 5. Routing, Requirements, And Review Skills
 
@@ -313,7 +319,9 @@ Add regressions:
 - Level 3 exploratory target routes to `reviewed_replanning`
 - risk changes `control_level` or `gate_mode`, not `strategy_policy`
 - `frozen_strategy` rejects amendment continuation
-- `reviewed_replanning` allows reviewed amendment continuation
+- `reviewed_replanning` allows reviewed patch-based amendment continuation
+- amendment proposal without `patch_ref` fails
+- amendment patch without approved review does not switch generation
 - hybrid targets must split into phases
 
 ## 8. Fixtures And Examples

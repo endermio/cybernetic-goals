@@ -83,6 +83,23 @@ def compile_generation_runtime_control(run_dir: Path) -> Path:
                     "run.control.json: only discovery generations may use synthetic required_steps"
                 )
             required_steps = synthetic_steps_from_requirements(requirements)
+        verifier = generation.get("verifier")
+        if not isinstance(verifier, dict):
+            verifier = {
+                "required_before_goal_achieved": True,
+                "command": "python3 .agents/skills/using-control-json/scripts/verify_runtime_progress.py",
+                "required_outcomes": blocking_required_outcome_ids(requirements),
+                "output_schema": "final-report.schema.json",
+            }
+        writable_evidence_paths = generation.get("writable_evidence_paths")
+        if not isinstance(writable_evidence_paths, list) or not writable_evidence_paths:
+            writable_evidence_paths = WRITABLE_EVIDENCE_PATHS
+        imported_evidence = generation.get("imported_evidence")
+        if not isinstance(imported_evidence, list):
+            imported_evidence = []
+        invalidated_evidence = generation.get("invalidated_evidence")
+        if not isinstance(invalidated_evidence, list):
+            invalidated_evidence = []
         runtime = {
             "artifact_type": "runtime.control",
             "schema_version": run_control.get("schema_version", "1.0.0"),
@@ -99,18 +116,13 @@ def compile_generation_runtime_control(run_dir: Path) -> Path:
             "runtime": {
                 "readonly_files": generation_runtime_readonly_files(generation),
                 "writable_files": WRITABLE_FILES,
-                "writable_evidence_paths": WRITABLE_EVIDENCE_PATHS,
+                "writable_evidence_paths": writable_evidence_paths,
             },
             "required_steps": required_steps,
             "progress": {"event_schema": "progress-event.schema.json", "append_only": True},
-            "verifier": {
-                "required_before_goal_achieved": True,
-                "command": "python3 .agents/skills/using-control-json/scripts/verify_runtime_progress.py",
-                "required_outcomes": blocking_required_outcome_ids(requirements),
-                "output_schema": "final-report.schema.json",
-            },
-            "imported_evidence": [],
-            "invalidated_evidence": [],
+            "verifier": verifier,
+            "imported_evidence": imported_evidence,
+            "invalidated_evidence": invalidated_evidence,
         }
         for field in RUN_STRATEGY_FIELDS:
             runtime[field] = run_control.get(field)

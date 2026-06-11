@@ -253,6 +253,40 @@ def approved_generation_review() -> dict:
     }
 
 
+def amendment_patch(
+    amendment_id: str = "A1",
+    *,
+    parent_generation: str = "gen-000",
+    evidence_id: str = "evidence.target-startup.v2",
+) -> dict:
+    return {
+        "artifact_type": "amendment.patch",
+        "schema_version": "1.0.0",
+        "amendment_id": amendment_id,
+        "parent_generation": parent_generation,
+        "strategy_kind": "amendment",
+        "required_steps": [
+            {
+                "step_id": "S2",
+                "transition": "reviewed amendment strategy produces required evidence",
+                "evidence": [evidence_id],
+                "satisfies_outcomes": ["O-target-startup"],
+            }
+        ],
+        "runtime_updates": {
+            "writable_evidence_paths": ["evidence/"],
+            "verifier": {
+                "required_before_goal_achieved": True,
+                "command": "python3 .agents/skills/using-control-json/scripts/verify_runtime_progress.py",
+                "required_outcomes": ["O-target-startup"],
+                "output_schema": "final-report.schema.json",
+            },
+            "imported_evidence": [],
+            "invalidated_evidence": ["evidence.target-startup"],
+        },
+    }
+
+
 def progress_event(
     evidence_id: str,
     *,
@@ -283,6 +317,7 @@ def progress_event(
         event["authority_expanded"] = False
         event["proposed_changes"] = ["replace substitute evidence with producing strategy"]
         event["review_required"] = ["intent-preservation", "required-outcome-coverage"]
+        event["patch_ref"] = f"amendments/{amendment_id}.patch.json"
     return event
 
 
@@ -439,6 +474,7 @@ class ReviewedReplanningControlTest(unittest.TestCase):
             "authority_expanded": False,
             "proposed_changes": ["replace substitute evidence with producing strategy"],
             "review_required": ["intent-preservation", "required-outcome-coverage"],
+            "patch_ref": "amendments/A1.patch.json",
         }
         report = final_report("gen-000", "evidence.target-startup")
         with tempfile.TemporaryDirectory() as tmpdir:
@@ -475,7 +511,7 @@ class ReviewedReplanningControlTest(unittest.TestCase):
             self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
             self.assertTrue(json.loads(result.stdout)["goal_achieved_permitted"])
 
-    def test_amendment_orchestrator_creates_reviewed_next_generation_for_anchor_preserving_proposal(self):
+    def test_amendment_orchestrator_requires_patch_review_before_switching_generation(self):
         event = {
             "event_type": "control.amendment.proposed",
             "schema_version": "1.0.0",
@@ -491,10 +527,51 @@ class ReviewedReplanningControlTest(unittest.TestCase):
             "authority_expanded": False,
             "proposed_changes": ["create reviewed amendment generation"],
             "review_required": ["intent-preservation", "required-outcome-coverage"],
+            "patch_ref": "amendments/A1.patch.json",
         }
         with tempfile.TemporaryDirectory() as tmpdir:
             run_dir = Path(tmpdir)
             write_strategy_run(run_dir, progress_events=[event], strategy_policy="reviewed_replanning")
+            patch_path = run_dir / "amendments/A1.patch.json"
+            patch_path.parent.mkdir(parents=True, exist_ok=True)
+            patch_path.write_text(json.dumps(amendment_patch(), indent=2), encoding="utf-8")
+
+            result = run_script(AMENDMENT_ORCHESTRATOR, "--run-dir", str(run_dir))
+
+            self.assertNotEqual(result.returncode, 0, result.stdout + result.stderr)
+            payload = json.loads(result.stdout)
+            self.assertEqual("RunReview", payload["next_allowed_action"])
+            self.assertEqual("gen-001", payload["candidate_generation"])
+            run = json.loads((run_dir / "run.control.json").read_text(encoding="utf-8"))
+            self.assertEqual("gen-000", run["current_generation"])
+            self.assertFalse((run_dir / "gen-001/runtime.control.json").exists())
+            self.assertFalse((run_dir / "gen-001/review.control.json").exists())
+            self.assertTrue((run_dir / "amendments/A1.candidate-generation.json").exists())
+            progress = [
+                json.loads(line)
+                for line in (run_dir / "progress.jsonl").read_text(encoding="utf-8").splitlines()
+                if line.strip()
+            ]
+            self.assertFalse(any(event.get("event_type") == "control.amendment.approved" for event in progress))
+
+    def test_amendment_orchestrator_applies_reviewed_patch_after_review_exists(self):
+        event = progress_event(
+            "evidence.target-startup",
+            event_type="control.amendment.proposed",
+            amendment_id="A1",
+        )
+        with tempfile.TemporaryDirectory() as tmpdir:
+            run_dir = Path(tmpdir)
+            write_strategy_run(run_dir, progress_events=[event], strategy_policy="reviewed_replanning")
+            patch_path = run_dir / "amendments/A1.patch.json"
+            review_path = run_dir / "amendments/A1.review.control.json"
+            patch_path.parent.mkdir(parents=True, exist_ok=True)
+            patch_path.write_text(json.dumps(amendment_patch(), indent=2), encoding="utf-8")
+            review = approved_generation_review()
+            review["review_scope"] = "amendment"
+            review["amendment_source"] = "progress.jsonl#A1"
+            review["parent_generation"] = "gen-000"
+            review_path.write_text(json.dumps(review, indent=2), encoding="utf-8")
 
             result = run_script(AMENDMENT_ORCHESTRATOR, "--run-dir", str(run_dir))
 
@@ -508,33 +585,31 @@ class ReviewedReplanningControlTest(unittest.TestCase):
             self.assertEqual("active", generations["gen-001"]["status"])
             self.assertEqual("amendment", generations["gen-001"]["strategy_kind"])
             self.assertEqual("gen-000", generations["gen-001"]["parent"])
+            self.assertEqual("amendments/A1.patch.json", generations["gen-001"]["patch_ref"])
+            self.assertEqual(["evidence.target-startup"], generations["gen-001"]["invalidated_evidence"])
+            self.assertEqual(
+                [{"step_id": "S2", "transition": "reviewed amendment strategy produces required evidence", "evidence": ["evidence.target-startup.v2"], "satisfies_outcomes": ["O-target-startup"]}],
+                generations["gen-001"]["required_steps"],
+            )
             self.assertTrue((run_dir / "gen-001/review.control.json").exists())
             self.assertTrue((run_dir / "gen-001/runtime.control.json").exists())
-            review = json.loads((run_dir / "gen-001/review.control.json").read_text(encoding="utf-8"))
-            check_ids = {check["check_id"] for check in review["review_checks"]}
-            self.assertGreaterEqual(
-                check_ids,
-                {
-                    "intent-preservation",
-                    "obligation-preservation",
-                    "required-outcome-coverage",
-                    "source-requirement-preservation",
-                    "horizon-authority",
-                },
-            )
+            runtime = json.loads((run_dir / "gen-001/runtime.control.json").read_text(encoding="utf-8"))
+            self.assertEqual("S2", runtime["required_steps"][0]["step_id"])
+            self.assertEqual(["evidence.target-startup"], runtime["invalidated_evidence"])
+            copied_review = json.loads((run_dir / "gen-001/review.control.json").read_text(encoding="utf-8"))
             source_check = next(
                 check
-                for check in review["review_checks"]
+                for check in copied_review["review_checks"]
                 if check["check_id"] == "source-requirement-preservation"
             )
-            self.assertIn("SR-target-startup", "\n".join(source_check["evidence"]))
+            self.assertIn("source-requirement-preservation passed for current generation", "\n".join(source_check["evidence"]))
             self.assertEqual(0, run_script(CONTROL_GUARD, "--run-dir", str(run_dir)).returncode)
             progress = [
                 json.loads(line)
                 for line in (run_dir / "progress.jsonl").read_text(encoding="utf-8").splitlines()
                 if line.strip()
             ]
-            self.assertTrue(any(event.get("event_type") == "control.amendment.approved" for event in progress))
+            self.assertTrue(any(item.get("event_type") == "control.amendment.approved" for item in progress))
 
     def test_amendment_orchestrator_rejects_frozen_strategy_continuation(self):
         event = {
@@ -552,6 +627,7 @@ class ReviewedReplanningControlTest(unittest.TestCase):
             "authority_expanded": False,
             "proposed_changes": ["create reviewed amendment generation"],
             "review_required": ["intent-preservation", "required-outcome-coverage"],
+            "patch_ref": "amendments/A-frozen.patch.json",
         }
         with tempfile.TemporaryDirectory() as tmpdir:
             run_dir = Path(tmpdir)
@@ -580,6 +656,7 @@ class ReviewedReplanningControlTest(unittest.TestCase):
             "authority_expanded": False,
             "proposed_changes": ["change approved meaning"],
             "review_required": ["intent-preservation"],
+            "patch_ref": "amendments/A-anchor.patch.json",
         }
         with tempfile.TemporaryDirectory() as tmpdir:
             run_dir = Path(tmpdir)
@@ -791,6 +868,29 @@ class ReviewedReplanningControlTest(unittest.TestCase):
             self.assertIn("control.amendment.proposed events must include triggering_observation", result.stdout + result.stderr)
             self.assertIn("control.amendment.proposed events must include affected_stages", result.stdout + result.stderr)
             self.assertIn("control.amendment.proposed events must include semantic_base_change", result.stdout + result.stderr)
+
+    def test_runtime_validator_requires_patch_ref_on_amendment_proposal(self):
+        event = progress_event(
+            "evidence.target-startup",
+            event_type="control.amendment.proposed",
+            amendment_id="A1",
+        )
+        del event["patch_ref"]
+        with tempfile.TemporaryDirectory() as tmpdir:
+            run_dir = Path(tmpdir)
+            write_strategy_run(
+                run_dir,
+                progress_events=[event],
+                report=final_report("gen-000", "evidence.target-startup"),
+            )
+
+            result = run_script(VERIFY, str(run_dir))
+
+            self.assertNotEqual(result.returncode, 0, result.stdout + result.stderr)
+            self.assertIn(
+                "control.amendment.proposed events must include patch_ref",
+                result.stdout + result.stderr,
+            )
 
     def test_runtime_validator_requires_affected_source_requirements_on_amendment_proposal(self):
         event = progress_event(

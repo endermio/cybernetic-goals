@@ -99,11 +99,19 @@ Amendment events use `control.amendment.proposed`,
 - `authority_expanded`
 - `proposed_changes`
 - `review_required`
+- `patch_ref`
 
 The schemas preserve v1.0 parse compatibility for historical amendment events.
 Current runtime execution policy requires `affected_source_requirements` on
 every `control.amendment.proposed` event so affected source requirements can be
 reviewed before a new generation is approved.
+
+`patch_ref` names a JSON patch artifact inside the same run directory. The patch
+describes the next strategy candidate, including refined required steps and any
+derived runtime updates such as verifier config, evidence import, or evidence
+invalidation. The patch must not contain target-anchor changes. A proposal
+without a patch is incomplete, and a patch without an approved amendment review
+cannot switch `run.control.json.current_generation`.
 
 When runtime observes that current strategy can only produce weaker evidence
 for a blocking source requirement, append `control.amendment.proposed` with

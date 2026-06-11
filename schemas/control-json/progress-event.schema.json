@@ -119,6 +119,10 @@
         "minLength": 1
       }
     },
+    "patch_ref": {
+      "type": "string",
+      "minLength": 1
+    },
     "parent_generation": {
       "type": "string",
       "minLength": 1
@@ -182,7 +186,8 @@
           "required_outcomes_changed",
           "authority_expanded",
           "proposed_changes",
-          "review_required"
+          "review_required",
+          "patch_ref"
         ]
       }
     },

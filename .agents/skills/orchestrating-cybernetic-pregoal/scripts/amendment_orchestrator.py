@@ -18,17 +18,10 @@ sys.path.insert(0, str(COMPILE_SCRIPTS))
 sys.path.insert(0, str(RUNTIME_SCRIPTS))
 
 from compile_runtime_goal import compile_runtime_control  # noqa: E402
-from control_json_runtime import read_progress_events, validate_control_chain  # noqa: E402
+from control_json_runtime import generation_review_errors, read_progress_events, validate_control_chain  # noqa: E402
 
 
 ANCHOR_FIELDS = ("semantic_base_change", "required_outcomes_changed", "authority_expanded")
-AMENDMENT_REVIEW_CHECKS = (
-    "intent-preservation",
-    "obligation-preservation",
-    "required-outcome-coverage",
-    "source-requirement-preservation",
-    "horizon-authority",
-)
 
 
 def read_json(path: Path) -> dict[str, Any]:
@@ -111,41 +104,89 @@ def append_progress_event(run_dir: Path, event: dict[str, Any]) -> None:
         handle.write(json.dumps(event, ensure_ascii=False, separators=(",", ":")) + "\n")
 
 
-def approved_review(amendment: dict[str, Any], parent_generation: str) -> dict[str, Any]:
+def safe_ref_path(run_dir: Path, ref: Any, label: str) -> tuple[Path | None, list[str]]:
+    if not isinstance(ref, str) or not ref:
+        return None, [f"{label} must be a non-empty relative path"]
+    path = Path(ref)
+    if path.is_absolute() or ".." in path.parts:
+        return None, [f"{label} must stay inside the run directory"]
+    return run_dir / path, []
+
+
+def patch_validation_errors(patch: dict[str, Any], amendment: dict[str, Any], current_generation: str) -> list[str]:
+    errors: list[str] = []
     amendment_id = amendment["amendment_id"]
-    evidence_by_check = {
-        "intent-preservation": f"amendment {amendment_id} preserves the approved semantic base and target intent",
-        "obligation-preservation": f"amendment {amendment_id} keeps required outcomes and completion obligations unchanged",
-        "required-outcome-coverage": f"amendment {amendment_id} carries current required steps into the reviewed generation",
-        "source-requirement-preservation": (
-            "amendment preserves source requirements affected by "
-            + amendment_id
-            + ": "
-            + ", ".join(string_list(amendment.get("affected_source_requirements")))
-        ),
-        "horizon-authority": f"amendment {amendment_id} does not expand authority or approved runtime horizon",
+    for forbidden in ("semantic_base_change", "required_outcomes_changed", "authority_expanded"):
+        if forbidden in patch:
+            errors.append(f"amendment patch must not contain approved-anchor field: {forbidden}")
+    if patch.get("artifact_type") != "amendment.patch":
+        errors.append("amendment patch artifact_type must be amendment.patch")
+    if patch.get("amendment_id") != amendment_id:
+        errors.append("amendment patch amendment_id must match proposal")
+    if patch.get("parent_generation") != current_generation:
+        errors.append("amendment patch parent_generation must match current_generation")
+    if patch.get("strategy_kind") != "amendment":
+        errors.append("amendment patch strategy_kind must be amendment")
+    required_steps = patch.get("required_steps")
+    if not isinstance(required_steps, list) or not required_steps:
+        errors.append("amendment patch must include non-empty required_steps")
+    else:
+        for index, step in enumerate(required_steps):
+            if not isinstance(step, dict):
+                errors.append(f"amendment patch required_steps[{index}] must be an object")
+                continue
+            for field in ("step_id", "transition", "evidence", "satisfies_outcomes"):
+                if field not in step:
+                    errors.append(f"amendment patch required_steps[{index}] missing {field}")
+            if step.get("synthetic") is True:
+                errors.append("amendment patch required_steps must be reviewed non-synthetic steps")
+    runtime_updates = patch.get("runtime_updates", {})
+    if runtime_updates is None:
+        runtime_updates = {}
+    if not isinstance(runtime_updates, dict):
+        errors.append("amendment patch runtime_updates must be an object when present")
+    else:
+        writable = runtime_updates.get("writable_evidence_paths")
+        if writable is not None and not string_list(writable):
+            errors.append("amendment patch runtime_updates.writable_evidence_paths must be a non-empty string list")
+        verifier = runtime_updates.get("verifier")
+        if verifier is not None:
+            if not isinstance(verifier, dict):
+                errors.append("amendment patch runtime_updates.verifier must be an object")
+            else:
+                for field in ("required_before_goal_achieved", "command", "required_outcomes", "output_schema"):
+                    if field not in verifier:
+                        errors.append(f"amendment patch runtime_updates.verifier missing {field}")
+        for field in ("imported_evidence", "invalidated_evidence"):
+            if field in runtime_updates and not isinstance(runtime_updates.get(field), list):
+                errors.append(f"amendment patch runtime_updates.{field} must be a list")
+    return errors
+
+
+def generation_entry_from_patch(
+    patch: dict[str, Any],
+    amendment: dict[str, Any],
+    new_generation: str,
+    current_generation: str,
+) -> dict[str, Any]:
+    runtime_updates = patch.get("runtime_updates")
+    if not isinstance(runtime_updates, dict):
+        runtime_updates = {}
+    entry: dict[str, Any] = {
+        "id": new_generation,
+        "strategy_kind": "amendment",
+        "status": "active",
+        "parent": current_generation,
+        "runtime": f"{new_generation}/runtime.control.json",
+        "review": f"{new_generation}/review.control.json",
+        "amendment_source": f"progress.jsonl#{amendment['amendment_id']}",
+        "patch_ref": amendment["patch_ref"],
+        "required_steps": copy.deepcopy(patch["required_steps"]),
     }
-    return {
-        "artifact_type": "review.control",
-        "schema_version": amendment.get("schema_version", "1.0.0"),
-        "status": "approved",
-        "review_scope": "amendment",
-        "amendment_source": f"progress.jsonl#{amendment_id}",
-        "parent_generation": parent_generation,
-        "review_checks": [
-            {
-                "check_id": check_id,
-                "status": "pass",
-                "verdict": "approved",
-                "return_to_stage": None,
-                "evidence": [evidence_by_check[check_id]],
-                "findings": [],
-                "required_changes": [],
-                "checked_transformations": ["runtime->amendment-generation"],
-            }
-            for check_id in AMENDMENT_REVIEW_CHECKS
-        ],
-    }
+    for field in ("writable_evidence_paths", "verifier", "imported_evidence", "invalidated_evidence"):
+        if field in runtime_updates:
+            entry[field] = copy.deepcopy(runtime_updates[field])
+    return entry
 
 
 def apply_amendment(run_dir: Path, requested_amendment_id: str | None = None) -> tuple[int, dict[str, Any]]:
@@ -198,33 +239,42 @@ def apply_amendment(run_dir: Path, requested_amendment_id: str | None = None) ->
             errors=["auto amendment rounds exceed max_auto_amendment_rounds"],
         )
 
-    runtime_rel = current.get("runtime")
-    if not isinstance(runtime_rel, str):
-        return 2, result_payload(False, next_allowed_action="FixJsonControlRun", errors=["current generation has no runtime"])
-    current_runtime = read_json(run_dir / runtime_rel)
-    required_steps = copy.deepcopy(current_runtime.get("required_steps"))
-    if not isinstance(required_steps, list) or not required_steps:
-        return 2, result_payload(False, next_allowed_action="RunReview", errors=["current runtime has no required_steps to refine"])
-    for step in required_steps:
-        if isinstance(step, dict) and step.get("synthetic") is True:
-            return 2, result_payload(
-                False,
-                next_allowed_action="RunReview",
-                amendment_id=amendment_id,
-                errors=["synthetic discovery steps require reviewed non-synthetic refinement"],
-            )
-
+    patch_path, patch_ref_errors = safe_ref_path(run_dir, amendment.get("patch_ref"), "patch_ref")
+    if patch_ref_errors:
+        return 2, result_payload(False, next_allowed_action="FixAmendmentProposal", amendment_id=amendment_id, errors=patch_ref_errors)
+    if patch_path is None or not patch_path.exists():
+        return 2, result_payload(
+            False,
+            next_allowed_action="RunReview",
+            amendment_id=amendment_id,
+            errors=["amendment patch file is missing: " + str(amendment.get("patch_ref"))],
+        )
+    patch = read_json(patch_path)
+    patch_errors = patch_validation_errors(patch, amendment, current_generation)
+    if patch_errors:
+        return 2, result_payload(False, next_allowed_action="FixAmendmentPatch", amendment_id=amendment_id, errors=patch_errors)
     new_generation = next_generation_id(run_control)
-    new_generation_entry = {
-        "id": new_generation,
-        "strategy_kind": "amendment",
-        "status": "active",
-        "parent": current_generation,
-        "runtime": f"{new_generation}/runtime.control.json",
-        "review": f"{new_generation}/review.control.json",
-        "amendment_source": f"progress.jsonl#{amendment_id}",
-        "required_steps": required_steps,
-    }
+    new_generation_entry = generation_entry_from_patch(patch, amendment, new_generation, current_generation)
+    review_ref = f"amendments/{amendment_id}.review.control.json"
+    review_path = run_dir / review_ref
+    if not review_path.exists():
+        candidate_path = run_dir / f"amendments/{amendment_id}.candidate-generation.json"
+        write_json(candidate_path, new_generation_entry)
+        return 2, result_payload(
+            False,
+            next_allowed_action="RunReview",
+            amendment_id=amendment_id,
+            candidate_generation=new_generation,
+            candidate_generation_ref=str(candidate_path.relative_to(run_dir)),
+            review_ref=review_ref,
+            errors=["reviewed amendment patch requires approved review before generation switch"],
+        )
+    review = read_json(review_path)
+    review_errors = generation_review_errors(review, context="amendment patch")
+    if review.get("artifact_type") != "review.control" or review.get("status") != "approved":
+        review_errors.append("amendment patch review must be an approved review.control artifact")
+    if review_errors:
+        return 2, result_payload(False, next_allowed_action="RunReview", amendment_id=amendment_id, errors=review_errors)
 
     updated_run = copy.deepcopy(run_control)
     for generation in updated_run["generations"]:
@@ -233,7 +283,7 @@ def apply_amendment(run_dir: Path, requested_amendment_id: str | None = None) ->
     updated_run["generations"].append(new_generation_entry)
     updated_run["current_generation"] = new_generation
     write_json(run_dir / "run.control.json", updated_run)
-    write_json(run_dir / new_generation_entry["review"], approved_review(amendment, current_generation))
+    write_json(run_dir / new_generation_entry["review"], review)
 
     runtime_path = compile_runtime_control(run_dir)
     append_progress_event(

@@ -37,13 +37,17 @@ or substitute evidence. Do not edit approved JSON in place. Append a
 `control.amendment.proposed` event with the current `runtime_generation`,
 reason, triggering observation, affected strategy stages,
 `affected_source_requirements`, and whether `semantic_base`, required outcomes,
-or authority would change.
+or authority would change. The proposal must also include `patch_ref` pointing
+to a JSON amendment patch that describes the next candidate strategy. Runtime
+must not rely on the proposal text alone as the strategy change.
 
 Anchor-preserving amendments may be reviewed into a new generation by the
 orchestrator only when `run.control.json.strategy_policy` is
 `reviewed_replanning`. Under `frozen_strategy`, an amendment proposal reports
 that the approved strategy does not fit and requires a human decision before
-continuing. Amendments that change `requirements.control.json`,
+continuing. The orchestrator must not synthesize its own approved review; it can
+switch generations only after the patch has an approved amendment review.
+Amendments that change `requirements.control.json`,
 `semantic_base`, required outcomes, what counts as done, work coverage,
 authority, or forbidden actions require human reapproval.
 

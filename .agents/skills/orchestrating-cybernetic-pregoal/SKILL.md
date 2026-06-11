@@ -349,11 +349,18 @@ The amendment orchestrator:
 3. stops with `HumanApprovalRequired` if the proposal changes semantic base,
    required outcomes, or authority;
 4. refuses to exceed `max_auto_amendment_rounds`;
-5. creates a reviewed `gen-N+1` amendment generation for anchor-preserving
-   proposals;
-6. updates `run.control.json.current_generation`;
-7. compiles the new generation runtime;
-8. appends `control.amendment.approved`.
+5. requires the proposal to name a JSON strategy patch via `patch_ref`;
+6. validates the patch without allowing approved-anchor fields in the patch;
+7. writes a candidate generation file and returns `RunReview` when the patch has
+   not yet been independently reviewed;
+8. applies the patch only after an approved amendment review exists;
+9. updates `run.control.json.current_generation`;
+10. compiles the new generation runtime;
+11. appends `control.amendment.approved`.
+
+The orchestrator must not manufacture an approved review. Amendment review is a
+separate control artifact. A proposal plus patch is not enough to switch
+generations.
 
 Generation selection comes only from `run.control.json.current_generation`.
 Do not pass a separate generation override that can diverge from the manifest.

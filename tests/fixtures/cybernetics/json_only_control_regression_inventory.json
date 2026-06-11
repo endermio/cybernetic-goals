@@ -124,7 +124,8 @@
           "file": "tests/skills/test_reviewed_replanning_control.py",
           "tests": [
             "test_guard_rejects_amendment_generation_with_shallow_review",
-            "test_amendment_orchestrator_creates_reviewed_next_generation_for_anchor_preserving_proposal"
+            "test_amendment_orchestrator_requires_patch_review_before_switching_generation",
+            "test_amendment_orchestrator_applies_reviewed_patch_after_review_exists"
           ]
         },
         {

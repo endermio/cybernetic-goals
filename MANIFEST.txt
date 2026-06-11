@@ -107,6 +107,7 @@ scripts/redact_run_event.py
 scripts/sync_run_events_to_github.py
 scripts/validate_run_events.py
 schemas/control-json/design.control.schema.json
+schemas/control-json/amendment.patch.schema.json
 schemas/control-json/amendment-proposal.schema.json
 schemas/control-json/bounded-runtime.control.schema.json
 schemas/control-json/final-report.schema.json

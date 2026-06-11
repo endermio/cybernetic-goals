@@ -129,14 +129,19 @@ The proposal must state:
 - whether semantic base would change
 - whether required outcomes would change
 - whether authority would expand
+- patch reference for the proposed next strategy
 
 If semantic base, required outcomes, what counts as done, work covered,
 authority, forbidden actions, or unacceptable substitutes would change, the
 orchestrator must stop for human approval.
 
 If the proposal preserves anchors and `strategy_policy` is
-`reviewed_replanning`, the orchestrator may create a reviewed successor
-generation.
+`reviewed_replanning`, it still cannot approve itself. The proposal must point
+to an amendment patch. The patch defines the proposed next strategy: required
+steps, runtime evidence paths, verifier config, imported evidence, and
+invalidated evidence. The orchestrator may write a candidate generation and ask
+for review. It may switch `current_generation` only after an approved amendment
+review exists.
 
 If `strategy_policy` is `frozen_strategy`, the orchestrator must not create a
 successor generation from runtime observation. It reports that the fixed

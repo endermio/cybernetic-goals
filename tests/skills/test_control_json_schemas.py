@@ -353,6 +353,33 @@ SCHEMA_FIXTURES = {
         "authority_expanded": False,
         "proposed_changes": ["replace readiness-only work package with implementation work"],
         "review_required": ["intent-preservation", "obligation-preservation"],
+        "patch_ref": "amendments/A1.patch.json",
+    },
+    "amendment.patch.schema.json": {
+        "artifact_type": "amendment.patch",
+        "schema_version": "1.0.0",
+        "amendment_id": "A1",
+        "parent_generation": "gen-000",
+        "strategy_kind": "amendment",
+        "required_steps": [
+            {
+                "step_id": "S2",
+                "transition": "reviewed amendment strategy produces required evidence",
+                "evidence": ["evidence.schema-validation-tests.v2"],
+                "satisfies_outcomes": ["outcome.schema-validation"],
+            }
+        ],
+        "runtime_updates": {
+            "writable_evidence_paths": ["evidence/"],
+            "verifier": {
+                "required_before_goal_achieved": True,
+                "command": "python3 .agents/skills/using-control-json/scripts/verify_runtime_progress.py",
+                "required_outcomes": ["outcome.schema-validation"],
+                "output_schema": "final-report.schema.json",
+            },
+            "imported_evidence": [],
+            "invalidated_evidence": ["evidence.schema-validation-tests"],
+        },
     },
     "progress-event.schema.json": {
         "event_type": "step.completed",
@@ -731,6 +758,13 @@ class ControlJsonSchemaTest(unittest.TestCase):
         self.assertEqual("control.amendment.proposal", amendment_schema["properties"]["artifact_type"]["const"])
         self.assertIn("semantic_base_change", amendment_schema["required"])
         self.assertIn("authority_expanded", amendment_schema["required"])
+        self.assertIn("patch_ref", amendment_schema["required"])
+        patch_schema = load_json(SCHEMA_DIR / "amendment.patch.schema.json")
+        self.assertEqual("amendment.patch", patch_schema["properties"]["artifact_type"]["const"])
+        self.assertIn("required_steps", patch_schema["required"])
+        self.assertNotIn("semantic_base_change", patch_schema["properties"])
+        self.assertNotIn("required_outcomes_changed", patch_schema["properties"])
+        self.assertNotIn("authority_expanded", patch_schema["properties"])
 
         event_types = progress_schema["properties"]["event_type"]["enum"]
         self.assertIn("control.amendment.proposed", event_types)
@@ -741,6 +775,7 @@ class ControlJsonSchemaTest(unittest.TestCase):
         self.assertNotIn("status", progress_schema["required"])
         self.assertIn("runtime_generation", progress_schema["properties"])
         self.assertIn("proposed_changes", progress_schema["properties"])
+        self.assertIn("patch_ref", progress_schema["properties"])
         self.assertIn("next_generation", progress_schema["properties"])
         self.assertIn("allOf", progress_schema)
 
@@ -849,6 +884,7 @@ class ControlJsonSchemaTest(unittest.TestCase):
             "authority_expanded": False,
             "proposed_changes": ["add measured curve producing step"],
             "review_required": ["source-requirement-preservation", "obligation-preservation"],
+            "patch_ref": "amendments/A1.patch.json",
         }
 
         validate(event, schema)
@@ -869,6 +905,7 @@ class ControlJsonSchemaTest(unittest.TestCase):
             "authority_expanded": False,
             "proposed_changes": ["add measured curve producing step"],
             "review_required": ["source-requirement-preservation", "obligation-preservation"],
+            "patch_ref": "amendments/A1.patch.json",
         }
 
         with self.assertRaises(AssertionError):
@@ -890,6 +927,7 @@ class ControlJsonSchemaTest(unittest.TestCase):
             "authority_expanded": False,
             "proposed_changes": ["replace readiness-only work package with implementation work"],
             "review_required": ["intent-preservation", "obligation-preservation"],
+            "patch_ref": "amendments/A1.patch.json",
         }
 
         validate(event, schema)
