@@ -35,7 +35,7 @@
         "Does not invent the missing lifecycle or failure model in the execution policy.",
         "Does not mark the execution policy Approved.",
         "Reports the smallest missing design decision.",
-        "Includes a response-only next step to $designing-cybernetic-solutions or return to $orchestrating-cybernetic-pregoal for full pre-goal work.",
+        "Includes a response-only next step to $designing-cybernetic-solutions or return to $orchestrating-cybernetic-pregoal for JSON pre-goal work.",
         "Does not execute target work."
       ]
     },
@@ -64,13 +64,13 @@
     },
     {
       "id": "level-3-policy-handoff-returns-to-orchestrator",
-      "prompt": "根据 requirements、solution design 和 goal 创建 execution policy。路由结果是 Level 3 full pre-goal pipeline，review check required，$orchestrating-cybernetic-pregoal 可用。",
+      "prompt": "根据 requirements、solution design 和 goal 创建 execution policy。路由结果是 Level 3 JSON pre-goal orchestration，review check required，$orchestrating-cybernetic-pregoal 可用。",
       "expected_output": "Create a candidate execution policy, then in the response hand off back to $orchestrating-cybernetic-pregoal rather than directly recommending $reviewing-cybernetic-control-structures.",
       "assertions": [
         "Creates or references docs/cybernetics/runs/<slug>/plan.control.json.",
         "Marks the execution policy Candidate, not Approved.",
         "Response-only handoff recommends $orchestrating-cybernetic-pregoal.",
-        "Does not recommend $reviewing-cybernetic-control-structures as the next user action for Level 3 full pre-goal work."
+        "Does not recommend $reviewing-cybernetic-control-structures as the next user action for Level 3 JSON pre-goal work."
       ]
     },
     {

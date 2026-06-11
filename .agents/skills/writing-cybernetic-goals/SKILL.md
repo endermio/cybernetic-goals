@@ -1,6 +1,6 @@
 ---
 name: writing-cybernetic-goals
-description: 'Use when confirmed requirements and any required design exist and goal.control.json must be written for a Level 2 bounded goal or Level 3/4 full pre-goal orchestration. For Level 3/4, What the User Approved is required.'
+description: 'Use when confirmed requirements and any required design exist and goal.control.json must be written for a Level 2 bounded goal or Level 3/4 JSON pre-goal orchestration. For Level 3/4, What the User Approved is required.'
 ---
 
 # Writing Cybernetic Goals
@@ -27,11 +27,11 @@ For complex controlled work, this skill must not produce an executable `/goal` c
 
 If `required design: required`, do not create final complex `goal.control.json` until a solution design exists or the human explicitly says the required design is unnecessary.
 
-For Level 3, Level 4, or full pre-goal work, stop after creating `goal.control.json` and hand off back to `$orchestrating-cybernetic-pregoal` when it is available or already owns the chain.
+For Level 3, Level 4, or JSON pre-goal work, stop after creating `goal.control.json` and hand off back to `$orchestrating-cybernetic-pregoal` when it is available or already owns the chain.
 
 Recommend `$writing-cybernetic-execution-policies` or `$reviewing-cybernetic-control-structures` directly only when the user explicitly chose a manual pre-goal chain or `$orchestrating-cybernetic-pregoal` is unavailable.
 
-For Level 3, Level 4, or full pre-goal work, do not create `goal.control.json` unless the requirements analysis contains `What the User Approved: Approved`, or the current user message explicitly approves the compact control commitment. Human answers to requirements questions are inputs, not approval.
+For Level 3, Level 4, or JSON pre-goal work, do not create `goal.control.json` unless the requirements analysis contains `What the User Approved: Approved`, or the current user message explicitly approves the compact control commitment. Human answers to requirements questions are inputs, not approval.
 
 If the current user message approves the compact control commitment, update the requirements analysis `What the User Approved` section first, quoting or referencing that approval, then continue. Do not rely on in-memory approval to pass orchestration or runtime guards.
 
@@ -174,7 +174,7 @@ Behavior:
 2. If required, confirm `docs/cybernetics/runs/<slug>/design.control.json` or an explicit design source exists.
 3. Create `docs/cybernetics/runs/<slug>/goal.control.json`.
 4. Do not output an executable `/goal` unless an approved execution policy and approved review already exist.
-5. Use the route-appropriate response-only handoff: return to `$orchestrating-cybernetic-pregoal` for full pre-goal work, or recommend `$writing-cybernetic-execution-policies` only for an explicit manual chain.
+5. Use the route-appropriate response-only handoff: return to `$orchestrating-cybernetic-pregoal` for JSON pre-goal work, or recommend `$writing-cybernetic-execution-policies` only for an explicit manual chain.
 
 ### Mode B: Bounded File Goal / Audit Goal
 
@@ -206,7 +206,7 @@ Before creating goal control JSON for complex work, check:
 
 - `requirements.control.json` exists;
 - `Requirements Analysis Status` is `Complete` or the user explicitly states the meaning are confirmed;
-- for Level 3/4 or full pre-goal work, `What the User Approved: Approved` is present unless the current user message explicitly approves the compact control commitment;
+- for Level 3/4 or JSON pre-goal work, `What the User Approved: Approved` is present unless the current user message explicitly approves the compact control commitment;
 - confirmed decisions are recorded;
 - required solution design exists, or the user explicitly says the required design is unnecessary;
 - no blocking human decision remains unresolved.
@@ -217,7 +217,7 @@ If required design is required and no design exists, route to `$designing-cybern
 
 For bounded JSON goals, completed `requirements.control.json` is optional when the user request or router decision already fixes the meaning, limits, output path, stop conditions, and any evaluation rubric. Record the user request or router decision as the source of truth.
 
-Bounded runtime control JSON is not a reduced full pre-goal chain. It does not require requirements/design/plan/review control JSON. If those artifacts become necessary to decide or prove the work, stop treating the task as Level 2 and route to full pre-goal orchestration.
+Bounded runtime control JSON is not a reduced JSON pre-goal chain. It does not require requirements/design/plan/review control JSON. If those artifacts become necessary to decide or prove the work, stop treating the task as Level 2 and route to JSON pre-goal orchestration.
 
 ## Goal Control Requirements
 
@@ -244,7 +244,7 @@ Bounded runtime control JSON is not a reduced full pre-goal chain. It does not r
 
 The goal control JSON must preserve confirmed meaning. It must not reinterpret or downscope them.
 
-For Level 3/4 or full pre-goal work, the goal must preserve the approved compact control commitment from `What the User Approved`: human purpose, input role binding, primary object, requested transformation, non-goals, How We Know The User Purpose Was Met, result placement, What counts as done, Evidence needed to call it done, If it is not done, what should be reported, Required answer path, How this should be answered, What is not enough, Work covered in this run, What the agent may do, Forbidden live / irreversible actions, Required handling for unauthorized actions, Explicitly out-of-scope items, Final Answer Format, why this process is needed, and known assumptions.
+For Level 3/4 or JSON pre-goal work, the goal must preserve the approved compact control commitment from `What the User Approved`: human purpose, input role binding, primary object, requested transformation, non-goals, How We Know The User Purpose Was Met, result placement, What counts as done, Evidence needed to call it done, If it is not done, what should be reported, Required answer path, How this should be answered, What is not enough, Work covered in this run, What the agent may do, Forbidden live / irreversible actions, Required handling for unauthorized actions, Explicitly out-of-scope items, Final Answer Format, why this process is needed, and known assumptions.
 
 If a design records how this should be answered, the goal must not weaken the approved answer path or substitute a different how this should be answered. Bind the what counts as done and required answer path to the required answer path.
 
@@ -290,7 +290,7 @@ Control map:
 - Final output: ...
 
 Response-only handoff:
-- For Level 3/4 or full pre-goal work: return to `$orchestrating-cybernetic-pregoal` with this goal path.
+- For Level 3/4 or JSON pre-goal work: return to `$orchestrating-cybernetic-pregoal` with this goal path.
 - For an explicit manual chain only: use `$writing-cybernetic-execution-policies` to create the execution policy.
 ```
 
@@ -373,7 +373,7 @@ If the user explicitly requests a small inline `/goal` and the task is low-risk,
 - [ ] The goal includes How We Know The User Purpose Was Met when requirements define How We Know The User Purpose Was Met or purpose-achievement evidence is non-obvious.
 - [ ] The goal includes Where The Result Must Show Up for compiled runtime goals; direct bounded goals include it when requirements define result placement or intended-result realization spans places.
 - [ ] The goal includes What Counts As Done for compiled runtime goals, including a required answer path reference.
-- [ ] For Level 3/4 or full pre-goal work, What the User Approved is Approved before the goal is written.
+- [ ] For Level 3/4 or JSON pre-goal work, What the User Approved is Approved before the goal is written.
 - [ ] Success Condition allows `goal achieved: yes` only when the what counts as done is satisfied and user-purpose evidence/result-placement permit the matching achieved claims.
 - [ ] Any strongest positive result claim requires result-placement adequate; partial, missing, unavailable, or not applicable with justification receives calibrated wording.
 - [ ] Evidence checks are named but not treated as the objective.

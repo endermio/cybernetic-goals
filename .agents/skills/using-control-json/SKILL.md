@@ -12,9 +12,8 @@ Use this skill when a runtime `/goal` pointer, `runtime.control.json`, or approv
 This is not the Level 2 bounded runtime protocol. Level 2 bounded goals use
 `.agents/skills/using-bounded-control-json`.
 
-This skill supports both approved JSON control shapes:
+This skill supports official generation-aware JSON control runs:
 
-- full root chains with requirements/design/goal/plan/review/runtime;
 - generation-aware runs with `requirements.control.json`, `run.control.json`,
   and the current `gen-N/runtime.control.json`.
 
@@ -23,7 +22,7 @@ Read `references/runtime-control-json-protocol.md` before executing, reporting s
 ## Operating Contract
 
 1. Validate first. Confirm required JSON files exist, parse, and agree on source paths, required steps, work coverage, verifier configuration, generation state, and writable output paths. Stop on missing, invalid, or inconsistent JSON and report the smallest required human decision.
-2. approved control JSON is read-only. In full mode this includes `requirements.control.json`, `design.control.json`, `goal.control.json`, `plan.control.json`, `review.control.json`, and `runtime.control.json`. In generation-aware mode this includes `requirements.control.json`, `run.control.json`, the current `gen-N/runtime.control.json`, and any current-generation review named by `run.control.json`. Read these files to execute the approved chain; never rewrite them during runtime.
+2. approved control JSON is read-only. This includes `requirements.control.json`, `run.control.json`, the current `gen-N/runtime.control.json`, and any current-generation review named by `run.control.json`. If the selected strategy or gate uses expanded design/goal/plan/review artifacts, those approved artifacts are read-only too. Read these files to execute the approved chain; never rewrite them during runtime.
 3. runtime writes control-output files only to `progress.jsonl`, `runtime-status.json`, and `final-report.json`. Non-control evidence artifacts may be written only under paths named in `runtime.control.json.runtime.writable_evidence_paths`.
 4. Append to `progress.jsonl` for runtime observations, using one JSON object per line. Record discoveries, commands, evidence, blockers, required-step state, generation state, and amendment proposals there; do not mutate approved JSON to match execution.
 5. Run the verifier before `goal_achieved: true`; only a verifier result that permits the claim allows `final-report.json` to contain `goal_achieved: true`.
@@ -41,7 +40,10 @@ reason, triggering observation, affected strategy stages,
 or authority would change.
 
 Anchor-preserving amendments may be reviewed into a new generation by the
-orchestrator. Amendments that change `requirements.control.json`,
+orchestrator only when `run.control.json.strategy_policy` is
+`reviewed_replanning`. Under `frozen_strategy`, an amendment proposal reports
+that the approved strategy does not fit and requires a human decision before
+continuing. Amendments that change `requirements.control.json`,
 `semantic_base`, required outcomes, what counts as done, work coverage,
 authority, or forbidden actions require human reapproval.
 

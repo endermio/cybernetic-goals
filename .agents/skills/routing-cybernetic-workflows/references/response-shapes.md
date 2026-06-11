@@ -179,14 +179,14 @@ Why:
 - ...
 
 Required checks:
-- Full pre-goal checks: required.
+- JSON pre-goal checks: required.
 - Explicit Human Approval Check: required before runtime execution.
 - rubric check: required if the task is evaluative and the rubric is not explicit.
 - required design: required if solution structure is not explicit.
 - final-answer-format check: required if final output shape affects execution, acceptance, handoff, persistence, or downstream consumption and is not explicit.
 
 Recommended next step:
-Run the full pre-goal pipeline, but require explicit human approval before runtime `/goal`.
+Run the JSON pre-goal orchestration, but require explicit human approval before runtime `/goal`.
 
 Rejected workflow:
 - Do not allow uncheckd runtime execution.

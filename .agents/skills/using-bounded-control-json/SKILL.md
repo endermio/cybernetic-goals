@@ -8,13 +8,13 @@ description: 'Use when runtime execution is a Level 2 bounded cybernetic JSON go
 ## Overview
 
 Use this skill for Level 2 bounded runtime goals. It is intentionally not the
-full pre-goal control-chain executor.
+JSON pre-goal control-chain executor.
 
-Level 2 keeps its meaning only if it avoids the full
+Level 2 keeps its meaning only if it avoids the expanded
 `requirements/design/goal/plan/review/runtime` chain. If execution needs
 design, execution policy, review, required-outcome coverage, subagent
 coordination, or multi-stage control decisions, stop and route the work to the
-full pre-goal flow instead.
+JSON pre-goal flow instead.
 
 ## Required Files
 

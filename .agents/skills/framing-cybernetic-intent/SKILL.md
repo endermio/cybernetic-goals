@@ -68,7 +68,7 @@ Use this skill when the input is not yet a formed task. Common signals:
 - risk sense: "This may explode context";
 - observed symptoms: "The agent keeps writing plans";
 - failure experience: "Last time this did not converge";
-- method preference: "Use the full cybernetic workflow";
+- method preference: "Use the whole cybernetic workflow";
 - process distrust: "I do not trust the current pipeline";
 - completed findings: "I already finished the investigation; turn these
   findings into a repair plan";
@@ -211,7 +211,7 @@ docs/cybernetics/intents/YYYY-MM-DD-<slug>.md
 Use `assets/intent-frame-template.md`.
 
 The intent brief preserves shared understanding and optional handoff only. It
-must not contain full requirements, solution design, execution policy, control
+must not contain complete requirements, solution design, execution policy, control
 review, or runtime goal content.
 
 ## Common Mistakes

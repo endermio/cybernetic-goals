@@ -24,7 +24,7 @@ It decides whether the task needs:
 - a bounded JSON-backed goal
 - rubric analysis before a bounded/evaluation goal
 - solution design before goal writing
-- the full pre-goal pipeline
+- JSON pre-goal orchestration
 - a high-risk human-checkd workflow
 
 The key routing question is not:
@@ -57,7 +57,7 @@ Route based on unresolved control decisions, not scary keywords.
 
 Use the lightest workflow that keeps the agent from inventing approved work chain during execution.
 
-A task should not be routed to the full pre-goal pipeline merely because it mentions:
+A task should not be routed to JSON pre-goal orchestration merely because it mentions:
 
 - authorization
 - identity mapping
@@ -70,7 +70,7 @@ A task should not be routed to the full pre-goal pipeline merely because it ment
 - risk words
 - multiple artifacts
 
-Route to the full pipeline only when those areas contain unresolved control decisions.
+Route to JSON pre-goal orchestration only when those areas contain unresolved control decisions.
 
 ## Output Contract
 
@@ -116,7 +116,7 @@ Examples:
 
 - `Level 1` + `Required checks: rubric check required` means short rubric analysis before inline goal.
 - `Level 2` + `Required checks: rubric check required` means rubric analysis before bounded file/audit goal.
-- `Level 3` + `Required checks: rubric check required` means the full requirements analysis phase must explicitly include rubric meaning.
+- `Level 3` + `Required checks: rubric check required` means the requirements analysis phase must explicitly include rubric meaning.
 
 Do not route an unrubriced evaluation task directly to execution merely because execution scope is bounded.
 
@@ -144,7 +144,7 @@ Examples:
 
 - `Level 1` + `final-answer-format check: satisfied` can describe a simple local correction with a brief chat summary.
 - `Level 2` + `final-answer-format check: required` can describe a bounded audit/report task whose evaluation scope is clear but whose decision-report shape is not defined.
-- `Level 3` + `final-answer-format check: required` can describe full pre-goal work where downstream runtime must produce a structured artifact bundle or machine-readable handoff.
+- `Level 3` + `final-answer-format check: required` can describe JSON pre-goal work where downstream runtime must produce a structured artifact bundle or machine-readable handoff.
 
 ## required design
 
@@ -218,7 +218,7 @@ Example:
 修复一个当前失败的局部检查，不改变相关目标行为；运行对应 focused check 验证。
 ```
 
-Reject full workflow because the coordination overhead is larger than the task.
+Reject over-control because the coordination overhead is larger than the task.
 
 ### Level 1: Inline Goal
 
@@ -251,7 +251,7 @@ Signals:
 - localized correction across observer output, source fixture, evidence channel, documentation, or one bounded workflow
 - wide read-only audit with fixed classification meaning, an explicit evaluation rubric, and a fixed report artifact
 - moderate verification needs
-- persistent `goal.control.json` and `runtime.control.json` may help, but a full pre-goal pipeline would be too heavy
+- persistent `goal.control.json` and `runtime.control.json` may help, but a JSON pre-goal orchestration would be too heavy
 
 Recommended next step options:
 
@@ -298,7 +298,7 @@ After rubric analysis is complete:
 $writing-cybernetic-goals 为这个 Level 2 有界任务创建 goal.control.json 和 runtime.control.json，并在完成后给出指向 runtime.control.json 的短 /goal，不要默认建议 execution policy：<任务 + confirmed rubric>
 ```
 
-### Level 3: Lean Pre-goal With Reviewed Replanning
+### Level 3: JSON Pre-goal Orchestration
 
 Use when the execution agent would otherwise need to invent or revise the approved work chain.
 
@@ -323,14 +323,16 @@ $analyzing-cybernetic-requirements <需求>
 After requirements analysis is complete and What the User Approved is Approved:
 
 ```text
-$orchestrating-cybernetic-pregoal 根据 <requirements-path> 启动 lean pre-goal，生成 requirements.control.json, run.control.json, and gen-000/runtime.control.json。允许 goal 中通过 reviewed amendment 生成后续 generation。
+$orchestrating-cybernetic-pregoal 根据 <requirements-path> 编译 JSON control run，生成 requirements.control.json, run.control.json, and gen-000/runtime.control.json。明确 strategy_policy 是 frozen_strategy 还是 reviewed_replanning。
 ```
 
-Lean pre-goal is the default for Level 3 exploratory, diagnostic, research, and implementation work where runtime can safely observe and replan. Full pre-goal is an exception, not the default.
+Level 3 does not decide whether the strategy may change during runtime. Record that separately as `strategy_policy`.
 
-Use full pre-goal for Level 3 only when the work has irreversible action, live external-state impact, external contract publication, compliance/security/legal/financial risk, complex multi-team dependency freezing, unsafe runtime replanning, or the user explicitly requests full design/plan review before runtime.
+Use `reviewed_replanning` when the approved target is stable but execution strategy may need to change after observations. Use `frozen_strategy` when the approved target, strategy, and completion path must not be changed during runtime; if the strategy proves wrong, runtime stops and reports instead of amending and continuing.
 
-If `required design: required`, do not recommend a standalone design step before orchestration for Level 3/4 work. The orchestrator must either place the design strategy in the initial lean generation or invoke/request `$designing-cybernetic-solutions` when full pre-goal exception criteria require a frozen design before runtime.
+Risk is separate. Irreversible actions, live external-state impact, external contract publication, or compliance/security/legal/financial risk add `human_gate` or `live_gate`; they do not by themselves choose `strategy_policy`.
+
+If `required design: required`, do not recommend a standalone design step before orchestration for Level 3/4 work. The orchestrator must either place the design strategy in the initial generation or invoke/request `$designing-cybernetic-solutions` when the chosen `strategy_policy` requires an approved design before runtime.
 
 If orchestration is unavailable, manually run the downstream sequence. In that manual fallback only, run solution design before goal writing when required design is required:
 
@@ -371,7 +373,7 @@ Signals:
 Recommended next step:
 
 ```text
-Use the full pre-goal pipeline, and require explicit human approval before runtime /goal execution.
+Use JSON pre-goal orchestration with `human_gate` or `live_gate`, and require explicit human approval before runtime /goal execution.
 ```
 
 ## Scoring Heuristic
@@ -414,7 +416,7 @@ Design clarity is also orthogonal to the score. Missing solution structure means
 Before choosing Level 3, ask:
 
 ```text
-What unresolved control decision would the execution agent have to make if we did not run the full pipeline?
+What unresolved control decision would the execution agent have to make without JSON pre-goal orchestration?
 ```
 
 If the answer is only:
@@ -461,11 +463,11 @@ core rules, checks, and downgrade pass above before using one.
 | Treating any structure mention as Level 3 | Ask whether structure meaning change |
 | Treating any evidence-artifact mention as Level 3 | Evidence artifacts alone are often Level 1/2 evidence checks |
 | Treating existing-feature fixes as new-feature work | Run the downgrade pass |
-| Recommending full pipeline for local display/fixture cleanup | Use Level 1/2 |
+| Recommending JSON pre-goal orchestration for local display/fixture cleanup | Use Level 1/2 |
 | Ignoring approved requirements analysis/design/goal/plan artifacts | Downgrade when meaning and solution structure are already frozen |
 | Listing five manual pre-goal skills when orchestrator exists | Prefer `$analyzing-cybernetic-requirements` then `$orchestrating-cybernetic-pregoal` |
 | Listing `$designing-cybernetic-solutions` as a separate Level 3/4 next step before orchestration | Keep required design in Required checks and let `$orchestrating-cybernetic-pregoal` dispatch design before goal writing |
-| Letting small tasks use the full workflow because the user asked | Explain that the workflow is over-control and propose a lighter route |
+| Letting small tasks use over-control because the user asked | Explain that the process is too heavy and propose a lighter route |
 | Recommending execution policy after a Level 2 bounded file goal | Give the direct `/goal` path unless the user explicitly asks for policy or new control decisions appear |
 | Treating an object checklist as a completed rubric | Check the evaluation function before routing to execution |
 | Treating a requirement list as a completed design | Check whether objects, relationships, flows, limits, and evidence model are explicit |
@@ -489,10 +491,10 @@ Before responding, verify:
 - [ ] A complete object list is not mistaken for a complete evaluation rubric.
 - [ ] A requirement list is not mistaken for a complete solution design.
 - [ ] The recommended next step is the lightest safe workflow.
-- [ ] For Level 3/4, the response recommends `$analyzing-cybernetic-requirements`, then `$orchestrating-cybernetic-pregoal`; Level 3 defaults to lean pre-goal and full pre-goal is justified only by exception criteria.
-- [ ] For Level 0/1/2, the response does not recommend full pre-goal pipeline.
+- [ ] For Level 3/4, the response recommends `$analyzing-cybernetic-requirements`, then `$orchestrating-cybernetic-pregoal`; `strategy_policy` and `gate_mode` are recorded separately from Level.
+- [ ] For Level 0/1/2, the response does not recommend JSON pre-goal orchestration by default.
 - [ ] For Level 2 bounded file goals, the response does not recommend execution policy by default.
 - [ ] If rubric check is required, the response recommends rubric analysis before execution.
 - [ ] If final-answer-format check is required, the response routes output-contract definition through requirements analysis and solution design only when structure synthesis is needed.
-- [ ] If required design is required for Level 3/4 work, the response says orchestration must either place the design strategy in a lean generation or invoke/request solution design when full pre-goal exception criteria apply; direct solution design is still valid for Level 2 with required design or manual fallback.
+- [ ] If required design is required for Level 3/4 work, the response says orchestration must either place the design strategy in the initial generation or invoke/request solution design when `frozen_strategy` or gate requirements require design approval before runtime; direct solution design is still valid for Level 2 with required design or manual fallback.
 - [ ] The response includes rejected workflow rationale.

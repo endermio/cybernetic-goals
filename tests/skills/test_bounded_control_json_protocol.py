@@ -131,7 +131,7 @@ class BoundedControlJsonProtocolTest(unittest.TestCase):
         with self.assertRaises(AssertionError):
             validate(invalid, schema)
 
-    def test_level2_goal_writer_points_to_bounded_runtime_skill_not_full_chain_skill(self):
+    def test_level2_goal_writer_points_to_bounded_runtime_skill_not_json_pregoal_skill(self):
         text = WRITING_GOALS_SKILL.read_text(encoding="utf-8")
         mode_b = text.split("### Mode B: Bounded File Goal / Audit Goal", 1)[1]
 
@@ -158,7 +158,7 @@ class BoundedControlJsonProtocolTest(unittest.TestCase):
             payload = json.loads(result.stdout)
             self.assertTrue(payload["ok"])
 
-    def test_full_chain_validator_still_rejects_bounded_goal_and_runtime_only(self):
+    def test_json_pregoal_validator_still_rejects_bounded_goal_and_runtime_only(self):
         with tempfile.TemporaryDirectory() as tmpdir:
             run_dir = Path(tmpdir)
             write_bounded_run(run_dir, final_report=False)

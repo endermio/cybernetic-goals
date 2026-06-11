@@ -3,7 +3,7 @@
   "evals": [
     {
       "id": "method-preference-is-not-purpose",
-      "prompt": "Use the full cybernetic workflow for this because I do not trust the current process.",
+      "prompt": "Use the whole cybernetic workflow for this because I do not trust the current process.",
       "expected_output": "The skill distinguishes the requested workflow as a method preference, frames the underlying distrust and uncertainty, and does not start routing or requirements analysis.",
       "assertions": [
         "States that the workflow is a possible method, not the human purpose.",

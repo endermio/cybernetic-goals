@@ -4,21 +4,21 @@
     {
       "id": "small-check-fix-direct",
       "prompt": "使用 $routing-cybernetic-workflows 分析任务：修复当前失败的一个局部检查，不改变相关目标行为。",
-      "expected_output": "Route to Level 0 or Level 1, not a full workflow.",
+      "expected_output": "Route to Level 0 or Level 1, not JSON pre-goal orchestration.",
       "assertions": [
         "Classifies the task as Level 0 or Level 1.",
-        "Does not recommend the full pre-goal pipeline.",
+        "Does not recommend the JSON pre-goal orchestration.",
         "Explains that the task is small, bounded, and has an obvious verification path.",
         "Recommends a direct prompt or inline goal."
       ]
     },
     {
-      "id": "bounded-observer-display-fix-is-not-full-pipeline",
+      "id": "bounded-observer-display-fix-is-not-json-pregoal",
       "prompt": "使用 $routing-cybernetic-workflows 分析任务：已有 requirements analysis 和 goal。现在发现本地预览里 Actor A/B 被显示成 Entity C，需要修正观察表面和本地 fixture，让不同角色不被混同展示。不改变结构契约、授权模型、观测流语义或标识符语义。",
       "expected_output": "Route to Level 1 or Level 2, not Level 3, because this is a bounded correction inside an already analyzed feature.",
       "assertions": [
         "Classifies the task as Level 1 or Level 2.",
-        "Does not recommend the full pre-goal pipeline.",
+        "Does not recommend the JSON pre-goal orchestration.",
         "Explains that existing approved files already fix the meaning.",
         "Explains that no new structure-contract, authorization, observation-flow, or entity-mapping decision is required.",
         "Recommends a bounded repair prompt or small file-based goal."
@@ -27,7 +27,7 @@
     {
       "id": "mentions-authorization-but-no-new-authorization-meaning",
       "prompt": "使用 $routing-cybernetic-workflows 评估任务：已有授权模型不变，只修一个观察表面的授权提示文案和证据断言，让未授权状态显示明确提示。",
-      "expected_output": "Do not route to full pipeline merely because permissions are mentioned.",
+      "expected_output": "Do not route to JSON pre-goal orchestration merely because permissions are mentioned.",
       "assertions": [
         "Classifies as Level 0, Level 1, or Level 2.",
         "Does not classify as Level 3 solely due to authorization wording.",
@@ -36,7 +36,7 @@
       ]
     },
     {
-      "id": "new-relationship-meaning-still-full-pipeline",
+      "id": "new-relationship-meaning-needs-json-pregoal",
       "prompt": "使用 $routing-cybernetic-workflows 评估任务：我们还没有决定 Actor A、Group B、Entity C 和 identifier 的关系，也没决定记录是直接观测还是中介上报，现在要建立新的控制关系。",
       "expected_output": "Route to Level 3 because requirement meaning and approved work chain are unresolved.",
       "assertions": [
@@ -48,7 +48,7 @@
       ]
     },
     {
-      "id": "full-pipeline-for-ambiguous-authorization-visibility",
+      "id": "json-pregoal-for-ambiguous-authorization-visibility",
       "prompt": "使用 $routing-cybernetic-workflows 分析任务：我们要重构授权模型，从单层改成三层授权，但还没决定迁移策略、可见范围和旧授权如何兼容。",
       "expected_output": "Route to Level 3 or Level 4 depending on risk; likely Level 3 unless live external state is involved.",
       "assertions": [
@@ -71,9 +71,9 @@
       ]
     },
     {
-      "id": "evidence-baseline-update-not-full-pipeline",
+      "id": "evidence-baseline-update-not-json-pregoal",
       "prompt": "使用 $routing-cybernetic-workflows 分析任务：已有观察语义和 goal 都确定了，只是证据基线里的按钮文案从 hash 改成 哈希，需要更新证据断言。",
-      "expected_output": "Route to Level 0, 1, or 2; evidence artifacts alone should not force full pipeline.",
+      "expected_output": "Route to Level 0, 1, or 2; evidence artifacts alone should not force JSON pre-goal orchestration.",
       "assertions": [
         "Does not classify as Level 3.",
         "Explains that evidence artifacts are evidence checks, and the meaning decision is already fixed.",
@@ -89,7 +89,7 @@
         "Does not classify as Level 3 solely due to structure wording.",
         "Mentions that approved plan already fixes structure meaning.",
         "Recommends bounded repair.",
-        "Does not recommend full pre-goal pipeline."
+        "Does not recommend JSON pre-goal orchestration."
       ]
     },
     {
@@ -99,27 +99,27 @@
       "assertions": [
         "Mentions existing approved artifacts.",
         "Classifies as Level 1 or Level 2.",
-        "Does not route to full pre-goal pipeline.",
+        "Does not route to JSON pre-goal orchestration.",
         "Frames the task as a bounded correction inside existing approved work chain."
       ]
     },
     {
-      "id": "user-asks-full-flow-for-small-task",
-      "prompt": "使用 $routing-cybernetic-workflows 分析任务：我想为改一个小型说明文档标题走完整 cybernetic workflow。",
-      "expected_output": "Reject or discourage full workflow as over-control; recommend direct prompt or Level 0.",
+      "id": "user-asks-heavy-flow-for-small-task",
+      "prompt": "使用 $routing-cybernetic-workflows 分析任务：我想为改一个小型说明文档标题走完整 cybernetic process。",
+      "expected_output": "Reject or discourage over-control; recommend direct prompt or Level 0.",
       "assertions": [
         "Classifies as Level 0.",
-        "Explains that full workflow is over-control.",
+        "Explains that the requested process is over-control.",
         "Recommends direct action.",
-        "Does not follow the user's request to use full workflow unnecessarily."
+        "Does not follow the user's request to use an unnecessarily heavy process."
       ]
     },
     {
       "id": "pre-task-method-preference-routes-to-intent-framing",
-      "prompt": "使用 $routing-cybernetic-workflows 分析：我不信任当前流程，想直接走完整 cybernetic workflow。",
+      "prompt": "使用 $routing-cybernetic-workflows 分析：我不信任当前流程，想直接走完整 cybernetic process。",
       "expected_output": "Do not route as a formed task. Hand off to framing-cybernetic-intent because this is method preference and process distrust.",
       "assertions": [
-        "Does not classify as Level 3 merely because the user requested full workflow.",
+        "Does not classify as Level 3 merely because the user requested a heavier process.",
         "Identifies method preference or process distrust.",
         "Recommends $framing-cybernetic-intent before routing.",
         "Does not recommend orchestrating-cybernetic-pregoal yet."
@@ -136,7 +136,7 @@
         "Explains that broad scope is not the same as unresolved approved work chain.",
         "Explains that the evaluation function or rubric is not sufficiently defined.",
         "Recommends analyzing status definitions, evidence strength, and minimum evidence for the strongest positive status before creating the audit goal.",
-        "Does not recommend the full pre-goal pipeline or execution policy by default."
+        "Does not recommend the JSON pre-goal orchestration or execution policy by default."
       ]
     },
     {
@@ -148,7 +148,7 @@
         "States that the evaluation rubric is explicit.",
         "Recommends a bounded file-based audit goal.",
         "Says the bounded goal should lead to direct /goal execution.",
-        "Does not recommend the full pre-goal pipeline or execution policy by default."
+        "Does not recommend the JSON pre-goal orchestration or execution policy by default."
       ]
     },
     {
@@ -161,7 +161,7 @@
         "Explains that the execution agent would otherwise need to invent the solution structure.",
         "Recommends $analyzing-cybernetic-requirements before pre-goal orchestration.",
         "Recommends $orchestrating-cybernetic-pregoal only after requirements analysis is complete and What the User Approved is Approved.",
-        "Does not recommend $designing-cybernetic-solutions as a standalone manual step before orchestration for Level 3 full pre-goal work.",
+        "Does not recommend $designing-cybernetic-solutions as a standalone manual step before orchestration for Level 3 JSON pre-goal work.",
         "Explains that the orchestrator invokes or requests $designing-cybernetic-solutions when required design is required.",
         "Keeps the routing decision as Level 3 without encoding a suffix such as Level 3D."
       ]
@@ -180,7 +180,7 @@
     {
       "id": "bounded-fix-with-existing-design-does-not-need-design-check",
       "prompt": "使用 $routing-cybernetic-workflows 分析任务：已有 requirements analysis、solution design、goal、plan 和 approved review。现在只修正一个观察表面把 Actor A/B 误显示为 Entity C 的问题，不改变结构契约、授权、观测语义或概念边界。",
-      "expected_output": "Classify as Level 1 or Level 2 with required design satisfied or not applicable, not full pre-goal pipeline.",
+      "expected_output": "Classify as Level 1 or Level 2 with required design satisfied or not applicable, not JSON pre-goal orchestration.",
       "assertions": [
         "Classifies the task as Level 1 or Level 2.",
         "Does not classify as Level 3 solely because design-sensitive concepts are mentioned.",

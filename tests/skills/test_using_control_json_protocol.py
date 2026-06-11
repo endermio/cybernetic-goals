@@ -39,7 +39,7 @@ class UsingControlJsonProtocolTest(unittest.TestCase):
             re.compile(r"stop[^.\n]*(missing|invalid|inconsistent)[^.\n]*JSON", re.I),
         )
 
-    def test_full_chain_skill_is_not_level2_bounded_runtime_protocol(self):
+    def test_json_pregoal_skill_is_not_level2_bounded_runtime_protocol(self):
         text = combined_protocol_text()
 
         self.assertRegex(text, re.compile(r"not[^.\n]*Level 2 bounded", re.I))

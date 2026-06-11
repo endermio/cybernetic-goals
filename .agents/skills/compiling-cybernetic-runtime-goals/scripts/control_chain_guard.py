@@ -37,6 +37,13 @@ READONLY_FILES = list(CONTROL_SCHEMAS)
 WRITABLE_FILES = ["progress.jsonl", "runtime-status.json", "final-report.json"]
 DEFAULT_WRITABLE_EVIDENCE_PATHS = ["evidence/"]
 RUN_CONTROL_SCHEMA = "run.control.schema.json"
+RUN_STRATEGY_FIELDS = (
+    "control_level",
+    "target_model",
+    "strategy_policy",
+    "gate_mode",
+    "phase_structure",
+)
 SOURCE_REQUIREMENT_TYPES = {
     "implement_behavior",
     "produce_empirical_measurement",
@@ -738,14 +745,18 @@ def validate_generation_control_run(run_dir: Path) -> dict[str, dict[str, Any]]:
         raise ControlJsonValidationError("run.control.json: current generation strategy_kind must be discovery, execution, or amendment")
     if strategy_kind == "amendment" and not generation.get("parent"):
         raise ControlJsonValidationError("run.control.json: amendment generations must declare parent")
+    strategy_policy = run_control.get("strategy_policy")
+    if strategy_policy == "frozen_strategy" and (strategy_kind == "amendment" or generation.get("parent")):
+        raise ControlJsonValidationError("run.control.json: frozen_strategy cannot continue through amendment generations")
 
     runtime_rel = generation["runtime"]
     runtime = read_json_object(run_dir / runtime_rel)
     validate_json_schema(runtime, read_json_object(SCHEMA_DIR / "runtime.control.schema.json"), f"${runtime_rel}")
     if runtime.get("artifact_type") != "runtime.control" or runtime.get("status") != "compiled":
         raise ControlJsonValidationError(f"{runtime_rel}: artifact_type/status must be runtime.control/compiled")
-    if runtime.get("control_mode") != run_control.get("control_mode"):
-        raise ControlJsonValidationError(f"{runtime_rel}: control_mode must match run.control.json")
+    for field in RUN_STRATEGY_FIELDS:
+        if runtime.get(field) != run_control.get(field):
+            raise ControlJsonValidationError(f"{runtime_rel}: {field} must match run.control.json")
     if runtime.get("semantic_base_ref") != semantic_base:
         raise ControlJsonValidationError(f"{runtime_rel}: semantic_base_ref must match requirements approved semantic_base")
     runtime_generation = runtime.get("generation")

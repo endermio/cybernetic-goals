@@ -18,15 +18,16 @@ For complex controlled work, do not let the runtime `/goal` write its own policy
 /goal First write a plan, then execute it...
 ```
 
-## Good full-chain runtime goal pattern
+## Good JSON pre-goal runtime pattern
 
 ```text
-/goal Execute the runtime control JSON at docs/cybernetics/runs/YYYY-MM-DD-slug/runtime.control.json using .agents/skills/using-control-json. If the JSON is missing, invalid, inconsistent, or insufficient, stop and report the smallest required human decision.
+/goal Execute the runtime control JSON at docs/cybernetics/runs/YYYY-MM-DD-slug/gen-000/runtime.control.json using .agents/skills/using-control-json. If the JSON is missing, invalid, inconsistent, or insufficient, stop and report the smallest required human decision.
 ```
 
-`runtime.control.json` references the approved requirements, required design,
-goal, execution policy, and review control JSON. The user-entered `/goal`
-stays pointer-only and length-bounded.
+`runtime.control.json` references the approved requirements, run manifest,
+current generation, required steps, verifier, and any expanded approved
+artifacts named by the selected strategy. The user-entered `/goal` stays
+pointer-only and length-bounded.
 
 ## Good Level 2 bounded runtime goal pattern
 
@@ -36,4 +37,4 @@ stays pointer-only and length-bounded.
 
 Bounded runtime reads only `goal.control.json` and `runtime.control.json`.
 If requirements/design/plan/review become necessary, the task is no longer a
-Level 2 bounded runtime and must move to the full pre-goal chain.
+Level 2 bounded runtime and must move to JSON pre-goal orchestration.

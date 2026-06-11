@@ -1,6 +1,6 @@
 ---
 name: orchestrating-cybernetic-pregoal
-description: 'Use when completed requirements analysis exists and routing or requirements require JSON pre-goal orchestration before runtime /goal. Level 3 defaults to lean pre-goal; full pre-goal is an exception for high-risk, irreversible, externally impactful, non-replannable, or explicitly full workflows.'
+description: 'Use when completed requirements analysis exists and routing or requirements require JSON pre-goal orchestration before runtime /goal. The run must record target_model, strategy_policy, gate_mode, and phase_structure; do not use lean/full as control concepts.'
 ---
 
 # Orchestrating Cybernetic Pre-goal
@@ -11,7 +11,7 @@ This skill orchestrates the **pre-goal compilation chain** after requirements ha
 
 It turns completed requirements control JSON into approved JSON control files.
 
-Lean default:
+Default controlled run shape:
 
 ```text
 requirements.control.json
@@ -19,7 +19,9 @@ requirements.control.json
   -> gen-000/runtime.control.json plus short /goal pointer
 ```
 
-Full exception:
+When `strategy_policy: frozen_strategy`, required design/goal/plan/review artifacts may be generated before runtime if they are needed to freeze the approved strategy. When `strategy_policy: reviewed_replanning`, the initial generation may start with a smaller current strategy and later propose reviewed amendments.
+
+Manual expanded chain, when required by the selected strategy or gate:
 
 ```text
 requirements.control.json
@@ -31,7 +33,7 @@ requirements.control.json
   -> runtime.control.json plus short /goal pointer
 ```
 
-This skill is a thin orchestrator. It does not replace the other cybernetic skills. It coordinates them. Full-chain orchestration is a safety exception or migration bridge, not the default Level 3 startup path.
+This skill is a thin orchestrator. It does not replace the other cybernetic skills. It coordinates them. Expanded chain orchestration is selected by `strategy_policy`, required design/review needs, or gate needs, not by legacy lean/full labels.
 
 Official persistent control facts are JSON only. Historical Markdown may be read as non-authoritative background, but do not create or compile Markdown as official guard, compiler, runtime, or long-term dual-path control input.
 
@@ -91,7 +93,7 @@ If a required workflow is unavailable, stop and report the missing infrastructur
 Use this skill only after completed `requirements.control.json` exists and
 one of these fit checks is satisfied:
 
-- `$routing-cybernetic-workflows` has recommended Level 3 lean pre-goal, Level 4 full pre-goal, or explicit full pre-goal exception handling;
+- `$routing-cybernetic-workflows` has recommended Level 3/4 JSON pre-goal orchestration with target model, strategy policy, and gate mode decisions;
 - `$analyzing-cybernetic-requirements` has explicitly recorded that JSON pre-goal orchestration is required.
 
 The same requirements brief must record `What the User Approved: Approved`,
@@ -100,7 +102,7 @@ commitment recorded in that requirements brief.
 
 If the current user message approves the compact control commitment, update the requirements analysis `What the User Approved` section first, quoting or referencing that approval, then continue. Do not rely on in-memory approval to pass orchestration or runtime guards.
 
-A user request to use full pre-goal compilation is not sufficient by itself.
+A user request to use a heavier or lighter process is not sufficient by itself.
 If the request expresses method preference, uncertainty, dissatisfaction, or
 process distrust, route to `$framing-cybernetic-intent` or
 `$routing-cybernetic-workflows` first.
@@ -126,15 +128,22 @@ Never emulate required Superpowers workflows. In particular:
 ## Process Need Check
 
 Before creating downstream artifacts, confirm the lightest workflow that
-controls the task. Level 3 defaults to lean pre-goal. Full pre-goal is selected
-only by exception criteria.
+controls the task. Do not infer strategy from Level or risk alone.
+
+Record these independent controls:
+
+- `control_level`: how much control structure the target needs;
+- `target_model`: what kind of result is being produced and how well the path is known;
+- `strategy_policy`: `frozen_strategy` or `reviewed_replanning`;
+- `gate_mode`: `none`, `human_gate`, or `live_gate`;
+- `phase_structure`: `single_phase`, `staged`, or `adaptive_loop`.
 
 Reject or downgrade when:
 
 - the input is pre-task intent;
 - the task is Level 0/1/2;
 - existing artifacts already control the meaning;
-- full orchestration would produce formal artifacts without reducing runtime
+- expanded orchestration would produce formal artifacts without reducing runtime
   uncertainty;
 - evidence/context/review budget cannot be bounded.
 
@@ -198,7 +207,7 @@ If pre-goal review subagents are not authorized:
 - You must not claim independent review or mark the approved work chain `Approved` unless a separate reviewer, explicit human approval, or an authorized subagent review exists.
 - Ask the user to authorize pre-goal review subagents or provide explicit control-review approval of the review findings before compiling a final runtime `/goal`.
 
-## Pre-goal Orchestration Modes
+## Review Orchestration Modes
 
 ### Mode A: Candidate-Only Mode
 
@@ -279,7 +288,11 @@ the first artifact that converted implementation into compatibility readiness.
 ## Finalize Approved Control Chain
 
 Before `ReviewApproved -> RunRuntimeCompile`, all control JSON that enters
-runtime must be in final approved state:
+runtime must be in final approved state. For generation-aware runs this means
+`requirements.control.json`, `run.control.json`, the current
+`gen-N/runtime.control.json`, and any current generation review named by
+`run.control.json` agree and pass validation. For manually expanded chains, the
+expanded artifacts must also be approved:
 
 ```text
 requirements.control.json status == approved
@@ -318,6 +331,11 @@ When a running generation writes `control.amendment.proposed`, the orchestrator
 must not treat the event as completion evidence. It must either apply the
 reviewed amendment or stop for human approval.
 
+Amendment continuation is allowed only when `run.control.json.strategy_policy`
+is `reviewed_replanning`. With `frozen_strategy`, an amendment proposal means the
+approved strategy no longer fits; stop and report the smallest required human
+decision instead of creating `gen-N+1`.
+
 Use:
 
 ```bash
@@ -353,7 +371,8 @@ The requirements analysis is acceptable only when:
 
 - `Requirements Analysis Status: Complete`;
 - `What the User Approved: Approved`;
-- routing or requirements recorded Level 3/4 or full pre-goal fit.
+- routing or requirements recorded Level 3/4 JSON pre-goal fit and the run can
+  record target model, strategy policy, gate mode, and phase structure.
 
 If requirements analysis is incomplete or What the User Approved is missing/not Approved, stop
 before design.
@@ -371,18 +390,15 @@ docs/cybernetics/runs/YYYY-MM-DD-<slug>/requirements.control.json
 Use:
 
 ```text
-docs/cybernetics/runs/YYYY-MM-DD-<slug>/design.control.json
-docs/cybernetics/runs/YYYY-MM-DD-<slug>/goal.control.json
-docs/cybernetics/runs/YYYY-MM-DD-<slug>/plan.control.json
-docs/cybernetics/runs/YYYY-MM-DD-<slug>/review.control.json
-docs/cybernetics/runs/YYYY-MM-DD-<slug>/runtime.control.json
+docs/cybernetics/runs/YYYY-MM-DD-<slug>/run.control.json
+docs/cybernetics/runs/YYYY-MM-DD-<slug>/gen-000/runtime.control.json
 docs/cybernetics/runs/YYYY-MM-DD-<slug>/progress.jsonl
 docs/cybernetics/runs/YYYY-MM-DD-<slug>/runtime-status.json
 docs/cybernetics/runs/YYYY-MM-DD-<slug>/final-report.json
 docs/cybernetics/runs/YYYY-MM-DD-<slug>/evidence/
 ```
 
-The design, goal, plan, review, runtime control JSON, and runtime outputs must use the same run directory. This keeps queue-friendly `/goal` commands emitted by `$analyzing-cybernetic-requirements` stable. If the requested path is ambiguous or lacks a deterministic slug, stop and ask for the smallest path decision; keep the slug unresolved until the decision exists.
+If the selected strategy or gate requires expanded artifacts, keep them in the same run directory or current generation. This keeps queue-friendly `/goal` commands emitted by `$analyzing-cybernetic-requirements` stable. If the requested path is ambiguous or lacks a deterministic slug, stop and ask for the smallest path decision; keep the slug unresolved until the decision exists.
 
 Do not use Markdown orchestration status as official control input. If historical Markdown status exists, treat it as non-authoritative background only.
 

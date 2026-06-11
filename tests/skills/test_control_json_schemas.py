@@ -231,7 +231,17 @@ SCHEMA_FIXTURES = {
         "artifact_type": "runtime.control",
         "schema_version": "1.0.0",
         "status": "compiled",
-        "control_mode": "lean",
+        "control_level": 3,
+        "target_model": {
+            "result_orientation": ["state_change"],
+            "result_content": "specified",
+            "path": "known_enough",
+            "result_placement": "multi_place",
+            "impact_scope": "local_reversible",
+        },
+        "strategy_policy": "frozen_strategy",
+        "gate_mode": "none",
+        "phase_structure": "single_phase",
         "generation": {
             "id": "gen-000",
         },
@@ -273,8 +283,18 @@ SCHEMA_FIXTURES = {
         "artifact_type": "run.control",
         "schema_version": "1.0.0",
         "status": "active",
-        "run_id": "2026-06-10-lean-fixture",
-        "control_mode": "lean",
+        "run_id": "2026-06-10-target-model-fixture",
+        "control_level": 3,
+        "target_model": {
+            "result_orientation": ["state_change"],
+            "result_content": "specified",
+            "path": "known_enough",
+            "result_placement": "multi_place",
+            "impact_scope": "local_reversible",
+        },
+        "strategy_policy": "frozen_strategy",
+        "gate_mode": "none",
+        "phase_structure": "single_phase",
         "current_generation": "gen-000",
         "max_auto_amendment_rounds": 2,
         "semantic_base_ref": {
@@ -310,8 +330,8 @@ SCHEMA_FIXTURES = {
                 "required_steps": [
                     {
                         "step_id": "S1",
-                        "transition": "first lean horizon is executable",
-                        "evidence": ["lean runtime evidence"],
+                        "transition": "first target-model horizon is executable",
+                        "evidence": ["target-model runtime evidence"],
                         "satisfies_outcomes": ["outcome.schema-validation"],
                     }
                 ],
@@ -683,7 +703,11 @@ class ControlJsonSchemaTest(unittest.TestCase):
             verifier = schema["properties"]["verifier"]
             self.assertIn("required_outcomes", verifier["required"])
             self.assertIn("required_outcomes", verifier["properties"])
-        self.assertIn("control_mode", runtime["required"])
+        self.assertNotIn("control_mode", runtime["required"])
+        self.assertNotIn("control_mode", runtime["properties"])
+        for field in ("control_level", "target_model", "strategy_policy", "gate_mode", "phase_structure"):
+            self.assertIn(field, runtime["required"])
+            self.assertIn(field, runtime["properties"])
         self.assertIn("generation", runtime["required"])
 
     def test_generation_and_amendment_schemas_are_first_class(self):
@@ -694,7 +718,12 @@ class ControlJsonSchemaTest(unittest.TestCase):
 
         self.assertIn("current_generation", run_schema["required"])
         self.assertIn("max_auto_amendment_rounds", run_schema["required"])
-        self.assertEqual(["lean", "full"], run_schema["properties"]["control_mode"]["enum"])
+        self.assertNotIn("control_mode", run_schema["required"])
+        self.assertNotIn("control_mode", run_schema["properties"])
+        for field in ("control_level", "target_model", "strategy_policy", "gate_mode", "phase_structure"):
+            self.assertIn(field, run_schema["required"])
+            self.assertIn(field, run_schema["properties"])
+        self.assertEqual(["frozen_strategy", "reviewed_replanning"], run_schema["properties"]["strategy_policy"]["enum"])
         self.assertIn("must_not_change_without_human", run_schema["properties"]["amendment_policy"]["required"])
         self.assertIn("strategy_kind", run_schema["properties"]["generations"]["items"]["required"])
         self.assertIn("runtime", run_schema["properties"]["generations"]["items"]["required"])

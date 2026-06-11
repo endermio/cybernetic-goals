@@ -33,32 +33,32 @@ def refresh_semantic_base(req: dict) -> None:
     approved = copy.deepcopy(req["approved_control"])
     approved.pop("semantic_base", None)
     req["approved_control"]["semantic_base"] = {
-        "id": "semantic-base:lean-test",
+        "id": "semantic-base:target-model-test",
         "hash": canonical_json_hash(approved),
     }
 
 
-def requirements(outcome_id: str = "O-lean-startup", evidence_id: str = "evidence.lean-startup") -> dict:
+def requirements(outcome_id: str = "O-target-startup", evidence_id: str = "evidence.target-startup") -> dict:
     req = {
         "artifact_type": "requirements.control",
         "schema_version": "1.1.0",
         "status": "approved",
         "approved_control": {
-            "human_purpose": "exercise lean pre-goal reviewed replanning",
+            "human_purpose": "exercise target-model strategy control",
             "primary_object": "generation-aware control run",
-            "requested_transformation": "run a lean current generation",
-            "non_goals": ["do not use full-chain artifacts as startup requirements"],
+            "requested_transformation": "run a target current generation",
+            "non_goals": ["do not require expanded root artifacts for startup"],
             "how_we_know_purpose_was_met": "current generation verifier permits completion",
             "where_result_must_show_up": ["run.control.json", "gen-000/runtime.control.json"],
             "what_counts_as_done": "current generation has required evidence and no unresolved amendment",
             "source_requirements": [
                 {
-                    "id": "SR-lean-startup",
-                    "source": {"kind": "user_message", "quote": "run a lean current generation"},
-                    "required_action": "run a lean current generation to completion",
+                    "id": "SR-target-startup",
+                    "source": {"kind": "user_message", "quote": "run a target current generation"},
+                    "required_action": "run a target current generation to completion",
                     "requirement_type": "implement_behavior",
                     "required_evidence_strength": "test_result",
-                    "target_objects": ["lean current generation"],
+                    "target_objects": ["target current generation"],
                     "completion_checks": ["current generation verifier permits completion"],
                     "blocks_goal_achieved_if_missing": True,
                 }
@@ -68,18 +68,18 @@ def requirements(outcome_id: str = "O-lean-startup", evidence_id: str = "evidenc
                     "id": outcome_id,
                     "statement": f"{outcome_id} is implemented, not merely prepared",
                     "blocks_goal_achieved_if_missing": True,
-                    "source_requirements": ["SR-lean-startup"],
-                    "completion_claim": "Completes the lean current generation.",
-                    "completed_target_objects": ["lean current generation"],
+                    "source_requirements": ["SR-target-startup"],
+                    "completion_claim": "Completes the target current generation.",
+                    "completed_target_objects": ["target current generation"],
                     "required_evidence": [
                         {
                             "evidence_id": evidence_id,
                             "kind": "progress_event",
                             "description": "mainline current-generation evidence",
                             "evidence_strength": "test_result",
-                            "satisfies_source_requirements": ["SR-lean-startup"],
+                            "satisfies_source_requirements": ["SR-target-startup"],
                             "evidence_claim": "The current generation verifier permits completion.",
-                            "completed_target_objects": ["lean current generation"],
+                            "completed_target_objects": ["target current generation"],
                         }
                     ],
                     "not_satisfied_by": ["readiness or partial candidate evidence"],
@@ -94,13 +94,28 @@ def requirements(outcome_id: str = "O-lean-startup", evidence_id: str = "evidenc
     approved = copy.deepcopy(req["approved_control"])
     approved.pop("semantic_base", None)
     req["approved_control"]["semantic_base"] = {
-        "id": "semantic-base:lean-test",
+        "id": "semantic-base:target-model-test",
         "hash": canonical_json_hash(approved),
     }
     return req
 
 
-def run_control(current_generation: str = "gen-000", generations: list[dict] | None = None) -> dict:
+def default_target_model() -> dict:
+    return {
+        "result_orientation": ["state_change"],
+        "result_content": "specified",
+        "path": "known_enough",
+        "result_placement": "multi_place",
+        "impact_scope": "local_reversible",
+    }
+
+
+def run_control(
+    current_generation: str = "gen-000",
+    generations: list[dict] | None = None,
+    *,
+    strategy_policy: str = "frozen_strategy",
+) -> dict:
     if generations is None:
         generations = [
             {
@@ -114,7 +129,7 @@ def run_control(current_generation: str = "gen-000", generations: list[dict] | N
                         "step_id": "S1",
                         "transition": "current generation produces required evidence",
                         "evidence": ["current generation evidence"],
-                        "satisfies_outcomes": ["O-lean-startup"],
+                        "satisfies_outcomes": ["O-target-startup"],
                     }
                 ],
             }
@@ -123,11 +138,15 @@ def run_control(current_generation: str = "gen-000", generations: list[dict] | N
         "artifact_type": "run.control",
         "schema_version": "1.0.0",
         "status": "active",
-        "run_id": "lean-test-run",
-        "control_mode": "lean",
+        "run_id": "target-model-test-run",
+        "control_level": 3,
+        "target_model": default_target_model(),
+        "strategy_policy": strategy_policy,
+        "gate_mode": "none",
+        "phase_structure": "single_phase",
         "current_generation": current_generation,
         "max_auto_amendment_rounds": 2,
-        "semantic_base_ref": {"id": "semantic-base:lean-test", "hash": "unset"},
+        "semantic_base_ref": {"id": "semantic-base:target-model-test", "hash": "unset"},
         "amendment_policy": {
             "may_change": ["design_strategy", "plan_strategy", "runtime_strategy", "verifier_config"],
             "must_not_change_without_human": [
@@ -149,7 +168,11 @@ def runtime_control(req: dict, run: dict, generation_id: str, outcome_id: str, e
         "artifact_type": "runtime.control",
         "schema_version": "1.0.0",
         "status": "compiled",
-        "control_mode": run["control_mode"],
+        "control_level": run["control_level"],
+        "target_model": copy.deepcopy(run["target_model"]),
+        "strategy_policy": run["strategy_policy"],
+        "gate_mode": run["gate_mode"],
+        "phase_structure": run["phase_structure"],
         "generation": {"id": generation_id},
         "semantic_base_ref": req["approved_control"]["semantic_base"],
         "approved_control": {
@@ -254,7 +277,7 @@ def progress_event(
         event["reason"] = "current strategy cannot produce required evidence"
         event["triggering_observation"] = "current strategy produced substitute evidence"
         event["affected_stages"] = ["plan", "runtime"]
-        event["affected_source_requirements"] = ["SR-lean-startup"]
+        event["affected_source_requirements"] = ["SR-target-startup"]
         event["semantic_base_change"] = False
         event["required_outcomes_changed"] = False
         event["authority_expanded"] = False
@@ -288,19 +311,20 @@ def final_report(generation: str, evidence_id: str, unresolved: list[str] | None
     }
 
 
-def write_lean_run(
+def write_strategy_run(
     run_dir: Path,
     *,
-    outcome_id: str = "O-lean-startup",
-    required_evidence_id: str = "evidence.lean-startup",
+    outcome_id: str = "O-target-startup",
+    required_evidence_id: str = "evidence.target-startup",
     progress_events: list[dict] | None = None,
     report: dict | None = None,
     current_generation: str = "gen-000",
     generations: list[dict] | None = None,
+    strategy_policy: str = "frozen_strategy",
     runtime_edits=None,
 ) -> None:
     req = requirements(outcome_id, required_evidence_id)
-    run = run_control(current_generation=current_generation, generations=generations)
+    run = run_control(current_generation=current_generation, generations=generations, strategy_policy=strategy_policy)
     runtime_rel = next(item["runtime"] for item in run["generations"] if item["id"] == current_generation)
     runtime = runtime_control(req, run, current_generation, outcome_id, required_evidence_id)
     if runtime_edits:
@@ -333,7 +357,7 @@ def run_script(script: Path, *args: str) -> subprocess.CompletedProcess:
 
 
 class ReviewedReplanningControlTest(unittest.TestCase):
-    def test_official_runtime_entrypoints_reject_full_chain_without_run_control(self):
+    def test_official_runtime_entrypoints_reject_root_chain_without_run_control(self):
         fixture = json.loads(LEGACY_FIXTURE.read_text(encoding="utf-8"))["valid"]
         with tempfile.TemporaryDirectory() as tmpdir:
             run_dir = Path(tmpdir)
@@ -348,10 +372,10 @@ class ReviewedReplanningControlTest(unittest.TestCase):
                 self.assertNotEqual(result.returncode, 0, result.stdout + result.stderr)
                 self.assertIn("missing run.control.json", result.stdout + result.stderr)
 
-    def test_guard_and_runtime_validator_accept_lean_run_without_full_chain_artifacts(self):
+    def test_guard_and_runtime_validator_accept_generation_run_without_expanded_root_artifacts(self):
         with tempfile.TemporaryDirectory() as tmpdir:
             run_dir = Path(tmpdir)
-            write_lean_run(run_dir)
+            write_strategy_run(run_dir)
 
             guard = run_script(CONTROL_GUARD, "--run-dir", str(run_dir))
             validate = run_script(VALIDATE, str(run_dir))
@@ -365,7 +389,7 @@ class ReviewedReplanningControlTest(unittest.TestCase):
     def test_guard_rejects_generation_review_missing_source_requirement_preservation(self):
         with tempfile.TemporaryDirectory() as tmpdir:
             run_dir = Path(tmpdir)
-            write_lean_run(run_dir)
+            write_strategy_run(run_dir)
             review_path = run_dir / "gen-000/review.control.json"
             review = json.loads(review_path.read_text(encoding="utf-8"))
             review["review_checks"] = [
@@ -386,13 +410,13 @@ class ReviewedReplanningControlTest(unittest.TestCase):
             self.assertIn("source-requirement-preservation", result.stdout + result.stderr)
 
     def test_runtime_validator_requires_runtime_generation_for_step_events(self):
-        event = progress_event("evidence.lean-startup")
+        event = progress_event("evidence.target-startup")
         del event["runtime_generation"]
         events = [event]
-        report = final_report("gen-000", "evidence.lean-startup")
+        report = final_report("gen-000", "evidence.target-startup")
         with tempfile.TemporaryDirectory() as tmpdir:
             run_dir = Path(tmpdir)
-            write_lean_run(run_dir, progress_events=events, report=report)
+            write_strategy_run(run_dir, progress_events=events, report=report)
 
             result = run_script(VERIFY, str(run_dir))
 
@@ -409,17 +433,17 @@ class ReviewedReplanningControlTest(unittest.TestCase):
             "reason": "current strategy cannot produce required evidence",
             "triggering_observation": "current strategy produced substitute evidence",
             "affected_stages": ["plan", "runtime"],
-            "affected_source_requirements": ["SR-lean-startup"],
+            "affected_source_requirements": ["SR-target-startup"],
             "semantic_base_change": False,
             "required_outcomes_changed": False,
             "authority_expanded": False,
             "proposed_changes": ["replace substitute evidence with producing strategy"],
             "review_required": ["intent-preservation", "required-outcome-coverage"],
         }
-        report = final_report("gen-000", "evidence.lean-startup")
+        report = final_report("gen-000", "evidence.target-startup")
         with tempfile.TemporaryDirectory() as tmpdir:
             run_dir = Path(tmpdir)
-            write_lean_run(run_dir, progress_events=[event], report=report)
+            write_strategy_run(run_dir, progress_events=[event], report=report)
 
             result = run_script(VERIFY, str(run_dir))
             payload = json.loads(result.stdout)
@@ -440,11 +464,11 @@ class ReviewedReplanningControlTest(unittest.TestCase):
             "runtime_generation": "gen-000",
             "reason": "initial generation started",
         }
-        events = [generation_event, progress_event("evidence.lean-startup")]
-        report = final_report("gen-000", "evidence.lean-startup")
+        events = [generation_event, progress_event("evidence.target-startup")]
+        report = final_report("gen-000", "evidence.target-startup")
         with tempfile.TemporaryDirectory() as tmpdir:
             run_dir = Path(tmpdir)
-            write_lean_run(run_dir, progress_events=events, report=report)
+            write_strategy_run(run_dir, progress_events=events, report=report)
 
             result = run_script(VERIFY, str(run_dir))
 
@@ -461,7 +485,7 @@ class ReviewedReplanningControlTest(unittest.TestCase):
             "reason": "current strategy cannot produce required evidence",
             "triggering_observation": "current strategy cannot produce required evidence",
             "affected_stages": ["plan", "runtime"],
-            "affected_source_requirements": ["SR-lean-startup"],
+            "affected_source_requirements": ["SR-target-startup"],
             "semantic_base_change": False,
             "required_outcomes_changed": False,
             "authority_expanded": False,
@@ -470,7 +494,7 @@ class ReviewedReplanningControlTest(unittest.TestCase):
         }
         with tempfile.TemporaryDirectory() as tmpdir:
             run_dir = Path(tmpdir)
-            write_lean_run(run_dir, progress_events=[event])
+            write_strategy_run(run_dir, progress_events=[event], strategy_policy="reviewed_replanning")
 
             result = run_script(AMENDMENT_ORCHESTRATOR, "--run-dir", str(run_dir))
 
@@ -503,7 +527,7 @@ class ReviewedReplanningControlTest(unittest.TestCase):
                 for check in review["review_checks"]
                 if check["check_id"] == "source-requirement-preservation"
             )
-            self.assertIn("SR-lean-startup", "\n".join(source_check["evidence"]))
+            self.assertIn("SR-target-startup", "\n".join(source_check["evidence"]))
             self.assertEqual(0, run_script(CONTROL_GUARD, "--run-dir", str(run_dir)).returncode)
             progress = [
                 json.loads(line)
@@ -511,6 +535,34 @@ class ReviewedReplanningControlTest(unittest.TestCase):
                 if line.strip()
             ]
             self.assertTrue(any(event.get("event_type") == "control.amendment.approved" for event in progress))
+
+    def test_amendment_orchestrator_rejects_frozen_strategy_continuation(self):
+        event = {
+            "event_type": "control.amendment.proposed",
+            "schema_version": "1.0.0",
+            "occurred_at": "2026-06-10T00:00:00Z",
+            "runtime_generation": "gen-000",
+            "amendment_id": "A-frozen",
+            "reason": "current strategy cannot produce required evidence",
+            "triggering_observation": "current frozen strategy is insufficient",
+            "affected_stages": ["plan", "runtime"],
+            "affected_source_requirements": ["SR-target-startup"],
+            "semantic_base_change": False,
+            "required_outcomes_changed": False,
+            "authority_expanded": False,
+            "proposed_changes": ["create reviewed amendment generation"],
+            "review_required": ["intent-preservation", "required-outcome-coverage"],
+        }
+        with tempfile.TemporaryDirectory() as tmpdir:
+            run_dir = Path(tmpdir)
+            write_strategy_run(run_dir, progress_events=[event], strategy_policy="frozen_strategy")
+
+            result = run_script(AMENDMENT_ORCHESTRATOR, "--run-dir", str(run_dir))
+
+            self.assertNotEqual(result.returncode, 0, result.stdout + result.stderr)
+            payload = json.loads(result.stdout)
+            self.assertEqual("HumanApprovalRequired", payload["next_allowed_action"])
+            self.assertIn("frozen_strategy", "\n".join(payload["errors"]))
 
     def test_amendment_orchestrator_blocks_anchor_changing_proposal(self):
         event = {
@@ -522,7 +574,7 @@ class ReviewedReplanningControlTest(unittest.TestCase):
             "reason": "current strategy would require changing approved anchors",
             "triggering_observation": "required outcome must change",
             "affected_stages": ["plan", "runtime"],
-            "affected_source_requirements": ["SR-lean-startup"],
+            "affected_source_requirements": ["SR-target-startup"],
             "semantic_base_change": True,
             "required_outcomes_changed": False,
             "authority_expanded": False,
@@ -531,7 +583,7 @@ class ReviewedReplanningControlTest(unittest.TestCase):
         }
         with tempfile.TemporaryDirectory() as tmpdir:
             run_dir = Path(tmpdir)
-            write_lean_run(run_dir, progress_events=[event])
+            write_strategy_run(run_dir, progress_events=[event])
 
             result = run_script(AMENDMENT_ORCHESTRATOR, "--run-dir", str(run_dir))
 
@@ -561,8 +613,8 @@ class ReviewedReplanningControlTest(unittest.TestCase):
                     {
                         "step_id": "S1",
                         "transition": "current generation produces required evidence",
-                        "evidence": ["evidence.lean-startup"],
-                        "satisfies_outcomes": ["O-lean-startup"],
+                        "evidence": ["evidence.target-startup"],
+                        "satisfies_outcomes": ["O-target-startup"],
                     }
                 ],
             },
@@ -586,7 +638,12 @@ class ReviewedReplanningControlTest(unittest.TestCase):
         }
         with tempfile.TemporaryDirectory() as tmpdir:
             run_dir = Path(tmpdir)
-            write_lean_run(run_dir, generations=generations, current_generation="gen-001")
+            write_strategy_run(
+                run_dir,
+                generations=generations,
+                current_generation="gen-001",
+                strategy_policy="reviewed_replanning",
+            )
             (run_dir / "gen-001/review.control.json").write_text(json.dumps(shallow, indent=2), encoding="utf-8")
             req = json.loads((run_dir / "requirements.control.json").read_text(encoding="utf-8"))
             run = json.loads((run_dir / "run.control.json").read_text(encoding="utf-8"))
@@ -602,7 +659,7 @@ class ReviewedReplanningControlTest(unittest.TestCase):
     def test_guard_and_runtime_validator_reject_missing_evidence_source_requirement_coverage(self):
         with tempfile.TemporaryDirectory() as tmpdir:
             run_dir = Path(tmpdir)
-            write_lean_run(run_dir)
+            write_strategy_run(run_dir)
             req = json.loads((run_dir / "requirements.control.json").read_text(encoding="utf-8"))
             req["approved_control"]["required_outcomes"][0]["required_evidence"][0][
                 "satisfies_source_requirements"
@@ -622,14 +679,14 @@ class ReviewedReplanningControlTest(unittest.TestCase):
             for result in (guard, validate):
                 self.assertNotEqual(result.returncode, 0, result.stdout + result.stderr)
                 self.assertIn(
-                    "source requirements not covered by required evidence: SR-lean-startup",
+                    "source requirements not covered by required evidence: SR-target-startup",
                     result.stdout + result.stderr,
                 )
 
     def test_guard_and_runtime_validator_reject_source_requirement_evidence_below_required_strength(self):
         with tempfile.TemporaryDirectory() as tmpdir:
             run_dir = Path(tmpdir)
-            write_lean_run(run_dir)
+            write_strategy_run(run_dir)
             req = json.loads((run_dir / "requirements.control.json").read_text(encoding="utf-8"))
             evidence = req["approved_control"]["required_outcomes"][0]["required_evidence"][0]
             evidence["evidence_strength"] = "behavior_exists"
@@ -649,7 +706,7 @@ class ReviewedReplanningControlTest(unittest.TestCase):
                 self.assertNotEqual(result.returncode, 0, result.stdout + result.stderr)
                 self.assertIn(
                     "evidence strength behavior_exists does not meet required evidence strength "
-                    "test_result for source requirement SR-lean-startup",
+                    "test_result for source requirement SR-target-startup",
                     result.stdout + result.stderr,
                 )
 
@@ -674,15 +731,20 @@ class ReviewedReplanningControlTest(unittest.TestCase):
                     {
                         "step_id": "S1",
                         "transition": "current generation produces required evidence",
-                        "evidence": ["evidence.lean-startup"],
-                        "satisfies_outcomes": ["O-lean-startup"],
+                        "evidence": ["evidence.target-startup"],
+                        "satisfies_outcomes": ["O-target-startup"],
                     }
                 ],
             },
         ]
         with tempfile.TemporaryDirectory() as tmpdir:
             run_dir = Path(tmpdir)
-            write_lean_run(run_dir, generations=generations, current_generation="gen-001")
+            write_strategy_run(
+                run_dir,
+                generations=generations,
+                current_generation="gen-001",
+                strategy_policy="reviewed_replanning",
+            )
             review = approved_generation_review()
             review["review_checks"] = [
                 check
@@ -721,7 +783,7 @@ class ReviewedReplanningControlTest(unittest.TestCase):
         report = final_report("gen-000", "evidence.api-v2-readiness")
         with tempfile.TemporaryDirectory() as tmpdir:
             run_dir = Path(tmpdir)
-            write_lean_run(run_dir, progress_events=events, report=report)
+            write_strategy_run(run_dir, progress_events=events, report=report)
 
             result = run_script(VERIFY, str(run_dir))
 
@@ -732,17 +794,17 @@ class ReviewedReplanningControlTest(unittest.TestCase):
 
     def test_runtime_validator_requires_affected_source_requirements_on_amendment_proposal(self):
         event = progress_event(
-            "evidence.lean-startup",
+            "evidence.target-startup",
             event_type="control.amendment.proposed",
             amendment_id="A1",
         )
         del event["affected_source_requirements"]
         with tempfile.TemporaryDirectory() as tmpdir:
             run_dir = Path(tmpdir)
-            write_lean_run(
+            write_strategy_run(
                 run_dir,
                 progress_events=[event],
-                report=final_report("gen-000", "evidence.lean-startup"),
+                report=final_report("gen-000", "evidence.target-startup"),
             )
 
             result = run_script(VERIFY, str(run_dir))
@@ -761,7 +823,7 @@ class ReviewedReplanningControlTest(unittest.TestCase):
         )
         event["semantic_base_change"] = True
         events = [
-            progress_event("evidence.lean-startup"),
+            progress_event("evidence.target-startup"),
             event,
             progress_event(
                 "evidence.api-v2-readiness",
@@ -770,10 +832,10 @@ class ReviewedReplanningControlTest(unittest.TestCase):
             ),
         ]
         events[-1]["semantic_base_change"] = True
-        report = final_report("gen-000", "evidence.lean-startup")
+        report = final_report("gen-000", "evidence.target-startup")
         with tempfile.TemporaryDirectory() as tmpdir:
             run_dir = Path(tmpdir)
-            write_lean_run(run_dir, progress_events=events, report=report)
+            write_strategy_run(run_dir, progress_events=events, report=report)
 
             result = run_script(VERIFY, str(run_dir))
 
@@ -783,7 +845,7 @@ class ReviewedReplanningControlTest(unittest.TestCase):
     def test_guard_rejects_run_control_without_max_auto_amendment_rounds(self):
         with tempfile.TemporaryDirectory() as tmpdir:
             run_dir = Path(tmpdir)
-            write_lean_run(run_dir)
+            write_strategy_run(run_dir)
             run = json.loads((run_dir / "run.control.json").read_text(encoding="utf-8"))
             del run["max_auto_amendment_rounds"]
             runtime = json.loads((run_dir / "gen-000/runtime.control.json").read_text(encoding="utf-8"))
@@ -806,7 +868,7 @@ class ReviewedReplanningControlTest(unittest.TestCase):
     def test_guard_rejects_blocking_source_requirement_without_outcome_coverage(self):
         with tempfile.TemporaryDirectory() as tmpdir:
             run_dir = Path(tmpdir)
-            write_lean_run(run_dir)
+            write_strategy_run(run_dir)
             req = json.loads((run_dir / "requirements.control.json").read_text(encoding="utf-8"))
             req["approved_control"]["source_requirements"].append(
                 {
@@ -840,7 +902,7 @@ class ReviewedReplanningControlTest(unittest.TestCase):
     def test_guard_rejects_framework_evidence_for_measurement_source_requirement(self):
         with tempfile.TemporaryDirectory() as tmpdir:
             run_dir = Path(tmpdir)
-            write_lean_run(run_dir)
+            write_strategy_run(run_dir)
             req = json.loads((run_dir / "requirements.control.json").read_text(encoding="utf-8"))
             sr = req["approved_control"]["source_requirements"][0]
             sr["id"] = "SR-measure-curves"
@@ -879,7 +941,7 @@ class ReviewedReplanningControlTest(unittest.TestCase):
     def test_guard_rejects_source_requirement_weakened_from_quote(self):
         with tempfile.TemporaryDirectory() as tmpdir:
             run_dir = Path(tmpdir)
-            write_lean_run(run_dir)
+            write_strategy_run(run_dir)
             req = json.loads((run_dir / "requirements.control.json").read_text(encoding="utf-8"))
             sr = req["approved_control"]["source_requirements"][0]
             sr["source"] = {"kind": "user_message", "quote": "measure scale curves for E and S"}
@@ -909,7 +971,7 @@ class ReviewedReplanningControlTest(unittest.TestCase):
     def test_guard_rejects_api_v2_source_requirement_weakened_to_readiness(self):
         with tempfile.TemporaryDirectory() as tmpdir:
             run_dir = Path(tmpdir)
-            write_lean_run(run_dir)
+            write_strategy_run(run_dir)
             req = json.loads((run_dir / "requirements.control.json").read_text(encoding="utf-8"))
             sr = req["approved_control"]["source_requirements"][0]
             sr["source"] = {
@@ -943,7 +1005,7 @@ class ReviewedReplanningControlTest(unittest.TestCase):
     def test_guard_rejects_api_v2_routes_source_requirement_weakened_to_readiness(self):
         with tempfile.TemporaryDirectory() as tmpdir:
             run_dir = Path(tmpdir)
-            write_lean_run(run_dir)
+            write_strategy_run(run_dir)
             req = json.loads((run_dir / "requirements.control.json").read_text(encoding="utf-8"))
             sr = req["approved_control"]["source_requirements"][0]
             sr["source"] = {"kind": "user_message", "quote": "implement /api/v2 routes"}
@@ -976,7 +1038,7 @@ class ReviewedReplanningControlTest(unittest.TestCase):
     def test_guard_accepts_preserved_measurement_source_requirement_with_framework_words(self):
         with tempfile.TemporaryDirectory() as tmpdir:
             run_dir = Path(tmpdir)
-            write_lean_run(run_dir)
+            write_strategy_run(run_dir)
             req = json.loads((run_dir / "requirements.control.json").read_text(encoding="utf-8"))
             sr = req["approved_control"]["source_requirements"][0]
             sr["source"] = {"kind": "user_message", "quote": "measure framework adoption growth curves"}
@@ -1008,7 +1070,7 @@ class ReviewedReplanningControlTest(unittest.TestCase):
     def test_guard_accepts_api_v2_already_implemented_wording_as_preserved_behavior(self):
         with tempfile.TemporaryDirectory() as tmpdir:
             run_dir = Path(tmpdir)
-            write_lean_run(run_dir)
+            write_strategy_run(run_dir)
             req = json.loads((run_dir / "requirements.control.json").read_text(encoding="utf-8"))
             sr = req["approved_control"]["source_requirements"][0]
             sr["source"] = {"kind": "user_message", "quote": "implement /api/v2 routes"}
@@ -1040,7 +1102,7 @@ class ReviewedReplanningControlTest(unittest.TestCase):
     def test_guard_accepts_legitimate_framework_source_requirement(self):
         with tempfile.TemporaryDirectory() as tmpdir:
             run_dir = Path(tmpdir)
-            write_lean_run(run_dir)
+            write_strategy_run(run_dir)
             req = json.loads((run_dir / "requirements.control.json").read_text(encoding="utf-8"))
             sr = req["approved_control"]["source_requirements"][0]
             sr["source"] = {
@@ -1105,7 +1167,7 @@ class ReviewedReplanningControlTest(unittest.TestCase):
         ]
         with tempfile.TemporaryDirectory() as tmpdir:
             run_dir = Path(tmpdir)
-            write_lean_run(run_dir, generations=generations, current_generation="gen-003")
+            write_strategy_run(run_dir, generations=generations, current_generation="gen-003")
 
             result = run_script(CONTROL_GUARD, "--run-dir", str(run_dir))
 
@@ -1124,14 +1186,14 @@ class ReviewedReplanningControlTest(unittest.TestCase):
                         "step_id": "S1",
                         "transition": "current generation produces required evidence",
                         "evidence": ["current generation evidence"],
-                        "satisfies_outcomes": ["O-lean-startup"],
+                        "satisfies_outcomes": ["O-target-startup"],
                     }
                 ],
             }
         ]
         with tempfile.TemporaryDirectory() as tmpdir:
             run_dir = Path(tmpdir)
-            write_lean_run(run_dir, generations=generations)
+            write_strategy_run(run_dir, generations=generations)
 
             result = run_script(CONTROL_GUARD, "--run-dir", str(run_dir))
 
@@ -1150,23 +1212,23 @@ class ReviewedReplanningControlTest(unittest.TestCase):
                         "step_id": "S1",
                         "transition": "current generation discovers required evidence path",
                         "evidence": ["current generation evidence"],
-                        "satisfies_outcomes": ["O-lean-startup"],
+                        "satisfies_outcomes": ["O-target-startup"],
                     }
                 ],
             }
         ]
-        events = [progress_event("evidence.lean-startup")]
-        report = final_report("gen-000", "evidence.lean-startup")
+        events = [progress_event("evidence.target-startup")]
+        report = final_report("gen-000", "evidence.target-startup")
         with tempfile.TemporaryDirectory() as tmpdir:
             run_dir = Path(tmpdir)
-            write_lean_run(run_dir, generations=generations, progress_events=events, report=report)
+            write_strategy_run(run_dir, generations=generations, progress_events=events, report=report)
 
             result = run_script(VERIFY, str(run_dir))
 
             self.assertNotEqual(result.returncode, 0, result.stdout + result.stderr)
             self.assertIn("discovery generation cannot permit goal_achieved true", result.stdout + result.stderr)
 
-    def test_compiler_creates_initial_generation_runtime_from_lean_run_manifest(self):
+    def test_compiler_creates_initial_generation_runtime_from_run_manifest(self):
         with tempfile.TemporaryDirectory() as tmpdir:
             run_dir = Path(tmpdir)
             req = requirements()
@@ -1197,7 +1259,7 @@ class ReviewedReplanningControlTest(unittest.TestCase):
         ]
         with tempfile.TemporaryDirectory() as tmpdir:
             run_dir = Path(tmpdir)
-            write_lean_run(run_dir, generations=generations, current_generation="gen-001")
+            write_strategy_run(run_dir, generations=generations, current_generation="gen-001")
 
             result = run_script(CONTROL_GUARD, "--run-dir", str(run_dir))
 
@@ -1216,7 +1278,7 @@ class ReviewedReplanningControlTest(unittest.TestCase):
         report = final_report("gen-000", "evidence.api-v2-readiness")
         with tempfile.TemporaryDirectory() as tmpdir:
             run_dir = Path(tmpdir)
-            write_lean_run(
+            write_strategy_run(
                 run_dir,
                 outcome_id="O-api-v2-implementation",
                 required_evidence_id="evidence.api-v2-implementation",
@@ -1242,7 +1304,7 @@ class ReviewedReplanningControlTest(unittest.TestCase):
         report = final_report("gen-000", "evidence.checkpoint-only")
         with tempfile.TemporaryDirectory() as tmpdir:
             run_dir = Path(tmpdir)
-            write_lean_run(
+            write_strategy_run(
                 run_dir,
                 outcome_id="O-full-workflow-ceiling",
                 required_evidence_id="evidence.full-workflow-ceiling",
@@ -1269,11 +1331,11 @@ class ReviewedReplanningControlTest(unittest.TestCase):
                 "amendment_source": "progress.jsonl#A1",
             },
         ]
-        events = [progress_event("evidence.lean-startup", generation="gen-000")]
-        report = final_report("gen-001", "evidence.lean-startup")
+        events = [progress_event("evidence.target-startup", generation="gen-000")]
+        report = final_report("gen-001", "evidence.target-startup")
         with tempfile.TemporaryDirectory() as tmpdir:
             run_dir = Path(tmpdir)
-            write_lean_run(
+            write_strategy_run(
                 run_dir,
                 generations=generations,
                 current_generation="gen-001",
@@ -1299,21 +1361,22 @@ class ReviewedReplanningControlTest(unittest.TestCase):
                 "amendment_source": "progress.jsonl#A1",
             },
         ]
-        events = [progress_event("evidence.lean-startup", generation="gen-000")]
-        report = final_report("gen-001", "evidence.lean-startup")
+        events = [progress_event("evidence.target-startup", generation="gen-000")]
+        report = final_report("gen-001", "evidence.target-startup")
 
         def import_old(runtime: dict) -> None:
-            runtime["imported_evidence"] = ["evidence.lean-startup"]
+            runtime["imported_evidence"] = ["evidence.target-startup"]
 
         with tempfile.TemporaryDirectory() as tmpdir:
             run_dir = Path(tmpdir)
-            write_lean_run(
+            write_strategy_run(
                 run_dir,
                 generations=generations,
                 current_generation="gen-001",
                 progress_events=events,
                 report=report,
                 runtime_edits=import_old,
+                strategy_policy="reviewed_replanning",
             )
 
             result = run_script(VERIFY, str(run_dir))

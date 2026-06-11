@@ -13,13 +13,13 @@
     },
     {
       "id": "level-3-goal-handoff-returns-to-orchestrator",
-      "prompt": "根据 complete requirements analysis 和 solution design 创建复杂 goal。路由结果是 Level 3 full pre-goal pipeline，execution-plan check required，review check required，$orchestrating-cybernetic-pregoal 可用。",
+      "prompt": "根据 complete requirements analysis 和 solution design 创建复杂 goal。路由结果是 Level 3 JSON pre-goal orchestration，execution-plan check required，review check required，$orchestrating-cybernetic-pregoal 可用。",
       "expected_output": "Create goal.control.json, then in the response hand off back to $orchestrating-cybernetic-pregoal rather than directly recommending $writing-cybernetic-execution-policies.",
       "assertions": [
         "Creates or references docs/cybernetics/runs/<slug>/goal.control.json.",
         "Does not output a final runtime /goal.",
         "Response-only handoff recommends $orchestrating-cybernetic-pregoal.",
-        "Does not recommend $writing-cybernetic-execution-policies as the next user action for Level 3 full pre-goal work."
+        "Does not recommend $writing-cybernetic-execution-policies as the next user action for Level 3 JSON pre-goal work."
       ]
     },
     {

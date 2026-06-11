@@ -16,7 +16,7 @@ from tests.skills.test_reviewed_replanning_control import (
     requirements,
     run_control,
     runtime_control,
-    write_lean_run,
+    write_strategy_run,
 )
 
 
@@ -33,7 +33,7 @@ class JsonOfficialGuardCompilerPathTest(unittest.TestCase):
     def test_control_chain_guard_accepts_generation_run_directory(self):
         with tempfile.TemporaryDirectory() as tmpdir:
             run_dir = Path(tmpdir)
-            write_lean_run(run_dir)
+            write_strategy_run(run_dir)
 
             result = run_script(CONTROL_GUARD, "--run-dir", str(run_dir))
 
@@ -41,7 +41,7 @@ class JsonOfficialGuardCompilerPathTest(unittest.TestCase):
             self.assertIn("PASS", result.stdout)
             self.assertIn("CompileRuntimeGoal", result.stdout)
 
-    def test_official_guard_and_compiler_reject_full_chain_without_run_control(self):
+    def test_official_guard_and_compiler_reject_root_chain_without_run_control(self):
         fixture = json.loads(LEGACY_FIXTURE.read_text(encoding="utf-8"))["valid"]
         with tempfile.TemporaryDirectory() as tmpdir:
             run_dir = Path(tmpdir)
@@ -58,7 +58,7 @@ class JsonOfficialGuardCompilerPathTest(unittest.TestCase):
     def test_orchestration_guard_accepts_generation_run_before_runtime_compile(self):
         with tempfile.TemporaryDirectory() as tmpdir:
             run_dir = Path(tmpdir)
-            write_lean_run(run_dir)
+            write_strategy_run(run_dir)
 
             result = run_script(
                 ORCHESTRATION_GUARD,
@@ -77,7 +77,7 @@ class JsonOfficialGuardCompilerPathTest(unittest.TestCase):
     def test_orchestration_guard_routes_current_generation_review_needs_revision(self):
         with tempfile.TemporaryDirectory() as tmpdir:
             run_dir = Path(tmpdir)
-            write_lean_run(run_dir)
+            write_strategy_run(run_dir)
             review_path = run_dir / "gen-000/review.control.json"
             review = json.loads(review_path.read_text(encoding="utf-8"))
             review["status"] = "needs_revision"
@@ -135,7 +135,9 @@ class JsonOfficialGuardCompilerPathTest(unittest.TestCase):
             self.assertTrue(runtime_path.exists())
             runtime = json.loads(runtime_path.read_text(encoding="utf-8"))
             self.assertEqual(runtime["generation"]["id"], "gen-000")
-            self.assertEqual(runtime["control_mode"], "lean")
+            self.assertEqual(runtime["strategy_policy"], "frozen_strategy")
+            self.assertEqual(runtime["gate_mode"], "none")
+            self.assertNotIn("control_mode", runtime)
             self.assertIn("/goal Execute the runtime control JSON at", result.stdout)
             self.assertIn("gen-000/runtime.control.json", result.stdout)
             self.assertNotIn(".goal.md", result.stdout)
@@ -157,7 +159,7 @@ class JsonOfficialGuardCompilerPathTest(unittest.TestCase):
     def test_generation_guard_rejects_required_outcome_coverage_gap(self):
         with tempfile.TemporaryDirectory() as tmpdir:
             run_dir = Path(tmpdir)
-            write_lean_run(run_dir)
+            write_strategy_run(run_dir)
             req = json.loads((run_dir / "requirements.control.json").read_text(encoding="utf-8"))
             run = json.loads((run_dir / "run.control.json").read_text(encoding="utf-8"))
             review = json.loads((run_dir / "gen-000/review.control.json").read_text(encoding="utf-8"))
@@ -174,7 +176,7 @@ class JsonOfficialGuardCompilerPathTest(unittest.TestCase):
     def test_generation_guard_rejects_required_evidence_outside_authorized_paths(self):
         with tempfile.TemporaryDirectory() as tmpdir:
             run_dir = Path(tmpdir)
-            write_lean_run(run_dir)
+            write_strategy_run(run_dir)
             req = json.loads((run_dir / "requirements.control.json").read_text(encoding="utf-8"))
             run = json.loads((run_dir / "run.control.json").read_text(encoding="utf-8"))
             review = json.loads((run_dir / "gen-000/review.control.json").read_text(encoding="utf-8"))
@@ -197,10 +199,10 @@ class JsonOfficialGuardCompilerPathTest(unittest.TestCase):
     def test_pregoal_predictor_uses_current_generation_runtime(self):
         with tempfile.TemporaryDirectory() as tmpdir:
             run_dir = Path(tmpdir)
-            write_lean_run(
+            write_strategy_run(
                 run_dir,
-                progress_events=[progress_event("evidence.lean-startup")],
-                report=final_report("gen-000", "evidence.lean-startup"),
+                progress_events=[progress_event("evidence.target-startup")],
+                report=final_report("gen-000", "evidence.target-startup"),
             )
 
             result = run_script(PREDICTOR, "--run-dir", str(run_dir))

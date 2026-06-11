@@ -60,6 +60,19 @@ def unresolved_amendment_ids(events: list[dict], current_generation: str | None)
     return proposed - resolved
 
 
+def proposed_amendment_ids(events: list[dict], current_generation: str | None) -> set[str]:
+    proposed: set[str] = set()
+    for event in events:
+        if current_generation is not None and event.get("runtime_generation") != current_generation:
+            continue
+        if event.get("event_type") != "control.amendment.proposed":
+            continue
+        amendment_id = event.get("amendment_id")
+        if isinstance(amendment_id, str) and amendment_id:
+            proposed.add(amendment_id)
+    return proposed
+
+
 def anchor_changing_amendment_ids(events: list[dict], current_generation: str | None) -> set[str]:
     anchor_changing: set[str] = set()
     for event in events:
@@ -161,6 +174,8 @@ def final_report_errors(
     unresolved_amendments: set[str] | None = None,
     anchor_changing_amendments: set[str] | None = None,
     strategy_kind: str | None = None,
+    strategy_policy: str | None = None,
+    proposed_amendments: set[str] | None = None,
     synthetic_required_steps: set[str] | None = None,
 ) -> list[str]:
     errors: list[str] = []
@@ -189,8 +204,11 @@ def final_report_errors(
     if synthetic_required_steps:
         errors.append("synthetic required_steps cannot permit goal_achieved true: " + ", ".join(sorted(synthetic_required_steps)))
     unresolved_amendments = unresolved_amendments or set()
+    proposed_amendments = proposed_amendments or set()
     anchor_changing_amendments = anchor_changing_amendments or set()
     reported_unresolved = final_report.get("unresolved_amendments")
+    if strategy_policy == "frozen_strategy" and proposed_amendments:
+        errors.append("frozen_strategy cannot permit goal_achieved true after amendment proposals: " + ", ".join(sorted(proposed_amendments)))
     if unresolved_amendments:
         errors.append("unresolved amendments block goal_achieved true: " + ", ".join(sorted(unresolved_amendments)))
     if anchor_changing_amendments:
@@ -240,6 +258,7 @@ def main() -> int:
         item for item in runtime.get("invalidated_evidence", []) if isinstance(item, str)
     )
     unresolved = unresolved_amendment_ids(events, current_generation)
+    proposed = proposed_amendment_ids(events, current_generation)
     anchor_changing = anchor_changing_amendment_ids(events, current_generation)
     synthetic_steps = synthetic_required_step_ids(runtime)
     evidence_by_step = mainline_evidence_by_completed_step(
@@ -311,6 +330,8 @@ def main() -> int:
                 unresolved_amendments=unresolved,
                 anchor_changing_amendments=anchor_changing,
                 strategy_kind=strategy_kind if isinstance(strategy_kind, str) else None,
+                strategy_policy=runtime.get("strategy_policy") if isinstance(runtime.get("strategy_policy"), str) else None,
+                proposed_amendments=proposed,
                 synthetic_required_steps=synthetic_steps,
             )
         )
@@ -333,6 +354,7 @@ def main() -> int:
                 current_generation=current_generation,
                 unresolved_amendments=sorted(unresolved),
                 anchor_changing_amendments=sorted(anchor_changing),
+                proposed_amendments=sorted(proposed),
             ),
             indent=2,
         )

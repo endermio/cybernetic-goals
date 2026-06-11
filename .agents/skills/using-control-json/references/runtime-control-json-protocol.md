@@ -39,7 +39,7 @@ If the approved target, plan, review, or runtime contract appears wrong, stale, 
 
 Generation-aware runs declare a generation `strategy_kind`:
 
-- `discovery`: may start from a lean horizon and may use synthetic steps from requirements, but cannot permit `goal_achieved: true`.
+- `discovery`: may start from a narrow observation horizon and may use synthetic steps from requirements, but cannot permit `goal_achieved: true`.
 - `execution`: may permit final completion only when the generation has an approved review and non-synthetic executable steps.
 - `amendment`: must have a parent, amendment source, approved review, and non-synthetic executable steps.
 

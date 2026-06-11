@@ -33,11 +33,12 @@ Use completed `requirements.control.json` and `goal.control.json`, plus `design.
 
 Official persistent control facts are JSON only. Historical Markdown may be read as non-authoritative background, but do not create or compile Markdown as official guard, compiler, runtime, or long-term dual-path control input.
 
-For Level 3 lean pre-goal, Level 4, or full pre-goal work, do not create an execution policy unless the requirements analysis contains `What the User Approved: Approved`, or the current user message explicitly approves the compact control commitment. Level 1/2 bounded work does not require What the User Approved unless the requirements analysis records it as required.
+For Level 3, Level 4, or JSON pre-goal work, do not create an execution policy unless the requirements analysis contains `What the User Approved: Approved`, or the current user message explicitly approves the compact control commitment. Level 1/2 bounded work does not require What the User Approved unless the requirements analysis records it as required.
 
-In lean pre-goal, the execution policy may be a generation strategy rather than
-a frozen whole-run plan. It must state which parts are hard anchors and which
-parts may be revised by reviewed amendment during goal execution.
+An execution policy may be a current-generation strategy rather than a fixed
+whole-run plan when `strategy_policy` is `reviewed_replanning`. It must state
+which parts are hard anchors and which parts may be revised by reviewed
+amendment during goal execution.
 
 If the current user message approves the compact control commitment, update the requirements analysis `What the User Approved` section first, quoting or referencing that approval, then continue. Do not rely on in-memory approval to pass orchestration or runtime guards.
 
@@ -398,7 +399,7 @@ If the design is missing, contradictory, or insufficient for planning, stop and 
 
 ## Response-Only Handoff Rule
 
-For Level 3 lean pre-goal, Level 4, or full pre-goal work, hand off back to `$orchestrating-cybernetic-pregoal` after creating the candidate execution policy when it is available or already owns the chain.
+For Level 3, Level 4, or JSON pre-goal work, hand off back to `$orchestrating-cybernetic-pregoal` after creating the candidate execution policy when it is available or already owns the chain.
 
 Recommend `$reviewing-cybernetic-control-structures` directly only when the user explicitly chose a manual pre-goal chain or `$orchestrating-cybernetic-pregoal` is unavailable.
 
@@ -432,7 +433,7 @@ Control-law summary:
 - Phase checks: ...
 
 Response-only handoff:
-- For Level 3/4 or full pre-goal work: return to `$orchestrating-cybernetic-pregoal` with this execution policy path.
+- For Level 3/4 or JSON pre-goal work: return to `$orchestrating-cybernetic-pregoal` with this execution policy path.
 - For an explicit manual chain only: use `$reviewing-cybernetic-control-structures` before runtime `/goal`.
 ```
 
@@ -449,14 +450,14 @@ Smallest input or dependency needed:
 
 Response-only next step:
 - If required planning workflow is missing: load/use `$superpowers:writing-plans`, or return blocked status to `$orchestrating-cybernetic-pregoal`.
-- If the solution design is missing or insufficient: return to `$designing-cybernetic-solutions` for an explicit manual chain, or return blocked status to `$orchestrating-cybernetic-pregoal` for Level 3/4 or full pre-goal work.
+- If the solution design is missing or insufficient: return to `$designing-cybernetic-solutions` for an explicit manual chain, or return blocked status to `$orchestrating-cybernetic-pregoal` for Level 3/4 or JSON pre-goal work.
 - Do not run review or runtime `/goal` until a candidate execution policy exists.
 ```
 
 ## Validation Checklist
 
 - [ ] Non-trivial execution policies invoke `$superpowers:writing-plans` or load and follow its `SKILL.md` instructions, otherwise stop/report missing infrastructure.
-- [ ] For Level 3/4 or full pre-goal work, What the User Approved is Approved before execution-policy writing starts.
+- [ ] For Level 3/4 or JSON pre-goal work, What the User Approved is Approved before execution-policy writing starts.
 - [ ] The plan records planning workflow status.
 - [ ] The plan does not self-substitute for a missing required planning workflow.
 - [ ] If blocked, the assistant response includes a response-only next step.

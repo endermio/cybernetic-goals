@@ -154,6 +154,16 @@ def apply_amendment(run_dir: Path, requested_amendment_id: str | None = None) ->
         return 2, result_payload(False, next_allowed_action="FixJsonControlRun", errors=chain_errors)
 
     run_control = read_json(run_dir / "run.control.json")
+    if run_control.get("strategy_policy") != "reviewed_replanning":
+        return 2, result_payload(
+            False,
+            next_allowed_action="HumanApprovalRequired",
+            errors=[
+                "strategy_policy is "
+                + str(run_control.get("strategy_policy"))
+                + "; automatic amendment continuation requires reviewed_replanning"
+            ],
+        )
     current_generation = run_control.get("current_generation")
     current = active_generation(run_control)
     if not isinstance(current_generation, str) or current is None:

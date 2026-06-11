@@ -22,6 +22,13 @@ CONTROL_FILES = {
 READONLY_FILES = tuple(CONTROL_FILES.values())
 WRITABLE_FILES = ("progress.jsonl", "runtime-status.json", "final-report.json")
 DEFAULT_WRITABLE_EVIDENCE_PATHS = ("evidence/",)
+RUN_STRATEGY_FIELDS = (
+    "control_level",
+    "target_model",
+    "strategy_policy",
+    "gate_mode",
+    "phase_structure",
+)
 SOURCE_REQUIREMENT_TYPES = {
     "implement_behavior",
     "produce_empirical_measurement",
@@ -937,8 +944,12 @@ def validate_generation_control_chain(run_dir: Path) -> tuple[dict[str, dict[str
     runtime_generation = runtime.get("generation")
     if not isinstance(runtime_generation, dict) or runtime_generation.get("id") != current_generation:
         errors.append("runtime.control.json generation.id must match run.control.json current_generation")
-    if runtime.get("control_mode") != run_control.get("control_mode"):
-        errors.append("runtime.control.json control_mode must match run.control.json")
+    for field in RUN_STRATEGY_FIELDS:
+        if runtime.get(field) != run_control.get(field):
+            errors.append(f"runtime.control.json {field} must match run.control.json")
+    strategy_policy = run_control.get("strategy_policy")
+    if strategy_policy == "frozen_strategy" and (strategy_kind == "amendment" or generation.get("parent")):
+        errors.append("run.control.json frozen_strategy cannot continue through amendment generations")
     if strategy_kind == "amendment" and not generation.get("parent"):
         errors.append("run.control.json amendment generations must declare parent")
     if generation.get("parent") and (not generation.get("review") or not generation.get("amendment_source")):

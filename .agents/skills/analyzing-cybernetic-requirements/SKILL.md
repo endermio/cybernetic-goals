@@ -44,12 +44,12 @@ Owned analysis:
 - identify the work covered and allowed actions limit for full-route or multi-batch work: work covered in this run, what the agent may do, forbidden actions, unauthorized-action handling, and explicitly out-of-scope items;
 - identify the path that makes the result true for implementation work: one actor-centered path from initial state to the what counts as done;
 - identify how this should be answered for tasks where merely running a plausible path would not answer the question, including what is not enough;
-- prepare the What the User Approved compact control commitment for Level 3/4 or full pre-goal work: Human purpose, Input role binding, Primary object, Requested transformation, Non-goals, how we know the user's purpose was met, where the result must show up, What counts as done, Evidence needed to call it done, If it is not done, what should be reported, Required answer path, How this should be answered, What is not enough, Work covered in this run, What the agent may do, Forbidden live / irreversible actions, Required handling for unauthorized actions, Explicitly out-of-scope items, Agent delegation preference, Agent workflow preference, Parallel execution authority, Maximum parallel agents, Final answer format, Why this process is needed, and Known assumptions;
+- prepare the What the User Approved compact control commitment for Level 3/4 or JSON pre-goal work: Human purpose, Input role binding, Primary object, Requested transformation, Non-goals, how we know the user's purpose was met, where the result must show up, What counts as done, Evidence needed to call it done, If it is not done, what should be reported, Required answer path, How this should be answered, What is not enough, Work covered in this run, What the agent may do, Forbidden live / irreversible actions, Required handling for unauthorized actions, Explicitly out-of-scope items, Agent delegation preference, Agent workflow preference, Parallel execution authority, Maximum parallel agents, Final answer format, Why this process is needed, and Known assumptions;
 - identify constraints, rules that cannot change, assumptions, and stop conditions;
 - decide whether Meaning, Rubric, Output Contract, Design, Goal, Execution Plan, Review, or Risk checks are required;
 - ask high-value human questions;
 - record obvious defaults without blocking progress;
-- recommend the appropriate handoff for design check: direct `$designing-cybernetic-solutions` for bounded/manual chains, or `$orchestrating-cybernetic-pregoal` for Level 3/4 full pre-goal work.
+- recommend the appropriate handoff for design check: direct `$designing-cybernetic-solutions` for bounded/manual chains, or `$orchestrating-cybernetic-pregoal` for Level 3/4 JSON pre-goal work.
 
 Routed elsewhere:
 
@@ -91,7 +91,7 @@ Use `references/decision-levels.md` for decision classification.
 
 ## What the User Approved Rule
 
-For Level 3, Level 4, or full pre-goal orchestration, `Requirements Analysis Status: Complete` is not sufficient to start downstream orchestration.
+For Level 3, Level 4, or JSON pre-goal orchestration, `Requirements Analysis Status: Complete` is not sufficient to start downstream orchestration.
 
 The requirements analysis must also include:
 
@@ -268,7 +268,7 @@ When design check is required, record the missing solution-model questions. Do n
 
 For Level 1/2 bounded work or manual downstream chains, recommend `$designing-cybernetic-solutions` before goal writing.
 
-For Level 3/4 or full pre-goal work, pass design check to `$orchestrating-cybernetic-pregoal` and state that the orchestrator must invoke or request `$designing-cybernetic-solutions` before goal writing. Do not output a standalone `$designing-cybernetic-solutions` command as a separate pre-orchestration next step.
+For Level 3/4 or JSON pre-goal work, pass design check to `$orchestrating-cybernetic-pregoal` and state that the orchestrator must invoke or request `$designing-cybernetic-solutions` before goal writing. Do not output a standalone `$designing-cybernetic-solutions` command as a separate pre-orchestration next step.
 
 ## Process
 
@@ -280,7 +280,7 @@ For Level 3/4 or full pre-goal work, pass design check to `$orchestrating-cybern
 6. Identify how we know the user's purpose was met and whether internal checks are sufficient or only supporting evidence.
 7. Identify where the result must show up when intended-result realization spans places.
 8. Identify output-contract needs and whether a safe default is sufficient.
-9. For Level 3/4 or full pre-goal work, build or update the What the User Approved compact control commitment.
+9. For Level 3/4 or JSON pre-goal work, build or update the What the User Approved compact control commitment.
 10. If the commitment includes How this should be answered or What is not enough, record the plain-language requirement in `requirements.control.json` and leave execution-shape synthesis to design; do not map it to a predefined internal category.
 11. Identify required checks: Meaning, Rubric, Output Contract, Design, Goal, Execution Plan, Review, Risk.
 12. Classify uncertainty as blocking human decision, safe default assumption, or deferred design/planning/execution detail.
@@ -294,7 +294,7 @@ For Level 3/4 or full pre-goal work, pass design check to `$orchestrating-cybern
 
 When requirements analysis is complete, choose the next command from the intended workflow.
 
-If requirements analysis is complete but What the User Approved is not Approved for Level 3/4 or full pre-goal work, do not output the orchestration command or predicted `/goal`.
+If requirements analysis is complete but What the User Approved is not Approved for Level 3/4 or JSON pre-goal work, do not output the orchestration command or predicted `/goal`.
 
 Instead, output only the compact approval request:
 
@@ -302,7 +302,7 @@ Instead, output only the compact approval request:
 What the User Approved is Pending. Please approve or revise the compact control commitment before orchestration.
 ```
 
-For Level 3/4 or full pre-goal work, when `What the User Approved: Approved` is recorded and the run directory is deterministic, output:
+For Level 3/4 or JSON pre-goal work, when `What the User Approved: Approved` is recorded and the run directory is deterministic, output:
 
 1. A pre-goal orchestration command using the concrete run directory.
 2. The predicted `runtime.control.json` path and pointer-only `/goal` shape for the same slug.
@@ -316,7 +316,7 @@ python3 .agents/skills/analyzing-cybernetic-requirements/scripts/predict_pregoal
 
 Use the script output instead of hand-writing predicted runtime commands when the script supports JSON run directories. The script checks `Requirements Analysis Status: Complete`, `What the User Approved: Approved`, required answer-path data, deterministic path shape, design check, and same-slug control paths.
 
-If `design check: required`, still output the predicted runtime contract path and pointer-only `/goal` shape. State that `$orchestrating-cybernetic-pregoal` must invoke or request `$designing-cybernetic-solutions` before goal writing, and make the predicted downstream artifact paths include the expected solution design path. design check dispatch note must not replace the predicted pointer-only `/goal`. Do not output `$designing-cybernetic-solutions` as a standalone command before orchestration for Level 3/4 or full pre-goal work.
+If `design check: required`, still output the predicted runtime contract path and pointer-only `/goal` shape. State that `$orchestrating-cybernetic-pregoal` must invoke or request `$designing-cybernetic-solutions` before goal writing, and make the predicted downstream artifact paths include the expected solution design path. design check dispatch note must not replace the predicted pointer-only `/goal`. Do not output `$designing-cybernetic-solutions` as a standalone command before orchestration for Level 3/4 or JSON pre-goal work.
 
 The predicted pointer-only `/goal` is not the final approved runtime command. Label it as predicted or queue-friendly, and make it point to `runtime.control.json` that the pre-goal compiler must create after downstream artifacts are approved.
 
@@ -370,7 +370,7 @@ Mark `Complete` only when:
 - remaining assumptions are low-risk and explicit;
 - the next step can safely create solution design control JSON or goal control JSON.
 
-For Level 3/4 or full pre-goal work, `Complete` only means requirement meaning are sufficiently analyzed. Downstream orchestration still requires `What the User Approved: Approved`.
+For Level 3/4 or JSON pre-goal work, `Complete` only means requirement meaning are sufficiently analyzed. Downstream orchestration still requires `What the User Approved: Approved`.
 
 ## Output Format
 
@@ -385,10 +385,10 @@ Return a compact chat summary with:
 - blocking human decisions, if any;
 - default assumptions;
 - required checks;
-- What the User Approved status for Level 3/4 or full pre-goal work;
+- What the User Approved status for Level 3/4 or JSON pre-goal work;
 - response-only next action.
 
-If all blocking decisions are resolved for full pre-goal work:
+If all blocking decisions are resolved for JSON pre-goal work:
 
 If `What the User Approved` is not `Approved`, output only:
 
@@ -430,12 +430,12 @@ For Level 1/2 work with `rubric check: required`, summarize the confirmed rubric
 - [ ] Obvious defaults are not asked as blocking questions.
 - [ ] There are no more than 7 questions.
 - [ ] The brief includes `Requirements Analysis Status`.
-- [ ] Level 3/4 or full pre-goal work includes `What the User Approved`.
+- [ ] Level 3/4 or JSON pre-goal work includes `What the User Approved`.
 - [ ] If How this should be answered or What is not enough is recorded, `requirements.control.json` records the plain-language requirement without internal classification keys.
 - [ ] Human answers to clarification questions are not treated as approval.
 - [ ] If What the User Approved is not `Approved`, the response asks for approval or revision and does not output the orchestration command or predicted `/goal`.
 - [ ] No solution design, goal, plan, review, or approved runtime `/goal` was created.
-- [ ] Level 1/2 work with `rubric check: required` routes to `$writing-cybernetic-goals`, not full pre-goal orchestration by default.
+- [ ] Level 1/2 work with `rubric check: required` routes to `$writing-cybernetic-goals`, not JSON pre-goal orchestration by default.
 - [ ] When the predictor script is available, Level 3/4 queue-friendly commands are generated with `.agents/skills/analyzing-cybernetic-requirements/scripts/predict_pregoal_handoff.py`.
 - [ ] Any predicted queue-friendly `/goal` is clearly labeled as predicted and includes the missing/not-approved/inconsistent artifact precondition.
-- [ ] For Level 3/4 or full pre-goal work, `design check: required` is passed to `$orchestrating-cybernetic-pregoal`; requirements analysis does not output standalone `$designing-cybernetic-solutions` before orchestration.
+- [ ] For Level 3/4 or JSON pre-goal work, `design check: required` is passed to `$orchestrating-cybernetic-pregoal`; requirements analysis does not output standalone `$designing-cybernetic-solutions` before orchestration.

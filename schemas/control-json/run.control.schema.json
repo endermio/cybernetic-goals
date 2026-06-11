@@ -9,7 +9,11 @@
     "schema_version",
     "status",
     "run_id",
-    "control_mode",
+    "control_level",
+    "target_model",
+    "strategy_policy",
+    "gate_mode",
+    "phase_structure",
     "current_generation",
     "max_auto_amendment_rounds",
     "semantic_base_ref",
@@ -35,10 +39,82 @@
       "type": "string",
       "minLength": 1
     },
-    "control_mode": {
+    "control_level": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 4
+    },
+    "target_model": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "result_orientation",
+        "result_content",
+        "path",
+        "result_placement",
+        "impact_scope"
+      ],
+      "properties": {
+        "result_orientation": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "enum": [
+              "state_change",
+              "knowledge_production",
+              "judgment",
+              "design_model"
+            ]
+          }
+        },
+        "result_content": {
+          "enum": [
+            "specified",
+            "partially_specified",
+            "discover_during_work"
+          ]
+        },
+        "path": {
+          "enum": [
+            "known_enough",
+            "partially_known",
+            "discover_during_work"
+          ]
+        },
+        "result_placement": {
+          "enum": [
+            "single_place",
+            "multi_place",
+            "not_applicable"
+          ]
+        },
+        "impact_scope": {
+          "enum": [
+            "local_reversible",
+            "persistent_internal",
+            "live_external_or_irreversible"
+          ]
+        }
+      }
+    },
+    "strategy_policy": {
       "enum": [
-        "lean",
-        "full"
+        "frozen_strategy",
+        "reviewed_replanning"
+      ]
+    },
+    "gate_mode": {
+      "enum": [
+        "none",
+        "human_gate",
+        "live_gate"
+      ]
+    },
+    "phase_structure": {
+      "enum": [
+        "single_phase",
+        "staged",
+        "adaptive_loop"
       ]
     },
     "current_generation": {

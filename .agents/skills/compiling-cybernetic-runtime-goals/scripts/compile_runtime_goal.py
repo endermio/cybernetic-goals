@@ -30,6 +30,13 @@ APPROVED_CONTROL_FILES = [
 ]
 WRITABLE_FILES = ["progress.jsonl", "runtime-status.json", "final-report.json"]
 WRITABLE_EVIDENCE_PATHS = ["evidence/"]
+RUN_STRATEGY_FIELDS = [
+    "control_level",
+    "target_model",
+    "strategy_policy",
+    "gate_mode",
+    "phase_structure",
+]
 
 
 def runtime_control_pointer(runtime_control_path: Path) -> str:
@@ -80,7 +87,6 @@ def compile_generation_runtime_control(run_dir: Path) -> Path:
             "artifact_type": "runtime.control",
             "schema_version": run_control.get("schema_version", "1.0.0"),
             "status": "compiled",
-            "control_mode": run_control.get("control_mode", "lean"),
             "generation": {
                 "id": current_generation,
             },
@@ -106,6 +112,8 @@ def compile_generation_runtime_control(run_dir: Path) -> Path:
             "imported_evidence": [],
             "invalidated_evidence": [],
         }
+        for field in RUN_STRATEGY_FIELDS:
+            runtime[field] = run_control.get(field)
         review_rel = generation.get("review")
         if isinstance(review_rel, str) and review_rel:
             review = read_json_object(run_dir / review_rel)

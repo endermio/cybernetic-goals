@@ -71,7 +71,7 @@
     {
       "id": "runtime-command-is-pointer-only",
       "prompt": "requirements analysis Complete with What the User Approved: Approved, goal exists, execution policy status Candidate, review Approved, Final Independent Check allows approval；编译最终 runtime command。",
-      "expected_output": "Outputs a short /goal that points to docs/cybernetics/runs/<slug>/runtime.control.json and writes the full runtime control JSON there.",
+      "expected_output": "Outputs a short /goal that points to docs/cybernetics/runs/<slug>/gen-000/runtime.control.json and writes the runtime control JSON there.",
       "assertions": [
         "The user-entered /goal references a runtime.control.json path.",
         "The user-entered /goal is length-bounded.",

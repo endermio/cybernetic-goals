@@ -12,7 +12,7 @@ from tests.skills.test_reviewed_replanning_control import (
     final_report,
     progress_event,
     refresh_semantic_base,
-    write_lean_run,
+    write_strategy_run,
 )
 
 
@@ -39,7 +39,7 @@ def approved_hashes(run_dir: Path, runtime: dict) -> dict:
 class RuntimeJsonProgressVerifierTest(unittest.TestCase):
     def test_progress_event_schema_accepts_mainline_and_supporting_only_role_fields(self):
         schema = json.loads(PROGRESS_EVENT_SCHEMA.read_text(encoding="utf-8"))
-        mainline = progress_event("evidence.lean-startup")
+        mainline = progress_event("evidence.target-startup")
         supporting = {
             **copy.deepcopy(mainline),
             "progress_role": "supporting_only",
@@ -52,7 +52,7 @@ class RuntimeJsonProgressVerifierTest(unittest.TestCase):
     def test_validate_control_chain_accepts_complete_generation_run(self):
         with tempfile.TemporaryDirectory() as tmpdir:
             run_dir = Path(tmpdir)
-            write_lean_run(run_dir)
+            write_strategy_run(run_dir)
 
             result = run_script(VALIDATE, str(run_dir))
 
@@ -64,7 +64,7 @@ class RuntimeJsonProgressVerifierTest(unittest.TestCase):
     def test_validate_control_chain_rejects_api_v2_source_requirement_weakened_to_readiness(self):
         with tempfile.TemporaryDirectory() as tmpdir:
             run_dir = Path(tmpdir)
-            write_lean_run(run_dir)
+            write_strategy_run(run_dir)
             req = json.loads((run_dir / "requirements.control.json").read_text(encoding="utf-8"))
             sr = req["approved_control"]["source_requirements"][0]
             sr["source"] = {
@@ -97,7 +97,7 @@ class RuntimeJsonProgressVerifierTest(unittest.TestCase):
     def test_validate_control_chain_rejects_api_v2_routes_source_requirement_weakened_to_readiness(self):
         with tempfile.TemporaryDirectory() as tmpdir:
             run_dir = Path(tmpdir)
-            write_lean_run(run_dir)
+            write_strategy_run(run_dir)
             req = json.loads((run_dir / "requirements.control.json").read_text(encoding="utf-8"))
             sr = req["approved_control"]["source_requirements"][0]
             sr["source"] = {"kind": "user_message", "quote": "implement /api/v2 routes"}
@@ -130,7 +130,7 @@ class RuntimeJsonProgressVerifierTest(unittest.TestCase):
     def test_validate_control_chain_accepts_preserved_measurement_source_requirement_with_framework_words(self):
         with tempfile.TemporaryDirectory() as tmpdir:
             run_dir = Path(tmpdir)
-            write_lean_run(run_dir)
+            write_strategy_run(run_dir)
             req = json.loads((run_dir / "requirements.control.json").read_text(encoding="utf-8"))
             sr = req["approved_control"]["source_requirements"][0]
             sr["source"] = {"kind": "user_message", "quote": "measure framework adoption growth curves"}
@@ -162,7 +162,7 @@ class RuntimeJsonProgressVerifierTest(unittest.TestCase):
     def test_validate_control_chain_accepts_api_v2_already_implemented_wording_as_preserved_behavior(self):
         with tempfile.TemporaryDirectory() as tmpdir:
             run_dir = Path(tmpdir)
-            write_lean_run(run_dir)
+            write_strategy_run(run_dir)
             req = json.loads((run_dir / "requirements.control.json").read_text(encoding="utf-8"))
             sr = req["approved_control"]["source_requirements"][0]
             sr["source"] = {"kind": "user_message", "quote": "implement /api/v2 routes"}
@@ -194,7 +194,7 @@ class RuntimeJsonProgressVerifierTest(unittest.TestCase):
     def test_validate_control_chain_accepts_legitimate_framework_source_requirement(self):
         with tempfile.TemporaryDirectory() as tmpdir:
             run_dir = Path(tmpdir)
-            write_lean_run(run_dir)
+            write_strategy_run(run_dir)
             req = json.loads((run_dir / "requirements.control.json").read_text(encoding="utf-8"))
             sr = req["approved_control"]["source_requirements"][0]
             sr["source"] = {
@@ -229,7 +229,7 @@ class RuntimeJsonProgressVerifierTest(unittest.TestCase):
     def test_validate_control_chain_rejects_measurement_source_requirement_weakened_to_framework(self):
         with tempfile.TemporaryDirectory() as tmpdir:
             run_dir = Path(tmpdir)
-            write_lean_run(run_dir)
+            write_strategy_run(run_dir)
             req = json.loads((run_dir / "requirements.control.json").read_text(encoding="utf-8"))
             sr = req["approved_control"]["source_requirements"][0]
             sr["source"] = {"kind": "user_message", "quote": "measure scale curves for E and S"}
@@ -263,7 +263,7 @@ class RuntimeJsonProgressVerifierTest(unittest.TestCase):
         event = progress_event("new evidence pointer")
         with tempfile.TemporaryDirectory() as tmpdir:
             run_dir = Path(tmpdir)
-            write_lean_run(run_dir)
+            write_strategy_run(run_dir)
 
             good = run_script(APPEND, str(run_dir), "--event-json", json.dumps(event))
             bad = run_script(APPEND, str(run_dir), "--event-json", json.dumps({**event, "evidence": []}))
@@ -278,17 +278,17 @@ class RuntimeJsonProgressVerifierTest(unittest.TestCase):
             self.assertIn("evidence must be a non-empty list", bad.stdout + bad.stderr)
 
     def test_verify_runtime_progress_rejects_verifier_bypass_supporting_only_and_not_done_success(self):
-        bypass_report = final_report("gen-000", "evidence.lean-startup")
+        bypass_report = final_report("gen-000", "evidence.target-startup")
         bypass_report["verification"] = {
             "verifier_result": "not_run",
             "verifier_permits_goal_achieved": False,
         }
 
-        supporting_event = progress_event("evidence.lean-startup")
+        supporting_event = progress_event("evidence.target-startup")
         supporting_event["progress_role"] = "supporting_only"
         supporting_event["counts_as_goal_progress"] = False
 
-        not_done_report = final_report("gen-000", "evidence.lean-startup")
+        not_done_report = final_report("gen-000", "evidence.target-startup")
         not_done_report["goal_achieved"] = False
         not_done_report["what_counts_as_done_met"] = False
         not_done_report["work_coverage"]["status"] = "partial"
@@ -296,17 +296,17 @@ class RuntimeJsonProgressVerifierTest(unittest.TestCase):
 
         cases = (
             (
-                [progress_event("evidence.lean-startup")],
+                [progress_event("evidence.target-startup")],
                 bypass_report,
                 "verifier does not permit goal_achieved true",
             ),
             (
                 [supporting_event],
-                final_report("gen-000", "evidence.lean-startup"),
+                final_report("gen-000", "evidence.target-startup"),
                 "missing mainline evidence-backed progress for required steps",
             ),
             (
-                [progress_event("evidence.lean-startup")],
+                [progress_event("evidence.target-startup")],
                 not_done_report,
                 "not-done final report cannot be treated as success",
             ),
@@ -314,7 +314,7 @@ class RuntimeJsonProgressVerifierTest(unittest.TestCase):
         for events, report, expected in cases:
             with self.subTest(expected=expected), tempfile.TemporaryDirectory() as tmpdir:
                 run_dir = Path(tmpdir)
-                write_lean_run(run_dir, progress_events=events, report=report)
+                write_strategy_run(run_dir, progress_events=events, report=report)
 
                 result = run_script(VERIFY, str(run_dir))
 
@@ -324,10 +324,10 @@ class RuntimeJsonProgressVerifierTest(unittest.TestCase):
     def test_verify_runtime_progress_rejects_approved_json_mutation_boundary(self):
         with tempfile.TemporaryDirectory() as tmpdir:
             run_dir = Path(tmpdir)
-            write_lean_run(
+            write_strategy_run(
                 run_dir,
-                progress_events=[progress_event("evidence.lean-startup")],
-                report=final_report("gen-000", "evidence.lean-startup"),
+                progress_events=[progress_event("evidence.target-startup")],
+                report=final_report("gen-000", "evidence.target-startup"),
             )
             runtime = json.loads((run_dir / "gen-000/runtime.control.json").read_text(encoding="utf-8"))
             hashes = approved_hashes(run_dir, runtime)
@@ -346,10 +346,10 @@ class RuntimeJsonProgressVerifierTest(unittest.TestCase):
     def test_verify_runtime_progress_rejects_approved_json_mutation_from_embedded_hashes(self):
         with tempfile.TemporaryDirectory() as tmpdir:
             run_dir = Path(tmpdir)
-            write_lean_run(
+            write_strategy_run(
                 run_dir,
-                progress_events=[progress_event("evidence.lean-startup")],
-                report=final_report("gen-000", "evidence.lean-startup"),
+                progress_events=[progress_event("evidence.target-startup")],
+                report=final_report("gen-000", "evidence.target-startup"),
             )
 
             review = json.loads((run_dir / "gen-000/review.control.json").read_text(encoding="utf-8"))
@@ -365,25 +365,25 @@ class RuntimeJsonProgressVerifierTest(unittest.TestCase):
             )
 
     def test_verify_runtime_progress_rejects_blocking_outcome_without_mainline_evidence(self):
-        event = progress_event("evidence.lean-startup")
+        event = progress_event("evidence.target-startup")
         event["progress_role"] = "supporting_only"
         event["counts_as_goal_progress"] = False
         with tempfile.TemporaryDirectory() as tmpdir:
             run_dir = Path(tmpdir)
-            write_lean_run(run_dir, progress_events=[event], report=final_report("gen-000", "evidence.lean-startup"))
+            write_strategy_run(run_dir, progress_events=[event], report=final_report("gen-000", "evidence.target-startup"))
 
             result = run_script(VERIFY, str(run_dir))
 
             self.assertNotEqual(result.returncode, 0, result.stdout + result.stderr)
             self.assertIn(
-                "missing mainline evidence-backed progress for blocking required outcomes: O-lean-startup",
+                "missing mainline evidence-backed progress for blocking required outcomes: O-target-startup",
                 result.stdout + result.stderr,
             )
 
     def test_verify_runtime_progress_rejects_missing_required_evidence_id(self):
         with tempfile.TemporaryDirectory() as tmpdir:
             run_dir = Path(tmpdir)
-            write_lean_run(
+            write_strategy_run(
                 run_dir,
                 progress_events=[progress_event("some-other-evidence")],
                 report=final_report("gen-000", "some-other-evidence"),
@@ -393,14 +393,14 @@ class RuntimeJsonProgressVerifierTest(unittest.TestCase):
 
             self.assertNotEqual(result.returncode, 0, result.stdout + result.stderr)
             self.assertIn(
-                "missing required evidence for blocking required outcomes: O-lean-startup: evidence.lean-startup",
+                "missing required evidence for blocking required outcomes: O-target-startup: evidence.target-startup",
                 result.stdout + result.stderr,
             )
 
     def test_verify_runtime_progress_rejects_missing_completed_source_requirement_evidence(self):
         with tempfile.TemporaryDirectory() as tmpdir:
             run_dir = Path(tmpdir)
-            write_lean_run(
+            write_strategy_run(
                 run_dir,
                 progress_events=[progress_event("evidence.other")],
                 report=final_report("gen-000", "evidence.other"),
@@ -411,19 +411,19 @@ class RuntimeJsonProgressVerifierTest(unittest.TestCase):
             self.assertNotEqual(result.returncode, 0, result.stdout + result.stderr)
             payload = json.loads(result.stdout)
             self.assertIn(
-                "missing completed evidence for blocking source requirements: SR-lean-startup",
+                "missing completed evidence for blocking source requirements: SR-target-startup",
                 result.stdout + result.stderr,
             )
             self.assertEqual([], payload["completed_source_requirements"])
-            self.assertEqual(["SR-lean-startup"], payload["source_requirements"])
+            self.assertEqual(["SR-target-startup"], payload["source_requirements"])
 
     def test_verify_runtime_progress_permits_complete_mainline_verified_report(self):
         with tempfile.TemporaryDirectory() as tmpdir:
             run_dir = Path(tmpdir)
-            write_lean_run(
+            write_strategy_run(
                 run_dir,
-                progress_events=[progress_event("evidence.lean-startup")],
-                report=final_report("gen-000", "evidence.lean-startup"),
+                progress_events=[progress_event("evidence.target-startup")],
+                report=final_report("gen-000", "evidence.target-startup"),
             )
 
             result = run_script(VERIFY, str(run_dir))
@@ -431,15 +431,15 @@ class RuntimeJsonProgressVerifierTest(unittest.TestCase):
             self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
             payload = json.loads(result.stdout)
             self.assertTrue(payload["goal_achieved_permitted"])
-            self.assertEqual(["O-lean-startup"], payload["required_outcomes"])
-            self.assertEqual(["O-lean-startup"], payload["completed_required_outcomes"])
-            self.assertEqual(["SR-lean-startup"], payload["source_requirements"])
-            self.assertEqual(["SR-lean-startup"], payload["completed_source_requirements"])
+            self.assertEqual(["O-target-startup"], payload["required_outcomes"])
+            self.assertEqual(["O-target-startup"], payload["completed_required_outcomes"])
+            self.assertEqual(["SR-target-startup"], payload["source_requirements"])
+            self.assertEqual(["SR-target-startup"], payload["completed_source_requirements"])
 
     def test_build_runtime_prompt_outputs_short_goal_pointer(self):
         with tempfile.TemporaryDirectory() as tmpdir:
             run_dir = Path(tmpdir)
-            write_lean_run(run_dir)
+            write_strategy_run(run_dir)
 
             result = run_script(BUILD_PROMPT, str(run_dir / "gen-000/runtime.control.json"))
 

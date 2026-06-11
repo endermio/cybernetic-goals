@@ -68,7 +68,7 @@ docs/cybernetics/runs/<slug>/design.control.json
 
 If the requirements analysis is missing, incomplete, or has open blocking human decisions, stop and return to `$analyzing-cybernetic-requirements`.
 
-For Level 3, Level 4, or full pre-goal work, do not proceed unless the requirements analysis contains `What the User Approved: Approved`, or the current user message explicitly approves the compact control commitment. Level 1/2 bounded design work does not require What the User Approved unless the requirements analysis records it as required.
+For Level 3, Level 4, or JSON pre-goal work, do not proceed unless the requirements analysis contains `What the User Approved: Approved`, or the current user message explicitly approves the compact control commitment. Level 1/2 bounded design work does not require What the User Approved unless the requirements analysis records it as required.
 
 If the current user message approves the compact control commitment, update the requirements analysis `What the User Approved` section first, quoting or referencing that approval, then continue. Do not rely on in-memory approval to pass orchestration or runtime guards.
 
@@ -130,7 +130,7 @@ Do not leave runtime execution to invent the final output shape. Do not define o
 
 Design must be required answer path first. The first design-owned product is the required answer path instance; support objects, mechanisms, relationships, flows, and evidence model are derived from that answer path.
 
-For Level 3/4 or full pre-goal work, the design must preserve the approved way the task should be answered from What the User Approved.
+For Level 3/4 or JSON pre-goal work, the design must preserve the approved way the task should be answered from What the User Approved.
 
 When What the User Approved records `How this should be answered` or `What is not enough`, the design must include `## Required Answer Path Check` and record:
 
@@ -177,7 +177,7 @@ Open design questions that affect requirement meaning, controlled relationships,
 ## Process
 
 1. Read completed requirements control JSON.
-2. For Level 3/4 or full pre-goal work, verify `What the User Approved: Approved` before deriving or writing the design.
+2. For Level 3/4 or JSON pre-goal work, verify `What the User Approved: Approved` before deriving or writing the design.
 3. Derive the design path from the requirements path.
 4. Inspect the routing context from the user request, router output, and requirements checks.
 5. Inspect only enough context to avoid generic design.
@@ -198,11 +198,11 @@ Do not write handoff prompts into the design artifact.
 
 After design is sufficient, choose the response-only handoff from routing context:
 
-- If the task is Level 3, Level 4, full pre-goal work, or the requirements checks show `execution-plan check: required` or `review check: required`, hand off to `$orchestrating-cybernetic-pregoal`.
+- If the task is Level 3, Level 4, JSON pre-goal work, or the requirements checks show `execution-plan check: required` or `review check: required`, hand off to `$orchestrating-cybernetic-pregoal`.
 - If the task is Level 2 bounded work and no execution-policy or control-review check is required, hand off to `$writing-cybernetic-goals`.
 - If routing context is absent or contradictory, do not default to `$writing-cybernetic-goals`; report that the original routing decision is needed.
 
-The design-to-goal mapping means the future goal must reference the design. It does not mean this skill should directly dispatch goal writing for full pre-goal work.
+The design-to-goal mapping means the future goal must reference the design. It does not mean this skill should directly dispatch goal writing for JSON pre-goal work.
 
 ## Output Format
 
@@ -227,7 +227,7 @@ Design status:
 - Open design questions: ...
 
 Response-only handoff:
-- For Level 3/4 or full pre-goal work: use `$orchestrating-cybernetic-pregoal` with the requirements analysis and this design.
+- For Level 3/4 or JSON pre-goal work: use `$orchestrating-cybernetic-pregoal` with the requirements analysis and this design.
 - For Level 2 bounded work only: use `$writing-cybernetic-goals` with the requirements analysis and this design.
 ```
 
@@ -244,9 +244,9 @@ Smallest input needed:
 
 Response-only next step:
 - If requirements analysis is incomplete or has blocking human decisions: return to `$analyzing-cybernetic-requirements` with the missing decision.
-- If Level 3/4 or full pre-goal work lacks `What the User Approved: Approved`: return to `$analyzing-cybernetic-requirements` for approved target approval or revision.
+- If Level 3/4 or JSON pre-goal work lacks `What the User Approved: Approved`: return to `$analyzing-cybernetic-requirements` for approved target approval or revision.
 - If a design decision is missing: answer the smallest design question, then rerun `$designing-cybernetic-solutions`.
-- For Level 3/4 or full pre-goal work: return this blocked status to `$orchestrating-cybernetic-pregoal`; do not write goal control JSON.
+- For Level 3/4 or JSON pre-goal work: return this blocked status to `$orchestrating-cybernetic-pregoal`; do not write goal control JSON.
 - If the human explicitly says required design is unnecessary: return to the route-appropriate next stage.
 
 Do not write goal control JSON until this design decision is resolved or the human explicitly says the required design is unnecessary.
@@ -255,7 +255,7 @@ Do not write goal control JSON until this design decision is resolved or the hum
 ## Validation Checklist
 
 - [ ] Requirements analysis is complete before design is approved.
-- [ ] For Level 3/4 or full pre-goal work, What the User Approved is Approved before design starts.
+- [ ] For Level 3/4 or JSON pre-goal work, What the User Approved is Approved before design starts.
 - [ ] If What the User Approved records How this should be answered or What is not enough, the design includes Required Answer Path Check and does not substitute a weaker answer path.
 - [ ] The design path uses the requirements analysis date/slug.
 - [ ] The design stays within core cybernetic vocabulary unless an explicit adapter supplies additional terms.
@@ -270,5 +270,5 @@ Do not write goal control JSON until this design decision is resolved or the hum
 - [ ] `$superpowers:brainstorming` is used only when required by exploratory design.
 - [ ] The design artifact does not contain a next-step prompt.
 - [ ] If blocked, the assistant response includes a response-only next step.
-- [ ] Level 3/4 or full pre-goal work hands off to `$orchestrating-cybernetic-pregoal`, not directly to `$writing-cybernetic-goals`.
+- [ ] Level 3/4 or JSON pre-goal work hands off to `$orchestrating-cybernetic-pregoal`, not directly to `$writing-cybernetic-goals`.
 - [ ] No goal, execution policy, review, runtime `/goal`, or target-work artifact was created.

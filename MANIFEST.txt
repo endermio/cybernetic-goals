@@ -89,6 +89,7 @@ AGENTS.md
 docs/cybernetic-framework/invariant-artifact-consumer-matrix.md
 docs/cybernetic-framework/reviewed-replanning-control-architecture.md
 docs/cybernetic-framework/superpowers-infrastructure-policy.md
+docs/cybernetic-framework/target-model-strategy-policy-redesign.md
 MANIFEST.txt
 observability/README.md
 observability/examples/aggregation-summary.json

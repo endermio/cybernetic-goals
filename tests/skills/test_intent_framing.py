@@ -162,11 +162,11 @@ class IntentFramingSkillTest(unittest.TestCase):
 
         self.assertIn("Process Need Check", orchestrator)
         self.assertIn(
-            "A user request to use full pre-goal compilation is not sufficient by itself.",
+            "A user request to use a heavier or lighter process is not sufficient by itself.",
             orchestrator,
         )
         self.assertNotIn(
-            "or the user explicitly chose full pre-goal compilation",
+            "or the user explicitly chose a heavier process",
             orchestrator,
         )
         for term in (

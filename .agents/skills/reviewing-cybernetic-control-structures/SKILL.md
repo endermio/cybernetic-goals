@@ -153,13 +153,13 @@ Route `NeedsRevision` to the earliest artifact that introduced the drift:
 
 NeedsRevision routes to the earliest artifact that introduced drift; after
 revision, rerun independent review before approval. If the review owns the
-handoff inside full pre-goal orchestration, return the review path, verdict,
+handoff inside JSON pre-goal orchestration, return the review path, verdict,
 and revision route to `$orchestrating-cybernetic-pregoal`; do not compile
 `runtime.control.json`.
 
 ### 2. What The User Approved Check
 
-For Level 3/4 or full pre-goal work, requirements analysis must contain `What the User Approved: Approved`.
+For Level 3/4 or JSON pre-goal work, requirements analysis must contain `What the User Approved: Approved`.
 
 Check that design, goal, and execution policy preserve the approved compact control commitment:
 
@@ -445,7 +445,7 @@ Meaning rules that cannot change must be frozen. Tactical execution details must
 
 ### 20. Runtime Suitability
 
-The runtime `/goal` must be able to execute the approved artifacts without inventing new approved anchors. Lean pre-goal may allow runtime to propose reviewed amendments to derived strategy, but review must verify that `semantic_base`, required outcomes, what counts as done, work coverage, authority, and forbidden actions are unchanged unless human reapproval is required. Any required runtime discipline, including approved work assignment, bounded subagent delegation protocol, conditionally selected Superpowers workflow, amendment triggers, and generation switch rules, must be precompiled into the approved plan, run control, review, or final `/goal`.
+The runtime `/goal` must be able to execute the approved artifacts without inventing new approved anchors. Generation-aware startup may allow runtime to propose reviewed amendments to derived strategy, but review must verify that `semantic_base`, required outcomes, what counts as done, work coverage, authority, and forbidden actions are unchanged unless human reapproval is required. Any required runtime discipline, including approved work assignment, bounded subagent delegation protocol, conditionally selected Superpowers workflow, amendment triggers, and generation switch rules, must be precompiled into the approved plan, run control, review, or final `/goal`.
 
 Runtime completion claims must be calibrated to the highest purpose-relevant evidence actually observed. If user purpose evidence is missing, runtime must report what is verified, what is not yet observed, and the smallest next observation needed. Purpose-achieved wording is reserved for observed or approved user purpose evidence.
 
@@ -507,7 +507,7 @@ without a human decision, missing dependency, or unavailable external fact.
 Only mark `Approved` when:
 
 - requirements analysis, required design, goal, and plan are consistent;
-- What the User Approved is Approved when full pre-goal orchestration is used, and What The User Approved Check has no Blocking/Major findings;
+- What the User Approved is Approved when JSON pre-goal orchestration is used, and What The User Approved Check has no Blocking/Major findings;
 - Work Covered And Allowed Actions Check has no Blocking/Major findings for full-route or multi-batch work;
 - required design exists and is consistent with requirements analysis, goal, and plan;
 - Required Answer Path Check has no Blocking/Major findings when What the User Approved records how this should be answered;
@@ -532,7 +532,7 @@ Do not write handoff prompts into the review artifact.
 
 After review status is set:
 
-- If invoked by `$orchestrating-cybernetic-pregoal` or full pre-goal context, return the review path and status to `$orchestrating-cybernetic-pregoal`.
+- If invoked by `$orchestrating-cybernetic-pregoal` or JSON pre-goal context, return the review path and status to `$orchestrating-cybernetic-pregoal`.
 - If standalone/manual and status is `Approved`, hand off to `$compiling-cybernetic-runtime-goals`.
 - If status is `Needs Revision`, `Dirty`, or `Needs Re-review`, revise the relevant approved files and rerun review; do not compile runtime `/goal`.
 - If status is `Needs Independent Review`, obtain independent review or explicit human approval; do not compile runtime `/goal`.
@@ -557,7 +557,7 @@ Key findings:
 - ...
 
 Response-only next step:
-- If full pre-goal orchestration owns the chain: return to `$orchestrating-cybernetic-pregoal` with the review path and status.
+- If JSON pre-goal orchestration owns the chain: return to `$orchestrating-cybernetic-pregoal` with the review path and status.
 - If standalone/manual and `Approved`: run `$compiling-cybernetic-runtime-goals`.
 - If `Needs Revision`, `Dirty`, or `Needs Re-review`: revise the named artifacts and rerun `$reviewing-cybernetic-control-structures`.
 - If `Needs Independent Review`: obtain independent review or explicit human approval before runtime compilation.
@@ -570,7 +570,7 @@ Response-only next step:
 - [ ] Review status is explicit.
 - [ ] Review verdict is `Approved`, `NeedsRevision`, or `Blocked`.
 - [ ] Review independence is recorded.
-- [ ] What The User Approved Check was checked when full pre-goal orchestration is used.
+- [ ] What The User Approved Check was checked when JSON pre-goal orchestration is used.
 - [ ] Required Answer Path Check was checked when What the User Approved records how this should be answered.
 - [ ] Final observer check is recorded.
 - [ ] The review does not mark self-review as `Approved`.
@@ -589,7 +589,7 @@ Response-only next step:
 - [ ] Parallel Agent Safety Check was checked.
 - [ ] Work size and evidence check load were checked.
 - [ ] Required revisions are actionable.
-- [ ] Response-only handoff matches the review status and does not bypass `$orchestrating-cybernetic-pregoal` when full pre-goal orchestration owns the chain.
+- [ ] Response-only handoff matches the review status and does not bypass `$orchestrating-cybernetic-pregoal` when JSON pre-goal orchestration owns the chain.
 - [ ] The assistant response includes a response-only next step for every review status.
 - [ ] The review did not execute target work.
 - [ ] The review did not output final runtime `/goal`.

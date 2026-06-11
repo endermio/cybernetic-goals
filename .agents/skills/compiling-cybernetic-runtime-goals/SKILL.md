@@ -146,7 +146,7 @@ Guard result:
 - `NEXT: ...` if emitted by the guard
 
 Response-only next step:
-- For Level 3/4 or full pre-goal work: return to `$orchestrating-cybernetic-pregoal` with the failing guard output.
+- For Level 3/4 JSON pre-goal work: return to `$orchestrating-cybernetic-pregoal` with the failing guard output.
 - For an explicit manual chain: run the smallest missing upstream step, such as `$designing-cybernetic-solutions`, `$writing-cybernetic-goals`, `$writing-cybernetic-execution-policies`, or `$reviewing-cybernetic-control-structures`.
 - Do not output a runtime `/goal` until the guard passes and review is `Approved`.
 ```
