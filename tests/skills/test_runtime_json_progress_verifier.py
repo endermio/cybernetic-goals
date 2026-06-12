@@ -277,6 +277,44 @@ class RuntimeJsonProgressVerifierTest(unittest.TestCase):
             self.assertEqual([event], events)
             self.assertIn("evidence must be a non-empty list", bad.stdout + bad.stderr)
 
+    def test_append_progress_event_rejects_undefined_observation_correction_type(self):
+        event = {
+            "event_type": "observation.corrected",
+            "schema_version": "1.1.0",
+            "occurred_at": "2026-06-12T00:00:00Z",
+            "runtime_generation": "gen-000",
+            "evidence": ["evidence.corrected-observation"],
+            "summary": "Corrects an earlier observation.",
+        }
+        with tempfile.TemporaryDirectory() as tmpdir:
+            run_dir = Path(tmpdir)
+            write_strategy_run(run_dir)
+            progress_path = run_dir / "progress.jsonl"
+
+            result = run_script(APPEND, str(run_dir), "--event-json", json.dumps(event))
+
+            self.assertNotEqual(result.returncode, 0, result.stdout + result.stderr)
+            self.assertIn("event_type is not recognized", result.stdout + result.stderr)
+            self.assertFalse(progress_path.exists())
+
+    def test_append_progress_event_rejects_invalid_observation_correction_metadata(self):
+        event = {
+            "event_type": "observation.recorded",
+            "schema_version": "1.1.0",
+            "occurred_at": "2026-06-12T00:00:00Z",
+            "runtime_generation": "gen-000",
+            "corrects_event_ref": 21,
+            "summary": "Corrects an earlier observation.",
+        }
+        with tempfile.TemporaryDirectory() as tmpdir:
+            run_dir = Path(tmpdir)
+            write_strategy_run(run_dir)
+
+            result = run_script(APPEND, str(run_dir), "--event-json", json.dumps(event))
+
+            self.assertNotEqual(result.returncode, 0, result.stdout + result.stderr)
+            self.assertIn("corrects_event_ref must be a non-empty string", result.stdout + result.stderr)
+
     def test_verify_runtime_progress_rejects_verifier_bypass_supporting_only_and_not_done_success(self):
         bypass_report = final_report("gen-000", "evidence.target-startup")
         bypass_report["verification"] = {
@@ -447,6 +485,7 @@ class RuntimeJsonProgressVerifierTest(unittest.TestCase):
             self.assertIn("/goal Execute the runtime control JSON at", result.stdout)
             self.assertIn("gen-000/runtime.control.json", result.stdout)
             self.assertIn("using-control-json", result.stdout)
+            self.assertIn("append_progress_event.py", result.stdout)
             self.assertNotIn("required_steps", result.stdout)
             self.assertLess(len(result.stdout.strip().splitlines()), 3)
 

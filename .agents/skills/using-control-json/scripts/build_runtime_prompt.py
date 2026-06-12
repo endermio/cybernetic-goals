@@ -12,7 +12,8 @@ def main() -> int:
     print(
         "/goal Execute the runtime control JSON at "
         f"{args.runtime_control_json} using .agents/skills/using-control-json. "
-        "Read it first; if required JSON is missing, invalid, or inconsistent, stop and report the smallest required human decision."
+        "Read it first; write progress only through append_progress_event.py; "
+        "if required JSON is missing, invalid, or inconsistent, stop and report the smallest required human decision."
     )
     return 0
 

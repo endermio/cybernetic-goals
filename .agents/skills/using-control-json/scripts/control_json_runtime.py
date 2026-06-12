@@ -131,6 +131,14 @@ AMENDMENT_EVENT_TYPES = {
     "control.amendment.blocked",
 }
 GENERATION_EVENT_TYPES = {"runtime.generation.started", "runtime.generation.superseded"}
+OBSERVATION_EVENT_TYPES = {"observation.recorded"}
+OBSERVATION_STRING_FIELDS = (
+    "corrects_event_ref",
+    "classification",
+    "summary",
+    "evidence_id",
+    "evidence_path",
+)
 AMENDMENT_ANCHOR_FIELDS = ("semantic_base_change", "required_outcomes_changed", "authority_expanded")
 AMENDMENT_PROPOSAL_REQUIRED_FIELDS = (
     "reason",
@@ -866,6 +874,10 @@ def validate_event(event: dict[str, Any]) -> list[str]:
             not isinstance(event.get("reason"), str) or not event.get("reason")
         ):
             errors.append("runtime.generation.superseded events must include reason")
+    elif event_type in OBSERVATION_EVENT_TYPES:
+        for field in OBSERVATION_STRING_FIELDS:
+            if field in event and (not isinstance(event.get(field), str) or not event.get(field)):
+                errors.append(f"{field} must be a non-empty string")
     return errors
 
 

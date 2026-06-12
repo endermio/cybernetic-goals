@@ -68,6 +68,13 @@ class UsingControlJsonProtocolTest(unittest.TestCase):
         self.assertIn("observations", text)
         self.assertIn("do not mutate approved JSON", text)
 
+    def test_progress_events_must_use_validated_append_helper(self):
+        text = combined_protocol_text()
+
+        self.assertIn("append_progress_event.py", text)
+        self.assertRegex(text, re.compile(r"direct[^.\n]*writes?[^.\n]*progress\.jsonl[^.\n]*invalid", re.I))
+        self.assertRegex(text, re.compile(r"must[^.\n]*append_progress_event\.py", re.I))
+
     def test_amendment_proposal_documents_source_requirements_and_compatibility_split(self):
         text = combined_protocol_text()
 

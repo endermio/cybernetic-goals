@@ -35,7 +35,7 @@ Generation-aware mode:
 
 Use approved JSON to decide what work is authorized, what counts as done, where results must appear, what evidence is required, and what the final report shape must contain. A runtime executor records facts about execution; it does not edit approved JSON after execution starts.
 
-If the approved target, plan, review, or runtime contract appears wrong, stale, or insufficient, append an observation when `progress.jsonl` is available and valid. If the current strategy cannot produce a blocking required outcome but the approved anchors can remain unchanged, append a `control.amendment.proposed` event instead of hard-completing with substitute evidence. If the needed change would alter approved anchors or authority, stop and report the smallest required human decision.
+If the approved target, plan, review, or runtime contract appears wrong, stale, or insufficient, append an observation through `.agents/skills/using-control-json/scripts/append_progress_event.py` when `progress.jsonl` is available and valid. If the current strategy cannot produce a blocking required outcome but the approved anchors can remain unchanged, append a `control.amendment.proposed` event instead of hard-completing with substitute evidence. If the needed change would alter approved anchors or authority, stop and report the smallest required human decision.
 
 Generation-aware runs declare a generation `strategy_kind`:
 
@@ -70,7 +70,13 @@ only under `runtime.control.json.runtime.writable_evidence_paths`, such as
 evidence artifacts. Do not add evidence artifact paths to `writable_files`;
 `writable_files` is reserved for the three control-output files above.
 
-`progress.jsonl` is the append-only event log. Append to `progress.jsonl` as one JSON object per line. Each event should be a small observation about a command, evidence item, required-step state, blocker, deviation, amendment proposal, generation switch, or verifier result. Progress observations are additive; do not mutate approved JSON to make the contract match the run.
+`progress.jsonl` is the append-only event log. Runtime must append to `progress.jsonl` only through `.agents/skills/using-control-json/scripts/append_progress_event.py`; direct writes to `progress.jsonl` are invalid runtime behavior. Each event should be a small observation about a command, evidence item, required-step state, blocker, deviation, amendment proposal, generation switch, or verifier result. Progress observations are additive; do not mutate approved JSON to make the contract match the run.
+
+Corrections to earlier observations use `observation.recorded` with correction
+metadata such as `corrects_event_ref`, `classification`, `summary`,
+`evidence_id`, or `evidence_path`. Do not invent new event types such as
+`observation.corrected`; unsupported event types must be rejected at append
+time.
 
 Every progress event includes `runtime_generation`. Event families are validated
 separately:
@@ -141,7 +147,7 @@ block `goal_achieved: true`. Discovery generations and synthetic required steps
 also block `goal_achieved: true`; they are for finding or refining the strategy,
 not for final completion.
 
-When the verifier fails, append the verifier result to `progress.jsonl`, update `runtime-status.json`, and write a non-achieved final report only if the runtime contract calls for a terminal report.
+When the verifier fails, append the verifier result to `progress.jsonl` through `.agents/skills/using-control-json/scripts/append_progress_event.py`, update `runtime-status.json`, and write a non-achieved final report only if the runtime contract calls for a terminal report.
 
 ## Short `/goal` Adapter
 

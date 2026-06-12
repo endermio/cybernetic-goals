@@ -774,6 +774,7 @@ class ControlJsonSchemaTest(unittest.TestCase):
         self.assertNotIn("required_step", progress_schema["required"])
         self.assertNotIn("status", progress_schema["required"])
         self.assertIn("runtime_generation", progress_schema["properties"])
+        self.assertIn("corrects_event_ref", progress_schema["properties"])
         self.assertIn("proposed_changes", progress_schema["properties"])
         self.assertIn("patch_ref", progress_schema["properties"])
         self.assertIn("next_generation", progress_schema["properties"])
@@ -885,6 +886,22 @@ class ControlJsonSchemaTest(unittest.TestCase):
             "proposed_changes": ["add measured curve producing step"],
             "review_required": ["source-requirement-preservation", "obligation-preservation"],
             "patch_ref": "amendments/A1.patch.json",
+        }
+
+        validate(event, schema)
+
+    def test_progress_event_schema_accepts_recorded_observation_correction_metadata(self):
+        schema = json.loads((SCHEMA_DIR / "progress-event.schema.json").read_text(encoding="utf-8"))
+        event = {
+            "event_type": "observation.recorded",
+            "schema_version": "1.1.0",
+            "occurred_at": "2026-06-12T00:00:00Z",
+            "runtime_generation": "gen-000",
+            "corrects_event_ref": "progress.jsonl#L21",
+            "classification": "corrected-observation",
+            "summary": "Corrects an earlier observation without introducing a new event type.",
+            "evidence_id": "E-corrected-observation",
+            "evidence_path": "evidence/corrected_observation.json",
         }
 
         validate(event, schema)
