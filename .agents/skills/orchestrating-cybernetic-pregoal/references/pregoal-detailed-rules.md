@@ -284,8 +284,15 @@ Regression example: a required `/api/v2` implementation must not be accepted as 
 
 Before runtime compilation, approved review must include a `counterexample-gate`
 check. The Counterexample Gate attempts to disprove the candidate control
-interpretation before it becomes executable runtime control. It must cover every
-target decomposition position with these `checked_transformations`:
+interpretation before it becomes executable runtime control.
+
+The gate must execute the requirements-approved `counterexample_gate_contract`.
+Pregoal orchestration must not invent, weaken, or replace the quality standard,
+required checked transformations, reviewer requirement, or reject-if conditions.
+If the contract is absent, return to requirements analysis.
+
+It must cover every target decomposition position named by the contract,
+including at least these `checked_transformations`:
 
 ```text
 source_requirements->required_outcomes

@@ -254,7 +254,75 @@ def amendment_generation_count(run_control: dict[str, Any]) -> int:
     return sum(1 for generation in generations if isinstance(generation, dict) and generation.get("parent"))
 
 
-def generation_review_errors(review: dict[str, Any], *, context: str) -> list[str]:
+def counterexample_gate_contract(requirements: dict[str, Any] | None) -> dict[str, Any]:
+    if not isinstance(requirements, dict):
+        return {}
+    contract = requirements.get("approved_control", {}).get("counterexample_gate_contract")
+    return contract if isinstance(contract, dict) else {}
+
+
+def counterexample_contract_errors(requirements: dict[str, Any]) -> list[str]:
+    schema_version = str(requirements.get("schema_version", ""))
+    contract = counterexample_gate_contract(requirements)
+    if schema_version < "1.1.0" and not contract:
+        return []
+    errors: list[str] = []
+    if not contract:
+        return ["requirements.control.json approved_control.counterexample_gate_contract is required for schema_version >= 1.1.0"]
+    if not isinstance(contract.get("quality_standard"), str) or not contract.get("quality_standard"):
+        errors.append("requirements.control.json counterexample_gate_contract.quality_standard must be a non-empty string")
+    required_points = string_list(contract.get("required_checked_transformations"))
+    if not required_points:
+        errors.append(
+            "requirements.control.json counterexample_gate_contract.required_checked_transformations must be a non-empty list"
+        )
+    minimum = contract.get("minimum_reviewer")
+    if not isinstance(minimum, dict):
+        errors.append("requirements.control.json counterexample_gate_contract.minimum_reviewer must be an object")
+    else:
+        allowed = set(string_list(minimum.get("allowed_kinds")))
+        if not allowed:
+            errors.append(
+                "requirements.control.json counterexample_gate_contract.minimum_reviewer.allowed_kinds must be non-empty"
+            )
+        elif not allowed.issubset(COUNTEREXAMPLE_REVIEWER_KINDS):
+            errors.append(
+                "requirements.control.json counterexample_gate_contract.minimum_reviewer.allowed_kinds contains unknown kinds"
+            )
+        if not isinstance(minimum.get("independence"), str) or not minimum.get("independence"):
+            errors.append(
+                "requirements.control.json counterexample_gate_contract.minimum_reviewer.independence must be a non-empty string"
+            )
+        if not isinstance(minimum.get("evidence_ref_required"), bool):
+            errors.append(
+                "requirements.control.json counterexample_gate_contract.minimum_reviewer.evidence_ref_required must be boolean"
+            )
+    reject_if = contract.get("reject_if")
+    if not isinstance(reject_if, list) or not string_list(reject_if):
+        errors.append("requirements.control.json counterexample_gate_contract.reject_if must be a non-empty list")
+    return errors
+
+
+def counterexample_contract_points(requirements: dict[str, Any] | None) -> set[str]:
+    contract = counterexample_gate_contract(requirements)
+    return set(string_list(contract.get("required_checked_transformations")))
+
+
+def counterexample_allowed_reviewer_kinds(requirements: dict[str, Any] | None) -> set[str]:
+    contract = counterexample_gate_contract(requirements)
+    minimum = contract.get("minimum_reviewer")
+    if not isinstance(minimum, dict):
+        return set(COUNTEREXAMPLE_REVIEWER_KINDS)
+    allowed = set(string_list(minimum.get("allowed_kinds")))
+    return allowed or set(COUNTEREXAMPLE_REVIEWER_KINDS)
+
+
+def generation_review_errors(
+    review: dict[str, Any],
+    *,
+    context: str,
+    requirements: dict[str, Any] | None = None,
+) -> list[str]:
     review_checks = review.get("review_checks")
     if not isinstance(review_checks, list):
         return [f"{context} review missing review_checks"]
@@ -281,20 +349,28 @@ def generation_review_errors(review: dict[str, Any], *, context: str) -> list[st
                 f"{context} counterexample-gate missing required gate points: "
                 + ", ".join(missing_points)
             )
+        contract_missing_points = sorted(counterexample_contract_points(requirements) - checked)
+        if contract_missing_points:
+            errors.append(
+                f"{context} counterexample-gate missing requirements-approved gate points: "
+                + ", ".join(contract_missing_points)
+            )
         reviewer = counterexample.get("reviewer")
         if not isinstance(reviewer, dict):
             errors.append(f"{context} counterexample-gate missing independent reviewer provenance")
-        elif (
-            reviewer.get("kind") not in COUNTEREXAMPLE_REVIEWER_KINDS
-            or not isinstance(reviewer.get("id"), str)
-            or not reviewer["id"].strip()
-            or not isinstance(reviewer.get("evidence_ref"), str)
-            or not reviewer["evidence_ref"].strip()
-        ):
-            errors.append(
-                f"{context} counterexample-gate reviewer provenance must be subagent, human, or external "
-                "with id and evidence_ref"
-            )
+        else:
+            allowed_reviewer_kinds = counterexample_allowed_reviewer_kinds(requirements)
+            if (
+                reviewer.get("kind") not in allowed_reviewer_kinds
+                or not isinstance(reviewer.get("id"), str)
+                or not reviewer["id"].strip()
+                or not isinstance(reviewer.get("evidence_ref"), str)
+                or not reviewer["evidence_ref"].strip()
+            ):
+                errors.append(
+                    f"{context} counterexample-gate reviewer provenance must be subagent, human, or external "
+                    "with id and evidence_ref"
+                )
     return errors
 
 
@@ -966,6 +1042,7 @@ def validate_generation_control_chain(run_dir: Path) -> tuple[dict[str, dict[str
         errors.append("run.control.json semantic_base_ref must match requirements approved semantic_base")
     if runtime.get("semantic_base_ref") != semantic_base:
         errors.append("runtime.control.json semantic_base_ref must match requirements approved semantic_base")
+    errors.extend(counterexample_contract_errors(requirements))
 
     current_generation = run_control.get("current_generation")
     active_ids = active_generation_ids(run_control)
@@ -1013,7 +1090,7 @@ def validate_generation_control_chain(run_dir: Path) -> tuple[dict[str, dict[str
         if not isinstance(review, dict) or review.get("artifact_type") != "review.control" or review.get("status") != "approved":
             errors.append("amendment generation review must be approved")
         elif strategy_kind in {"execution", "amendment"}:
-            errors.extend(generation_review_errors(review, context=f"{strategy_kind} generation"))
+            errors.extend(generation_review_errors(review, context=f"{strategy_kind} generation", requirements=requirements))
 
     readonly_files = generation_runtime_readonly_files(generation) if generation and runtime_rel else []
     runtime_files = runtime.get("runtime", {})

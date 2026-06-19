@@ -209,6 +209,12 @@ check. This is an independent reverse review: the reviewer attempts to disprove
 the candidate control decision instead of helping the execution agent justify
 it.
 
+The gate must execute the requirements-approved `counterexample_gate_contract`.
+Review must not invent, weaken, or replace the gate's quality standard,
+checked-transformations, reviewer requirement, or reject-if conditions. If the
+contract is absent where a controlled run requires it, route to
+`ReturnToRequirementsAnalysis`.
+
 The approved `counterexample-gate` check must record reviewer provenance. A
 plain evidence sentence is not enough. Include:
 
@@ -219,8 +225,9 @@ plain evidence sentence is not enough. Include:
 
 The main execution agent's self-review does not satisfy this gate.
 
-The gate must cover target decomposition, not just final completion. Record
-these gate points in `checked_transformations`:
+The gate must cover target decomposition, not just final completion. Record the
+requirements-approved gate points in `checked_transformations`, including at
+least:
 
 - `source_requirements->required_outcomes`
 - `required_outcomes->required_steps`

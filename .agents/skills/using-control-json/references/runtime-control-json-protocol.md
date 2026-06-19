@@ -147,6 +147,12 @@ disprove the target decomposition, runtime strategy, blocked claim, or
 completion claim. `counterexample-gate` is the final quality gate for
 `goal_achieved: true` and terminal blocked claims.
 
+The quality gate scope comes from the requirements-approved
+`counterexample_gate_contract`. Runtime, design, orchestration, and review must
+not invent, weaken, or replace that contract. Missing or inconsistent
+requirements-approved gate contract means the run is not executable until
+requirements are fixed.
+
 Run the configured verifier before `goal_achieved: true`. The verifier command or module should come from `runtime.control.json`, the approved plan JSON, or a schema-backed run configuration. If no verifier is configured, stop.
 
 Verifier permission means the verifier output explicitly allows or permits the completion claim for the current control chain and progress evidence. A successful command that checks only one component is supporting evidence, not completion permission.
@@ -162,7 +168,8 @@ not for final completion.
 The approved generation review must include a `counterexample-gate` check before
 runtime relies on the generation for completion or blocked claims. Counterexample
 Gate means an independent reviewer attempts to disprove the candidate control
-claim. It must cover the target decomposition and runtime claim points:
+claim. It must cover the requirements-approved target decomposition and runtime
+claim points, including at least:
 
 ```text
 source_requirements->required_outcomes

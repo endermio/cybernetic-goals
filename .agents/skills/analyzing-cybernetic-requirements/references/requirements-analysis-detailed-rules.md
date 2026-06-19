@@ -74,6 +74,36 @@ Do not weaken the user's request while extracting source requirements. If the us
 
 The compact approval summary must show each source requirement in plain language: original quote/reference, required action, evidence needed, and completion checks.
 
+## Counterexample Gate Contract
+
+For `controlled_run`, requirements analysis must define
+`counterexample_gate_contract` before orchestration. Do not leave quality-control
+scope for design, plan, review, or runtime to invent.
+
+The contract must state:
+
+- `quality_standard`: what an independent reviewer must try to disprove;
+- `required_checked_transformations`: every decomposition or terminal-claim
+  position the gate must challenge;
+- `minimum_reviewer`: allowed independent reviewer kinds and whether
+  `reviewer.evidence_ref` is required;
+- `reject_if`: semantic failure conditions that block approval.
+
+The default checked transformations are the minimum, not the maximum:
+
+```text
+source_requirements->required_outcomes
+required_outcomes->required_steps
+required_steps->work_packages
+required_steps->runtime_steps
+pre_runtime_compile
+blocked_or_goal_achieved
+```
+
+Add task-specific transformations when the user's request needs them. Later
+review may require stronger evidence, but must not weaken, replace, or invent a
+different quality contract.
+
 ## Ask Only High-Value Human Questions
 
 Ask the human a question only if all are true:

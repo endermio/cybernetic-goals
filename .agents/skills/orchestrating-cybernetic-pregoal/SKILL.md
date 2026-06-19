@@ -99,8 +99,12 @@ legacy Drogon compatibility readiness. That is `NeedsRevision`.
 ## Counterexample Gate
 
 Approved review must include `counterexample-gate` before runtime compilation.
-It attempts to disprove the candidate control interpretation. Required gate
-points:
+It must execute the requirements-approved `counterexample_gate_contract`;
+orchestration and design must not invent, weaken, or replace that contract. If
+the contract is missing, return to requirements analysis before compiling
+runtime.
+
+Required gate points include at least:
 
 ```text
 source_requirements->required_outcomes

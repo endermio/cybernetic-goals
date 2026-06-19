@@ -85,6 +85,26 @@ def requirements(outcome_id: str = "O-target-startup", evidence_id: str = "evide
                     "not_satisfied_by": ["readiness or partial candidate evidence"],
                 }
             ],
+            "counterexample_gate_contract": {
+                "quality_standard": "Independent reverse review must try to disprove whether the current generation can claim complete or blocked without satisfying the approved source requirements.",
+                "required_checked_transformations": [
+                    "source_requirements->required_outcomes",
+                    "required_outcomes->required_steps",
+                    "required_steps->work_packages",
+                    "required_steps->runtime_steps",
+                    "pre_runtime_compile",
+                    "blocked_or_goal_achieved",
+                ],
+                "minimum_reviewer": {
+                    "allowed_kinds": ["subagent", "human", "external"],
+                    "independence": "The reviewer must be independent from the execution agent's own completion claim.",
+                    "evidence_ref_required": True,
+                },
+                "reject_if": [
+                    "Readiness or partial candidate evidence is accepted as the completed target result.",
+                    "A blocked or complete claim is not challenged against the approved source requirements.",
+                ],
+            },
             "final_answer_format": {
                 "medium": "chat summary",
                 "required_structure": ["verification"],
@@ -571,6 +591,38 @@ class ReviewedReplanningControlTest(unittest.TestCase):
             for command_result in (result, validate):
                 self.assertIn(
                     "counterexample-gate missing required gate points: required_steps->work_packages",
+                    command_result.stdout + command_result.stderr,
+                )
+
+    def test_guard_rejects_counterexample_gate_missing_requirements_contract_point(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            run_dir = Path(tmpdir)
+            write_strategy_run(run_dir)
+            req_path = run_dir / "requirements.control.json"
+            review_path = run_dir / "gen-000/review.control.json"
+            runtime_path = run_dir / "gen-000/runtime.control.json"
+            req = json.loads(req_path.read_text(encoding="utf-8"))
+            run = json.loads((run_dir / "run.control.json").read_text(encoding="utf-8"))
+            review = json.loads(review_path.read_text(encoding="utf-8"))
+            runtime = json.loads(runtime_path.read_text(encoding="utf-8"))
+
+            req["approved_control"]["counterexample_gate_contract"]["required_checked_transformations"].append(
+                "required_evidence->quality_standard"
+            )
+            refresh_semantic_base(req)
+            apply_hashes(req, run, runtime, "gen-000/runtime.control.json", review, "gen-000/review.control.json")
+            req_path.write_text(json.dumps(req, indent=2), encoding="utf-8")
+            (run_dir / "run.control.json").write_text(json.dumps(run, indent=2), encoding="utf-8")
+            runtime_path.write_text(json.dumps(runtime, indent=2), encoding="utf-8")
+
+            result = run_script(CONTROL_GUARD, "--run-dir", str(run_dir))
+            validate = run_script(VALIDATE, str(run_dir))
+
+            self.assertNotEqual(result.returncode, 0, result.stdout + result.stderr)
+            self.assertNotEqual(validate.returncode, 0, validate.stdout + validate.stderr)
+            for command_result in (result, validate):
+                self.assertIn(
+                    "counterexample-gate missing requirements-approved gate points: required_evidence->quality_standard",
                     command_result.stdout + command_result.stderr,
                 )
 

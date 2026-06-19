@@ -29,12 +29,15 @@ For the detailed rulebook, read
    requested behavior because it looks hard.
 3. Extract `source_requirements` before writing `required_outcomes` for
    `controlled_run` work.
-4. Ask only questions that change approved meaning, evidence, scope, authority,
+4. Define `counterexample_gate_contract` in the requirements stage for
+   `controlled_run`: quality standard, required checked transformations,
+   minimum independent reviewer, and reject-if conditions.
+5. Ask only questions that change approved meaning, evidence, scope, authority,
    or output contract.
-5. Classify uncertainty as human decision, default assumption, or deferred
+6. Classify uncertainty as human decision, default assumption, or deferred
    design/planning/execution detail.
-6. Produce or update `requirements.control.json`.
-7. For `controlled_run`, get `What the User Approved: Approved` before handoff.
+7. Produce or update `requirements.control.json`.
+8. For `controlled_run`, get `What the User Approved: Approved` before handoff.
 
 ## Source Requirements
 
@@ -53,6 +56,21 @@ If the user asks to measure, implement, decide, repair, or diagnose, preserve
 that action. A framework, plan, readiness result, compatibility result, or
 decision rule may support the work, but cannot replace it without new approval.
 
+## Counterexample Gate Contract
+
+For `controlled_run`, requirements must define the quality gate before
+orchestration starts. Record `counterexample_gate_contract` with:
+
+- `quality_standard`: what an independent reviewer must try to disprove;
+- `required_checked_transformations`: the decomposition and claim positions the
+  gate must challenge;
+- `minimum_reviewer`: allowed independent reviewer kinds and evidence reference
+  requirement;
+- `reject_if`: semantic failure conditions that must prevent approval.
+
+Downstream review may add stronger checks, but must not invent, weaken, or
+replace the requirements-approved quality contract.
+
 ## Approval Commitment
 
 For `controlled_run`, show the compact control commitment in
@@ -66,6 +84,7 @@ plain language and wait for approval. It must include at least:
 - where the result must show up;
 - what counts as done;
 - evidence needed to call it done;
+- counterexample gate quality contract;
 - required answer path and what is not enough;
 - work covered in this run;
 - what the agent may do;

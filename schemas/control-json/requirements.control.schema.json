@@ -314,6 +314,67 @@
             }
           }
         },
+        "counterexample_gate_contract": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "quality_standard",
+            "required_checked_transformations",
+            "minimum_reviewer",
+            "reject_if"
+          ],
+          "properties": {
+            "quality_standard": {
+              "type": "string",
+              "minLength": 1
+            },
+            "required_checked_transformations": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "minimum_reviewer": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "allowed_kinds",
+                "independence",
+                "evidence_ref_required"
+              ],
+              "properties": {
+                "allowed_kinds": {
+                  "type": "array",
+                  "minItems": 1,
+                  "items": {
+                    "enum": [
+                      "subagent",
+                      "human",
+                      "external"
+                    ]
+                  }
+                },
+                "independence": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "evidence_ref_required": {
+                  "type": "boolean"
+                }
+              }
+            },
+            "reject_if": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          }
+        },
         "final_answer_format": {
           "type": "object",
           "additionalProperties": false,
@@ -370,7 +431,8 @@
         "properties": {
           "approved_control": {
             "required": [
-              "source_requirements"
+              "source_requirements",
+              "counterexample_gate_contract"
             ],
             "properties": {
               "required_outcomes": {

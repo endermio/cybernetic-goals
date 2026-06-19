@@ -89,6 +89,26 @@ SCHEMA_FIXTURES = {
                     "not_satisfied_by": ["required step completion without outcome coverage"],
                 }
             ],
+            "counterexample_gate_contract": {
+                "quality_standard": "An independent reviewer must try to disprove whether the JSON control chain would let the agent claim completion without making the user-approved result true.",
+                "required_checked_transformations": [
+                    "source_requirements->required_outcomes",
+                    "required_outcomes->required_steps",
+                    "required_steps->work_packages",
+                    "required_steps->runtime_steps",
+                    "pre_runtime_compile",
+                    "blocked_or_goal_achieved",
+                ],
+                "minimum_reviewer": {
+                    "allowed_kinds": ["subagent", "human", "external"],
+                    "independence": "The reviewer must be independent from the execution agent's own completion claim.",
+                    "evidence_ref_required": True,
+                },
+                "reject_if": [
+                    "A required result is replaced by a plan, readiness claim, compatibility claim, or classification-only result.",
+                    "A blocked or complete claim has not been challenged against the approved source requirements.",
+                ],
+            },
             "final_answer_format": {
                 "medium": "chat summary",
                 "required_structure": ["changed files", "verification commands"],
@@ -640,6 +660,27 @@ class ControlJsonSchemaTest(unittest.TestCase):
         fixture = copy.deepcopy(SCHEMA_FIXTURES["review.control.schema.json"])
         counterexample = next(check for check in fixture["review_checks"] if check["check_id"] == "counterexample-gate")
         del counterexample["reviewer"]
+
+        with self.assertRaises(SchemaValidationError):
+            validate(fixture, schema)
+
+    def test_requirements_schema_defines_counterexample_gate_contract_for_v1_1(self):
+        schema = load_json(SCHEMA_DIR / "requirements.control.schema.json")
+        approved_control = schema["properties"]["approved_control"]
+        self.assertIn("counterexample_gate_contract", approved_control["properties"])
+        contract_schema = approved_control["properties"]["counterexample_gate_contract"]
+        for field in (
+            "quality_standard",
+            "required_checked_transformations",
+            "minimum_reviewer",
+            "reject_if",
+        ):
+            self.assertIn(field, contract_schema["required"])
+            self.assertIn(field, contract_schema["properties"])
+
+        fixture = copy.deepcopy(SCHEMA_FIXTURES["requirements.control.schema.json"])
+        fixture["schema_version"] = "1.1.0"
+        del fixture["approved_control"]["counterexample_gate_contract"]
 
         with self.assertRaises(SchemaValidationError):
             validate(fixture, schema)

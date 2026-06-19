@@ -31,7 +31,7 @@
     },
     "semantic_base": {
       "id": "semantic-base:control-example",
-      "hash": "sha256:590db16fc03d0916bce0274b53d441350e15bb7bef8251ca3268982fdc83ba3c"
+      "hash": "sha256:a4a57e82f641bca97874d619584cec84674a45d093fadd77be2f222837d3b68b"
     },
     "source_requirements": [
       {
@@ -84,6 +84,30 @@
           "Markdown template authority"
         ]
       }
-    ]
+    ],
+    "counterexample_gate_contract": {
+      "quality_standard": "Independent reverse review must try to disprove that the JSON-only control chain actually rejects Markdown authority and preserves the approved required outcome.",
+      "required_checked_transformations": [
+        "source_requirements->required_outcomes",
+        "required_outcomes->required_steps",
+        "required_steps->work_packages",
+        "required_steps->runtime_steps",
+        "pre_runtime_compile",
+        "blocked_or_goal_achieved"
+      ],
+      "minimum_reviewer": {
+        "allowed_kinds": [
+          "subagent",
+          "human",
+          "external"
+        ],
+        "independence": "The reviewer must be independent from the execution agent's own completion claim.",
+        "evidence_ref_required": true
+      },
+      "reject_if": [
+        "Markdown remains an official control input.",
+        "The JSON chain only documents readiness instead of changing guard/compiler/runtime behavior."
+      ]
+    }
   }
 }

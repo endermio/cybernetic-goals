@@ -628,7 +628,33 @@ def amendment_generation_count(run_control: dict[str, Any]) -> int:
     return sum(1 for generation in generations if isinstance(generation, dict) and generation.get("parent"))
 
 
-def require_generation_review_checks(review: dict[str, Any], *, context: str) -> None:
+def counterexample_gate_contract(requirements: dict[str, Any] | None) -> dict[str, Any]:
+    if not isinstance(requirements, dict):
+        return {}
+    contract = requirements.get("approved_control", {}).get("counterexample_gate_contract")
+    return contract if isinstance(contract, dict) else {}
+
+
+def counterexample_contract_points(requirements: dict[str, Any] | None) -> set[str]:
+    contract = counterexample_gate_contract(requirements)
+    return set(string_list(contract.get("required_checked_transformations")))
+
+
+def counterexample_allowed_reviewer_kinds(requirements: dict[str, Any] | None) -> set[str]:
+    contract = counterexample_gate_contract(requirements)
+    minimum = contract.get("minimum_reviewer")
+    if not isinstance(minimum, dict):
+        return set(COUNTEREXAMPLE_REVIEWER_KINDS)
+    allowed = set(string_list(minimum.get("allowed_kinds")))
+    return allowed or set(COUNTEREXAMPLE_REVIEWER_KINDS)
+
+
+def require_generation_review_checks(
+    review: dict[str, Any],
+    *,
+    context: str,
+    requirements: dict[str, Any] | None = None,
+) -> None:
     review_checks = review.get("review_checks")
     if not isinstance(review_checks, list):
         raise ControlJsonValidationError(f"{context} review missing review_checks")
@@ -654,13 +680,20 @@ def require_generation_review_checks(review: dict[str, Any], *, context: str) ->
                 f"{context} counterexample-gate missing required gate points: "
                 + ", ".join(missing_points)
             )
+        contract_missing_points = sorted(counterexample_contract_points(requirements) - checked)
+        if contract_missing_points:
+            raise ControlJsonValidationError(
+                f"{context} counterexample-gate missing requirements-approved gate points: "
+                + ", ".join(contract_missing_points)
+            )
         reviewer = counterexample.get("reviewer")
         if not isinstance(reviewer, dict):
             raise ControlJsonValidationError(
                 f"{context} counterexample-gate missing independent reviewer provenance"
             )
+        allowed_reviewer_kinds = counterexample_allowed_reviewer_kinds(requirements)
         if (
-            reviewer.get("kind") not in COUNTEREXAMPLE_REVIEWER_KINDS
+            reviewer.get("kind") not in allowed_reviewer_kinds
             or not isinstance(reviewer.get("id"), str)
             or not reviewer["id"].strip()
             or not isinstance(reviewer.get("evidence_ref"), str)
@@ -807,7 +840,7 @@ def validate_generation_control_run(run_dir: Path) -> dict[str, dict[str, Any]]:
         if review.get("artifact_type") != "review.control" or review.get("status") != "approved":
             raise ControlJsonValidationError(f"{review_rel}: amendment generation review must be approved")
         if strategy_kind in {"execution", "amendment"}:
-            require_generation_review_checks(review, context=f"{strategy_kind} generation")
+            require_generation_review_checks(review, context=f"{strategy_kind} generation", requirements=requirements)
     if strategy_kind in {"execution", "amendment"} and not review_rel:
         raise ControlJsonValidationError(f"run.control.json: {strategy_kind} generations must declare review")
     if generation.get("parent") and (not review_rel or not generation.get("amendment_source")):

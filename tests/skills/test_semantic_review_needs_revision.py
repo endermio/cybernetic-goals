@@ -11,6 +11,7 @@ SUBAGENT_ROLES = (
     ROOT / ".agents/skills/orchestrating-cybernetic-pregoal/references/subagent-review-roles.md"
 )
 REVIEW_SKILL = ROOT / ".agents/skills/reviewing-cybernetic-control-structures/SKILL.md"
+REQUIREMENTS_SKILL = ROOT / ".agents/skills/analyzing-cybernetic-requirements/SKILL.md"
 
 
 def read(path: Path) -> str:
@@ -85,6 +86,7 @@ class SemanticReviewNeedsRevisionTest(unittest.TestCase):
     def test_counterexample_gate_covers_goal_decomposition_and_runtime_claims(self):
         combined = "\n".join(
             [
+                read(REQUIREMENTS_SKILL),
                 read(ORCHESTRATION_SKILL),
                 read(REVIEW_SKILL),
                 read(ROOT / ".agents/skills/using-control-json/references/runtime-control-json-protocol.md"),
@@ -106,6 +108,21 @@ class SemanticReviewNeedsRevisionTest(unittest.TestCase):
 
         self.assertIn("target decomposition", combined)
         self.assertIn("attempts to disprove", combined)
+
+    def test_counterexample_gate_quality_contract_is_defined_in_requirements(self):
+        requirements_text = read(REQUIREMENTS_SKILL)
+        downstream_text = "\n".join(
+            [
+                read(ORCHESTRATION_SKILL),
+                read(REVIEW_SKILL),
+                read(ROOT / ".agents/skills/using-control-json/references/runtime-control-json-protocol.md"),
+            ]
+        )
+
+        self.assertIn("counterexample_gate_contract", requirements_text)
+        self.assertIn("requirements stage", requirements_text)
+        self.assertIn("requirements-approved", downstream_text)
+        self.assertIn("must not invent", downstream_text)
 
     def test_runtime_compile_requires_approved_control_statuses_and_runtime_validator(self):
         combined = "\n".join(
