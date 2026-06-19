@@ -61,6 +61,16 @@ ACCEPTABLE_EVIDENCE_STRENGTHS = {
     "decide_or_classify": {"analysis_report"},
 }
 SOURCE_REQUIREMENT_REVIEW_CHECK = "source-requirement-preservation"
+COUNTEREXAMPLE_GATE_CHECK = "counterexample-gate"
+COUNTEREXAMPLE_GATE_POINTS = {
+    "source_requirements->required_outcomes",
+    "required_outcomes->required_steps",
+    "required_steps->work_packages",
+    "required_steps->runtime_steps",
+    "pre_runtime_compile",
+    "blocked_or_goal_achieved",
+}
+COUNTEREXAMPLE_REVIEWER_KINDS = {"subagent", "human", "external"}
 MEASUREMENT_ACTION_RE = re.compile(r"\b(?:measure|measuring|measured)\b", re.IGNORECASE)
 MEASUREMENT_CURVE_LANGUAGE_RE = re.compile(r"\b(?:curve|curves|growth)\b", re.IGNORECASE)
 API_V2_IMPLEMENT_ACTION_RE = re.compile(r"\b(?:implement|implementing)\b", re.IGNORECASE)
@@ -86,6 +96,7 @@ REQUIRED_REVIEW_CHECKS = {
     "obligation-preservation",
     "required-outcome-coverage",
     SOURCE_REQUIREMENT_REVIEW_CHECK,
+    COUNTEREXAMPLE_GATE_CHECK,
     "producing-action-alignment",
     "work-assignment",
     "horizon-authority",
@@ -96,6 +107,7 @@ GENERATION_REVIEW_CHECKS = {
     "obligation-preservation",
     "required-outcome-coverage",
     SOURCE_REQUIREMENT_REVIEW_CHECK,
+    COUNTEREXAMPLE_GATE_CHECK,
     "horizon-authority",
 }
 REVIEW_HASH_FILES = (
@@ -260,6 +272,29 @@ def generation_review_errors(review: dict[str, Any], *, context: str) -> list[st
             or not string_list(check.get("evidence"))
         ):
             errors.append(f"{context} required review check did not pass with evidence: {check_id}")
+    counterexample = checks_by_id.get(COUNTEREXAMPLE_GATE_CHECK)
+    if isinstance(counterexample, dict):
+        checked = set(string_list(counterexample.get("checked_transformations")))
+        missing_points = sorted(COUNTEREXAMPLE_GATE_POINTS - checked)
+        if missing_points:
+            errors.append(
+                f"{context} counterexample-gate missing required gate points: "
+                + ", ".join(missing_points)
+            )
+        reviewer = counterexample.get("reviewer")
+        if not isinstance(reviewer, dict):
+            errors.append(f"{context} counterexample-gate missing independent reviewer provenance")
+        elif (
+            reviewer.get("kind") not in COUNTEREXAMPLE_REVIEWER_KINDS
+            or not isinstance(reviewer.get("id"), str)
+            or not reviewer["id"].strip()
+            or not isinstance(reviewer.get("evidence_ref"), str)
+            or not reviewer["evidence_ref"].strip()
+        ):
+            errors.append(
+                f"{context} counterexample-gate reviewer provenance must be subagent, human, or external "
+                "with id and evidence_ref"
+            )
     return errors
 
 

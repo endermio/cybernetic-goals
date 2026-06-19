@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://cybernetic-goals.local/schemas/control-json/bounded-runtime.control.schema.json",
-  "title": "Cybernetic Level 2 Bounded Runtime Control",
+  "title": "Cybernetic Bounded Runtime Control",
   "type": "object",
   "additionalProperties": false,
   "required": [

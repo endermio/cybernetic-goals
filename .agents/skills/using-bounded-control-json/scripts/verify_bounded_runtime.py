@@ -36,7 +36,7 @@ def final_report_errors(final_report: dict) -> list[str]:
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description="Verify a Level 2 bounded runtime progress log and final report.")
+    parser = argparse.ArgumentParser(description="Verify a bounded_runtime progress log and final report.")
     parser.add_argument("runtime_or_run_dir", help="Run directory or path to runtime.control.json.")
     args = parser.parse_args()
 

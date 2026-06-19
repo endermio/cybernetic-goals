@@ -9,7 +9,7 @@ description: 'Use when runtime execution must operate approved cybernetic contro
 
 Use this skill when a runtime `/goal` pointer, `runtime.control.json`, or approved control chain sends Codex into JSON-backed cybernetic execution.
 
-This is not the Level 2 bounded runtime protocol. Level 2 bounded goals use
+This is not `bounded_runtime`. Bounded runtime goals use
 `.agents/skills/using-bounded-control-json`.
 
 This skill supports official generation-aware JSON control runs:
@@ -28,6 +28,17 @@ Read `references/runtime-control-json-protocol.md` before executing, reporting s
 5. Run the verifier before `goal_achieved: true`; only a verifier result that permits the claim allows `final-report.json` to contain `goal_achieved: true`.
 6. Source requirements are approved original-request items. Runtime may not treat weaker substitute evidence as completion. If strategy cannot complete a blocking source requirement, propose an amendment with `affected_source_requirements`.
 7. `/goal` is a short pointer and adapter, not a control fact. It should point to `runtime.control.json` and name `using-control-json`, leaving approved facts in JSON.
+
+## Gate Roles
+
+Structural gates are schema checks, `control_chain_guard`,
+`validate_control_chain`, and `verify_runtime_progress`. They prove file shape,
+hashes, declared coverage, and progress consistency. Structural gates are not
+quality approval.
+
+Quality gate means `counterexample-gate`: an independent reviewer tries to
+disprove the target decomposition, runtime strategy, blocked claim, or
+completion claim.
 
 ## Reviewed Replanning
 

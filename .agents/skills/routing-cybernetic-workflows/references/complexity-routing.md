@@ -1,42 +1,44 @@
-# Complexity Routing Reference
+# Control Entry Reference
 
-Route by unresolved control decisions, not by scary keywords.
+Route by unresolved control decisions, not by scary keywords or process weight.
 
-## Main question
+## Main Question
 
-Would the execution agent need to invent or revise any of these during runtime?
+Would runtime need to invent or revise any of these?
 
 - requirement meaning
-- solution structure/design model
+- solution structure or design model
 - goal or success criteria
-- authorization/visibility meaning
-- structure/external-contract meaning
-- evidence check/evidence governance
-- execution policy
+- authorization or visibility meaning
+- external contract meaning
+- evidence checks
+- execution strategy
 - phase checks
-- stop conditions
+- stop or completion conditions
 
-If yes, consider Level 3 or Level 4.
+If yes, choose `controlled_run`.
 
-If no, prefer Level 0, 1, or 2.
+If no, choose `ordinary_direct_work` or `bounded_runtime`.
 
-## Downgrade rule
+## Existing Control Structure
 
-If approved artifacts or explicit user decisions already fix meaning, and the task is a bounded correction, downgrade even if the task mentions complex concepts.
+If approved artifacts or explicit user decisions already fix meaning and the
+task is a bounded correction, do not create a new controlled run.
 
-## Examples
+Examples for `bounded_runtime`:
 
-Level 2:
-- Fix a misleading observer display inside an already analyzed approved work chain.
+- Fix a misleading observer display inside an already approved work chain.
 - Update an evidence assertion after a confirmed observer-label change.
-- Adjust fixture names so local preview matches existing requirement meaning.
+- Write a bounded audit when rubric and output shape are explicit.
 
-Level 3:
-- Decide what the controlled relationship means for the first time.
+Examples for `controlled_run`:
+
+- Define a controlled relationship for the first time.
 - Decide direct observation vs intermediary reporting.
-- Decide entity mapping and authorization model.
-- Decide objects, relationships, limits, information flow, or evidence model for a new solution.
-- Execute new multi-subsystem work without approved approved files.
+- Create a new authorization or visibility model.
+- Execute multi-subsystem work without approved requirements and strategy.
 
-Level 4:
-- Production-impacting, irreversible, credentialed, regulated, or customer-data tasks.
+Risk examples:
+
+- Production-impacting, irreversible, credentialed, regulated, or customer-data
+  work adds `human_gate` or `live_gate`.

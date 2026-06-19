@@ -62,8 +62,8 @@
       ]
     },
     {
-      "id": "level-3-design-handoff-goes-to-orchestrator-not-goal-writer",
-      "prompt": "使用 $designing-cybernetic-solutions 根据 docs/cybernetics/runs/2026-05-31-complex-control/requirements.control.json 创建 solution design。路由结果是 Level 3 JSON pre-goal orchestration，required design required，execution-plan check required，review check required。",
+      "id": "controlled-run-design-handoff-goes-to-orchestrator-not-goal-writer",
+      "prompt": "使用 $designing-cybernetic-solutions 根据 docs/cybernetics/runs/2026-05-31-complex-control/requirements.control.json 创建 solution design。控制入口是 controlled_run JSON pre-goal orchestration，required design required，execution-plan check required，review check required。",
       "expected_output": "Create the solution design artifact, then in the response hand off to $orchestrating-cybernetic-pregoal rather than directly to $writing-cybernetic-goals.",
       "assertions": [
         "Creates or references docs/cybernetics/runs/2026-05-31-complex-control/design.control.json.",
@@ -71,7 +71,7 @@
         "Does not write an execution policy.",
         "Does not include a Next Step or handoff prompt in the design artifact.",
         "Response-only handoff recommends $orchestrating-cybernetic-pregoal.",
-        "Does not recommend $writing-cybernetic-goals as the next action for Level 3 JSON pre-goal work."
+        "Does not recommend $writing-cybernetic-goals as the next action for controlled_run JSON pre-goal work."
       ]
     },
     {

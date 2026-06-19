@@ -37,14 +37,16 @@ required design is usually not applicable for:
 - audits whose rubric and report shape are explicit;
 - tasks where the execution path is obvious and does not introduce new abstractions.
 
-## Routing Rule
+## Control Entry Rule
 
-Keep the routing level separate from checks:
+Keep the control entry separate from checks:
 
 ```text
-Routing decision: Level N
+Control entry decision: ordinary_direct_work / bounded_runtime / controlled_run
 Required checks:
 - required design: required/satisfied/not applicable
 ```
 
-Do not create routing levels such as `Level 3D`.
+Do not encode design needs into the entry name. A task can be `controlled_run`
+with `required design: required`, or `controlled_run` with an existing design
+already satisfied.

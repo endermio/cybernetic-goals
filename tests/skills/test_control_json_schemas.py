@@ -15,7 +15,7 @@ LEGACY_REQUIREMENTS_ARTIFACT = (
 
 
 def review_check(check_id: str, evidence: list[str], checked_transformations: list[str] | None = None) -> dict:
-    return {
+    check = {
         "check_id": check_id,
         "status": "pass",
         "verdict": "approved",
@@ -26,6 +26,14 @@ def review_check(check_id: str, evidence: list[str], checked_transformations: li
         "checked_transformations": checked_transformations
         or ["requirements->design", "design->goal", "goal->plan", "plan->runtime"],
     }
+    if check_id == "counterexample-gate":
+        check["reviewer"] = {
+            "kind": "subagent",
+            "id": "counterexample-reviewer",
+            "evidence_ref": "review.control.json#counterexample-gate",
+            "summary": "Independent reverse review checked the control chain before runtime compilation.",
+        }
+    return check
 
 
 SCHEMA_FIXTURES = {
@@ -221,6 +229,18 @@ SCHEMA_FIXTURES = {
             review_check("intent-preservation", ["approved user intent is preserved across design, goal, and plan"]),
             review_check("obligation-preservation", ["required outcomes are not downgraded into permission, readiness, or future work"]),
             review_check("required-outcome-coverage", ["blocking required outcomes are mapped through required steps, work packages, and verifier"]),
+            review_check(
+                "counterexample-gate",
+                ["independent reverse review found no blocking counterexample for target decomposition or runtime claims"],
+                [
+                    "source_requirements->required_outcomes",
+                    "required_outcomes->required_steps",
+                    "required_steps->work_packages",
+                    "required_steps->runtime_steps",
+                    "pre_runtime_compile",
+                    "blocked_or_goal_achieved",
+                ],
+            ),
             review_check("producing-action-alignment", ["blocking required steps are mapped to producing actions and mainline work packages"]),
             review_check("work-assignment", ["parallel workflow registry binding present"]),
             review_check("horizon-authority", ["covered work remains in this run"]),
@@ -614,6 +634,15 @@ class ControlJsonSchemaTest(unittest.TestCase):
 
         review = load_json(SCHEMA_DIR / "review.control.schema.json")
         self.assertIn("review_checks", review["properties"])
+
+    def test_review_schema_requires_counterexample_gate_independent_reviewer_provenance(self):
+        schema = load_json(SCHEMA_DIR / "review.control.schema.json")
+        fixture = copy.deepcopy(SCHEMA_FIXTURES["review.control.schema.json"])
+        counterexample = next(check for check in fixture["review_checks"] if check["check_id"] == "counterexample-gate")
+        del counterexample["reviewer"]
+
+        with self.assertRaises(SchemaValidationError):
+            validate(fixture, schema)
 
     def test_no_predefined_answer_method_registry_or_keys_remain(self):
         self.assertFalse((ROOT / ".agents/skills/references/answer-method-registry.json").exists())

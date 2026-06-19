@@ -4,29 +4,34 @@ Use these roles only when the user explicitly authorizes subagents.
 
 ## Requirement Traceability Reviewer
 
-Input: `requirements.control.json`, `design.control.json` when present, `goal.control.json`, and `plan.control.json`.
+Input: `requirements.control.json`, `run.control.json`, the current generation
+runtime strategy, and any expanded design/goal/plan artifacts named by the run.
 
 Check:
 
-- Every confirmed human decision appears in the goal and plan.
-- Every confirmed human decision that affects structure appears in the solution design.
+- Every confirmed human decision appears in the current generation strategy or
+  in the expanded artifact that owns it.
+- Every confirmed human decision that affects structure appears in the solution
+  model when a solution model is required.
 - No confirmed meaning decision is weakened, reworded into ambiguity, or converted into an execution option.
 - No new requirement appears without source.
 
 ## Intent Preservation / Obligation Preservation Reviewer
 
-Input: `requirements.control.json`, `design.control.json` when present, `goal.control.json`, and `plan.control.json`.
+Input: `requirements.control.json`, `run.control.json`, current generation
+runtime strategy, and any expanded artifacts named by the run.
 
 Check:
 
-- Required outcomes remain required outcomes through design, goal, and plan.
+- Required outcomes remain required outcomes through source requirements,
+  current generation steps, work packages, verifier, and any expanded artifacts.
 - Required implementation is not downgraded into readiness, future work,
   allowed action, prepare-only handling, or compatibility-only behavior.
 - The review distinguishes tactical execution freedom from obligation removal.
 - A required `/api/v2` implementation is not accepted as legacy Drogon
   compatibility readiness.
 - Drift findings identify the earliest artifact that introduced the drift:
-  requirements, design, goal, or plan.
+  requirements, design, goal, plan, review, run, or current generation.
 
 Verdict:
 
@@ -38,43 +43,46 @@ Verdict:
 
 ## Solution Design Match Reviewer
 
-Input: `requirements.control.json`, `design.control.json`, `goal.control.json`, and `plan.control.json`.
+Input: `requirements.control.json`, `run.control.json`, current generation
+strategy, and expanded design/goal/plan artifacts when present.
 
 Check:
 
 - Design preserves requirements analysis meaning.
 - Design defines objects/actors/roles, relationships, flows, limits, interfaces/contracts, failure model, and evidence model when relevant.
-- Goal preserves design rules that cannot change.
-- Plan does not redesign the solution model.
+- Current generation strategy preserves design rules that cannot change.
+- Runtime strategy does not redesign the solution model.
 - Tactical degrees of freedom are not frozen as meaning rules that cannot change unless the design explicitly says so.
 
 ## Control Contract Reviewer
 
-Input: `requirements.control.json`, `design.control.json` when present, and `goal.control.json`.
+Input: `requirements.control.json`, `run.control.json`, current generation
+runtime strategy, and `goal.control.json` when the run names one.
 
 Check:
 
-- Goal has success conditions, limits, rules that cannot change, verification places, stop conditions, and source of truth.
-- Goal does not ask runtime `/goal` to generate or approve its own plan.
-- Goal separates requirement meaning from execution tactics.
+- Current generation has success conditions, limits, verification places, stop
+  conditions, and source of truth.
+- Runtime `/goal` does not generate or approve its own plan.
+- Requirement meaning stays separate from execution tactics.
 
 ## Execution Policy / Cadence Reviewer
 
-Input: `design.control.json` when present, `goal.control.json`, and `plan.control.json`.
+Input: current generation strategy plus expanded plan/design artifacts when the
+run names them.
 
 Check:
 
-- Plan contains dependency matrix.
-- Plan defines work size and evidence check budget.
-- Plan defines batch cadence.
-- Plan defines destructive intermediate-state policy.
-- Plan defines batch-end openable or verifiable state.
-- Plan avoids both tiny evidence check-bound steps and huge unobservable batches.
+- Strategy contains dependency matrix or equivalent sequencing.
+- Strategy defines work size, evidence budget, cadence, and destructive
+  intermediate-state policy when relevant.
+- Strategy defines batch-end openable or verifiable state.
+- Strategy avoids both tiny evidence-check-bound steps and huge unobservable batches.
 - Broad verification is assigned to integration or final checks unless justified.
 
 ## Evidence check / Evidence Governance Reviewer
 
-Input: `design.control.json` when present, `goal.control.json`, and `plan.control.json`.
+Input: current generation strategy plus expanded artifacts when present.
 
 Check:
 
@@ -85,12 +93,14 @@ Check:
 
 ## Runtime Limit Reviewer
 
-Input: all approved control JSON plus proposed runtime `/goal`.
+Input: requirements, run control, current generation runtime, generation review
+when required, and proposed runtime `/goal`.
 
 Check:
 
 - Runtime `/goal` only points to `runtime.control.json`.
 - Runtime `/goal` does not rewrite requirements, plan, evidence checks, or review.
 - Runtime `/goal` does not rewrite required solution design.
-- `runtime.control.json` references requirements analysis, required design, goal, plan, and review control JSON.
+- `runtime.control.json` references requirements, run control, current
+  generation, required review, and any expanded artifacts named by the run.
 - Runtime execution stops if control JSON conflicts or becomes insufficient.

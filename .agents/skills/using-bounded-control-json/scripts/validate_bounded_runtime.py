@@ -9,7 +9,7 @@ from bounded_control_runtime import normalize_run_dir, result_payload, validate_
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description="Validate a Level 2 bounded runtime control JSON.")
+    parser = argparse.ArgumentParser(description="Validate a bounded_runtime control JSON.")
     parser.add_argument("runtime_or_run_dir", help="Run directory or path to runtime.control.json.")
     args = parser.parse_args()
 

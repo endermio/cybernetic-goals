@@ -12,6 +12,7 @@ from control_chain_guard import (
     control_file_hash,
     generation_entry,
     generation_runtime_readonly_files,
+    require_generation_review_checks,
     synthetic_steps_from_requirements,
     read_json_object,
     reject_markdown_control_artifacts,
@@ -60,6 +61,20 @@ def blocking_required_outcome_ids(requirements: dict) -> list[str]:
     ]
 
 
+def require_review_before_runtime_write(run_dir: Path, generation: dict, strategy_kind: object) -> None:
+    if strategy_kind not in {"execution", "amendment"}:
+        return
+    review_rel = generation.get("review")
+    if not isinstance(review_rel, str) or not review_rel:
+        raise ControlJsonValidationError(f"run.control.json: {strategy_kind} generations must declare review")
+    review = read_json_object(run_dir / review_rel)
+    if review.get("artifact_type") != "review.control":
+        raise ControlJsonValidationError(f"{review_rel}: expected artifact_type review.control")
+    if review.get("status") != "approved":
+        raise ControlJsonValidationError(f"{review_rel}: generation review must be approved")
+    require_generation_review_checks(review, context=f"{strategy_kind} generation")
+
+
 def compile_generation_runtime_control(run_dir: Path) -> Path:
     requirements = read_json_object(run_dir / "requirements.control.json")
     run_control = read_json_object(run_dir / "run.control.json")
@@ -75,6 +90,8 @@ def compile_generation_runtime_control(run_dir: Path) -> Path:
 
     runtime_path = run_dir / runtime_rel
     if not runtime_path.exists():
+        strategy_kind = generation.get("strategy_kind")
+        require_review_before_runtime_write(run_dir, generation, strategy_kind)
         runtime_path.parent.mkdir(parents=True, exist_ok=True)
         required_steps = generation.get("required_steps")
         if not isinstance(required_steps, list) or not required_steps:

@@ -42,7 +42,7 @@
     "allowed_mode": ["none"],
     "max_concurrent": "0",
     "required_controls": [
-      "main-only context-load rationale when Level 3/4"
+      "main-only context-load rationale when controlled_run context load is high"
     ]
   }
 }

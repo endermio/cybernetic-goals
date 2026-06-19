@@ -97,6 +97,31 @@
       ]
     },
     {
+      "check_id": "counterexample-gate",
+      "status": "pass",
+      "evidence": [
+        "independent reverse review found no blocking counterexample for target decomposition, runtime compilation, blocked claims, or completion claims"
+      ],
+      "verdict": "approved",
+      "return_to_stage": null,
+      "findings": [],
+      "required_changes": [],
+      "checked_transformations": [
+        "source_requirements->required_outcomes",
+        "required_outcomes->required_steps",
+        "required_steps->work_packages",
+        "required_steps->runtime_steps",
+        "pre_runtime_compile",
+        "blocked_or_goal_achieved"
+      ],
+      "reviewer": {
+        "kind": "subagent",
+        "id": "counterexample-reviewer",
+        "evidence_ref": "review.control.json#counterexample-gate",
+        "summary": "Independent reverse review checked decomposition and completion counterexamples."
+      }
+    },
+    {
       "check_id": "producing-action-alignment",
       "status": "pass",
       "verdict": "approved",

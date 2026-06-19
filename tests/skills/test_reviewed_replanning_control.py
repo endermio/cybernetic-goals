@@ -231,20 +231,37 @@ def approved_generation_review() -> dict:
         "obligation-preservation",
         "required-outcome-coverage",
         "source-requirement-preservation",
+        "counterexample-gate",
         "horizon-authority",
     ):
-        checks.append(
-            {
-                "check_id": check_id,
-                "status": "pass",
-                "verdict": "approved",
-                "return_to_stage": None,
-                "evidence": [f"{check_id} passed for current generation"],
-                "findings": [],
-                "required_changes": [],
-                "checked_transformations": ["runtime->generation"],
+        checked_transformations = ["runtime->generation"]
+        if check_id == "counterexample-gate":
+            checked_transformations = [
+                "source_requirements->required_outcomes",
+                "required_outcomes->required_steps",
+                "required_steps->work_packages",
+                "required_steps->runtime_steps",
+                "pre_runtime_compile",
+                "blocked_or_goal_achieved",
+            ]
+        check = {
+            "check_id": check_id,
+            "status": "pass",
+            "verdict": "approved",
+            "return_to_stage": None,
+            "evidence": [f"{check_id} passed for current generation"],
+            "findings": [],
+            "required_changes": [],
+            "checked_transformations": checked_transformations,
+        }
+        if check_id == "counterexample-gate":
+            check["reviewer"] = {
+                "kind": "subagent",
+                "id": "counterexample-reviewer",
+                "evidence_ref": "gen-000/review.control.json#counterexample-gate",
+                "summary": "Independent reverse review checked the required decomposition and completion gates.",
             }
-        )
+        checks.append(check)
     return {
         "artifact_type": "review.control",
         "schema_version": "1.0.0",
@@ -443,6 +460,119 @@ class ReviewedReplanningControlTest(unittest.TestCase):
 
             self.assertNotEqual(result.returncode, 0, result.stdout + result.stderr)
             self.assertIn("source-requirement-preservation", result.stdout + result.stderr)
+
+    def test_guard_rejects_generation_review_missing_counterexample_gate(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            run_dir = Path(tmpdir)
+            write_strategy_run(run_dir)
+            review_path = run_dir / "gen-000/review.control.json"
+            review = json.loads(review_path.read_text(encoding="utf-8"))
+            review["review_checks"] = [
+                check
+                for check in review["review_checks"]
+                if check["check_id"] != "counterexample-gate"
+            ]
+            req = json.loads((run_dir / "requirements.control.json").read_text(encoding="utf-8"))
+            run = json.loads((run_dir / "run.control.json").read_text(encoding="utf-8"))
+            runtime = json.loads((run_dir / "gen-000/runtime.control.json").read_text(encoding="utf-8"))
+            apply_hashes(req, run, runtime, "gen-000/runtime.control.json", review, "gen-000/review.control.json")
+            review_path.write_text(json.dumps(review, indent=2), encoding="utf-8")
+            (run_dir / "gen-000/runtime.control.json").write_text(json.dumps(runtime, indent=2), encoding="utf-8")
+
+            result = run_script(CONTROL_GUARD, "--run-dir", str(run_dir))
+            validate = run_script(VALIDATE, str(run_dir))
+
+            self.assertNotEqual(result.returncode, 0, result.stdout + result.stderr)
+            self.assertNotEqual(validate.returncode, 0, validate.stdout + validate.stderr)
+            self.assertIn("counterexample-gate", result.stdout + result.stderr)
+            self.assertIn("counterexample-gate", validate.stdout + validate.stderr)
+
+    def test_guard_rejects_counterexample_gate_without_independent_reviewer_provenance(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            run_dir = Path(tmpdir)
+            write_strategy_run(run_dir)
+            review_path = run_dir / "gen-000/review.control.json"
+            review = json.loads(review_path.read_text(encoding="utf-8"))
+            counterexample = next(check for check in review["review_checks"] if check["check_id"] == "counterexample-gate")
+            counterexample.pop("reviewer", None)
+            req = json.loads((run_dir / "requirements.control.json").read_text(encoding="utf-8"))
+            run = json.loads((run_dir / "run.control.json").read_text(encoding="utf-8"))
+            runtime = json.loads((run_dir / "gen-000/runtime.control.json").read_text(encoding="utf-8"))
+            apply_hashes(req, run, runtime, "gen-000/runtime.control.json", review, "gen-000/review.control.json")
+            review_path.write_text(json.dumps(review, indent=2), encoding="utf-8")
+            (run_dir / "gen-000/runtime.control.json").write_text(json.dumps(runtime, indent=2), encoding="utf-8")
+
+            result = run_script(CONTROL_GUARD, "--run-dir", str(run_dir))
+            validate = run_script(VALIDATE, str(run_dir))
+
+            self.assertNotEqual(result.returncode, 0, result.stdout + result.stderr)
+            self.assertNotEqual(validate.returncode, 0, validate.stdout + validate.stderr)
+            for command_result in (result, validate):
+                self.assertIn("counterexample-gate", command_result.stdout + command_result.stderr)
+                self.assertIn("independent reviewer provenance", command_result.stdout + command_result.stderr)
+
+    def test_guard_rejects_counterexample_gate_missing_goal_decomposition_edge(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            run_dir = Path(tmpdir)
+            write_strategy_run(run_dir)
+            review_path = run_dir / "gen-000/review.control.json"
+            review = json.loads(review_path.read_text(encoding="utf-8"))
+            counterexample = next(check for check in review["review_checks"] if check["check_id"] == "counterexample-gate")
+            counterexample["checked_transformations"] = [
+                transformation
+                for transformation in counterexample["checked_transformations"]
+                if transformation != "source_requirements->required_outcomes"
+            ]
+            req = json.loads((run_dir / "requirements.control.json").read_text(encoding="utf-8"))
+            run = json.loads((run_dir / "run.control.json").read_text(encoding="utf-8"))
+            runtime = json.loads((run_dir / "gen-000/runtime.control.json").read_text(encoding="utf-8"))
+            apply_hashes(req, run, runtime, "gen-000/runtime.control.json", review, "gen-000/review.control.json")
+            review_path.write_text(json.dumps(review, indent=2), encoding="utf-8")
+            (run_dir / "gen-000/runtime.control.json").write_text(json.dumps(runtime, indent=2), encoding="utf-8")
+
+            result = run_script(CONTROL_GUARD, "--run-dir", str(run_dir))
+            validate = run_script(VALIDATE, str(run_dir))
+
+            self.assertNotEqual(result.returncode, 0, result.stdout + result.stderr)
+            self.assertNotEqual(validate.returncode, 0, validate.stdout + validate.stderr)
+            self.assertIn(
+                "counterexample-gate missing required gate points: source_requirements->required_outcomes",
+                result.stdout + result.stderr,
+            )
+            self.assertIn(
+                "counterexample-gate missing required gate points: source_requirements->required_outcomes",
+                validate.stdout + validate.stderr,
+            )
+
+    def test_guard_rejects_counterexample_gate_missing_work_package_decomposition_edge(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            run_dir = Path(tmpdir)
+            write_strategy_run(run_dir)
+            review_path = run_dir / "gen-000/review.control.json"
+            review = json.loads(review_path.read_text(encoding="utf-8"))
+            counterexample = next(check for check in review["review_checks"] if check["check_id"] == "counterexample-gate")
+            counterexample["checked_transformations"] = [
+                transformation
+                for transformation in counterexample["checked_transformations"]
+                if transformation != "required_steps->work_packages"
+            ]
+            req = json.loads((run_dir / "requirements.control.json").read_text(encoding="utf-8"))
+            run = json.loads((run_dir / "run.control.json").read_text(encoding="utf-8"))
+            runtime = json.loads((run_dir / "gen-000/runtime.control.json").read_text(encoding="utf-8"))
+            apply_hashes(req, run, runtime, "gen-000/runtime.control.json", review, "gen-000/review.control.json")
+            review_path.write_text(json.dumps(review, indent=2), encoding="utf-8")
+            (run_dir / "gen-000/runtime.control.json").write_text(json.dumps(runtime, indent=2), encoding="utf-8")
+
+            result = run_script(CONTROL_GUARD, "--run-dir", str(run_dir))
+            validate = run_script(VALIDATE, str(run_dir))
+
+            self.assertNotEqual(result.returncode, 0, result.stdout + result.stderr)
+            self.assertNotEqual(validate.returncode, 0, validate.stdout + validate.stderr)
+            for command_result in (result, validate):
+                self.assertIn(
+                    "counterexample-gate missing required gate points: required_steps->work_packages",
+                    command_result.stdout + command_result.stderr,
+                )
 
     def test_runtime_validator_requires_runtime_generation_for_step_events(self):
         event = progress_event("evidence.target-startup")

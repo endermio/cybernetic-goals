@@ -190,8 +190,65 @@
               "type": "string",
               "minLength": 1
             }
+          },
+          "reviewer": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "kind",
+              "id",
+              "evidence_ref"
+            ],
+            "properties": {
+              "kind": {
+                "enum": [
+                  "subagent",
+                  "human",
+                  "external"
+                ]
+              },
+              "id": {
+                "type": "string",
+                "minLength": 1
+              },
+              "evidence_ref": {
+                "type": "string",
+                "minLength": 1
+              },
+              "summary": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
           }
-        }
+        },
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "check_id": {
+                  "const": "counterexample-gate"
+                },
+                "status": {
+                  "const": "pass"
+                },
+                "verdict": {
+                  "const": "approved"
+                }
+              },
+              "required": [
+                "check_id",
+                "status",
+                "verdict"
+              ]
+            },
+            "then": {
+              "required": [
+                "reviewer"
+              ]
+            }
+          }
+        ]
       }
     }
   }

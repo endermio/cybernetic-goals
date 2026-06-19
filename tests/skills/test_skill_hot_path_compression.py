@@ -38,7 +38,32 @@ def frontmatter_description(text: str) -> str:
     return desc.group(1)
 
 
+def body_word_count(text: str) -> int:
+    body = text.split("---", 2)[-1] if text.startswith("---") else text
+    return len(re.findall(r"[A-Za-z0-9_`/$.-]+|[\u4e00-\u9fff]", body))
+
+
 class SkillHotPathCompressionTest(unittest.TestCase):
+    def test_skill_main_files_stay_as_hot_path_indexes(self):
+        max_lines = 260
+        max_section_lines = 90
+        max_words = 650
+        for path in sorted((ROOT / ".agents/skills").glob("*/SKILL.md")):
+            with self.subTest(path=path.relative_to(ROOT)):
+                text = path.read_text(encoding="utf-8")
+                self.assertLessEqual(len(text.splitlines()), max_lines)
+                self.assertLessEqual(body_word_count(text), max_words)
+
+                headings = list(re.finditer(r"^(#{2,3})\s+(.+?)\s*$", text, re.MULTILINE))
+                for index, heading in enumerate(headings):
+                    end = headings[index + 1].start() if index + 1 < len(headings) else len(text)
+                    section_lines = text[heading.start() : end].splitlines()
+                    self.assertLessEqual(
+                        len(section_lines),
+                        max_section_lines,
+                        f"{path.relative_to(ROOT)} section {heading.group(2)!r}",
+                    )
+
     def test_requirements_output_format_is_compact_and_script_owned(self):
         skill = read(".agents/skills/analyzing-cybernetic-requirements/SKILL.md")
         output_format = section_body(skill, "Output Format")
@@ -57,10 +82,32 @@ class SkillHotPathCompressionTest(unittest.TestCase):
     def test_orchestrator_hot_path_avoids_repeated_guard_commands(self):
         skill = read(".agents/skills/orchestrating-cybernetic-pregoal/SKILL.md")
 
-        self.assertLessEqual(len(skill.splitlines()), 520)
+        self.assertLessEqual(len(skill.splitlines()), 260)
         self.assertLessEqual(skill.count("scripts/orchestration_guard.py"), 2)
         self.assertIn("references/output-and-final-checks.md", skill)
         self.assertIn("references/orchestration-protocol.md", skill)
+
+    def test_entry_model_uses_controlled_run_not_levels(self):
+        skill = read(".agents/skills/routing-cybernetic-workflows/SKILL.md")
+
+        self.assertIn("controlled_run", skill)
+        self.assertIn("strategy_policy", skill)
+        self.assertIn("human_gate", skill)
+        self.assertIn("live_gate", skill)
+        self.assertIn("counterexample_gate", skill)
+        self.assertNotIn("### Level", skill)
+        self.assertNotIn("Routing decision: Level", skill)
+        self.assertNotIn("Level 4", skill)
+
+    def test_compiler_hot_path_is_generation_aware(self):
+        skill = read(".agents/skills/compiling-cybernetic-runtime-goals/SKILL.md")
+
+        self.assertLessEqual(body_word_count(skill), 650)
+        self.assertIn("run.control.json", skill)
+        self.assertIn("current_generation", skill)
+        self.assertIn("strategy_policy", skill)
+        self.assertNotIn("Inputs:\n\n- `requirements.control.json` with status Complete", skill)
+        self.assertNotIn("approved control chain paths for requirements, design when present, goal, execution policy, and review", skill)
 
     def test_hot_paths_do_not_teach_old_long_runtime_goal_pattern(self):
         hot_paths = [

@@ -82,6 +82,31 @@ class SemanticReviewNeedsRevisionTest(unittest.TestCase):
         self.assertIn("NeedsRevision", review_text)
         self.assertIn("ReturnToRequirementsAnalysis", review_text)
 
+    def test_counterexample_gate_covers_goal_decomposition_and_runtime_claims(self):
+        combined = "\n".join(
+            [
+                read(ORCHESTRATION_SKILL),
+                read(REVIEW_SKILL),
+                read(ROOT / ".agents/skills/using-control-json/references/runtime-control-json-protocol.md"),
+            ]
+        )
+
+        self.assertIn("Counterexample Gate", combined)
+        self.assertIn("counterexample-gate", combined)
+        for gate_point in (
+            "source_requirements->required_outcomes",
+            "required_outcomes->required_steps",
+            "required_steps->work_packages",
+            "required_steps->runtime_steps",
+            "pre_runtime_compile",
+            "blocked_or_goal_achieved",
+        ):
+            with self.subTest(gate_point=gate_point):
+                self.assertIn(gate_point, combined)
+
+        self.assertIn("target decomposition", combined)
+        self.assertIn("attempts to disprove", combined)
+
     def test_runtime_compile_requires_approved_control_statuses_and_runtime_validator(self):
         combined = "\n".join(
             [

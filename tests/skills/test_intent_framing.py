@@ -132,7 +132,7 @@ class IntentFramingSkillTest(unittest.TestCase):
         self.assertIn("framing-cybernetic-intent", target_text)
         self.assertIn("method preference", target_text)
         self.assertIn("process distrust", target_text)
-        self.assertIn("Does not classify as Level 3", target_text)
+        self.assertIn("Does not classify as controlled_run", target_text)
         self.assertIn("Does not recommend orchestrating-cybernetic-pregoal yet", target_text)
 
     def test_integration_places_reference_pre_task_handoff(self):
@@ -171,8 +171,8 @@ class IntentFramingSkillTest(unittest.TestCase):
         )
         for term in (
             "pre-task intent",
-            "Level 0/1/2",
-            "lightest workflow",
+            "ordinary direct work",
+            "controlled run",
             "evidence/context/review budget",
         ):
             self.assertIn(term.casefold(), folded)

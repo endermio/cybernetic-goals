@@ -7,36 +7,25 @@ description: 'Use when requirements analysis, any required design, goal.control.
 
 ## Overview
 
-Review whether the AI approved work chain is coherent enough to execute.
+Review whether the approved work chain is coherent enough to execute.
 
-Inputs:
-
-- requirements control JSON
-- solution design, when required design is required or a design exists
-- goal control JSON
-- execution policy / plan
-
-Output:
-
-```text
-docs/cybernetics/runs/<slug>/review.control.json
-```
-
-Official persistent control facts are JSON only. Historical Markdown may be read as non-authoritative background, but do not create or compile Markdown as official guard, compiler, runtime, or long-term dual-path control input.
+Input: requirements JSON, optional design, goal JSON, execution policy or
+current generation strategy. Output: `review.control.json`.
 
 This skill does not execute target work and does not start `/goal`.
+Detailed review dimensions live in `references/control-review-detailed-rules.md`
+and `references/review-rubric.md`.
 
-## Required Infrastructure
+## Independent Review Rule
 
-Follow `$cybernetic-superpowers-infrastructure`.
+Do not self-review and mark `Approved`.
 
-This skill requires independent review discipline before it may mark a approved work chain `Approved`.
+Use authorized subagents, explicit human approval, or another independent
+reviewer. Otherwise mark `Needs Independent Review`.
 
-Do not self-review and mark `Approved`. Do not run target execution. Do not dispatch execution agents during pre-goal review.
-
-If pre-goal review subagents are explicitly authorized, use independent reviewer passes for the approved work chain. This is not the full `$superpowers:subagent-driven-development` execution workflow; it is independent review discipline only.
-
-If pre-goal review subagents are not authorized and no explicit human approval or other independent reviewer exists, produce a review marked `Needs Independent Review`. Do not mark `Approved`.
+No `Approved` state is allowed after an unreviewed substantive artifact
+mutation. If approved files change after review, mark `Dirty` or `Needs
+Re-review` until final independent re-review passes.
 
 ## Semantic Review Verdicts
 
@@ -46,428 +35,78 @@ Subagent semantic review verdicts must be one of:
 `Approved` / `NeedsRevision` / `Blocked`
 ```
 
-This verdict is not a simple fail. `NeedsRevision` means the approved work
-chain contains repairable intent drift, obligation downgrade, or artifact
-misrouting, and orchestration must return to the earliest artifact that
-introduced the drift. `Blocked` means review cannot identify a safe revision
-path without a human decision, missing dependency, or unavailable evidence.
+`NeedsRevision` is not a simple fail. It means the chain contains repairable
+intent drift, obligation downgrade, or artifact misrouting.
+runtime compilation is forbidden until the verdict is `Approved`.
 
-When persisted in `review.control.json`, `NeedsRevision` may be rendered as
-the existing review status `Needs Revision`; response-only handoff should still
-include the normalized verdict. The review contract is: runtime compilation is forbidden until the verdict is `Approved`.
+## Required Checks
 
-## Final Observer Rule
+Always check:
 
-No `Approved` state is allowed after an unreviewed substantive artifact mutation.
+- requirement traceability;
+- Intent Preservation / Obligation Preservation Review;
+- source-requirement-preservation when `source_requirements` exist;
+- required outcome coverage;
+- Counterexample Gate;
+- design match when design exists;
+- goal correctness;
+- plan controllability;
+- evidence governance;
+- runtime suitability;
+- review independence;
+- final observer.
 
-A approved work chain may be marked `Approved` only when the last substantive change to the reviewed approved files, meaning the requirements analysis, solution design, goal, or execution policy, has been followed by an independent review pass that reports no Blocking or Major findings.
+Use the detailed reference for the full rubric.
 
-If any approved file changes after the latest independent review, the review state becomes `Dirty` / `Needs Re-review` and cannot be `Approved`.
+## Intent Preservation / Obligation Preservation Review
 
-Substantive changes to the review's final decision, reviewer findings, approval rationale, or Final Independent Check after approval also require re-review or explicit human approval. Mechanical recording of already-reviewed findings into the review file does not itself create a new review cycle.
+Reject or return to revision when implementation, measurement, repair,
+diagnosis, or decision work is weakened into readiness, future work, allowed
+action, compatibility-only behavior, a framework, or a plan.
 
-Deterministic-only changes may skip subagent re-review only when all of the following are true:
+Regression examples that must be `NeedsRevision`:
 
-- the change is explicitly listed as deterministic-only;
-- a deterministic guard covers the changed condition and passes;
-- the review records that no meaning or control-policy content changed.
+- required `/api/v2` implementation must not be accepted as legacy Drogon compatibility readiness;
+- source request to measure E, S, A, M, Q, K, Se, Nout, Cckpt growth curves must
+  not become define scan framework and dominance rules;
+- implement /api/v2 download/extract/preview API family must not become
+  compatible with future v2 exposure.
 
-Substantive changes include changes to:
+Route these to `ReturnToRequirementsAnalysis` if the source requirement itself
+was weakened.
 
-- confirmed meaning;
-- What the User Approved or the approved compact control commitment;
-- solution design objects, relationships, flows, limits, interfaces/contracts, evidence model, or design rules that cannot change;
-- goal success conditions;
-- scope, limits, or rules that cannot change;
-- execution policy or batch cadence;
-- who does the work / context use;
-- evidence check or evidence structure;
-- user purpose evidence limit, user purpose evidence strategy, or completion-claim wording;
-- where the result must show up, residual reconciliation, or result claim wording;
-- work covered in this run, what the agent may do, forbidden-action handling, or work covered in this run coverage matrix;
-- evidence lifecycle, retention, budget, or tracked-evidence policy;
-- progress log required fields;
-- stop conditions;
-- runtime limit;
-- approval criteria;
-- artifact consistency rules;
-- anything required by a prior reviewer as a Blocking or Major finding.
+## Counterexample Gate
 
-Deterministic-only changes include:
+Every approved review must include `counterexample-gate`. It attempts to
+disprove the target decomposition and runtime claim.
 
-- heading capitalization required by lint;
-- Markdown fence repair;
-- path typo repair when the intended path is unambiguous;
-- manifest ordering;
-- whitespace.
+It must include reviewer provenance: `reviewer.kind`, `reviewer.id`, and
+`reviewer.evidence_ref`. Self-written evidence is not enough.
 
-The author of a post-review revision must not be the sole approver of that revision.
-
-## Check Cascade Rule
-
-Record required check results before detailed findings:
-
-1. Required Answer Path Check
-2. Steps That Make The Result True / Producing Action Check
-3. Work Coverage / Action Limits Check
-4. what-counts-as-done / user-purpose evidence / result-placement Check
-5. Work Assignment / Subagent Check
-
-If Required Answer Path Check is `FAIL`, the review cannot be `Approved`; route back to design or What the User Approved according to the failing approved answer path. If another required check is `FAIL`, route to the earliest failing artifact before evaluating downstream polish.
-
-## Review Dimensions
-
-### 1. Requirement Traceability
-
-Every confirmed human decision in requirements control JSON must appear in the goal and execution policy.
-
-### 1A. Intent Preservation / Obligation Preservation Review
-
-Independent reviewers must check that downstream artifacts preserve the
-approved intent and required obligations, not only that they mention similar
-terms. Flag `NeedsRevision` when a required outcome is downgraded into:
-
-- readiness while implementation or delivery is the approved obligation;
-- future work, roadmap, handoff, or later-goal language;
-- allowed or permitted action when the action must be covered by the plan;
-- compatibility-only behavior when the approved obligation requires a new or
-  changed behavior.
-
-Example regression: a required `/api/v2` implementation must not be accepted
-as legacy Drogon compatibility readiness. That downgrade is `NeedsRevision`,
-not `Approved`, because the obligation changed from implementing the required
-endpoint to preparing or preserving compatibility.
-
-Route `NeedsRevision` to the earliest artifact that introduced the drift:
-
-- Requirements drift -> `ReturnToRequirementsAnalysis`: approved meaning is
-  ambiguous, contradictory, infeasible, or lacks the obligation that downstream
-  artifacts are trying to satisfy.
-- Design drift -> `RunDesign`: the design turns a required outcome into
-  readiness, future, allowed, or compatibility-only behavior.
-- Goal drift -> `RunGoalWriting`: the goal downscopes success conditions,
-  target state, what-counts-as-done, or final answer format.
-- Plan drift -> `RunExecutionPolicy`: the plan moves required work to future
-  work, compatibility readiness, prepare-only status, or permission-only
-  handling while keeping success claims possible.
-
-NeedsRevision routes to the earliest artifact that introduced drift; after
-revision, rerun independent review before approval. If the review owns the
-handoff inside JSON pre-goal orchestration, return the review path, verdict,
-and revision route to `$orchestrating-cybernetic-pregoal`; do not compile
-`runtime.control.json`.
-
-### 2. What The User Approved Check
-
-For Level 3/4 or JSON pre-goal work, requirements analysis must contain `What the User Approved: Approved`.
-
-Check that design, goal, and execution policy preserve the approved compact control commitment:
-
-- human purpose;
-- input role binding;
-- primary object;
-- requested transformation;
-- non-goals;
-- How We Know The User Purpose Was Met Limit;
-- Where The Result Must Show Up;
-- What counts as done;
-- Evidence needed to call it done;
-- If it is not done, what should be reported;
-- How this should be answered;
-- What is not enough;
-- How this should be answered;
-- Final Answer Format;
-- Work covered in this run;
-- What the agent may do;
-- Forbidden live / irreversible actions;
-- Required handling for unauthorized actions;
-- Explicitly out-of-scope items;
-- Agent delegation preference;
-- Agent workflow preference;
-- Parallel execution authority;
-- Maximum parallel agents;
-- why this process is needed;
-- known assumptions.
-
-Flag as Major or Blocking when downstream artifacts reinterpret, expand, remove, or contradict the approved compact control commitment. If a downstream artifact changes the primary object, requested transformation, non-goals, user-purpose evidence, result-placement, what-counts-as-done condition, final answer format, or why this process is needed, require what the user approved revision or explicit human reapproval before approval.
-
-### Source Requirement Preservation Check
-
-For JSON control runs with `source_requirements`, review must first compare the approved user request text or approved compact summary to `source_requirements`. Reject or return to requirements when a source requirement weakens the requested action, changes the target object, lowers the required evidence strength, omits completion checks, or converts current-run required work into future work.
-
-Then review `source_requirements -> required_outcomes -> required_evidence -> runtime.required_steps -> verifier`. Each blocking source requirement must be covered by equal or stronger evidence. This is not keyword lint: judge whether the proposed outcome and evidence actually complete the original requested item.
-
-Record this check as `source-requirement-preservation`. Historical regressions
-that must be `NeedsRevision` and route to `ReturnToRequirementsAnalysis`
-include:
-
-- source quote says to measure E, S, A, M, Q, K, Se, Nout, Cckpt growth curves, but the source requirement says only to define scan framework and dominance rules;
-- source quote says to implement /api/v2 download/extract/preview API family, but the source requirement says only compatible with future v2 exposure.
-
-### 3. Goal Check
-
-The goal must not add, remove, downscope, or reinterpret requirement meaning.
-
-### 4. Design Check
-
-When a solution design exists or required design was required:
-
-- the design must preserve requirements analysis meaning;
-- the goal must preserve design rules that cannot change;
-- the plan must preserve design objects, relationships, limits, flows, interfaces/contracts, lifecycle/failure model, and evidence model;
-- tactical degrees of freedom must not be frozen as meaning rules that cannot change unless the design explicitly says so;
-- the plan must not redesign the solution model.
-
-### 5. Required Answer Path Check
-
-When What the User Approved records `How this should be answered` or `What is not enough`, the design is a meaning compiler for that approved answer path.
-
-Flag as Major or Blocking when:
-
-- design substitutes a weaker answer path for the approved way this should be answered;
-- design instantiates a different how this should be answered without returning to What the User Approved;
-- design reports the what is not enough as sufficient;
-- goal or execution policy inherits a weaker answer path than the design;
-- review approves what the user marked as not enough as sufficient evidence.
-
-If the approved answer path is infeasible or unsuitable, require return to requirements/What the User Approved. Do not approve a design that silently changes task type.
-
-### 6. Final Answer Format Check
-
-When requirements analysis, solution design, or goal includes an final answer format:
-
-- the requirements `Final Answer Format` must be preserved in the goal `Final Final Answer Format`;
-- the design `Final Answer Format Design`, if present, must be preserved in the goal and execution policy;
-- the execution policy must collect the material needed for the final output;
-- evidence-reference, destination, machine-readable, and acceptance-condition requirements must not be weakened;
-- runtime `/goal` must not be able to replace the audience, purpose, medium, structure, detail level, destination, or machine-readable shape.
-
-### 7. Is The Plan Controllable
-
-The execution policy must define a sane execution rule:
-
-- dependency matrix
-- who does the work / context use
-- context budget
-- work size
-- evidence check budget
-- evidence lifecycle / evidence budget
-- batch cadence
-- phase checks
-- repair policy
-- stop conditions
-
-### 8. Evidence check / Evidence Governance
-
-Approved evidence checks, checks, and evidence channels are evidence checks, not objectives.
-
-Flag plans that:
-
-- overfit old evidence checks;
-- require every micro-step to pass;
-- lack stale evidence check retirement rules;
-- lack intended-result evidence.
-
-### 9. User Purpose Evidence Check
-
-Block false completion claims, not necessarily continued execution.
-
-Classify user purpose evidence as one of:
-
-- User purpose evidence adequate
-- Internally verified, user purpose evidence pending
-- Purpose partially observed
-- User purpose evidence unavailable, honest handoff required
-- Purpose-limit evidence not required, justified
-
-Flag as Major or Blocking when:
-
-- evidence is used to claim purpose achieved without observing the human purpose or beneficiary/observer limit;
-- internal checks, scripts, lint, API smoke, or other convenient evidence checks are treated as purpose-achievement evidence without justification;
-- purpose-limit feedback is missing and the plan does not provide honest pending, partial, or unavailable status wording;
-- the plan demands heavy end-to-end or operational feedback when a smaller purpose-limit observation would suffice;
-- the goal defines success as evidence check success; purpose-realizing outcome evidence is required unless the purpose is internal-state correctness.
-
-### 10. Evidence Lifecycle / Evidence Budget
-
-Flag as Major or Blocking when:
-
-- the execution policy stores repeated full raw evidence check outputs per batch;
-- raw evidence volume can exceed the controlled work size without justification;
-- intermediate evidence lacks summary or delta;
-- tracked evidence is not reviewable;
-- no raw, pointer, summary/delta, and retained-full retention policy exists;
-- evidence files are loaded as context; indexed references are the required form;
-- reviewers would need to read raw evidence to approve;
-- evidence artifacts are not separated into transient raw, raw pointer, reviewable summary/delta, and retained full classes;
-- repeated full snapshots of the same evidence check are allowed without explaining why delta is impossible.
-
-Use `Major` when execution-policy revision can repair evidence lifecycle. Use `Blocking` when evidence check output would likely swamp review, context management, or runtime completion.
-
-### 11. Result Placement Check
-
-Classify result-placement as one of:
-
-- result-placement adequate
-- result-placement partial
-- result-placement missing
-- result-placement unavailable
-- result-placement not applicable with justification
-
-Flag as Major or Blocking when:
-
-- local action is being treated as global intended-result realization;
-- the intended result spans places but the policy lacks a place model;
-- required actions are unclear for places that carry the intended result;
-- old-state residuals, unknown places, preserved places, or excluded
-  places lack reconciliation;
-- result-placement evidence is used as human-purpose achievement evidence without user-purpose evidence support;
-- result-placement not applicable is claimed without justification.
-
-Use `Major` when policy or goal revision can repair result-placement wording. Use
-`Blocking` when runtime could claim intended-result realization while important
-places or residuals remain unresolved.
-
-### 12. What Counts As Done Check
-
-Flag as Major or Blocking when:
-
-- there is more than one what counts as done;
-- any partial, diagnostic, blocked, invalid, unavailable, fallback, or not done report appears in Success Condition;
-- any report-when-not-done status is listed under target-achieved states;
-- the execution policy lacks an action that can make it done or a proof-of-impossibility path;
-- the plan can terminate with `goal achieved: yes` without satisfying the what counts as done;
-- "valid final status" is used without separating `goal achieved: yes` from `goal achieved: no`.
-
-### 13. Answer Path Check
-
-Flag as Major or Blocking when:
-
-- implementation decomposes by components without a required answer path;
-- no mainline work package owns the actor-centered path from initial state to what counts as done;
-- candidate tasks lack `Required step(s)`, `Role`, state-transition, transition-evidence, integration-check, or goal-progress fields;
-- supporting-only work is allowed to satisfy goal progress by itself;
-- final integration path, primary use path, or required-step transition evidence is deferred to future work while achieved claims remain possible;
-- component, module, or workflow evidence replaces required-step transition evidence;
-- failed, blocked, or unobserved required-step transitions are recorded only as residual risk while review remains Approved.
-
-### 13A. Producing Action Alignment Check
-
-Plan review must check that each blocking required step has a credible chain:
+Required `checked_transformations`:
 
 ```text
-required step -> what would make it true -> planned producing action -> mainline work package -> evidence after action
+source_requirements->required_outcomes
+required_outcomes->required_steps
+required_steps->work_packages
+required_steps->runtime_steps
+pre_runtime_compile
+blocked_or_goal_achieved
 ```
 
-Flag as Major or Blocking when:
+## Plan And Runtime Review
 
-- a required step needs a new state, artifact, implementation, experiment, or run result, but the plan only inspects existing artifacts, summarizes old evidence, checks available modes, or compares current results;
-- a mainline work package is verification-only, discovery-only, old-result comparison, or check-only while `Counts as goal progress` remains true;
-- "missing existing capability" is treated as runtime `blocked` without first planning an allowed producing action or proving that approved authority forbids producing it;
-- the plan's allowed write/run authority cannot execute the planned producing action;
-- the plan verifies that a required step is already true but never defines what work will make it true if it is currently false;
-- supporting-only discovery is used as the final mainline action for a generating target;
-- work packages can satisfy a blocking required outcome without showing the state change they produce.
+Each blocking required step needs a credible chain:
 
-Use `NeedsRevision` when the plan can be repaired by adding producing actions, expanding allowed work within already approved authority, or returning to design for a clearer support path. Use `Blocked` only when the approved control facts forbid the necessary producing action, a required dependency is unavailable, or the review cannot identify a safe revision route without a human decision.
+```text
+required step -> what would make it true -> producing action -> mainline work package -> evidence after action
+```
 
-### 14. Work Covered And Allowed Actions Check
+Flag plans that inspect old artifacts or compare current results while required
+implementation, experiment, repair, or measurement is still needed.
 
-Flag as Major or Blocking when:
-
-- approved full work covered in this run is silently reduced to the first safe segment;
-- what the agent may do limits are used as scope removal, bypassing execute / prepare-only / observe-only / forbidden-not-executed handling;
-- unauthorized live or irreversible actions are moved to future roadmap, handoff, or later goal while still inside the approved work covered in this run;
-- approved work covered in this run items lack coverage in the execution policy;
-- prepare-only or forbidden-not-executed work is claimed as executed or live complete;
-- the final report cannot distinguish executed, prepared-only, forbidden-not-executed, and explicitly out-of-scope by What the User Approved.
-
-### 15. Who Does The Work / Context Use
-
-Flag as Major or Blocking when:
-
-- no who does the work exists;
-- Level 3/4 work assigns all target work to the main agent without a context-load justification;
-- the plan creates context overload by making the main agent coordinator, worker, integrator, and verifier for context-heavy work;
-- delecheckd work packages lack Context pack, Allowed actions, Return format, or Integration check;
-- context packs contain only artifact path lists; bounded operating context requires relevant control excerpts, current batch objective, allowed artifacts/places, forbidden changes, required evidence checks/evidence, stop conditions, and expected return format;
-- parallel subagent-driven execution lacks explicit human approval, dependency independence, or control-review approval;
-- a subagent may modify approved files, widen scope, replace work assignment, or bypass integration checks;
-- progress-log ownership or stop-condition detection is unclear;
-- context compression or bounded return material is missing for delecheckd work;
-- subagent outputs can be treated as final completion before main-agent integration.
-
-Use `Major` when execution-policy revision can repair work assignment. Use `Blocking` when context overload would likely make runtime lose requirements, design rules that cannot change, final answer format, stop conditions, or approval limits.
-
-### 16. Parallel Agent Safety Check
-
-Flag as Major or Blocking when:
-
-- the What the User Approved requests max-safe-parallel but the plan selects serial without a concrete safe-frontier reason;
-- What the User Approved requests `superpowers-subagent-driven-development` and max-safe-parallel at the same time without returning to what the user approved revision;
-- selected subagent execution mode does not match who does the work or agent workflow;
-- the selected Superpowers workflow does not support the selected execution mode;
-- `$superpowers:subagent-driven-development` is used with `parallel-max-safe`;
-- `$superpowers:dispatching-parallel-agents` is treated as if it provides the implementer/spec-review/code-quality review loop from subagent-driven-development;
-- serial subagent-driven execution lacks `serial-single-active`, `Max concurrent subagents: 1`, ordered sequence, or integration after each package;
-- parallel subagent-driven execution lacks dependency independence, concurrency frontier, wave matrix, conflict / lock model, integration barriers, or failure policy;
-- two parallel work packages can touch the same place without a lock rule or barrier;
-- subagent outputs can become final without main-agent integration;
-- selected agent workflow does not fit the approved work packages.
-
-### 17. Is The Work Split At The Right Size
-
-Flag as Major or Blocking when:
-
-- batches are mechanical micro-steps; coherent intended-result slices are the required form;
-- every step requires full observability;
-- evidence check cost dominates execution cost;
-- broad verification is required after every small edit;
-- stale evidence checks can block approved structural change;
-- batch-end checks are too weak to detect drift;
-- batch-end checks are so heavy that they prevent progress;
-- the plan does not explain why batch size is diagnosable.
-
-Use `Major` when execution-policy revision can repair the execution rule. Use `Blocking` when the granularity or evidence check load would prevent runtime completion or let evidence checks override confirmed meaning.
-
-### 18. Batch Rhythm
-
-Flag:
-
-- excessively tiny steps;
-- huge unobservable batches;
-- no batch-end openability requirement;
-- no destructive intermediate-state policy.
-
-### 19. Meaning vs Tactical Limit
-
-Meaning rules that cannot change must be frozen. Tactical execution details must remain adjustable.
-
-### 20. Runtime Suitability
-
-The runtime `/goal` must be able to execute the approved artifacts without inventing new approved anchors. Generation-aware startup may allow runtime to propose reviewed amendments to derived strategy, but review must verify that `semantic_base`, required outcomes, what counts as done, work coverage, authority, and forbidden actions are unchanged unless human reapproval is required. Any required runtime discipline, including approved work assignment, bounded subagent delegation protocol, conditionally selected Superpowers workflow, amendment triggers, and generation switch rules, must be precompiled into the approved plan, run control, review, or final `/goal`.
-
-Runtime completion claims must be calibrated to the highest purpose-relevant evidence actually observed. If user purpose evidence is missing, runtime must report what is verified, what is not yet observed, and the smallest next observation needed. Purpose-achieved wording is reserved for observed or approved user purpose evidence.
-
-Runtime result claims must also be calibrated to Where The Result Must Show Up
-Placement status. Do not claim intended-result realization from local action alone
-when Where The Result Must Show Up is required. Strongest positive
-result claims require result-placement adequate.
-
-Runtime what-counts-as-done claims must be calibrated to the what counts as done. not done report may stop execution honestly. They do not support `goal achieved: yes`.
-
-### 21. Review Independence
-
-The review must record:
-
-- whether subagents were explicitly authorized;
-- which independent review passes were completed;
-- whether approval is allowed;
-- why approval is blocked when independent review is missing.
-
-### 22. Final Independent Check
-
-The review must record whether any substantive artifact changed after the latest independent review pass and whether a final independent observer confirmed no Blocking or Major findings after that change.
+Runtime completion claims must match the strongest evidence actually observed.
+Missing purpose evidence supports not-done, not `goal_achieved: true`.
 
 ## Deterministic Lint
 
@@ -481,70 +120,16 @@ python3 .agents/skills/reviewing-cybernetic-control-structures/scripts/control_a
   --plan [PLAN]
 ```
 
-Use the lint output as a structural evidence check. Do not treat lint as meaning approval.
-
-## Output Verdict And Status
-
-The normalized semantic review verdict must be one of:
-
-- `Approved`
-- `NeedsRevision`
-- `Blocked`
-
-The persisted review status must be one of:
-
-- `Needs Revision`
-- `Needs Independent Review`
-- `Dirty`
-- `Needs Re-review`
-- `Blocked`
-- `Approved`
-
-Use `NeedsRevision` / `Needs Revision` for repairable drift or missing
-independent review loops. Use `Blocked` only when no safe revision route exists
-without a human decision, missing dependency, or unavailable external fact.
-
-Only mark `Approved` when:
-
-- requirements analysis, required design, goal, and plan are consistent;
-- What the User Approved is Approved when JSON pre-goal orchestration is used, and What The User Approved Check has no Blocking/Major findings;
-- Work Covered And Allowed Actions Check has no Blocking/Major findings for full-route or multi-batch work;
-- required design exists and is consistent with requirements analysis, goal, and plan;
-- Required Answer Path Check has no Blocking/Major findings when What the User Approved records how this should be answered;
-- any upstream final answer format is preserved in the goal and supported by the execution policy;
-- no unresolved meaning decision remains;
-- execution policy does not self-authorize uncontrolled changes;
-- work assignment is explicit and does not create main-agent context overload;
-- work size and evidence check load do not create micro-step overcontrol or evidence check overcoupling;
-- user purpose evidence check supports the permitted completion wording and does not confuse internal progress evidence with purpose achievement;
-- result placement check supports result claim wording and does not confuse local action with global realization;
-- what counts as done check preserves the what counts as done;
-- evidence lifecycle keeps tracked evidence reviewable and prevents raw evidence check output explosion;
-- evidence check/evidence governance is explicit;
-- runtime `/goal` can execute without writing or approving a new plan.
-- independent review discipline was satisfied or explicit human approval exists.
-- no substantive artifact mutation remains unreviewed after the latest independent review.
-- any deterministic-only exception is explicitly recorded and guard-covered.
-
-## Response-Only Handoff Rule
-
-Do not write handoff prompts into the review artifact.
-
-After review status is set:
-
-- If invoked by `$orchestrating-cybernetic-pregoal` or JSON pre-goal context, return the review path and status to `$orchestrating-cybernetic-pregoal`.
-- If standalone/manual and status is `Approved`, hand off to `$compiling-cybernetic-runtime-goals`.
-- If status is `Needs Revision`, `Dirty`, or `Needs Re-review`, revise the relevant approved files and rerun review; do not compile runtime `/goal`.
-- If status is `Needs Independent Review`, obtain independent review or explicit human approval; do not compile runtime `/goal`.
-- If verdict/status is `Blocked`, stop and report the smallest human decision, missing dependency, or unavailable fact; do not compile runtime `/goal`.
+Lint is structural evidence, not meaning approval.
 
 ## Output Format
 
-This output format is response-only. Do not write `$skill ...` commands, runtime `/goal` prompts, or conversational next-step prompts into the review artifact.
+This output format is response-only. Do not write `$skill ...` commands,
+runtime `/goal` prompts, or conversational next-step prompts into the review
+artifact.
 
 ```markdown
 Created or updated review:
-
 `docs/cybernetics/runs/YYYY-MM-DD-slug/review.control.json`
 
 Review status:
@@ -557,39 +142,18 @@ Key findings:
 - ...
 
 Response-only next step:
-- If JSON pre-goal orchestration owns the chain: return to `$orchestrating-cybernetic-pregoal` with the review path and status.
-- If standalone/manual and `Approved`: run `$compiling-cybernetic-runtime-goals`.
-- If `Needs Revision`, `Dirty`, or `Needs Re-review`: revise the named artifacts and rerun `$reviewing-cybernetic-control-structures`.
-- If `Needs Independent Review`: obtain independent review or explicit human approval before runtime compilation.
-- If `Blocked`: report the smallest unresolved decision, dependency, or unavailable fact.
+- return to `$orchestrating-cybernetic-pregoal`, or
+- revise the named artifact and rerun review, or
+- report the smallest unresolved decision, dependency, or unavailable fact.
 ```
 
 ## Validation Checklist
 
-- [ ] The review file was created.
-- [ ] Review status is explicit.
-- [ ] Review verdict is `Approved`, `NeedsRevision`, or `Blocked`.
-- [ ] Review independence is recorded.
-- [ ] What The User Approved Check was checked when JSON pre-goal orchestration is used.
-- [ ] Required Answer Path Check was checked when What the User Approved records how this should be answered.
+- [ ] Review file was created or updated.
+- [ ] Review status and verdict are explicit.
+- [ ] Independent review basis is recorded.
+- [ ] Counterexample Gate is present.
+- [ ] Source requirements were compared to approved user request text.
 - [ ] Final observer check is recorded.
-- [ ] The review does not mark self-review as `Approved`.
-- [ ] If subagents were not authorized and no human approval exists, status is `Needs Independent Review`.
-- [ ] If any substantive artifact changed after independent review, including required design, status is `Dirty` or `Needs Re-review` until final independent re-review reports no Blocking or Major findings.
-- [ ] Lint PASS is not treated as meaning/control-policy approval.
-- [ ] Critical findings distinguish meaning, design, goal, plan, evidence check, and runtime issues.
-- [ ] Output contract check was checked when any upstream final answer format exists.
-- [ ] Evidence lifecycle and evidence budget were checked.
-- [ ] User purpose evidence check was checked.
-- [ ] Result placement check was checked.
-- [ ] What Counts As Done Check was checked.
-- [ ] Answer Path Check was checked.
-- [ ] Producing Action Alignment was checked for blocking required steps.
-- [ ] Work Covered And Allowed Actions Check was checked.
-- [ ] Parallel Agent Safety Check was checked.
-- [ ] Work size and evidence check load were checked.
-- [ ] Required revisions are actionable.
-- [ ] Response-only handoff matches the review status and does not bypass `$orchestrating-cybernetic-pregoal` when JSON pre-goal orchestration owns the chain.
-- [ ] The assistant response includes a response-only next step for every review status.
-- [ ] The review did not execute target work.
-- [ ] The review did not output final runtime `/goal`.
+- [ ] Lint PASS is not treated as semantic approval.
+- [ ] Review does not execute target work or start `/goal`.

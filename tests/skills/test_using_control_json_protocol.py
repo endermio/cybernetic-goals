@@ -39,10 +39,10 @@ class UsingControlJsonProtocolTest(unittest.TestCase):
             re.compile(r"stop[^.\n]*(missing|invalid|inconsistent)[^.\n]*JSON", re.I),
         )
 
-    def test_json_pregoal_skill_is_not_level2_bounded_runtime_protocol(self):
+    def test_json_pregoal_skill_is_not_bounded_runtime_protocol(self):
         text = combined_protocol_text()
 
-        self.assertRegex(text, re.compile(r"not[^.\n]*Level 2 bounded", re.I))
+        self.assertRegex(text, re.compile(r"not[^.\n]*bounded_runtime", re.I))
         self.assertIn("using-bounded-control-json", text)
 
     def test_runtime_writes_are_limited_to_three_files(self):
@@ -88,6 +88,17 @@ class UsingControlJsonProtocolTest(unittest.TestCase):
         self.assertIn("goal_achieved: true", text)
         self.assertRegex(text, re.compile(r"verifier[^.\n]*before[^.\n]*goal_achieved: true", re.I))
         self.assertRegex(text, re.compile(r"verifier[^.\n]*(allows|permits|approved)", re.I))
+
+    def test_validators_are_structural_gates_not_quality_approval(self):
+        text = combined_protocol_text()
+
+        self.assertIn("Structural gates", text)
+        self.assertIn("Quality gate", text)
+        for structural in ("schema", "control_chain_guard", "validate_control_chain", "verify_runtime_progress"):
+            self.assertIn(structural, text)
+        self.assertIn("counterexample-gate", text)
+        self.assertRegex(text, re.compile(r"structural[^.\n]*not[^.\n]*quality approval", re.I))
+        self.assertRegex(text, re.compile(r"counterexample-gate[^.\n]*quality gate", re.I))
 
     def test_short_goal_adapter_stays_pointer_only(self):
         text = combined_protocol_text()

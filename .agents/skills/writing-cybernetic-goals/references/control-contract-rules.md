@@ -29,7 +29,7 @@ current generation, required steps, verifier, and any expanded approved
 artifacts named by the selected strategy. The user-entered `/goal` stays
 pointer-only and length-bounded.
 
-## Good Level 2 bounded runtime goal pattern
+## Good bounded_runtime goal pattern
 
 ```text
 /goal Use .agents/skills/using-bounded-control-json and execute docs/cybernetics/runs/YYYY-MM-DD-slug/runtime.control.json. If the bounded JSON is missing, invalid, inconsistent, or insufficient, stop and report the smallest required human decision.
@@ -37,4 +37,4 @@ pointer-only and length-bounded.
 
 Bounded runtime reads only `goal.control.json` and `runtime.control.json`.
 If requirements/design/plan/review become necessary, the task is no longer a
-Level 2 bounded runtime and must move to JSON pre-goal orchestration.
+bounded runtime and must move to JSON pre-goal orchestration.

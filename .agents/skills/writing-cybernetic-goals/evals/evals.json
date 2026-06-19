@@ -12,19 +12,19 @@
       ]
     },
     {
-      "id": "level-3-goal-handoff-returns-to-orchestrator",
-      "prompt": "根据 complete requirements analysis 和 solution design 创建复杂 goal。路由结果是 Level 3 JSON pre-goal orchestration，execution-plan check required，review check required，$orchestrating-cybernetic-pregoal 可用。",
+      "id": "controlled-run-goal-handoff-returns-to-orchestrator",
+      "prompt": "根据 complete requirements analysis 和 solution design 创建复杂 goal。控制入口是 controlled_run JSON pre-goal orchestration，execution-plan check required，review check required，$orchestrating-cybernetic-pregoal 可用。",
       "expected_output": "Create goal.control.json, then in the response hand off back to $orchestrating-cybernetic-pregoal rather than directly recommending $writing-cybernetic-execution-policies.",
       "assertions": [
         "Creates or references docs/cybernetics/runs/<slug>/goal.control.json.",
         "Does not output a final runtime /goal.",
         "Response-only handoff recommends $orchestrating-cybernetic-pregoal.",
-        "Does not recommend $writing-cybernetic-execution-policies as the next user action for Level 3 JSON pre-goal work."
+        "Does not recommend $writing-cybernetic-execution-policies as the next user action for controlled_run JSON pre-goal work."
       ]
     },
     {
       "id": "bounded-audit-goal-direct-runtime",
-      "prompt": "router 已判定为 Level 2：为观察者路径闭环评估创建小型文件 goal。只读检查源材料、文档、检查结果、记录和预览证据，输出 docs/cybernetics/audits/2026-05-26-completion.md，不修改目标 artifacts。",
+      "prompt": "router 已判定为 bounded_runtime：为观察者路径闭环评估创建小型文件 goal。只读检查源材料、文档、检查结果、记录和预览证据，输出 docs/cybernetics/audits/2026-05-26-completion.md，不修改目标 artifacts。",
       "expected_output": "Refuse to create an executable bounded audit goal because the evaluation rubric is missing. Ask for status definitions, evidence levels, minimum evidence for the strongest positive status, and external-dependency handling.",
       "assertions": [
         "Does not create an executable /goal for the audit.",
@@ -36,7 +36,7 @@
     },
     {
       "id": "bounded-audit-goal-with-rubric-direct-runtime",
-      "prompt": "router 已判定为 Level 2：为观察者路径闭环评估创建小型文件 goal。rubric 已定义：已闭环必须有实际操作流证据或已运行 runtime check；部分闭环是有 work artifact、文档或未运行传感器但没有实际路径证据；未闭环是只有占位/计划或没有可用入口；不可判定是需要外部凭证、外部环境、真实第三方服务或当前环境无法观测。只输出 docs/cybernetics/audits/2026-05-26-completion.md，不修改目标 artifacts。",
+      "prompt": "router 已判定为 bounded_runtime：为观察者路径闭环评估创建小型文件 goal。rubric 已定义：已闭环必须有实际操作流证据或已运行 runtime check；部分闭环是有 work artifact、文档或未运行传感器但没有实际路径证据；未闭环是只有占位/计划或没有可用入口；不可判定是需要外部凭证、外部环境、真实第三方服务或当前环境无法观测。只输出 docs/cybernetics/audits/2026-05-26-completion.md，不修改目标 artifacts。",
       "expected_output": "Create bounded goal.control.json and runtime.control.json, then output a short /goal pointer because the evaluation rubric is explicit.",
       "assertions": [
         "Creates or references docs/cybernetics/runs/<slug>/goal.control.json for the bounded audit goal.",

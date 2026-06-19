@@ -131,21 +131,22 @@ class BoundedControlJsonProtocolTest(unittest.TestCase):
         with self.assertRaises(AssertionError):
             validate(invalid, schema)
 
-    def test_level2_goal_writer_points_to_bounded_runtime_skill_not_json_pregoal_skill(self):
+    def test_bounded_goal_writer_points_to_bounded_runtime_skill_not_json_pregoal_skill(self):
         text = WRITING_GOALS_SKILL.read_text(encoding="utf-8")
         mode_b = text.split("### Mode B: Bounded File Goal / Audit Goal", 1)[1]
 
         self.assertIn("using-bounded-control-json", mode_b)
         self.assertNotIn("using-control-json", mode_b)
         self.assertIn("does not require requirements/design/plan/review", mode_b)
+        self.assertNotIn("Level 2", mode_b)
 
-    def test_routing_level2_points_to_bounded_runtime_skill(self):
+    def test_entry_guidance_does_not_route_bounded_runtime_by_level(self):
         text = ROUTING_SKILL.read_text(encoding="utf-8")
-        level2 = text.split("### Level 2: Bounded JSON Goal or Bounded Repair Goal", 1)[1]
-        level2 = level2.split("### Level 2 With rubric check", 1)[0]
 
-        self.assertIn("using-bounded-control-json", level2)
-        self.assertNotIn("using-control-json", level2)
+        self.assertIn("bounded_runtime", text)
+        self.assertIn("using-bounded-control-json", text)
+        self.assertNotIn("### Level 2", text)
+        self.assertNotIn("Routing decision: Level", text)
 
     def test_bounded_validator_accepts_goal_and_runtime_only(self):
         with tempfile.TemporaryDirectory() as tmpdir:

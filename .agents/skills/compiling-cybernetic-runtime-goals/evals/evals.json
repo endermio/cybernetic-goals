@@ -210,13 +210,13 @@
       ]
     },
     {
-      "id": "guard-rejects-missing-task-level-in-work assignment",
-      "prompt": "requirements analysis Complete, goal exists, execution policy selects Main-only work assignment but omits Task level. review Approved and Final Independent Check allows approval；编译最终 /goal。",
-      "expected_output": "Refuse to compile runtime /goal because the execution work assignment does not record Task level, and route back to execution-policy revision.",
+      "id": "guard-rejects-missing-control-entry-in-work-assignment",
+      "prompt": "requirements analysis Complete, goal exists, execution policy selects Main-only work assignment but omits Control entry. review Approved and Final Independent Check allows approval；编译最终 /goal。",
+      "expected_output": "Refuse to compile runtime /goal because the execution work assignment does not record Control entry, and route back to execution-policy revision.",
       "assertions": [
         "Does not output final /goal.",
-        "Reports missing Task level in Who Does The Work / Context Use.",
-        "Does not let missing Task level bypass Level 3/4 Main-only context-load justification.",
+        "Reports missing Control entry in Who Does The Work / Context Use.",
+        "Does not let missing Control entry bypass controlled_run Main-only context-load justification.",
         "Includes a response-only next step to revise the execution policy."
       ]
     },

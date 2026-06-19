@@ -1,193 +1,79 @@
 # Routing Response Shapes
 
-These templates are formatting aids only. Choose the routing level from
-`SKILL.md` core rules, checks, and downgrade pass before using a template.
+Templates only. Do not use level names.
 
-## Level 0
+## ordinary_direct_work
 
 ```markdown
-Routing decision: Level 0 - Direct Prompt
+Control entry decision: ordinary_direct_work
 
 Why:
 - ...
 
-Required checks:
-- None.
+gates:
+- none, or named local/manual checks
 
-Recommended next step:
-Use a direct prompt:
-
-```text
-...
-```
-
-Rejected workflow:
-- Full cybernetic workflow would be heavier than the task.
-```
-
-## Level 1
-
-```markdown
-Routing decision: Level 1 - Inline Goal
-
-Why:
+required_checks:
 - ...
 
-Required checks:
-- None, unless rubric check, final-answer-format check, or required design is required.
+recommended next step:
+- Directly perform the task and verify locally.
 
-Recommended next step:
-Use:
-
-```text
-$writing-cybernetic-goals 为这个明确小任务写 inline /goal：...
-```
+rejected path:
+- controlled_run would add process without preserving more meaning.
 ```
 
-## Level 2
+## bounded_runtime
 
 ```markdown
-Routing decision: Level 2 - Bounded File Goal / Bounded Repair
+Control entry decision: bounded_runtime
 
 Why:
-- Existing meaning are already fixed.
-- No new structure/authorization/external-contract meaning appear required.
-- The task is a bounded correction.
+- Fixed small task.
+- Meaning and rubric are explicit.
+- No new solution/control decision is needed during runtime.
 
-Required checks:
-- None, or only checks already satisfied by confirmed inputs.
+gates:
+- structural verifier for bounded runtime
 
-Rubric check:
-- Not an evaluation task, or evaluation rubric is already explicit.
+required_checks:
+- rubric/design/output checks only if not already explicit
 
-Design check:
-- Satisfied or not applicable when solution structure is already fixed.
+recommended next step:
+- `$writing-cybernetic-goals` creates `goal.control.json` and
+  `runtime.control.json`, then outputs a short `/goal` using
+  `using-bounded-control-json`.
 
-Output Contract check:
-- Satisfied or not applicable when a simple response or confirmed artifact shape is enough.
-
-Recommended next step:
-Use a bounded repair prompt or small file-based goal:
-
-```text
-修正 <issue>，保持 <approved artifact paths or confirmed meaning> 不变；验证 <commands/artifacts>.
+rejected path:
+- controlled_run is unnecessary because no approved work chain must be revised.
 ```
 
-For a file-based goal:
-
-```text
-$writing-cybernetic-goals 为这个 Level 2 有界任务创建小型文件 goal，并在完成后给出直接 /goal 执行命令，不要默认建议 execution policy：...
-```
-
-Rejected workflow:
-- Reject Level 3 because no new approved work chain is required.
-- Do not recommend execution policy by default for Level 2; add required checks or upgrade only if unresolved control decisions appear.
-```
-
-## Level 2 With rubric check
+## controlled_run
 
 ```markdown
-Routing decision: Level 2 - Bounded Audit
+Control entry decision: controlled_run
 
 Why:
-- Execution scope is bounded enough for a file goal.
-- Requirement, structure-contract, authorization, and external-contract meaning do not need redesign.
-- The evaluation function is not explicit enough for runtime execution.
+- Runtime would otherwise invent or revise user meaning, strategy, evidence
+  checks, blocked claims, or completion claims.
 
-Required checks:
-- rubric check: required.
-- final-answer-format check: required if the final report shape affects acceptance and is not explicit.
+strategy_policy:
+- frozen_strategy / reviewed_replanning
 
-Rubric check:
-- Missing or partial: status meanings, evidence strength, minimum evidence for the strongest positive status, downgrade rules, and external-dependency handling.
+gates:
+- counterexample_gate
+- human_gate, if required
+- live_gate, if required
 
-Recommended next step:
-Use rubric analysis before goal writing:
+required_checks:
+- requirements approval
+- design/rubric/output/data-plane/deployment checks as needed
 
-```text
-$analyzing-cybernetic-requirements 分析这个审计/评估任务的评价口径：...
-```
+recommended next step:
+- `$analyzing-cybernetic-requirements ...`
+- After approval: `$orchestrating-cybernetic-pregoal ...`
 
-Rejected workflow:
-- Reject direct Level 2 execution because runtime Codex would invent the error function.
-- Reject Level 3 unless broader requirement/control meaning are also unresolved.
-```
-
-## Level 2 With required design
-
-```markdown
-Routing decision: Level 2 - Bounded Design/Audit/Repair
-
-Why:
-- Execution scope is bounded enough for a small goal after design.
-- Requirement, structure-contract, authorization, and external-contract meaning do not need redesign.
-- The solution/report/evidence structure is not explicit enough for runtime execution.
-
-Required checks:
-- required design: required.
-- rubric check: required if the task is evaluative and the rubric is not explicit.
-- final-answer-format check: required if the final output audience, medium, structure, or acceptance condition is not explicit.
-
-Design check:
-- Missing or partial: objects/actors/roles, relationships, flow, limits, interfaces/contracts, or evidence model.
-
-Recommended next step:
-Use solution design before goal writing:
-
-```text
-$designing-cybernetic-solutions 根据 <requirements-path or confirmed request> 创建 solution design。
-```
-
-Rejected workflow:
-- Reject direct Level 2 execution because runtime Codex would invent the solution model.
-- Reject Level 3 unless broader control meaning are also unresolved.
-```
-
-## Level 3
-
-```markdown
-Routing decision: Level 3 - Full Pre-goal Pipeline
-
-Why:
-- ...
-
-Required checks:
-- Meaning Check: required.
-- Goal Check: required.
-- required design: required if solution structure is not explicit.
-- final-answer-format check: required if final output shape affects execution, acceptance, handoff, persistence, or downstream consumption and is not explicit.
-- execution-plan check: required.
-- review check: required.
-- rubric check: required if the task is evaluative and the rubric is not explicit.
-
-Recommended next step:
-1. `$analyzing-cybernetic-requirements <需求>`
-2. After requirements analysis is complete and What the User Approved is Approved: `$orchestrating-cybernetic-pregoal 根据 <requirements-path> 完成 pre-goal 编译，允许使用 subagents review。`
-
-If required design is required, keep it listed under Required checks. The orchestrator must invoke or request `$designing-cybernetic-solutions` before goal writing; do not list solution design as a separate manual step before orchestration for Level 3/4 work.
-
-Rejected workflow:
-- Level 0/1/2 would force runtime agent to invent unresolved control decisions.
-```
-
-## Level 4
-
-```markdown
-Routing decision: Level 4 - Human-Checkd Full Pipeline
-
-Why:
-- ...
-
-Required checks:
-- JSON pre-goal checks: required.
-- Explicit Human Approval Check: required before runtime execution.
-- rubric check: required if the task is evaluative and the rubric is not explicit.
-- required design: required if solution structure is not explicit.
-- final-answer-format check: required if final output shape affects execution, acceptance, handoff, persistence, or downstream consumption and is not explicit.
-
-Recommended next step:
-Run the JSON pre-goal orchestration, but require explicit human approval before runtime `/goal`.
-
-Rejected workflow:
-- Do not allow uncheckd runtime execution.
+rejected path:
+- ordinary_direct_work or bounded_runtime would leave runtime to invent control
+  decisions.
 ```

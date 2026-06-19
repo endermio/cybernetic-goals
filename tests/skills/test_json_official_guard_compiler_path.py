@@ -10,6 +10,7 @@ from tests.skills.test_reviewed_replanning_control import (
     COMPILER,
     LEGACY_FIXTURE,
     apply_hashes,
+    approved_generation_review,
     canonical_json_hash,
     final_report,
     progress_event,
@@ -110,6 +111,39 @@ class JsonOfficialGuardCompilerPathTest(unittest.TestCase):
             self.assertEqual(payload["next_allowed_action"], "RunExecutionPolicy")
             self.assertIn("plan downgraded required implementation", "\n".join(payload["errors"]))
 
+    def test_orchestration_guard_routes_missing_counterexample_gate_to_review(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            run_dir = Path(tmpdir)
+            write_strategy_run(run_dir)
+            review_path = run_dir / "gen-000/review.control.json"
+            review = json.loads(review_path.read_text(encoding="utf-8"))
+            review["review_checks"] = [
+                check
+                for check in review["review_checks"]
+                if check["check_id"] != "counterexample-gate"
+            ]
+            req = json.loads((run_dir / "requirements.control.json").read_text(encoding="utf-8"))
+            run = json.loads((run_dir / "run.control.json").read_text(encoding="utf-8"))
+            runtime = json.loads((run_dir / "gen-000/runtime.control.json").read_text(encoding="utf-8"))
+            apply_hashes(req, run, runtime, "gen-000/runtime.control.json", review, "gen-000/review.control.json")
+            review_path.write_text(json.dumps(review, indent=2), encoding="utf-8")
+            (run_dir / "gen-000/runtime.control.json").write_text(json.dumps(runtime, indent=2), encoding="utf-8")
+
+            result = run_script(
+                ORCHESTRATION_GUARD,
+                "--state",
+                "before-runtime-compile",
+                "--run-dir",
+                str(run_dir),
+                "--json",
+            )
+
+            self.assertNotEqual(result.returncode, 0, result.stdout + result.stderr)
+            payload = json.loads(result.stdout)
+            self.assertFalse(payload["ok"])
+            self.assertEqual(payload["next_allowed_action"], "RunReview")
+            self.assertIn("counterexample-gate", "\n".join(payload["errors"]))
+
     def test_compile_runtime_goal_creates_current_generation_runtime_and_pointer(self):
         req = requirements()
         run = run_control(
@@ -141,6 +175,48 @@ class JsonOfficialGuardCompilerPathTest(unittest.TestCase):
             self.assertIn("/goal Execute the runtime control JSON at", result.stdout)
             self.assertIn("gen-000/runtime.control.json", result.stdout)
             self.assertNotIn(".goal.md", result.stdout)
+
+    def test_compile_runtime_goal_does_not_write_runtime_when_counterexample_gate_missing(self):
+        req = requirements()
+        run = run_control(
+            generations=[
+                {
+                    "id": "gen-000",
+                    "strategy_kind": "execution",
+                    "status": "active",
+                    "runtime": "gen-000/runtime.control.json",
+                    "review": "gen-000/review.control.json",
+                    "required_steps": [
+                        {
+                            "step_id": "S1",
+                            "transition": "current generation produces required evidence",
+                            "evidence": ["evidence.target-startup"],
+                            "satisfies_outcomes": ["O-target-startup"],
+                        }
+                    ],
+                }
+            ]
+        )
+        run["semantic_base_ref"] = copy.deepcopy(req["approved_control"]["semantic_base"])
+        review = approved_generation_review()
+        review["review_checks"] = [
+            check
+            for check in review["review_checks"]
+            if check["check_id"] != "counterexample-gate"
+        ]
+        with tempfile.TemporaryDirectory() as tmpdir:
+            run_dir = Path(tmpdir)
+            review_path = run_dir / "gen-000/review.control.json"
+            review_path.parent.mkdir(parents=True, exist_ok=True)
+            (run_dir / "requirements.control.json").write_text(json.dumps(req, indent=2), encoding="utf-8")
+            (run_dir / "run.control.json").write_text(json.dumps(run, indent=2), encoding="utf-8")
+            review_path.write_text(json.dumps(review, indent=2), encoding="utf-8")
+
+            result = run_script(COMPILER, "--run-dir", str(run_dir))
+
+            self.assertNotEqual(result.returncode, 0, result.stdout + result.stderr)
+            self.assertIn("counterexample-gate", result.stdout + result.stderr)
+            self.assertFalse((run_dir / "gen-000/runtime.control.json").exists())
 
     def test_json_mode_rejects_markdown_official_inputs_for_guard_and_compiler(self):
         with tempfile.TemporaryDirectory() as tmpdir:

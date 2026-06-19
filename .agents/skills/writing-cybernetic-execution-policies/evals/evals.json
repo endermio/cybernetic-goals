@@ -63,14 +63,14 @@
       ]
     },
     {
-      "id": "level-3-policy-handoff-returns-to-orchestrator",
-      "prompt": "根据 requirements、solution design 和 goal 创建 execution policy。路由结果是 Level 3 JSON pre-goal orchestration，review check required，$orchestrating-cybernetic-pregoal 可用。",
+      "id": "controlled-run-policy-handoff-returns-to-orchestrator",
+      "prompt": "根据 requirements、solution design 和 goal 创建 execution policy。控制入口是 controlled_run JSON pre-goal orchestration，review check required，$orchestrating-cybernetic-pregoal 可用。",
       "expected_output": "Create a candidate execution policy, then in the response hand off back to $orchestrating-cybernetic-pregoal rather than directly recommending $reviewing-cybernetic-control-structures.",
       "assertions": [
         "Creates or references docs/cybernetics/runs/<slug>/plan.control.json.",
         "Marks the execution policy Candidate, not Approved.",
         "Response-only handoff recommends $orchestrating-cybernetic-pregoal.",
-        "Does not recommend $reviewing-cybernetic-control-structures as the next user action for Level 3 JSON pre-goal work."
+        "Does not recommend $reviewing-cybernetic-control-structures as the next user action for controlled_run JSON pre-goal work."
       ]
     },
     {
@@ -100,14 +100,14 @@
       ]
     },
     {
-      "id": "level-3-high-context-load-selects-subagent-work assignment",
-      "prompt": "Create an execution policy for a Level 3 controlled change with high context load across multiple independent work packages. The main agent would otherwise need to coordinate, investicheck, execute, verify, and integrate all work.",
+      "id": "controlled-run-high-context-load-selects-subagent-work-assignment",
+      "prompt": "Create an execution policy for a controlled_run change with high context load across multiple independent work packages. The main agent would otherwise need to coordinate, investigate, execute, verify, and integrate all work.",
       "expected_output": "The execution policy includes Who Does The Work / Context Use, selects Serial subagent-driven by default unless main-only is justified, defines bounded context packs, return formats, and integration checks, and does not default to parallel without approval.",
       "assertions": [
         "Includes Who Does The Work / Context Use.",
         "Selects Main-only, Serial subagent-driven, or Parallel subagent-driven explicitly.",
         "Records Selected agent workflow.",
-        "Defaults Level 3 high-context work to Serial subagent-driven unless Main-only has a context-load justification.",
+        "Defaults high-context controlled_run work to Serial subagent-driven unless Main-only has a context-load justification.",
         "Defines Context pack for each delecheckd work package.",
         "Defines Context Pack Requirements including relevant control excerpts, current batch objective, allowed artifacts/places, forbidden changes, required evidence checks/evidence, stop conditions, and expected return format.",
         "Defines Return format for each delecheckd work package.",
@@ -117,11 +117,11 @@
       ]
     },
     {
-      "id": "level-3-main-only-requires-context-load-justification",
-      "prompt": "Create an execution policy for a Level 3 controlled change, but choose Main-only work assignment because the work is tightly coupled and subagent delegation would add more integration risk than it removes.",
+      "id": "controlled-run-main-only-requires-context-load-justification",
+      "prompt": "Create an execution policy for a controlled_run change, but choose Main-only work assignment because the work is tightly coupled and subagent delegation would add more integration risk than it removes.",
       "expected_output": "The execution policy may choose Main-only only with an explicit Main-only context-load justification explaining why the main agent will not become an overloaded coordinator, worker, integrator, and verifier.",
       "assertions": [
-        "Records Task level as Level 3.",
+        "Records Control entry as controlled_run.",
         "Selects Main-only explicitly if that work assignment is used.",
         "Records Selected agent workflow as none or another justified non-delegating value for Main-only.",
         "Includes Main-only context-load justification.",

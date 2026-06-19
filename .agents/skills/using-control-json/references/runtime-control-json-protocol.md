@@ -4,7 +4,7 @@
 
 Before writing runtime files, load the approved control chain from JSON. Parse every required JSON file, check schema or registry validators when available, and confirm the artifacts identify the same run, required steps, work coverage, verifier, generation, and final report contract.
 
-This protocol is not for Level 2 bounded runtime. Level 2 bounded goals use
+This protocol is not for `bounded_runtime`. Bounded runtime goals use
 `using-bounded-control-json`; a directory with only `goal.control.json` and
 `runtime.control.json` is valid for bounded runtime but invalid for this
 control-chain protocol.
@@ -135,6 +135,18 @@ not an automatically reviewable strategy change.
 
 ## Verifier Gate
 
+### Structural Gates And Quality Gate
+
+Structural gates are schema validation, `control_chain_guard`,
+`validate_control_chain`, and `verify_runtime_progress`. They check file shape,
+hashes, declared coverage, generation consistency, progress format, and final
+report consistency. A structural pass is not quality approval.
+
+Quality gate means `counterexample-gate`: an independent reviewer attempts to
+disprove the target decomposition, runtime strategy, blocked claim, or
+completion claim. `counterexample-gate` is the final quality gate for
+`goal_achieved: true` and terminal blocked claims.
+
 Run the configured verifier before `goal_achieved: true`. The verifier command or module should come from `runtime.control.json`, the approved plan JSON, or a schema-backed run configuration. If no verifier is configured, stop.
 
 Verifier permission means the verifier output explicitly allows or permits the completion claim for the current control chain and progress evidence. A successful command that checks only one component is supporting evidence, not completion permission.
@@ -146,6 +158,30 @@ imports that evidence and does not invalidate it. Unresolved amendment proposals
 block `goal_achieved: true`. Discovery generations and synthetic required steps
 also block `goal_achieved: true`; they are for finding or refining the strategy,
 not for final completion.
+
+The approved generation review must include a `counterexample-gate` check before
+runtime relies on the generation for completion or blocked claims. Counterexample
+Gate means an independent reviewer attempts to disprove the candidate control
+claim. It must cover the target decomposition and runtime claim points:
+
+```text
+source_requirements->required_outcomes
+required_outcomes->required_steps
+required_steps->work_packages
+required_steps->runtime_steps
+pre_runtime_compile
+blocked_or_goal_achieved
+```
+
+An approved `counterexample-gate` must record independent reviewer provenance
+with `reviewer.kind`, `reviewer.id`, and `reviewer.evidence_ref`. Accepted
+reviewer kinds are `subagent`, `human`, and `external`. The execution agent's own
+summary is not enough.
+
+If runtime discovers a counterexample that was missed by review, record it as an
+observation or amendment proposal. Do not claim `goal_achieved: true`, and do
+not turn the missed work into `blocked` unless the blocked claim itself is
+reviewed under the Counterexample Gate.
 
 When the verifier fails, append the verifier result to `progress.jsonl` through `.agents/skills/using-control-json/scripts/append_progress_event.py`, update `runtime-status.json`, and write a non-achieved final report only if the runtime contract calls for a terminal report.
 

@@ -39,7 +39,7 @@
     },
     {
       "id": "requirements-complete-but-human-approved target-pending-does-not-handoff",
-      "prompt": "Create requirements analysis for a Level 3 task. The user answered clarification questions, but has not explicitly approved the compact control commitment.",
+      "prompt": "Create requirements analysis for a controlled_run task. The user answered clarification questions, but has not explicitly approved the compact control commitment.",
       "expected_output": "Requirements may be Complete, but What the User Approved remains Pending and no orchestration command or predicted /goal is emitted.",
       "assertions": [
         "Includes What the User Approved.",
@@ -64,7 +64,7 @@
     },
     {
       "id": "complete-rubric-analysis-routes-to-bounded-goal",
-      "prompt": "Level 2 且 Required checks: rubric check required 的评价口径需求分析已完成，requirements control JSON 是 docs/cybernetics/runs/2026-05-26-completion-rubric/requirements.control.json，已确认已闭环/部分闭环/未闭环/不可判定的状态定义和证据等级。",
+      "prompt": "bounded_runtime 且 Required checks: rubric check required 的评价口径需求分析已完成，requirements control JSON 是 docs/cybernetics/runs/2026-05-26-completion-rubric/requirements.control.json，已确认已闭环/部分闭环/未闭环/不可判定的状态定义和证据等级。",
       "expected_output": "Mark rubric analysis complete and recommend writing-cybernetic-goals for a bounded audit goal, not orchestrating-cybernetic-pregoal.",
       "assertions": [
         "Outputs that rubric analysis is complete.",
@@ -82,14 +82,14 @@
         "Marks required design as required.",
         "Lists missing solution-model questions as deferred solution design questions.",
         "Does not define final object structure, interfaces, state flow, or mechanism architecture.",
-        "For Level 3/4 or JSON pre-goal work, recommends $orchestrating-cybernetic-pregoal after requirements analysis is complete.",
-        "For Level 3/4 or JSON pre-goal work, does not output $designing-cybernetic-solutions as a standalone pre-orchestration command.",
+        "For controlled_run JSON pre-goal work, recommends $orchestrating-cybernetic-pregoal after requirements analysis is complete.",
+        "For controlled_run JSON pre-goal work, does not output $designing-cybernetic-solutions as a standalone pre-orchestration command.",
         "States that $orchestrating-cybernetic-pregoal must invoke or request $designing-cybernetic-solutions before goal writing when required design is required."
       ]
     },
     {
-      "id": "complete-level-3-analysis-routes-to-orchestrator-not-manual-design",
-      "prompt": "Level 3 JSON pre-goal requirements analysis is complete. Requirements control JSON is docs/cybernetics/runs/2026-05-31-complex-training/requirements.control.json. Required checks include required design: required, there are no open blocking requirement questions, and What the User Approved: Approved.",
+      "id": "complete-controlled-run-analysis-routes-to-orchestrator-not-manual-design",
+      "prompt": "controlled_run JSON pre-goal requirements analysis is complete. Requirements control JSON is docs/cybernetics/runs/2026-05-31-complex-training/requirements.control.json. Required checks include required design: required, there are no open blocking requirement questions, and What the User Approved: Approved.",
       "expected_output": "Emit a pre-goal orchestration command, predicted runtime.control.json path, and pointer-only /goal shape using the concrete requirements control path, not a standalone solution-design command before orchestration. Explain that the orchestrator owns design dispatch when required design is required, but the required design dispatch note must not replace the predicted pointer-only /goal.",
       "assertions": [
         "Outputs a command invoking $orchestrating-cybernetic-pregoal with docs/cybernetics/runs/2026-05-31-complex-training/requirements.control.json.",
@@ -99,7 +99,7 @@
         "Does not output a standalone $designing-cybernetic-solutions command as a separate next step before orchestration.",
         "States that the orchestrator must invoke or request $designing-cybernetic-solutions before goal writing because required design is required.",
         "Does not create a solution design inside requirements analysis.",
-        "Does not recommend direct goal writing for this Level 3 JSON pre-goal workflow."
+        "Does not recommend direct goal writing for this controlled_run JSON pre-goal workflow."
       ]
     },
     {

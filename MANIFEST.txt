@@ -4,6 +4,7 @@
 .agents/skills/analyzing-cybernetic-requirements/assets/requirements.control.example.json
 .agents/skills/analyzing-cybernetic-requirements/evals/evals.json
 .agents/skills/analyzing-cybernetic-requirements/references/decision-levels.md
+.agents/skills/analyzing-cybernetic-requirements/references/requirements-analysis-detailed-rules.md
 .agents/skills/analyzing-cybernetic-requirements/scripts/predict_pregoal_handoff.py
 .agents/skills/clarifying-cybernetic-tasks/SKILL.md
 .agents/skills/clarifying-cybernetic-tasks/agents/openai.yaml
@@ -15,6 +16,7 @@
 .agents/skills/compiling-cybernetic-runtime-goals/assets/runtime-goal-template.txt
 .agents/skills/compiling-cybernetic-runtime-goals/assets/runtime.control.example.json
 .agents/skills/compiling-cybernetic-runtime-goals/evals/evals.json
+.agents/skills/compiling-cybernetic-runtime-goals/references/runtime-compilation-detailed-rules.md
 .agents/skills/compiling-cybernetic-runtime-goals/scripts/compile_runtime_goal.py
 .agents/skills/compiling-cybernetic-runtime-goals/scripts/control_chain_guard.py
 .agents/skills/cybernetic-superpowers-infrastructure/SKILL.md
@@ -27,10 +29,12 @@
 .agents/skills/designing-cybernetic-solutions/assets/solution-design-template.md
 .agents/skills/designing-cybernetic-solutions/evals/evals.json
 .agents/skills/designing-cybernetic-solutions/references/design-check.md
+.agents/skills/designing-cybernetic-solutions/references/solution-design-detailed-rules.md
 .agents/skills/framing-cybernetic-intent/SKILL.md
 .agents/skills/framing-cybernetic-intent/agents/openai.yaml
 .agents/skills/framing-cybernetic-intent/assets/intent-frame-template.md
 .agents/skills/framing-cybernetic-intent/evals/evals.json
+.agents/skills/framing-cybernetic-intent/references/intent-framing-detailed-rules.md
 .agents/skills/orchestrating-cybernetic-pregoal/SKILL.md
 .agents/skills/orchestrating-cybernetic-pregoal/agents/openai.yaml
 .agents/skills/orchestrating-cybernetic-pregoal/assets/orchestration-report-template.md
@@ -38,6 +42,7 @@
 .agents/skills/orchestrating-cybernetic-pregoal/evals/evals.json
 .agents/skills/orchestrating-cybernetic-pregoal/references/orchestration-protocol.md
 .agents/skills/orchestrating-cybernetic-pregoal/references/output-and-final-checks.md
+.agents/skills/orchestrating-cybernetic-pregoal/references/pregoal-detailed-rules.md
 .agents/skills/orchestrating-cybernetic-pregoal/references/subagent-review-roles.md
 .agents/skills/orchestrating-cybernetic-pregoal/scripts/amendment_orchestrator.py
 .agents/skills/orchestrating-cybernetic-pregoal/scripts/check_pregoal_inputs.py
@@ -52,12 +57,14 @@
 .agents/skills/reviewing-cybernetic-control-structures/assets/control-review-template.md
 .agents/skills/reviewing-cybernetic-control-structures/assets/review.control.example.json
 .agents/skills/reviewing-cybernetic-control-structures/evals/evals.json
+.agents/skills/reviewing-cybernetic-control-structures/references/control-review-detailed-rules.md
 .agents/skills/reviewing-cybernetic-control-structures/references/review-rubric.md
 .agents/skills/reviewing-cybernetic-control-structures/scripts/control_artifact_lint.py
 .agents/skills/routing-cybernetic-workflows/SKILL.md
 .agents/skills/routing-cybernetic-workflows/agents/openai.yaml
 .agents/skills/routing-cybernetic-workflows/evals/evals.json
 .agents/skills/routing-cybernetic-workflows/references/complexity-routing.md
+.agents/skills/routing-cybernetic-workflows/references/routing-detailed-rules.md
 .agents/skills/routing-cybernetic-workflows/references/response-shapes.md
 .agents/skills/using-control-json/SKILL.md
 .agents/skills/using-control-json/references/runtime-control-json-protocol.md
@@ -76,6 +83,7 @@
 .agents/skills/writing-cybernetic-execution-policies/assets/plan.control.example.json
 .agents/skills/writing-cybernetic-execution-policies/evals/evals.json
 .agents/skills/writing-cybernetic-execution-policies/references/batch-cadence.md
+.agents/skills/writing-cybernetic-execution-policies/references/execution-policy-detailed-rules.md
 .agents/skills/writing-cybernetic-execution-policies/references/evidence-check-governance.md
 .agents/skills/writing-cybernetic-goals/SKILL.md
 .agents/skills/writing-cybernetic-goals/agents/openai.yaml
@@ -83,6 +91,7 @@
 .agents/skills/writing-cybernetic-goals/assets/goal.control.example.json
 .agents/skills/writing-cybernetic-goals/evals/evals.json
 .agents/skills/writing-cybernetic-goals/references/control-contract-rules.md
+.agents/skills/writing-cybernetic-goals/references/goal-writing-detailed-rules.md
 .github/ISSUE_TEMPLATE/cybernetic-improvement-pattern.md
 .github/workflows/aggregate-cybernetic-outcomes.yml
 AGENTS.md

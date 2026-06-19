@@ -261,9 +261,9 @@
       ]
     },
     {
-      "id": "orchestrator-blocks-level-3-main-only-without-justification",
-      "prompt": "Execution policy records Task level: Level 3 and Selected work assignment: Main-only, but Main-only context-load justification is missing or only says 'simpler'. Orchestrate the transition to review/runtime.",
-      "expected_output": "The orchestrator blocks and returns to execution-policy revision because Level 3 Main-only work assignment requires a meaningful context-load justification.",
+      "id": "orchestrator-blocks-controlled-run-main-only-without-justification",
+      "prompt": "Execution policy records Control entry: controlled_run and Selected work assignment: Main-only, but Main-only context-load justification is missing or only says 'simpler'. Orchestrate the transition to review/runtime.",
+      "expected_output": "The orchestrator blocks and returns to execution-policy revision because controlled_run Main-only work assignment requires a meaningful context-load justification.",
       "assertions": [
         "Does not decide or rewrite work assignment inside the orchestrator.",
         "Reports missing Main-only context-load justification.",

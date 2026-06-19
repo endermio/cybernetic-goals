@@ -155,6 +155,13 @@ def review_revision_route(run_dir: Path) -> tuple[str, list[str]] | None:
     return next_action, errors
 
 
+def review_structure_route(errors: list[str]) -> tuple[str, list[str]] | None:
+    combined = "\n".join(errors)
+    if "counterexample-gate" in combined or "required review check" in combined:
+        return "RunReview", ["review gate is incomplete -> RunReview"]
+    return None
+
+
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--state", required=True, choices=sorted(NEXT_ACTION))
@@ -199,7 +206,12 @@ def main() -> int:
             next_action, route_errors = route
             errors = route_errors + errors
         else:
-            next_action = "FixJsonControlRun"
+            structure_route = review_structure_route(errors)
+            if structure_route:
+                next_action, route_errors = structure_route
+                errors = route_errors + errors
+            else:
+                next_action = "FixJsonControlRun"
         data = payload(False, args.state, next_action, errors)
         print_result(data, args.json)
         return 2
