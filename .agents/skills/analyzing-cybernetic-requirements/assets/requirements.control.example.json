@@ -31,7 +31,7 @@
     },
     "semantic_base": {
       "id": "semantic-base:control-example",
-      "hash": "sha256:a4a57e82f641bca97874d619584cec84674a45d093fadd77be2f222837d3b68b"
+      "hash": "sha256:9c5415e59b89f878087618a0bb92c1966ccbc40553e12cc274666a4a454038f0"
     },
     "source_requirements": [
       {
@@ -82,7 +82,20 @@
         ],
         "not_satisfied_by": [
           "Markdown template authority"
-        ]
+        ],
+        "counterexample_gate": {
+          "completion_standard": "The JSON-only outcome is complete only when JSON artifacts pass validation and Markdown control inputs are rejected.",
+          "required_checked_transformations": [
+            "required_outcome:O-json-control-example->completion_gate"
+          ],
+          "required_evidence_ids": [
+            "evidence.example-guard-passes"
+          ],
+          "reject_if": [
+            "The outcome is claimed from a documentation-only change.",
+            "Markdown control inputs are still accepted."
+          ]
+        }
       }
     ],
     "counterexample_gate_contract": {

@@ -215,6 +215,10 @@ checked-transformations, reviewer requirement, or reject-if conditions. If the
 contract is absent where a controlled run requires it, route to
 `ReturnToRequirementsAnalysis`.
 
+The gate must also execute every blocking required outcome's per-outcome
+`counterexample_gate`. A review may not approve a stage goal, blocked claim, or
+completion claim unless that outcome's checked transformations are recorded.
+
 The approved `counterexample-gate` check must record reviewer provenance. A
 plain evidence sentence is not enough. Include:
 
@@ -226,8 +230,8 @@ plain evidence sentence is not enough. Include:
 The main execution agent's self-review does not satisfy this gate.
 
 The gate must cover target decomposition, not just final completion. Record the
-requirements-approved gate points in `checked_transformations`, including at
-least:
+requirements-approved and per-outcome gate points in `checked_transformations`,
+including at least:
 
 - `source_requirements->required_outcomes`
 - `required_outcomes->required_steps`

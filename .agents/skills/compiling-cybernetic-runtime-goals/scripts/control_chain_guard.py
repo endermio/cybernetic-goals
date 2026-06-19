@@ -640,6 +640,22 @@ def counterexample_contract_points(requirements: dict[str, Any] | None) -> set[s
     return set(string_list(contract.get("required_checked_transformations")))
 
 
+def counterexample_required_outcome_gate_points(requirements: dict[str, Any] | None) -> set[str]:
+    if not isinstance(requirements, dict):
+        return set()
+    outcomes = requirements.get("approved_control", {}).get("required_outcomes")
+    if not isinstance(outcomes, list):
+        return set()
+    points: set[str] = set()
+    for outcome in outcomes:
+        if not isinstance(outcome, dict) or outcome.get("blocks_goal_achieved_if_missing") is not True:
+            continue
+        gate = outcome.get("counterexample_gate")
+        if isinstance(gate, dict):
+            points.update(string_list(gate.get("required_checked_transformations")))
+    return points
+
+
 def counterexample_allowed_reviewer_kinds(requirements: dict[str, Any] | None) -> set[str]:
     contract = counterexample_gate_contract(requirements)
     minimum = contract.get("minimum_reviewer")
@@ -685,6 +701,12 @@ def require_generation_review_checks(
             raise ControlJsonValidationError(
                 f"{context} counterexample-gate missing requirements-approved gate points: "
                 + ", ".join(contract_missing_points)
+            )
+        outcome_missing_points = sorted(counterexample_required_outcome_gate_points(requirements) - checked)
+        if outcome_missing_points:
+            raise ControlJsonValidationError(
+                f"{context} counterexample-gate missing required-outcome gate points: "
+                + ", ".join(outcome_missing_points)
             )
         reviewer = counterexample.get("reviewer")
         if not isinstance(reviewer, dict):

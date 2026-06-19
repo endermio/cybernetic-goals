@@ -83,6 +83,17 @@ def requirements(outcome_id: str = "O-target-startup", evidence_id: str = "evide
                         }
                     ],
                     "not_satisfied_by": ["readiness or partial candidate evidence"],
+                    "counterexample_gate": {
+                        "completion_standard": f"{outcome_id} is complete only when its required evidence is present and readiness or partial candidate evidence is not used as completion.",
+                        "required_checked_transformations": [
+                            f"required_outcome:{outcome_id}->completion_gate"
+                        ],
+                        "required_evidence_ids": [evidence_id],
+                        "reject_if": [
+                            "The outcome is treated as complete from readiness or partial candidate evidence.",
+                            f"The outcome is claimed without {evidence_id}.",
+                        ],
+                    },
                 }
             ],
             "counterexample_gate_contract": {
@@ -263,6 +274,7 @@ def approved_generation_review() -> dict:
                 "required_steps->runtime_steps",
                 "pre_runtime_compile",
                 "blocked_or_goal_achieved",
+                "required_outcome:O-target-startup->completion_gate",
             ]
         check = {
             "check_id": check_id,
@@ -623,6 +635,36 @@ class ReviewedReplanningControlTest(unittest.TestCase):
             for command_result in (result, validate):
                 self.assertIn(
                     "counterexample-gate missing requirements-approved gate points: required_evidence->quality_standard",
+                    command_result.stdout + command_result.stderr,
+                )
+
+    def test_guard_rejects_counterexample_gate_missing_required_outcome_gate_point(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            run_dir = Path(tmpdir)
+            write_strategy_run(run_dir)
+            review_path = run_dir / "gen-000/review.control.json"
+            review = json.loads(review_path.read_text(encoding="utf-8"))
+            counterexample = next(check for check in review["review_checks"] if check["check_id"] == "counterexample-gate")
+            counterexample["checked_transformations"] = [
+                transformation
+                for transformation in counterexample["checked_transformations"]
+                if transformation != "required_outcome:O-target-startup->completion_gate"
+            ]
+            req = json.loads((run_dir / "requirements.control.json").read_text(encoding="utf-8"))
+            run = json.loads((run_dir / "run.control.json").read_text(encoding="utf-8"))
+            runtime = json.loads((run_dir / "gen-000/runtime.control.json").read_text(encoding="utf-8"))
+            apply_hashes(req, run, runtime, "gen-000/runtime.control.json", review, "gen-000/review.control.json")
+            review_path.write_text(json.dumps(review, indent=2), encoding="utf-8")
+            (run_dir / "gen-000/runtime.control.json").write_text(json.dumps(runtime, indent=2), encoding="utf-8")
+
+            result = run_script(CONTROL_GUARD, "--run-dir", str(run_dir))
+            validate = run_script(VALIDATE, str(run_dir))
+
+            self.assertNotEqual(result.returncode, 0, result.stdout + result.stderr)
+            self.assertNotEqual(validate.returncode, 0, validate.stdout + validate.stderr)
+            for command_result in (result, validate):
+                self.assertIn(
+                    "counterexample-gate missing required-outcome gate points: required_outcome:O-target-startup->completion_gate",
                     command_result.stdout + command_result.stderr,
                 )
 

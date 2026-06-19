@@ -120,8 +120,11 @@ class SemanticReviewNeedsRevisionTest(unittest.TestCase):
         )
 
         self.assertIn("counterexample_gate_contract", requirements_text)
+        self.assertIn("per-outcome", requirements_text)
+        self.assertIn("counterexample_gate", requirements_text)
         self.assertIn("requirements stage", requirements_text)
         self.assertIn("requirements-approved", downstream_text)
+        self.assertIn("per-outcome", downstream_text)
         self.assertIn("must not invent", downstream_text)
 
     def test_runtime_compile_requires_approved_control_statuses_and_runtime_validator(self):

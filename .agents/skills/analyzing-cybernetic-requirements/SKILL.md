@@ -10,9 +10,8 @@ description: 'Use when a formed task or task candidate has ambiguous requirement
 Turn a formed task or task candidate into approved requirement meaning for later
 goal/control work.
 
-This skill owns requirement analysis only. It does not design the solution,
-write goals or plans, review the chain, compile runtime JSON, or execute target
-work.
+This skill owns requirement analysis only. It does not design, plan, review,
+compile runtime JSON, or execute target work.
 
 Official persistent control facts are JSON only. Markdown templates are
 background aids, not official guard/compiler/runtime input.
@@ -29,9 +28,9 @@ For the detailed rulebook, read
    requested behavior because it looks hard.
 3. Extract `source_requirements` before writing `required_outcomes` for
    `controlled_run` work.
-4. Define `counterexample_gate_contract` in the requirements stage for
-   `controlled_run`: quality standard, required checked transformations,
-   minimum independent reviewer, and reject-if conditions.
+4. Define `counterexample_gate_contract` in requirements stage: quality
+   standard, required checked transformations,
+   minimum independent reviewer, reject-if conditions, and per-outcome gates.
 5. Ask only questions that change approved meaning, evidence, scope, authority,
    or output contract.
 6. Classify uncertainty as human decision, default assumption, or deferred
@@ -41,8 +40,7 @@ For the detailed rulebook, read
 
 ## Source Requirements
 
-Each source requirement is one must-do item from the approved user request. It
-must preserve:
+Each source requirement is one must-do item from the approved request. Preserve:
 
 - original quote or source reference;
 - required action;
@@ -68,6 +66,10 @@ orchestration starts. Record `counterexample_gate_contract` with:
   requirement;
 - `reject_if`: semantic failure conditions that must prevent approval.
 
+Each blocking `required_outcome` must also define a per-outcome
+`counterexample_gate`: completion standard, checked transformations, required
+evidence IDs, and reject-if conditions.
+
 Downstream review may add stronger checks, but must not invent, weaken, or
 replace the requirements-approved quality contract.
 
@@ -84,7 +86,7 @@ plain language and wait for approval. It must include at least:
 - where the result must show up;
 - what counts as done;
 - evidence needed to call it done;
-- counterexample gate quality contract;
+- counterexample gate quality contract and per-outcome gates;
 - required answer path and what is not enough;
 - work covered in this run;
 - what the agent may do;
@@ -106,8 +108,7 @@ Record these checks as required, satisfied, or not applicable:
 - Review;
 - Risk.
 
-Use `references/decision-levels.md` for human/default/deferred decision
-classification.
+Use `references/decision-levels.md` for decision classification.
 
 ## Output Format
 

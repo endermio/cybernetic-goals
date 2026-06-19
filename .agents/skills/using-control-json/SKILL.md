@@ -39,7 +39,8 @@ quality approval.
 Quality gate means `counterexample-gate`: an independent reviewer tries to
 disprove the target decomposition, runtime strategy, blocked claim, or
 completion claim. It must execute the requirements-approved
-`counterexample_gate_contract`; runtime must not invent or weaken that contract.
+`counterexample_gate_contract` and each blocking outcome's per-outcome
+`counterexample_gate`; runtime must not invent or weaken either.
 
 ## Reviewed Replanning
 

@@ -152,6 +152,9 @@ The quality gate scope comes from the requirements-approved
 not invent, weaken, or replace that contract. Missing or inconsistent
 requirements-approved gate contract means the run is not executable until
 requirements are fixed.
+Each blocking required outcome also has a per-outcome `counterexample_gate`;
+its checked transformations must be covered before the outcome can support
+`goal_achieved: true` or a terminal blocked claim.
 
 Run the configured verifier before `goal_achieved: true`. The verifier command or module should come from `runtime.control.json`, the approved plan JSON, or a schema-backed run configuration. If no verifier is configured, stop.
 
@@ -169,7 +172,7 @@ The approved generation review must include a `counterexample-gate` check before
 runtime relies on the generation for completion or blocked claims. Counterexample
 Gate means an independent reviewer attempts to disprove the candidate control
 claim. It must cover the requirements-approved target decomposition and runtime
-claim points, including at least:
+claim points plus per-outcome gate points, including at least:
 
 ```text
 source_requirements->required_outcomes

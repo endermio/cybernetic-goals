@@ -290,9 +290,13 @@ The gate must execute the requirements-approved `counterexample_gate_contract`.
 Pregoal orchestration must not invent, weaken, or replace the quality standard,
 required checked transformations, reviewer requirement, or reject-if conditions.
 If the contract is absent, return to requirements analysis.
+It must also execute each blocking required outcome's per-outcome
+`counterexample_gate`; a stage goal cannot be compiled as achieved or blocked
+without those checks.
 
 It must cover every target decomposition position named by the contract,
-including at least these `checked_transformations`:
+including the per-outcome gate points and at least these
+`checked_transformations`:
 
 ```text
 source_requirements->required_outcomes

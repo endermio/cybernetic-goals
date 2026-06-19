@@ -308,6 +308,64 @@ def counterexample_contract_points(requirements: dict[str, Any] | None) -> set[s
     return set(string_list(contract.get("required_checked_transformations")))
 
 
+def counterexample_required_outcome_gate_points(requirements: dict[str, Any] | None) -> set[str]:
+    if not isinstance(requirements, dict):
+        return set()
+    outcomes = requirements.get("approved_control", {}).get("required_outcomes")
+    if not isinstance(outcomes, list):
+        return set()
+    points: set[str] = set()
+    for outcome in outcomes:
+        if not isinstance(outcome, dict) or outcome.get("blocks_goal_achieved_if_missing") is not True:
+            continue
+        gate = outcome.get("counterexample_gate")
+        if isinstance(gate, dict):
+            points.update(string_list(gate.get("required_checked_transformations")))
+    return points
+
+
+def required_outcome_counterexample_gate_errors(requirements: dict[str, Any]) -> list[str]:
+    schema_version = str(requirements.get("schema_version", ""))
+    outcomes = requirements.get("approved_control", {}).get("required_outcomes")
+    if not isinstance(outcomes, list):
+        return []
+    errors: list[str] = []
+    for index, outcome in enumerate(outcomes):
+        if not isinstance(outcome, dict):
+            continue
+        if schema_version < "1.1.0" and "counterexample_gate" not in outcome:
+            continue
+        if outcome.get("blocks_goal_achieved_if_missing") is not True and "counterexample_gate" not in outcome:
+            continue
+        label = f"requirements.control.json required_outcomes[{index}].counterexample_gate"
+        gate = outcome.get("counterexample_gate")
+        if not isinstance(gate, dict):
+            errors.append(f"{label} is required for blocking required outcomes")
+            continue
+        if not isinstance(gate.get("completion_standard"), str) or not gate.get("completion_standard"):
+            errors.append(f"{label}.completion_standard must be a non-empty string")
+        if not string_list(gate.get("required_checked_transformations")):
+            errors.append(f"{label}.required_checked_transformations must be a non-empty list")
+        if not string_list(gate.get("reject_if")):
+            errors.append(f"{label}.reject_if must be a non-empty list")
+        gate_evidence_ids = set(string_list(gate.get("required_evidence_ids")))
+        if not gate_evidence_ids:
+            errors.append(f"{label}.required_evidence_ids must be a non-empty list")
+        outcome_evidence = outcome.get("required_evidence")
+        outcome_evidence_ids: set[str] = set()
+        if isinstance(outcome_evidence, list):
+            for evidence in outcome_evidence:
+                if isinstance(evidence, dict) and isinstance(evidence.get("evidence_id"), str):
+                    outcome_evidence_ids.add(evidence["evidence_id"])
+        missing_evidence_ids = sorted(gate_evidence_ids - outcome_evidence_ids)
+        if missing_evidence_ids:
+            errors.append(
+                f"{label}.required_evidence_ids reference unknown required evidence: "
+                + ", ".join(missing_evidence_ids)
+            )
+    return errors
+
+
 def counterexample_allowed_reviewer_kinds(requirements: dict[str, Any] | None) -> set[str]:
     contract = counterexample_gate_contract(requirements)
     minimum = contract.get("minimum_reviewer")
@@ -354,6 +412,12 @@ def generation_review_errors(
             errors.append(
                 f"{context} counterexample-gate missing requirements-approved gate points: "
                 + ", ".join(contract_missing_points)
+            )
+        outcome_missing_points = sorted(counterexample_required_outcome_gate_points(requirements) - checked)
+        if outcome_missing_points:
+            errors.append(
+                f"{context} counterexample-gate missing required-outcome gate points: "
+                + ", ".join(outcome_missing_points)
             )
         reviewer = counterexample.get("reviewer")
         if not isinstance(reviewer, dict):
@@ -1043,6 +1107,7 @@ def validate_generation_control_chain(run_dir: Path) -> tuple[dict[str, dict[str
     if runtime.get("semantic_base_ref") != semantic_base:
         errors.append("runtime.control.json semantic_base_ref must match requirements approved semantic_base")
     errors.extend(counterexample_contract_errors(requirements))
+    errors.extend(required_outcome_counterexample_gate_errors(requirements))
 
     current_generation = run_control.get("current_generation")
     active_ids = active_generation_ids(run_control)

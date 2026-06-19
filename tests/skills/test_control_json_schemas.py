@@ -87,6 +87,17 @@ SCHEMA_FIXTURES = {
                         }
                     ],
                     "not_satisfied_by": ["required step completion without outcome coverage"],
+                    "counterexample_gate": {
+                        "completion_standard": "Schema validation outcome is complete only when JSON control artifacts pass and Markdown control inputs are rejected.",
+                        "required_checked_transformations": [
+                            "required_outcome:outcome.schema-validation->completion_gate"
+                        ],
+                        "required_evidence_ids": ["evidence.schema-validation-tests"],
+                        "reject_if": [
+                            "The outcome is treated as complete without evidence.schema-validation-tests.",
+                            "The outcome is replaced by a readiness or documentation-only claim.",
+                        ],
+                    },
                 }
             ],
             "counterexample_gate_contract": {
@@ -259,6 +270,7 @@ SCHEMA_FIXTURES = {
                     "required_steps->runtime_steps",
                     "pre_runtime_compile",
                     "blocked_or_goal_achieved",
+                    "required_outcome:outcome.schema-validation->completion_gate",
                 ],
             ),
             review_check("producing-action-alignment", ["blocking required steps are mapped to producing actions and mainline work packages"]),
@@ -681,6 +693,27 @@ class ControlJsonSchemaTest(unittest.TestCase):
         fixture = copy.deepcopy(SCHEMA_FIXTURES["requirements.control.schema.json"])
         fixture["schema_version"] = "1.1.0"
         del fixture["approved_control"]["counterexample_gate_contract"]
+
+        with self.assertRaises(SchemaValidationError):
+            validate(fixture, schema)
+
+    def test_requirements_schema_defines_per_outcome_counterexample_gate_for_v1_1(self):
+        schema = load_json(SCHEMA_DIR / "requirements.control.schema.json")
+        outcome_schema = schema["properties"]["approved_control"]["properties"]["required_outcomes"]["items"]
+        self.assertIn("counterexample_gate", outcome_schema["properties"])
+        gate_schema = outcome_schema["properties"]["counterexample_gate"]
+        for field in (
+            "completion_standard",
+            "required_checked_transformations",
+            "required_evidence_ids",
+            "reject_if",
+        ):
+            self.assertIn(field, gate_schema["required"])
+            self.assertIn(field, gate_schema["properties"])
+
+        fixture = copy.deepcopy(SCHEMA_FIXTURES["requirements.control.schema.json"])
+        fixture["schema_version"] = "1.1.0"
+        del fixture["approved_control"]["required_outcomes"][0]["counterexample_gate"]
 
         with self.assertRaises(SchemaValidationError):
             validate(fixture, schema)

@@ -83,6 +83,7 @@ disprove the target decomposition and runtime claim.
 The gate executes the requirements-approved `counterexample_gate_contract`.
 Review must not invent, weaken, or replace that quality contract. If the
 contract is missing for a controlled run, return to requirements analysis.
+It must also cover each blocking outcome's per-outcome `counterexample_gate`.
 
 It must include reviewer provenance: `reviewer.kind`, `reviewer.id`, and
 `reviewer.evidence_ref`. Self-written evidence is not enough.

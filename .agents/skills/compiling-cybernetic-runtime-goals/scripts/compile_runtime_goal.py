@@ -61,7 +61,12 @@ def blocking_required_outcome_ids(requirements: dict) -> list[str]:
     ]
 
 
-def require_review_before_runtime_write(run_dir: Path, generation: dict, strategy_kind: object) -> None:
+def require_review_before_runtime_write(
+    run_dir: Path,
+    generation: dict,
+    strategy_kind: object,
+    requirements: dict,
+) -> None:
     if strategy_kind not in {"execution", "amendment"}:
         return
     review_rel = generation.get("review")
@@ -72,7 +77,7 @@ def require_review_before_runtime_write(run_dir: Path, generation: dict, strateg
         raise ControlJsonValidationError(f"{review_rel}: expected artifact_type review.control")
     if review.get("status") != "approved":
         raise ControlJsonValidationError(f"{review_rel}: generation review must be approved")
-    require_generation_review_checks(review, context=f"{strategy_kind} generation")
+    require_generation_review_checks(review, context=f"{strategy_kind} generation", requirements=requirements)
 
 
 def compile_generation_runtime_control(run_dir: Path) -> Path:
@@ -91,7 +96,7 @@ def compile_generation_runtime_control(run_dir: Path) -> Path:
     runtime_path = run_dir / runtime_rel
     if not runtime_path.exists():
         strategy_kind = generation.get("strategy_kind")
-        require_review_before_runtime_write(run_dir, generation, strategy_kind)
+        require_review_before_runtime_write(run_dir, generation, strategy_kind, requirements)
         runtime_path.parent.mkdir(parents=True, exist_ok=True)
         required_steps = generation.get("required_steps")
         if not isinstance(required_steps, list) or not required_steps:

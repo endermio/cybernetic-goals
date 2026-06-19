@@ -89,6 +89,15 @@ The contract must state:
   `reviewer.evidence_ref` is required;
 - `reject_if`: semantic failure conditions that block approval.
 
+Each blocking `required_outcome` must also define a per-outcome
+`counterexample_gate`:
+
+- `completion_standard`: what has to be true for that outcome alone;
+- `required_checked_transformations`: checks that challenge that outcome's
+  completion claim;
+- `required_evidence_ids`: evidence IDs from that outcome's `required_evidence`;
+- `reject_if`: semantic failure conditions for that outcome.
+
 The default checked transformations are the minimum, not the maximum:
 
 ```text

@@ -102,7 +102,8 @@ Approved review must include `counterexample-gate` before runtime compilation.
 It must execute the requirements-approved `counterexample_gate_contract`;
 orchestration and design must not invent, weaken, or replace that contract. If
 the contract is missing, return to requirements analysis before compiling
-runtime.
+runtime. It must also cover each blocking outcome's per-outcome
+`counterexample_gate`.
 
 Required gate points include at least:
 

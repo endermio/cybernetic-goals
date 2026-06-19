@@ -112,7 +112,8 @@
         "required_steps->work_packages",
         "required_steps->runtime_steps",
         "pre_runtime_compile",
-        "blocked_or_goal_achieved"
+        "blocked_or_goal_achieved",
+        "required_outcome:O-json-control-example->completion_gate"
       ],
       "reviewer": {
         "kind": "subagent",
