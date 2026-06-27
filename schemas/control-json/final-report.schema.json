@@ -10,7 +10,6 @@
     "goal_achieved",
     "what_counts_as_done_met",
     "evidence",
-    "verification",
     "work_coverage",
     "remaining_gaps"
   ],
@@ -67,7 +66,8 @@
             "pass",
             "fail",
             "blocked",
-            "not_run"
+            "not_run",
+            "pending"
           ]
         },
         "verifier_permits_goal_achieved": {

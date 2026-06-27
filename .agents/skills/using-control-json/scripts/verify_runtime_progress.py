@@ -226,12 +226,6 @@ def final_report_errors(
         errors.append("not-done final report cannot be treated as success")
     if final_report.get("what_counts_as_done_met") is not True:
         errors.append("what_counts_as_done_met must be true")
-    verification = final_report.get("verification")
-    if not isinstance(verification, dict):
-        errors.append("final-report.json missing verification object")
-    else:
-        if verification.get("verifier_result") != "pass" or verification.get("verifier_permits_goal_achieved") is not True:
-            errors.append("verifier does not permit goal_achieved true")
     work_coverage = final_report.get("work_coverage")
     if not isinstance(work_coverage, dict) or work_coverage.get("status") != "complete":
         errors.append("work coverage must be complete before goal_achieved true")

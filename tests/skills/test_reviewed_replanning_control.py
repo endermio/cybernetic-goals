@@ -415,10 +415,6 @@ def final_report(generation: str, evidence_id: str, unresolved: list[str] | None
         "superseded_generations": [],
         "unresolved_amendments": unresolved or [],
         "evidence": [evidence_id],
-        "verification": {
-            "verifier_result": "pass",
-            "verifier_permits_goal_achieved": True,
-        },
         "work_coverage": {
             "status": "complete",
             "executed": ["WP1"],

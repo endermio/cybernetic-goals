@@ -134,7 +134,16 @@ not an automatically reviewable strategy change.
 
 `runtime-status.json` is the current bounded status snapshot. It can summarize active step state, blockers, next action, and last evidence pointer.
 
-`final-report.json` is the terminal report. Write it after progress evidence exists and after verifier evaluation. If the verifier does not permit completion, the final report must carry `goal_achieved: false` plus the unmet step, missing evidence, or blocker.
+`final-report.json` is the terminal runtime report. It records the runtime's
+completion or non-completion claim, evidence, work coverage, and remaining gaps.
+It does not grant verifier permission to itself. A legacy `verification` object
+may be present for compatibility, but `verify_runtime_progress.py` output is the
+source of truth for whether `goal_achieved: true` is accepted.
+
+Write `final-report.json` after progress evidence exists. Then run the verifier.
+If the verifier does not permit completion, rewrite or replace the terminal
+report with `goal_achieved: false` plus the unmet step, missing evidence, or
+blocker before reporting the run as terminal.
 
 ## Verifier Gate
 
@@ -159,7 +168,10 @@ Each blocking required outcome also has a per-outcome `counterexample_gate`;
 its checked transformations must be covered before the outcome can support
 `goal_achieved: true` or a terminal blocked claim.
 
-Run the configured verifier before `goal_achieved: true`. The verifier command or module should come from `runtime.control.json`, the approved plan JSON, or a schema-backed run configuration. If no verifier is configured, stop.
+Run the configured verifier before accepting, reporting, or acting on
+`goal_achieved: true`. The verifier command or module should come from
+`runtime.control.json`, the approved plan JSON, or a schema-backed run
+configuration. If no verifier is configured, stop.
 
 Verifier permission means the verifier output explicitly allows or permits the completion claim for the current control chain and progress evidence. A successful command that checks only one component is supporting evidence, not completion permission.
 

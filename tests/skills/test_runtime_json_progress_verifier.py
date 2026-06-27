@@ -322,12 +322,6 @@ class RuntimeJsonProgressVerifierTest(unittest.TestCase):
             self.assertIn("corrects_event_ref must be a non-empty string", result.stdout + result.stderr)
 
     def test_verify_runtime_progress_rejects_verifier_bypass_supporting_only_and_not_done_success(self):
-        bypass_report = final_report("gen-000", "evidence.target-startup")
-        bypass_report["verification"] = {
-            "verifier_result": "not_run",
-            "verifier_permits_goal_achieved": False,
-        }
-
         supporting_event = progress_event("evidence.target-startup")
         supporting_event["progress_role"] = "supporting_only"
         supporting_event["counts_as_goal_progress"] = False
@@ -339,11 +333,6 @@ class RuntimeJsonProgressVerifierTest(unittest.TestCase):
         not_done_report["remaining_gaps"] = ["guard integration still pending"]
 
         cases = (
-            (
-                [progress_event("evidence.target-startup")],
-                bypass_report,
-                "verifier does not permit goal_achieved true",
-            ),
             (
                 [supporting_event],
                 final_report("gen-000", "evidence.target-startup"),
@@ -364,6 +353,26 @@ class RuntimeJsonProgressVerifierTest(unittest.TestCase):
 
                 self.assertNotEqual(result.returncode, 0, result.stdout + result.stderr)
                 self.assertIn(expected, result.stdout + result.stderr)
+
+    def test_verify_runtime_progress_does_not_require_final_report_to_predeclare_verifier_pass(self):
+        report = final_report("gen-000", "evidence.target-startup")
+        report.pop("verification", None)
+        with tempfile.TemporaryDirectory() as tmpdir:
+            run_dir = Path(tmpdir)
+            write_strategy_run(
+                run_dir,
+                progress_events=[
+                    progress_event("evidence.target-startup"),
+                    counterexample_review_event(),
+                ],
+                report=report,
+            )
+
+            result = run_script(VERIFY, str(run_dir))
+
+            self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+            payload = json.loads(result.stdout)
+            self.assertTrue(payload["goal_achieved_permitted"])
 
     def test_verify_runtime_progress_rejects_approved_json_mutation_boundary(self):
         with tempfile.TemporaryDirectory() as tmpdir:
