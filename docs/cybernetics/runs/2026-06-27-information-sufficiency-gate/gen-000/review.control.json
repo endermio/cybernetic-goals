@@ -1,0 +1,157 @@
+{
+  "artifact_type": "review.control",
+  "schema_version": "1.0",
+  "status": "approved",
+  "semantic_base_ref": {
+    "id": "semantic-base:information-sufficiency-gate",
+    "hash": "sha256:8072c67614d58240ba1b9ad837e926ab5abbb1dee954f83ef7f5bc20984fd197"
+  },
+  "source_contracts": {
+    "requirements": "requirements.control.json",
+    "run": "run.control.json",
+    "runtime": "gen-000/runtime.control.json"
+  },
+  "registry_bindings": {
+    "selected_agent_workflow": "using-control-json generation execution"
+  },
+  "approved_control_hashes": {
+    "requirements.control.json": "sha256:ab9ecabb7cc42de297f5760625cc1cca297d833adadf93e6f05e32570f489ab9",
+    "run.control.json": "sha256:d046812da026d3f1ffb39e692a5bcfe946de8c91041182d89217c291eab92a0f"
+  },
+  "review_checks": [
+    {
+      "check_id": "intent-preservation",
+      "status": "pass",
+      "verdict": "approved",
+      "return_to_stage": null,
+      "evidence": [
+        "requirements.control.json",
+        "run.control.json"
+      ],
+      "findings": [
+        "Generation strategy preserves the request to implement a pre-design/pre-plan information sufficiency gate."
+      ],
+      "required_changes": [],
+      "checked_transformations": [
+        "source_requirements->required_outcomes",
+        "required_outcomes->required_steps"
+      ]
+    },
+    {
+      "check_id": "obligation-preservation",
+      "status": "pass",
+      "verdict": "approved",
+      "return_to_stage": null,
+      "evidence": [
+        "requirements.control.json",
+        "run.control.json"
+      ],
+      "findings": [
+        "No required outcome is downgraded into documentation-only readiness or optional future work."
+      ],
+      "required_changes": [],
+      "checked_transformations": [
+        "required_outcomes->required_steps",
+        "required_steps->runtime_steps"
+      ]
+    },
+    {
+      "check_id": "required-outcome-coverage",
+      "status": "pass",
+      "verdict": "approved",
+      "return_to_stage": null,
+      "evidence": [
+        "run.control.json"
+      ],
+      "findings": [
+        "Five runtime steps cover five blocking required outcomes."
+      ],
+      "required_changes": [],
+      "checked_transformations": [
+        "required_outcomes->required_steps",
+        "required_steps->runtime_steps"
+      ]
+    },
+    {
+      "check_id": "source-requirement-preservation",
+      "status": "pass",
+      "verdict": "approved",
+      "return_to_stage": null,
+      "evidence": [
+        "requirements.control.json"
+      ],
+      "findings": [
+        "Source/evidence mapping was repaired and preserves required evidence strengths."
+      ],
+      "required_changes": [],
+      "checked_transformations": [
+        "source_requirements->required_outcomes",
+        "source_requirements->required_evidence"
+      ]
+    },
+    {
+      "check_id": "horizon-authority",
+      "status": "pass",
+      "verdict": "approved",
+      "return_to_stage": null,
+      "evidence": [
+        "run.control.json"
+      ],
+      "findings": [
+        "Runtime write authority is limited to repository surfaces needed for schema/guard/review/orchestrator/runtime protocol/tests and evidence."
+      ],
+      "required_changes": [],
+      "checked_transformations": [
+        "required_steps->work_packages",
+        "pre_runtime_compile"
+      ]
+    },
+    {
+      "check_id": "counterexample-gate",
+      "status": "pass",
+      "verdict": "approved",
+      "return_to_stage": null,
+      "evidence": [
+        "docs/cybernetics/runs/2026-06-27-information-sufficiency-gate/evidence/subagent_counterexample_review.json"
+      ],
+      "findings": [
+        "Independent reviewer found and verified repair of two blockers before approval."
+      ],
+      "required_changes": [],
+      "checked_transformations": [
+        "acceptance_command->goal_done_claim",
+        "blocked_or_goal_achieved",
+        "counterexample_review->design_plan_approval",
+        "counterexample_review->reject_if_conditions",
+        "current_status_and_evidence_ref->design_plan_entry_decision",
+        "current_status_and_evidence_ref->orchestrator_next_action",
+        "historical_failure->regression_fixture",
+        "information_sufficiency_check->pre_design_entry",
+        "information_sufficiency_check->pre_plan_entry",
+        "information_sufficiency_check->schema_guard_review_orchestrator_runtime_protocol",
+        "information_sufficiency_facts->counterexample_review",
+        "information_sufficiency_facts->required_schema_fields",
+        "information_sufficiency_facts->why_needed_and_acceptable_evidence",
+        "missing_pre_design_fact->blocked_or_goal_achieved",
+        "missing_pre_design_fact->reviewed_amendment_or_human_gate",
+        "pre_design_entry",
+        "pre_plan_entry",
+        "pre_runtime_compile",
+        "regression_fixture->guard_review_rejection",
+        "required_outcomes->information_sufficiency_facts",
+        "required_outcomes->required_steps",
+        "required_steps->runtime_steps",
+        "required_steps->work_packages",
+        "runtime_observation->missing_pre_design_fact",
+        "source_requirements->information_sufficiency_facts",
+        "source_requirements->required_outcomes"
+      ],
+      "reviewer": {
+        "kind": "subagent",
+        "id": "019f0968-be09-7e63-b80a-242e8affc580",
+        "evidence_ref": "docs/cybernetics/runs/2026-06-27-information-sufficiency-gate/evidence/subagent_counterexample_review.json",
+        "summary": "Independent reviewer approved after two repair rounds."
+      }
+    }
+  ]
+}

@@ -167,12 +167,15 @@
             "description": "Schema and skill/protocol changes define information_sufficiency_check or its referenced schema with derived fact records.",
             "evidence_strength": "code_change",
             "satisfies_source_requirements": [
-              "SR-pre-design-information-sufficiency-gate",
-              "SR-derived-facts-not-agent-checklist",
-              "SR-fact-record-shape"
+              "SR-pre-design-information-sufficiency-gate"
             ],
             "evidence_claim": "The schema can express the required gate without relying on design/runtime invented criteria.",
-            "path": "schemas/control-json/requirements.control.schema.json"
+            "path": "schemas/control-json/requirements.control.schema.json",
+            "completed_target_objects": [
+              "controlled_run pre-design boundary",
+              "orchestrating-cybernetic-pregoal flow",
+              "guard/review acceptance path"
+            ]
           },
           {
             "evidence_id": "E-info-sufficiency-schema-tests",
@@ -185,7 +188,15 @@
             ],
             "evidence_claim": "Schema and validation tests enforce traceability and fact-record shape.",
             "command": "pytest tests/skills -k information_sufficiency",
-            "must_pass": true
+            "must_pass": true,
+            "completed_target_objects": [
+              "requirements.control.json",
+              "information_sufficiency_check",
+              "counterexample gate",
+              "information_sufficiency_check schema",
+              "guard validation",
+              "review evidence"
+            ]
           }
         ],
         "not_satisfied_by": [
@@ -233,11 +244,15 @@
             "description": "Guard/orchestrator code checks information_sufficiency_check before design and plan entry.",
             "evidence_strength": "code_change",
             "satisfies_source_requirements": [
-              "SR-pre-design-information-sufficiency-gate",
-              "SR-modification-surfaces-defined"
+              "SR-pre-design-information-sufficiency-gate"
             ],
             "evidence_claim": "Design/plan entry is conditioned on the sufficiency gate, not merely on a later runtime verifier.",
-            "path": ".agents/skills/orchestrating-cybernetic-pregoal/scripts"
+            "path": ".agents/skills/orchestrating-cybernetic-pregoal/scripts",
+            "completed_target_objects": [
+              "controlled_run pre-design boundary",
+              "orchestrating-cybernetic-pregoal flow",
+              "guard/review acceptance path"
+            ]
           },
           {
             "evidence_id": "E-entry-block-guard-tests",
@@ -245,12 +260,31 @@
             "description": "Regression tests show runs with blocking missing facts are routed to information gathering or human approval instead of design/plan.",
             "evidence_strength": "test_result",
             "satisfies_source_requirements": [
-              "SR-pre-design-information-sufficiency-gate",
               "SR-derived-facts-not-agent-checklist"
             ],
             "evidence_claim": "The guard rejects design/plan entry when sufficiency is not satisfied.",
             "command": "pytest tests/skills -k 'information_sufficiency and guard'",
-            "must_pass": true
+            "must_pass": true,
+            "completed_target_objects": [
+              "requirements.control.json",
+              "information_sufficiency_check",
+              "counterexample gate"
+            ]
+          },
+          {
+            "evidence_id": "E-modification-surface-analysis",
+            "kind": "json_file",
+            "description": "Analysis evidence defines the requirements/schema/guard/review/orchestrator/runtime protocol modification scope, approval points, and done criteria.",
+            "evidence_strength": "analysis_report",
+            "satisfies_source_requirements": [
+              "SR-modification-surfaces-defined"
+            ],
+            "evidence_claim": "The implementation scope is explicitly defined before downstream design/runtime execution.",
+            "completed_target_objects": [
+              "requirements analysis artifact",
+              "future design and implementation scope"
+            ],
+            "path": "docs/cybernetics/runs/2026-06-27-information-sufficiency-gate/evidence/modification_surface_analysis.json"
           }
         ],
         "not_satisfied_by": [
@@ -292,27 +326,20 @@
         "blocks_goal_achieved_if_missing": true,
         "required_evidence": [
           {
-            "evidence_id": "E-independent-review-schema-code",
-            "kind": "file_exists",
-            "description": "Review schema/protocol requires information sufficiency counterexample checks with independent reviewer and evidence references.",
-            "evidence_strength": "code_change",
+            "evidence_id": "E-independent-counterexample-review-report",
+            "kind": "json_file",
+            "description": "Independent review report proves Counter Example Gate attempted to find missing facts that would invalidate design or plan.",
+            "evidence_strength": "review_report",
             "satisfies_source_requirements": [
               "SR-independent-counterexample-missing-facts"
             ],
-            "evidence_claim": "Review cannot approve sufficiency without an independent counterexample challenge.",
-            "path": "schemas/control-json/review.control.schema.json"
-          },
-          {
-            "evidence_id": "E-independent-review-tests",
-            "kind": "command_result",
-            "description": "Tests reject same-agent, evidence-free, or field-presence-only Counter Example Gate approvals.",
-            "evidence_strength": "test_result",
-            "satisfies_source_requirements": [
-              "SR-independent-counterexample-missing-facts"
+            "evidence_claim": "Independent review is required and evidenced before approval.",
+            "completed_target_objects": [
+              "counterexample_gate_contract",
+              "review.control.json",
+              "orchestration guard"
             ],
-            "evidence_claim": "Independent review is enforced and tied to concrete missing-fact challenge evidence.",
-            "command": "pytest tests/skills -k 'counterexample and information_sufficiency'",
-            "must_pass": true
+            "path": "docs/cybernetics/runs/2026-06-27-information-sufficiency-gate/evidence/independent_counterexample_review.json"
           }
         ],
         "not_satisfied_by": [
@@ -328,8 +355,7 @@
             "counterexample_review->reject_if_conditions"
           ],
           "required_evidence_ids": [
-            "E-independent-review-schema-code",
-            "E-independent-review-tests"
+            "E-independent-counterexample-review-report"
           ],
           "reject_if": [
             "Counterexample review is optional or absent.",
@@ -360,11 +386,15 @@
             "description": "Runtime protocol and progress schema define missing-pre-design-fact observation and required handling.",
             "evidence_strength": "code_change",
             "satisfies_source_requirements": [
-              "SR-pre-design-information-sufficiency-gate",
-              "SR-derived-facts-not-agent-checklist"
+              "SR-pre-design-information-sufficiency-gate"
             ],
             "evidence_claim": "Runtime cannot silently replace approved sufficiency standards; it must escalate or amend under review.",
-            "path": ".agents/skills/using-control-json/SKILL.md"
+            "path": ".agents/skills/using-control-json/SKILL.md",
+            "completed_target_objects": [
+              "controlled_run pre-design boundary",
+              "orchestrating-cybernetic-pregoal flow",
+              "guard/review acceptance path"
+            ]
           },
           {
             "evidence_id": "E-runtime-protocol-tests",
@@ -372,12 +402,16 @@
             "description": "Tests prove runtime cannot claim complete after discovering a missing pre-design fact without reviewed amendment or human approval.",
             "evidence_strength": "test_result",
             "satisfies_source_requirements": [
-              "SR-pre-design-information-sufficiency-gate",
               "SR-derived-facts-not-agent-checklist"
             ],
             "evidence_claim": "Newly discovered missing facts block completion or route to reviewed amendment.",
             "command": "pytest tests/skills -k 'missing_pre_design_fact or information_sufficiency_runtime'",
-            "must_pass": true
+            "must_pass": true,
+            "completed_target_objects": [
+              "requirements.control.json",
+              "information_sufficiency_check",
+              "counterexample gate"
+            ]
           }
         ],
         "not_satisfied_by": [
@@ -422,12 +456,17 @@
             "evidence_id": "E-historical-regression-fixtures",
             "kind": "file_exists",
             "description": "Fixtures cover missing client integration facts, self-filled observation lists, absent counterexample review, and runtime-discovered pre-design facts.",
-            "evidence_strength": "code_change",
+            "evidence_strength": "test_result",
             "satisfies_source_requirements": [
               "SR-historical-regression-coverage"
             ],
             "evidence_claim": "Historical failure modes are represented as executable regression fixtures.",
-            "path": "tests/skills"
+            "path": "tests/skills/",
+            "completed_target_objects": [
+              "tests",
+              "fixtures",
+              "guard behavior"
+            ]
           },
           {
             "evidence_id": "E-historical-regression-command",
@@ -435,12 +474,16 @@
             "description": "Acceptance command passes and includes negative tests for information sufficiency failures.",
             "evidence_strength": "test_result",
             "satisfies_source_requirements": [
-              "SR-historical-regression-coverage",
-              "SR-modification-surfaces-defined"
+              "SR-historical-regression-coverage"
             ],
             "evidence_claim": "Regression tests fail on the historical missing-information pattern and pass on valid sufficiency evidence.",
             "command": "pytest tests/skills -k information_sufficiency",
-            "must_pass": true
+            "must_pass": true,
+            "completed_target_objects": [
+              "tests",
+              "fixtures",
+              "guard behavior"
+            ]
           }
         ],
         "not_satisfied_by": [
@@ -508,7 +551,7 @@
     },
     "semantic_base": {
       "id": "semantic-base:information-sufficiency-gate",
-      "hash": "sha256:f076241d753c2f33fa3ad0692da0de2dd5dce24291727f109b942faa7700f4a1"
+      "hash": "sha256:8072c67614d58240ba1b9ad837e926ab5abbb1dee954f83ef7f5bc20984fd197"
     }
   }
 }

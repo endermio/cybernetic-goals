@@ -1,0 +1,133 @@
+{
+  "artifact_type": "runtime.control",
+  "schema_version": "1.0",
+  "status": "compiled",
+  "generation": {
+    "id": "gen-000"
+  },
+  "semantic_base_ref": {
+    "id": "semantic-base:information-sufficiency-gate",
+    "hash": "sha256:8072c67614d58240ba1b9ad837e926ab5abbb1dee954f83ef7f5bc20984fd197"
+  },
+  "approved_control": {
+    "objective": "Add an information_sufficiency_check before controlled_run design and plan. The check must derive design-before facts from source_requirements and required_outcomes, record why each fact is needed, acceptable evidence, current status, and evidence reference, and require an independent Counter Example Gate to search for missing facts that would invalidate design or plan.",
+    "what_counts_as_done": "Done means the implementation requirements define every required code/document/test surface for information_sufficiency_check; each blocking required outcome has direct evidence requirements and per-outcome Counter Example Gate checks; the approved requirements make it impossible for downstream design or runtime to replace the gate with an agent-authored observation list, field-presence validation, or unstated assumptions."
+  },
+  "approved_control_hashes": {
+    "gen-000/review.control.json": "sha256:21673f562da986245901e58fcb91d72177071480c69a1fb039f4ddcd8c4de420",
+    "requirements.control.json": "sha256:ab9ecabb7cc42de297f5760625cc1cca297d833adadf93e6f05e32570f489ab9",
+    "run.control.json": "sha256:d046812da026d3f1ffb39e692a5bcfe946de8c91041182d89217c291eab92a0f",
+    "gen-000/runtime.control.json": "sha256:10a91898ed1ef197fedef40fabc6295a36ce6b728145251b9020347d5892a864"
+  },
+  "runtime": {
+    "readonly_files": [
+      "requirements.control.json",
+      "run.control.json",
+      "gen-000/review.control.json",
+      "gen-000/runtime.control.json"
+    ],
+    "writable_files": [
+      "progress.jsonl",
+      "runtime-status.json",
+      "final-report.json"
+    ],
+    "writable_evidence_paths": [
+      "schemas/control-json/",
+      ".agents/skills/analyzing-cybernetic-requirements/",
+      ".agents/skills/compiling-cybernetic-runtime-goals/",
+      ".agents/skills/orchestrating-cybernetic-pregoal/",
+      ".agents/skills/using-control-json/",
+      "tests/skills/",
+      "docs/cybernetics/runs/2026-06-27-information-sufficiency-gate/evidence/"
+    ]
+  },
+  "required_steps": [
+    {
+      "step_id": "S1-info-sufficiency-schema-and-requirements-model",
+      "transition": "No official information_sufficiency_check model -> schema-backed requirements-stage model for derived facts with why_needed, acceptable_evidence, current_status, and evidence_ref.",
+      "evidence": [
+        "E-info-sufficiency-schema-code",
+        "E-info-sufficiency-schema-tests"
+      ],
+      "satisfies_outcomes": [
+        "O-information-sufficiency-requirements-and-schema"
+      ]
+    },
+    {
+      "step_id": "S2-pre-design-plan-guard-and-orchestrator-entry-block",
+      "transition": "Design/plan can start without factual sufficiency -> guard and orchestrator block design/plan entry until sufficiency is satisfied or human escalation is recorded.",
+      "evidence": [
+        "E-entry-block-guard-code",
+        "E-entry-block-guard-tests",
+        "E-modification-surface-analysis"
+      ],
+      "satisfies_outcomes": [
+        "O-guard-and-orchestrator-block-entry"
+      ]
+    },
+    {
+      "step_id": "S3-independent-counterexample-review-enforcement",
+      "transition": "Counterexample review can be optional or self-approved -> independent Counter Example Gate is required for information sufficiency and per-outcome checks before approval.",
+      "evidence": [
+        "E-independent-counterexample-review-report"
+      ],
+      "satisfies_outcomes": [
+        "O-independent-counterexample-review"
+      ]
+    },
+    {
+      "step_id": "S4-runtime-protocol-missing-fact-handling",
+      "transition": "Runtime can discover missing pre-design facts and continue ad hoc -> runtime protocol preserves missing facts as control issues requiring reviewed amendment or human decision.",
+      "evidence": [
+        "E-runtime-protocol-code-doc",
+        "E-runtime-protocol-tests"
+      ],
+      "satisfies_outcomes": [
+        "O-runtime-protocol-handles-new-missing-facts"
+      ]
+    },
+    {
+      "step_id": "S5-historical-regressions-and-acceptance-checks",
+      "transition": "Historical missing-information failures are untested -> executable regressions cover client integration minimal facts, self-filled observation lists, absent independent review, and runtime-discovered missing pre-design facts.",
+      "evidence": [
+        "E-historical-regression-fixtures",
+        "E-historical-regression-command"
+      ],
+      "satisfies_outcomes": [
+        "O-historical-regressions-and-acceptance-checks"
+      ]
+    }
+  ],
+  "progress": {
+    "event_schema": "progress-event.schema.json",
+    "append_only": true
+  },
+  "verifier": {
+    "required_before_goal_achieved": true,
+    "command": "python3 .agents/skills/using-control-json/scripts/verify_runtime_progress.py",
+    "required_outcomes": [
+      "O-information-sufficiency-requirements-and-schema",
+      "O-guard-and-orchestrator-block-entry",
+      "O-independent-counterexample-review",
+      "O-runtime-protocol-handles-new-missing-facts",
+      "O-historical-regressions-and-acceptance-checks"
+    ],
+    "output_schema": "final-report.schema.json"
+  },
+  "imported_evidence": [],
+  "invalidated_evidence": [],
+  "control_level": 3,
+  "target_model": {
+    "result_orientation": [
+      "state_change",
+      "design_model"
+    ],
+    "result_content": "specified",
+    "path": "partially_known",
+    "result_placement": "multi_place",
+    "impact_scope": "persistent_internal"
+  },
+  "strategy_policy": "reviewed_replanning",
+  "gate_mode": "human_gate",
+  "phase_structure": "staged"
+}
