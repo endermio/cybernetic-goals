@@ -129,10 +129,12 @@ EVENT_TYPES = {
     "control.amendment.approved",
     "control.amendment.rejected",
     "control.amendment.blocked",
+    "counterexample.review.completed",
     "verification.completed",
     "final_report.written",
 }
 EVENT_STATUSES = {"pass", "fail", "blocked", "partial"}
+COUNTEREXAMPLE_REVIEW_VERDICTS = {"approved", "needs_revision", "blocked"}
 PROGRESS_ROLES = {"mainline", "supporting_only"}
 REQUIRED_EVIDENCE_KINDS = {"progress_event", "file_exists", "json_file", "command_result"}
 STEP_EVENT_TYPES = {"step.started", "step.completed", "step.blocked", "step.failed"}
@@ -144,6 +146,7 @@ AMENDMENT_EVENT_TYPES = {
 }
 GENERATION_EVENT_TYPES = {"runtime.generation.started", "runtime.generation.superseded"}
 OBSERVATION_EVENT_TYPES = {"observation.recorded"}
+COUNTEREXAMPLE_REVIEW_EVENT_TYPES = {"counterexample.review.completed"}
 OBSERVATION_STRING_FIELDS = (
     "corrects_event_ref",
     "classification",
@@ -1053,6 +1056,31 @@ def validate_event(event: dict[str, Any]) -> list[str]:
         for field in OBSERVATION_STRING_FIELDS:
             if field in event and (not isinstance(event.get(field), str) or not event.get(field)):
                 errors.append(f"{field} must be a non-empty string")
+    elif event_type in COUNTEREXAMPLE_REVIEW_EVENT_TYPES:
+        for field in ("status", "verdict", "reviewer", "reviewed_steps", "reviewed_outcomes", "checked_transformations", "evidence"):
+            if field not in event:
+                errors.append(f"counterexample.review.completed events must include {field}")
+        if event.get("status") not in EVENT_STATUSES:
+            errors.append("status is not recognized")
+        if event.get("verdict") not in COUNTEREXAMPLE_REVIEW_VERDICTS:
+            errors.append("counterexample.review.completed verdict is not recognized")
+        reviewer = event.get("reviewer")
+        if not isinstance(reviewer, dict):
+            errors.append("counterexample.review.completed reviewer must be an object")
+        elif (
+            reviewer.get("kind") not in COUNTEREXAMPLE_REVIEWER_KINDS
+            or not isinstance(reviewer.get("id"), str)
+            or not reviewer["id"].strip()
+            or not isinstance(reviewer.get("evidence_ref"), str)
+            or not reviewer["evidence_ref"].strip()
+        ):
+            errors.append(
+                "counterexample.review.completed reviewer must be subagent, human, or external with id and evidence_ref"
+            )
+        for field in ("reviewed_steps", "reviewed_outcomes", "checked_transformations", "evidence"):
+            value = event.get(field)
+            if not isinstance(value, list) or not value or not all(isinstance(item, str) and item for item in value):
+                errors.append(f"counterexample.review.completed {field} must be a non-empty list")
     return errors
 
 

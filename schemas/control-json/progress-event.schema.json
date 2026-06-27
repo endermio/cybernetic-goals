@@ -24,6 +24,7 @@
         "control.amendment.approved",
         "control.amendment.rejected",
         "control.amendment.blocked",
+        "counterexample.review.completed",
         "verification.completed",
         "final_report.written"
       ]
@@ -51,6 +52,67 @@
         "blocked",
         "partial"
       ]
+    },
+    "verdict": {
+      "enum": [
+        "approved",
+        "needs_revision",
+        "blocked"
+      ]
+    },
+    "reviewer": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind",
+        "id",
+        "evidence_ref"
+      ],
+      "properties": {
+        "kind": {
+          "enum": [
+            "subagent",
+            "human",
+            "external"
+          ]
+        },
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "evidence_ref": {
+          "type": "string",
+          "minLength": 1
+        },
+        "summary": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "reviewed_steps": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "reviewed_outcomes": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "checked_transformations": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
     },
     "progress_role": {
       "enum": [
@@ -165,6 +227,26 @@
     }
   },
   "allOf": [
+    {
+      "if": {
+        "properties": {
+          "event_type": {
+            "const": "counterexample.review.completed"
+          }
+        }
+      },
+      "then": {
+        "required": [
+          "status",
+          "verdict",
+          "reviewer",
+          "reviewed_steps",
+          "reviewed_outcomes",
+          "checked_transformations",
+          "evidence"
+        ]
+      }
+    },
     {
       "if": {
         "properties": {

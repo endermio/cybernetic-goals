@@ -9,6 +9,7 @@ from pathlib import Path
 from tests.skills.test_control_json_schemas import validate
 from tests.skills.test_reviewed_replanning_control import (
     apply_hashes,
+    counterexample_review_event,
     final_report,
     progress_event,
     refresh_semantic_base,
@@ -48,6 +49,11 @@ class RuntimeJsonProgressVerifierTest(unittest.TestCase):
 
         validate(mainline, schema)
         validate(supporting, schema)
+
+    def test_progress_event_schema_accepts_runtime_counterexample_review_event(self):
+        schema = json.loads(PROGRESS_EVENT_SCHEMA.read_text(encoding="utf-8"))
+
+        validate(counterexample_review_event(), schema)
 
     def test_validate_control_chain_accepts_complete_generation_run(self):
         with tempfile.TemporaryDirectory() as tmpdir:
@@ -460,7 +466,10 @@ class RuntimeJsonProgressVerifierTest(unittest.TestCase):
             run_dir = Path(tmpdir)
             write_strategy_run(
                 run_dir,
-                progress_events=[progress_event("evidence.target-startup")],
+                progress_events=[
+                    progress_event("evidence.target-startup"),
+                    counterexample_review_event(),
+                ],
                 report=final_report("gen-000", "evidence.target-startup"),
             )
 
@@ -473,6 +482,47 @@ class RuntimeJsonProgressVerifierTest(unittest.TestCase):
             self.assertEqual(["O-target-startup"], payload["completed_required_outcomes"])
             self.assertEqual(["SR-target-startup"], payload["source_requirements"])
             self.assertEqual(["SR-target-startup"], payload["completed_source_requirements"])
+
+    def test_verify_runtime_progress_rejects_goal_achieved_without_runtime_counterexample_review(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            run_dir = Path(tmpdir)
+            write_strategy_run(
+                run_dir,
+                progress_events=[progress_event("evidence.target-startup")],
+                report=final_report("gen-000", "evidence.target-startup"),
+            )
+
+            result = run_script(VERIFY, str(run_dir))
+
+            self.assertNotEqual(result.returncode, 0, result.stdout + result.stderr)
+            self.assertIn(
+                "missing runtime counterexample review for required steps: S1",
+                result.stdout + result.stderr,
+            )
+            self.assertIn(
+                "missing runtime counterexample review for blocking required outcomes: O-target-startup",
+                result.stdout + result.stderr,
+            )
+
+    def test_verify_runtime_progress_rejects_counterexample_review_that_misses_stage_goal(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            run_dir = Path(tmpdir)
+            write_strategy_run(
+                run_dir,
+                progress_events=[
+                    progress_event("evidence.target-startup"),
+                    counterexample_review_event(reviewed_steps=["S-other"]),
+                ],
+                report=final_report("gen-000", "evidence.target-startup"),
+            )
+
+            result = run_script(VERIFY, str(run_dir))
+
+            self.assertNotEqual(result.returncode, 0, result.stdout + result.stderr)
+            self.assertIn(
+                "missing runtime counterexample review for required steps: S1",
+                result.stdout + result.stderr,
+            )
 
     def test_build_runtime_prompt_outputs_short_goal_pointer(self):
         with tempfile.TemporaryDirectory() as tmpdir:

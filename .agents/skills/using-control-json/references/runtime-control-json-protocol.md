@@ -86,6 +86,9 @@ separately:
 - amendment events require `amendment_id` and amendment-specific fields;
 - generation events require generation-specific fields such as `reason` when a
   generation is superseded.
+- runtime counterexample review events use `counterexample.review.completed`
+  and require `status`, `verdict`, `reviewer`, `reviewed_steps`,
+  `reviewed_outcomes`, `checked_transformations`, and `evidence`.
 
 Do not add fake `work_package_id`, `required_step`, `status`, or `evidence`
 fields just to make amendment or generation events look like step events.
@@ -187,6 +190,16 @@ An approved `counterexample-gate` must record independent reviewer provenance
 with `reviewer.kind`, `reviewer.id`, and `reviewer.evidence_ref`. Accepted
 reviewer kinds are `subagent`, `human`, and `external`. The execution agent's own
 summary is not enough.
+
+Before `goal_achieved: true`, runtime must also append a current-generation
+`counterexample.review.completed` event. This event is the hard runtime
+Counterexample Gate for the final completion claim. It must be `status: pass`
+and `verdict: approved`, must include independent reviewer provenance, and must
+cover every current runtime `required_step` plus every blocking required outcome.
+It must also cover the requirements-approved counterexample contract points and
+the per-outcome counterexample gate points. If any decomposed step or blocking
+outcome is missing from this review, the verifier must reject `goal_achieved:
+true` even when all step events and final-report fields are otherwise present.
 
 If runtime discovers a counterexample that was missed by review, record it as an
 observation or amendment proposal. Do not claim `goal_achieved: true`, and do

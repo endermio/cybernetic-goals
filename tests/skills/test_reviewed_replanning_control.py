@@ -370,6 +370,41 @@ def progress_event(
     return event
 
 
+def counterexample_review_event(
+    *,
+    generation: str = "gen-000",
+    reviewed_steps: list[str] | None = None,
+    reviewed_outcomes: list[str] | None = None,
+    evidence_id: str = "evidence.counterexample-review",
+) -> dict:
+    return {
+        "event_type": "counterexample.review.completed",
+        "schema_version": "1.1.0",
+        "occurred_at": "2026-06-10T00:00:00Z",
+        "runtime_generation": generation,
+        "status": "pass",
+        "verdict": "approved",
+        "reviewer": {
+            "kind": "subagent",
+            "id": "runtime-counterexample-reviewer",
+            "evidence_ref": evidence_id,
+            "summary": "Independent reverse review challenged the completed steps and required outcomes.",
+        },
+        "reviewed_steps": ["S1"] if reviewed_steps is None else reviewed_steps,
+        "reviewed_outcomes": ["O-target-startup"] if reviewed_outcomes is None else reviewed_outcomes,
+        "checked_transformations": [
+            "source_requirements->required_outcomes",
+            "required_outcomes->required_steps",
+            "required_steps->work_packages",
+            "required_steps->runtime_steps",
+            "pre_runtime_compile",
+            "blocked_or_goal_achieved",
+            "required_outcome:O-target-startup->completion_gate",
+        ],
+        "evidence": [evidence_id],
+    }
+
+
 def final_report(generation: str, evidence_id: str, unresolved: list[str] | None = None) -> dict:
     return {
         "artifact_type": "final-report",
@@ -724,7 +759,11 @@ class ReviewedReplanningControlTest(unittest.TestCase):
             "runtime_generation": "gen-000",
             "reason": "initial generation started",
         }
-        events = [generation_event, progress_event("evidence.target-startup")]
+        events = [
+            generation_event,
+            progress_event("evidence.target-startup"),
+            counterexample_review_event(),
+        ]
         report = final_report("gen-000", "evidence.target-startup")
         with tempfile.TemporaryDirectory() as tmpdir:
             run_dir = Path(tmpdir)
@@ -1655,7 +1694,10 @@ class ReviewedReplanningControlTest(unittest.TestCase):
                 "amendment_source": "progress.jsonl#A1",
             },
         ]
-        events = [progress_event("evidence.target-startup", generation="gen-000")]
+        events = [
+            progress_event("evidence.target-startup", generation="gen-000"),
+            counterexample_review_event(generation="gen-001"),
+        ]
         report = final_report("gen-001", "evidence.target-startup")
         with tempfile.TemporaryDirectory() as tmpdir:
             run_dir = Path(tmpdir)
@@ -1685,7 +1727,10 @@ class ReviewedReplanningControlTest(unittest.TestCase):
                 "amendment_source": "progress.jsonl#A1",
             },
         ]
-        events = [progress_event("evidence.target-startup", generation="gen-000")]
+        events = [
+            progress_event("evidence.target-startup", generation="gen-000"),
+            counterexample_review_event(generation="gen-001"),
+        ]
         report = final_report("gen-001", "evidence.target-startup")
 
         def import_old(runtime: dict) -> None:

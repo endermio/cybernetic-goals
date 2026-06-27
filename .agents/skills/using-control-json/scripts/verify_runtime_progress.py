@@ -7,6 +7,9 @@ from pathlib import Path
 
 from control_json_runtime import (
     blocking_required_outcomes,
+    counterexample_allowed_reviewer_kinds,
+    counterexample_contract_points,
+    counterexample_required_outcome_gate_points,
     covered_outcomes_by_steps,
     required_evidence_by_outcome,
     result_payload,
@@ -15,6 +18,7 @@ from control_json_runtime import (
     source_requirements_completed_by_evidence,
     step_outcome_map,
     step_ids,
+    string_list,
     validate_control_chain,
     verify_approved_hashes,
 )
@@ -167,6 +171,45 @@ def mainline_evidence_by_completed_step(
     return evidence_by_step
 
 
+def runtime_counterexample_review_coverage(
+    events: list[dict],
+    *,
+    requirements: dict,
+    current_generation: str | None,
+) -> tuple[set[str], set[str], set[str], list[str]]:
+    reviewed_steps: set[str] = set()
+    reviewed_outcomes: set[str] = set()
+    checked_transformations: set[str] = set()
+    errors: list[str] = []
+    allowed_reviewer_kinds = counterexample_allowed_reviewer_kinds(requirements)
+    for event in events:
+        if event.get("event_type") != "counterexample.review.completed":
+            continue
+        if current_generation is not None and event.get("runtime_generation") != current_generation:
+            continue
+        if event.get("status") != "pass" or event.get("verdict") != "approved":
+            continue
+        reviewer = event.get("reviewer")
+        if not isinstance(reviewer, dict):
+            errors.append("runtime counterexample review missing independent reviewer provenance")
+            continue
+        if (
+            reviewer.get("kind") not in allowed_reviewer_kinds
+            or not isinstance(reviewer.get("id"), str)
+            or not reviewer["id"].strip()
+            or not isinstance(reviewer.get("evidence_ref"), str)
+            or not reviewer["evidence_ref"].strip()
+        ):
+            errors.append(
+                "runtime counterexample review reviewer provenance must satisfy requirements.control.json minimum_reviewer"
+            )
+            continue
+        reviewed_steps.update(string_list(event.get("reviewed_steps")))
+        reviewed_outcomes.update(string_list(event.get("reviewed_outcomes")))
+        checked_transformations.update(string_list(event.get("checked_transformations")))
+    return reviewed_steps, reviewed_outcomes, checked_transformations, errors
+
+
 def final_report_errors(
     final_report: dict,
     *,
@@ -312,6 +355,39 @@ def main() -> int:
             "missing completed evidence for blocking source requirements: "
             + ", ".join(missing_source_requirements)
         )
+    (
+        counterexample_reviewed_steps,
+        counterexample_reviewed_outcomes,
+        counterexample_checked_transformations,
+        counterexample_review_errors,
+    ) = runtime_counterexample_review_coverage(
+        events,
+        requirements=artifacts["requirements"],
+        current_generation=current_generation,
+    )
+    errors.extend(counterexample_review_errors)
+    missing_counterexample_steps = sorted(required_steps - counterexample_reviewed_steps)
+    if missing_counterexample_steps:
+        errors.append(
+            "missing runtime counterexample review for required steps: "
+            + ", ".join(missing_counterexample_steps)
+        )
+    missing_counterexample_outcomes = sorted(required_outcomes - counterexample_reviewed_outcomes)
+    if missing_counterexample_outcomes:
+        errors.append(
+            "missing runtime counterexample review for blocking required outcomes: "
+            + ", ".join(missing_counterexample_outcomes)
+        )
+    required_counterexample_points = (
+        counterexample_contract_points(artifacts["requirements"])
+        | counterexample_required_outcome_gate_points(artifacts["requirements"])
+    )
+    missing_counterexample_points = sorted(required_counterexample_points - counterexample_checked_transformations)
+    if missing_counterexample_points:
+        errors.append(
+            "runtime counterexample review missing required gate points: "
+            + ", ".join(missing_counterexample_points)
+        )
 
     final_report_path = run_dir / "final-report.json"
     try:
@@ -355,6 +431,8 @@ def main() -> int:
                 unresolved_amendments=sorted(unresolved),
                 anchor_changing_amendments=sorted(anchor_changing),
                 proposed_amendments=sorted(proposed),
+                counterexample_reviewed_steps=sorted(counterexample_reviewed_steps),
+                counterexample_reviewed_outcomes=sorted(counterexample_reviewed_outcomes),
             ),
             indent=2,
         )
