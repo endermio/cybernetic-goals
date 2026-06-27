@@ -1,0 +1,63 @@
+{
+  "evidence_id": "E-modification-surface-analysis",
+  "runtime_generation": "gen-000",
+  "summary": "The implementation touched every approved surface required by SR-modification-surfaces-defined: requirements/schema, guard, review/counterexample enforcement, orchestrator entry routing, runtime protocol, historical regressions, human escalation behavior, and completion checks.",
+  "approved_surfaces": [
+    {
+      "surface": "requirements and schema",
+      "status": "implemented",
+      "evidence": [
+        "schemas/control-json/requirements.control.schema.json",
+        "tests/skills/test_control_json_schemas.py"
+      ]
+    },
+    {
+      "surface": "guard validation",
+      "status": "implemented",
+      "evidence": [
+        ".agents/skills/compiling-cybernetic-runtime-goals/scripts/control_chain_guard.py",
+        ".agents/skills/using-control-json/scripts/control_json_runtime.py",
+        "tests/skills/test_information_sufficiency_gate.py"
+      ]
+    },
+    {
+      "surface": "review and Counter Example Gate",
+      "status": "implemented",
+      "evidence": [
+        "schemas/control-json/requirements.control.schema.json",
+        "tests/skills/test_information_sufficiency_gate.py"
+      ]
+    },
+    {
+      "surface": "orchestrator/pre-goal flow",
+      "status": "implemented",
+      "evidence": [
+        ".agents/skills/orchestrating-cybernetic-pregoal/scripts/orchestration_guard.py",
+        ".agents/skills/orchestrating-cybernetic-pregoal/SKILL.md",
+        ".agents/skills/orchestrating-cybernetic-pregoal/references/pregoal-detailed-rules.md"
+      ]
+    },
+    {
+      "surface": "runtime protocol",
+      "status": "implemented",
+      "evidence": [
+        ".agents/skills/using-control-json/SKILL.md",
+        ".agents/skills/using-control-json/references/runtime-control-json-protocol.md",
+        "tests/skills/test_using_control_json_protocol.py"
+      ]
+    },
+    {
+      "surface": "historical regression tests",
+      "status": "implemented",
+      "evidence": [
+        "tests/skills/test_information_sufficiency_gate.py"
+      ]
+    }
+  ],
+  "human_approval_points_preserved": [
+    "Changing source requirements requires human approval.",
+    "Changing required outcomes requires human approval.",
+    "Changing authority or treating unavailable blocking facts as acceptable requires human approval.",
+    "Runtime-discovered missing pre-design facts require reviewed amendment or human decision instead of local assumption."
+  ]
+}

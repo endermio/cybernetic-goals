@@ -1,0 +1,73 @@
+{
+  "evidence_id": "information_sufficiency_implementation_evidence",
+  "runtime_generation": "gen-000",
+  "summary": "Information sufficiency is now represented in the requirements schema, enforced by generation control-chain validation, checked by pre-design orchestration routing, and preserved by the runtime protocol when missing pre-design facts are discovered later.",
+  "changed_surfaces": [
+    {
+      "surface": "requirements schema",
+      "paths": [
+        "schemas/control-json/requirements.control.schema.json"
+      ],
+      "implemented_behavior": [
+        "schema_version 1.2.0 requires approved_control.information_sufficiency_check",
+        "facts require source/outcome derivation, why_needed, acceptable_evidence, current_status, evidence_ref, and blocking behavior",
+        "counterexample_review requires reviewer provenance, checked facts, checked transformations, findings, and pass/approved verdict"
+      ]
+    },
+    {
+      "surface": "control-chain guard and runtime validator",
+      "paths": [
+        ".agents/skills/compiling-cybernetic-runtime-goals/scripts/control_chain_guard.py",
+        ".agents/skills/using-control-json/scripts/control_json_runtime.py"
+      ],
+      "implemented_behavior": [
+        "schema_version 1.2.0 runs require information_sufficiency_check",
+        "blocking facts must be satisfied before the chain is valid",
+        "facts must derive from existing source requirements and/or required outcomes",
+        "independent counterexample review must cover blocking facts and required information-sufficiency transformations"
+      ]
+    },
+    {
+      "surface": "pre-goal orchestration",
+      "paths": [
+        ".agents/skills/orchestrating-cybernetic-pregoal/scripts/orchestration_guard.py",
+        ".agents/skills/orchestrating-cybernetic-pregoal/SKILL.md",
+        ".agents/skills/orchestrating-cybernetic-pregoal/references/pregoal-detailed-rules.md"
+      ],
+      "implemented_behavior": [
+        "before-design and before-policy orchestration states route missing sufficiency to RunInformationSufficiencyCheck",
+        "pre-goal instructions now require satisfied, derived, evidenced sufficiency before design or execution policy"
+      ]
+    },
+    {
+      "surface": "requirements-analysis and runtime protocol",
+      "paths": [
+        ".agents/skills/analyzing-cybernetic-requirements/SKILL.md",
+        ".agents/skills/analyzing-cybernetic-requirements/references/requirements-analysis-detailed-rules.md",
+        ".agents/skills/using-control-json/SKILL.md",
+        ".agents/skills/using-control-json/references/runtime-control-json-protocol.md"
+      ],
+      "implemented_behavior": [
+        "requirements analysis must derive must-know facts from source requirements and required outcomes",
+        "runtime must preserve late-discovered missing pre-design facts as control issues rather than turning them into assumptions or local standards"
+      ]
+    }
+  ],
+  "verification_commands": [
+    {
+      "command": "PYTHONDONTWRITEBYTECODE=1 python3 -m unittest tests.skills.test_using_control_json_protocol.UsingControlJsonProtocolTest.test_runtime_preserves_information_sufficiency_failures",
+      "result": "pass",
+      "observed_output": "Ran 1 test ... OK"
+    },
+    {
+      "command": "PYTHONDONTWRITEBYTECODE=1 python3 -m unittest tests.skills.test_information_sufficiency_gate tests.skills.test_control_json_schemas tests.skills.test_using_control_json_protocol tests.skills.test_reviewed_replanning_control tests.skills.test_runtime_json_progress_verifier tests.skills.test_json_official_guard_compiler_path",
+      "result": "pass",
+      "observed_output": "Ran 121 tests ... OK"
+    },
+    {
+      "command": "PYTHONDONTWRITEBYTECODE=1 python3 -m unittest tests.skills.test_information_sufficiency_gate",
+      "result": "pass",
+      "observed_output": "Ran 8 tests ... OK"
+    }
+  ]
+}

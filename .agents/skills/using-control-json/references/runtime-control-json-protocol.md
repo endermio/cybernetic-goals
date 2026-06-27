@@ -37,6 +37,15 @@ Use approved JSON to decide what work is authorized, what counts as done, where 
 
 If the approved target, plan, review, or runtime contract appears wrong, stale, or insufficient, append an observation through `.agents/skills/using-control-json/scripts/append_progress_event.py` when `progress.jsonl` is available and valid. If the current strategy cannot produce a blocking required outcome but the approved anchors can remain unchanged, append a `control.amendment.proposed` event instead of hard-completing with substitute evidence. If the needed change would alter approved anchors or authority, stop and report the smallest required human decision.
 
+If execution discovers a fact that should have been known before design or
+planning, treat it as an `information_sufficiency_check` issue. Runtime must
+not invent a new sufficiency standard, silently continue from assumptions, or
+convert the missing fact into a design detail. Record the observation, and when
+the current strategy can be repaired without changing approved anchors, append
+a reviewed amendment proposal with affected source requirements and a patch.
+If the missing fact changes source requirements, required outcomes, authority,
+or what counts as done, stop for human reapproval.
+
 Generation-aware runs declare a generation `strategy_kind`:
 
 - `discovery`: may start from a narrow observation horizon and may use synthetic steps from requirements, but cannot permit `goal_achieved: true`.
@@ -164,6 +173,12 @@ The quality gate scope comes from the requirements-approved
 not invent, weaken, or replace that contract. Missing or inconsistent
 requirements-approved gate contract means the run is not executable until
 requirements are fixed.
+When requirements define `information_sufficiency_check`, runtime also treats
+that check as approved control. Blocking facts must have been derived from
+source requirements/outcomes and independently challenged before design or
+planning. A runtime completion or blocked claim cannot rely on facts invented
+afterward unless a reviewed amendment or human reapproval updates the control
+structure.
 Each blocking required outcome also has a per-outcome `counterexample_gate`;
 its checked transformations must be covered before the outcome can support
 `goal_achieved: true` or a terminal blocked claim.

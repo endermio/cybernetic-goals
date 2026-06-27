@@ -1,0 +1,38 @@
+{
+  "artifact_type": "final-report",
+  "schema_version": "1.0.0",
+  "goal_achieved": true,
+  "what_counts_as_done_met": true,
+  "runtime_generation": "gen-000",
+  "superseded_generations": [],
+  "unresolved_amendments": [],
+  "evidence": [
+    "E-info-sufficiency-schema-code",
+    "E-info-sufficiency-schema-tests",
+    "E-entry-block-guard-code",
+    "E-entry-block-guard-tests",
+    "E-modification-surface-analysis",
+    "E-independent-counterexample-review-report",
+    "E-runtime-protocol-code-doc",
+    "E-runtime-protocol-tests",
+    "E-historical-regression-fixtures",
+    "E-historical-regression-command",
+    "docs/cybernetics/runs/2026-06-27-information-sufficiency-gate/evidence/information_sufficiency_implementation_evidence.json",
+    "docs/cybernetics/runs/2026-06-27-information-sufficiency-gate/evidence/modification_surface_analysis.json",
+    "docs/cybernetics/runs/2026-06-27-information-sufficiency-gate/evidence/independent_counterexample_review.json"
+  ],
+  "work_coverage": {
+    "status": "complete",
+    "executed": [
+      "S1-info-sufficiency-schema-and-requirements-model",
+      "S2-pre-design-plan-guard-and-orchestrator-entry-block",
+      "S3-independent-counterexample-review-enforcement",
+      "S4-runtime-protocol-missing-fact-handling",
+      "S5-historical-regressions-and-acceptance-checks"
+    ],
+    "prepared_only": [],
+    "forbidden_not_executed": [],
+    "out_of_scope": []
+  },
+  "remaining_gaps": []
+}

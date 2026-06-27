@@ -82,6 +82,15 @@ class UsingControlJsonProtocolTest(unittest.TestCase):
         self.assertRegex(text, re.compile(r"v1\.0[^.\n]*compatibility", re.I))
         self.assertRegex(text, re.compile(r"runtime[^.\n]*policy[^.\n]*requires[^.\n]*affected_source_requirements", re.I))
 
+    def test_runtime_preserves_information_sufficiency_failures(self):
+        text = combined_protocol_text()
+
+        self.assertIn("information_sufficiency_check", text)
+        self.assertRegex(text, re.compile(r"should have been known before design or\s+planning", re.I))
+        self.assertRegex(text, re.compile(r"must\s+not[^.\n]*invent[^.\n]*sufficiency standard", re.I))
+        self.assertIn("control.amendment.proposed", text)
+        self.assertRegex(text, re.compile(r"reviewed amendment proposal", re.I))
+
     def test_goal_achieved_true_requires_verifier_permission(self):
         text = combined_protocol_text()
 

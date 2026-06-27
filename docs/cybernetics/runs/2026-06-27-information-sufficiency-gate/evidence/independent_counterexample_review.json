@@ -1,0 +1,69 @@
+{
+  "evidence_id": "E-independent-counterexample-review-report",
+  "runtime_generation": "gen-000",
+  "reviewer": {
+    "kind": "subagent",
+    "id": "019f0982-bbac-7a40-9f32-5e6e37d103fe",
+    "evidence_ref": "subagent final review in current runtime session"
+  },
+  "verdict": "approved",
+  "summary": "The independent reviewer first found evidence_ref and repository-integrity blockers. After repairs, final re-review found no remaining information-sufficiency gate bypasses or repository-integrity blockers.",
+  "initial_findings_repaired": [
+    {
+      "finding": "Blocking fact evidence_ref could point to a nonexistent file and still pass.",
+      "repair": "control_chain_guard.py, control_json_runtime.py, and orchestration_guard.py now require evidence_ref to resolve to an existing file inside the run directory."
+    },
+    {
+      "finding": "S3 and final runtime counterexample gate were not yet recorded.",
+      "repair": "This evidence file records the independent review and the runtime will append S3 plus counterexample.review.completed after this file exists."
+    },
+    {
+      "finding": "Historical regressions did not cover nonexistent evidence_ref, before-policy routing, and required_observations substitution.",
+      "repair": "tests/skills/test_information_sufficiency_gate.py now covers all three cases."
+    },
+    {
+      "finding": "Skill hot paths exceeded repository limits and the new test was missing from MANIFEST.txt.",
+      "repair": "The two SKILL.md files were compressed below 650 words and MANIFEST.txt now includes tests/skills/test_information_sufficiency_gate.py."
+    }
+  ],
+  "final_review": {
+    "verdict": "approved",
+    "remaining_blockers": [],
+    "verified_commands": [
+      "PYTHONDONTWRITEBYTECODE=1 python3 -m unittest discover -s tests/skills -v"
+    ],
+    "observed_output": "169 tests OK",
+    "reviewer_statement": "S1-S5 plus final runtime counterexample gate can be validly recorded; a temporary copy with S3 completion, counterexample.review.completed, and final-report.json verified goal_achieved_permitted true."
+  },
+  "checked_transformations": [
+    "source_requirements->information_sufficiency_facts",
+    "required_outcomes->information_sufficiency_facts",
+    "information_sufficiency_facts->counterexample_review",
+    "counterexample_review->design_plan_approval",
+    "counterexample_review->reject_if_conditions",
+    "information_sufficiency_check->pre_design_entry",
+    "information_sufficiency_check->pre_plan_entry",
+    "current_status_and_evidence_ref->orchestrator_next_action",
+    "runtime_observation->missing_pre_design_fact",
+    "missing_pre_design_fact->reviewed_amendment_or_human_gate",
+    "missing_pre_design_fact->blocked_or_goal_achieved",
+    "historical_failure->regression_fixture",
+    "regression_fixture->guard_review_rejection",
+    "acceptance_command->goal_done_claim",
+    "blocked_or_goal_achieved"
+  ],
+  "reviewed_steps": [
+    "S1-info-sufficiency-schema-and-requirements-model",
+    "S2-pre-design-plan-guard-and-orchestrator-entry-block",
+    "S3-independent-counterexample-review-enforcement",
+    "S4-runtime-protocol-missing-fact-handling",
+    "S5-historical-regressions-and-acceptance-checks"
+  ],
+  "reviewed_outcomes": [
+    "O-information-sufficiency-requirements-and-schema",
+    "O-guard-and-orchestrator-block-entry",
+    "O-independent-counterexample-review",
+    "O-runtime-protocol-handles-new-missing-facts",
+    "O-historical-regressions-and-acceptance-checks"
+  ]
+}

@@ -961,6 +961,56 @@ class ControlJsonSchemaTest(unittest.TestCase):
 
         validate(fixture, schema)
 
+    def test_requirements_schema_requires_information_sufficiency_check_for_v1_2(self):
+        schema = json.loads((SCHEMA_DIR / "requirements.control.schema.json").read_text(encoding="utf-8"))
+        fixture = copy.deepcopy(SCHEMA_FIXTURES["requirements.control.schema.json"])
+        fixture["schema_version"] = "1.2.0"
+
+        with self.assertRaises(SchemaValidationError):
+            validate(fixture, schema)
+
+        fixture["approved_control"]["information_sufficiency_check"] = {
+            "status": "satisfied",
+            "facts": [
+                {
+                    "fact_id": "F-schema-context",
+                    "statement": "Schema context needed before design is known.",
+                    "derived_from": {
+                        "source_requirements": ["SR-schema-validation"],
+                        "required_outcomes": ["outcome.schema-validation"],
+                    },
+                    "why_needed": "Design must know whether JSON schema validation is the required target.",
+                    "acceptable_evidence": [
+                        {
+                            "kind": "source_code",
+                            "description": "Schema fixture and source requirement were inspected.",
+                        }
+                    ],
+                    "current_status": "satisfied",
+                    "evidence_ref": "requirements.control.json#source_requirements",
+                    "blocks_design_or_plan_if_missing": True,
+                }
+            ],
+            "counterexample_review": {
+                "status": "pass",
+                "verdict": "approved",
+                "reviewer": {
+                    "kind": "subagent",
+                    "id": "information-sufficiency-reviewer",
+                    "evidence_ref": "review.control.json#information-sufficiency",
+                },
+                "checked_facts": ["F-schema-context"],
+                "checked_transformations": [
+                    "source_requirements->information_sufficiency_facts",
+                    "required_outcomes->information_sufficiency_facts",
+                    "information_sufficiency_facts->design_plan_entry",
+                ],
+                "findings": [],
+            },
+        }
+
+        validate(fixture, schema)
+
     def test_requirements_schema_rejects_source_without_quote_or_reference(self):
         schema = json.loads((SCHEMA_DIR / "requirements.control.schema.json").read_text(encoding="utf-8"))
         fixture = copy.deepcopy(SCHEMA_FIXTURES["requirements.control.schema.json"])

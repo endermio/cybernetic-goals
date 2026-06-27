@@ -138,6 +138,7 @@ tests/skills/__init__.py
 tests/skills/test_bounded_control_json_protocol.py
 tests/skills/test_control_json_schemas.py
 tests/skills/test_skill_hot_path_compression.py
+tests/skills/test_information_sufficiency_gate.py
 tests/skills/test_intent_framing.py
 tests/skills/test_invariant_consumer_matrix.py
 tests/skills/test_json_control_regression_inventory.py

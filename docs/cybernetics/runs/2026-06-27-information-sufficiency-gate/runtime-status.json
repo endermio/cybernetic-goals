@@ -1,0 +1,27 @@
+{
+  "artifact_type": "runtime-status",
+  "schema_version": "1.0.0",
+  "runtime_generation": "gen-000",
+  "status": "complete",
+  "goal_achieved_permitted": true,
+  "completed_required_steps": [
+    "S1-info-sufficiency-schema-and-requirements-model",
+    "S2-pre-design-plan-guard-and-orchestrator-entry-block",
+    "S3-independent-counterexample-review-enforcement",
+    "S4-runtime-protocol-missing-fact-handling",
+    "S5-historical-regressions-and-acceptance-checks"
+  ],
+  "completed_required_outcomes": [
+    "O-information-sufficiency-requirements-and-schema",
+    "O-guard-and-orchestrator-block-entry",
+    "O-independent-counterexample-review",
+    "O-runtime-protocol-handles-new-missing-facts",
+    "O-historical-regressions-and-acceptance-checks"
+  ],
+  "remaining_gaps": [],
+  "last_verifier": {
+    "command": "python3 .agents/skills/using-control-json/scripts/verify_runtime_progress.py docs/cybernetics/runs/2026-06-27-information-sufficiency-gate",
+    "ok": true,
+    "goal_achieved_permitted": true
+  }
+}

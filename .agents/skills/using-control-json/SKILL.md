@@ -27,7 +27,12 @@ Read `references/runtime-control-json-protocol.md` before executing, reporting s
 4. Runtime must use `append_progress_event.py` to append one JSON object per line to `progress.jsonl`; direct writes to `progress.jsonl` are invalid runtime behavior. Record discoveries, commands, evidence, blockers, required-step state, generation state, and amendment proposals there; do not mutate approved JSON to match execution.
 5. `final-report.json` records the runtime completion claim and evidence; it does not grant verifier permission to itself. Before accepting or reporting `goal_achieved: true`, run the verifier and use the verifier process output as the source of truth.
 6. Source requirements are approved original-request items. Runtime may not treat weaker substitute evidence as completion. If strategy cannot complete a blocking source requirement, propose an amendment with `affected_source_requirements`.
-7. `/goal` is a short pointer and adapter, not a control fact. It should point to `runtime.control.json` and name `using-control-json`, leaving approved facts in JSON.
+7. If runtime discovers a fact that should have been known before design or
+   planning, preserve it as an information sufficiency issue. Do not invent a
+   local sufficiency standard or continue under assumptions; append an
+   observation or reviewed amendment proposal, or stop for the smallest human
+   decision when approved anchors or authority would change.
+8. `/goal` is a short pointer and adapter, not a control fact. It should point to `runtime.control.json` and name `using-control-json`, leaving approved facts in JSON.
 
 ## Gate Roles
 

@@ -403,9 +403,18 @@ The requirements analysis is acceptable only when:
 - `What the User Approved: Approved`;
 - routing or requirements recorded `controlled_run` JSON pre-goal fit and the run can
   record target model, strategy policy, gate mode, and phase structure.
+- any required `information_sufficiency_check` is satisfied before entering
+  design or execution policy.
 
 If requirements analysis is incomplete or What the User Approved is missing/not Approved, stop
 before design.
+
+If `information_sufficiency_check` exists and is not satisfied, stop before
+design or plan and route to `RunInformationSufficiencyCheck`. The orchestrator
+must not reinterpret missing facts as assumptions, and it must not ask design
+or runtime to invent the sufficiency standard. The check is satisfied only when
+blocking facts are traced to source requirements/outcomes, have acceptable
+evidence, and have passed independent counterexample review.
 
 ### Determine Artifact Paths
 

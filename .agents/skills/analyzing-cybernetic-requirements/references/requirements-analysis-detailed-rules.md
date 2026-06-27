@@ -113,6 +113,40 @@ Add task-specific transformations when the user's request needs them. Later
 review may require stronger evidence, but must not weaken, replace, or invent a
 different quality contract.
 
+## Information Sufficiency Check
+
+Before controlled-run design or planning, requirements analysis must determine
+whether there are facts that must be known first. These are not solution-design
+choices; they are facts without which the design or plan could be invalid.
+
+When such facts exist, record `approved_control.information_sufficiency_check`
+in `requirements.control.json`. Each fact must include:
+
+- a stable `fact_id`;
+- the fact statement;
+- `derived_from.source_requirements` and/or `derived_from.required_outcomes`;
+- `why_needed`;
+- `acceptable_evidence`;
+- `current_status`;
+- `evidence_ref`;
+- whether missing it blocks design or plan.
+
+Do not ask design, plan, or runtime to invent this standard later. They may
+gather evidence, report a blocker, or propose a reviewed amendment, but they
+may not redefine what information was required before design.
+
+Do not reduce this to an agent-filled `required_observations` checklist. A fact
+is valid only when it is derived from approved source requirements/outcomes and
+has acceptable evidence criteria.
+
+`information_sufficiency_check.counterexample_review` must be independent and
+must try to find missing facts that would invalidate design or plan. It must
+record reviewer provenance, checked facts, checked transformations, evidence
+reference, and findings. If a blocking fact is missing, unknown, weakly
+evidenced, or not independently reviewed, orchestration must stop before design
+or plan and report the smallest required information-gathering or human
+decision.
+
 ## Ask Only High-Value Human Questions
 
 Ask the human a question only if all are true:
