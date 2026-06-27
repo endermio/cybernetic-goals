@@ -98,10 +98,6 @@ def write_bounded_run(run_dir: Path, *, progress_evidence: list[str] | None = No
             "goal_achieved": True,
             "what_counts_as_done_met": True,
             "evidence": ["evidence.s1"],
-            "verification": {
-                "verifier_result": "pass",
-                "verifier_permits_goal_achieved": True,
-            },
             "work_coverage": {
                 "status": "explicitly_bounded",
                 "executed": ["S1"],
@@ -189,6 +185,24 @@ class BoundedControlJsonProtocolTest(unittest.TestCase):
             self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
             payload = json.loads(result.stdout)
             self.assertTrue(payload["goal_achieved_permitted"])
+
+    def test_bounded_verifier_does_not_require_final_report_to_predeclare_verifier_pass(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            run_dir = Path(tmpdir)
+            write_bounded_run(run_dir, progress_evidence=["evidence.s1"])
+
+            result = run_script(BOUNDED_VERIFY, str(run_dir))
+
+            self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+            payload = json.loads(result.stdout)
+            self.assertTrue(payload["goal_achieved_permitted"])
+
+    def test_bounded_skill_says_final_report_does_not_self_grant_verifier_permission(self):
+        text = BOUNDED_SKILL.read_text(encoding="utf-8")
+
+        self.assertIn("final-report.json", text)
+        self.assertIn("does not grant verifier permission to itself", text)
+        self.assertIn("verifier process output", text)
 
 
 if __name__ == "__main__":

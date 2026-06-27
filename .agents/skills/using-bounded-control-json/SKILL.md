@@ -50,14 +50,17 @@ Append runtime observations to `progress.jsonl` as JSONL events. A required
 step is complete only when a passing mainline `step.completed` event names that
 step and includes every evidence id listed in `runtime.control.json`.
 
-Before writing `goal_achieved: true`, run:
+`final-report.json` records the bounded runtime completion claim and evidence.
+It does not grant verifier permission to itself.
+
+Before accepting or reporting `goal_achieved: true`, run:
 
 ```bash
 python3 .agents/skills/using-bounded-control-json/scripts/verify_bounded_runtime.py docs/cybernetics/runs/<slug>
 ```
 
-Only a verifier result that permits completion may support
-`final-report.json.goal_achieved: true`.
+Use the verifier process output as the source of truth for whether
+`final-report.json.goal_achieved: true` is accepted.
 
 ## Short `/goal` Adapter
 

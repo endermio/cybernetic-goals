@@ -22,14 +22,6 @@ def final_report_errors(final_report: dict) -> list[str]:
         errors.append("final-report.json goal_achieved must be true")
     if final_report.get("what_counts_as_done_met") is not True:
         errors.append("final-report.json what_counts_as_done_met must be true")
-    verification = final_report.get("verification")
-    if not isinstance(verification, dict):
-        errors.append("final-report.json verification must be an object")
-    else:
-        if verification.get("verifier_result") != "pass":
-            errors.append("final-report.json verification.verifier_result must be pass")
-        if verification.get("verifier_permits_goal_achieved") is not True:
-            errors.append("final-report.json verifier must permit goal_achieved")
     if final_report.get("remaining_gaps") not in ([], None):
         errors.append("final-report.json remaining_gaps must be empty for goal_achieved")
     return errors
