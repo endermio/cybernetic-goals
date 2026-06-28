@@ -134,6 +134,28 @@ def action_summary(action: dict[str, Any], facts: dict[str, dict[str, Any]]) -> 
     return item
 
 
+def has_string_list(value: Any) -> bool:
+    return isinstance(value, list) and any(isinstance(item, str) and item for item in value)
+
+
+def has_command(value: Any) -> bool:
+    if isinstance(value, str):
+        return bool(value.strip())
+    return has_string_list(value)
+
+
+def action_detail_errors(action: dict[str, Any], action_type: Any, action_ref: Any) -> list[str]:
+    if action_type in {"read_source", "read_documentation"} and not has_string_list(action.get("paths")):
+        return [f"collection action {action_ref} with action_type {action_type!r} must include non-empty paths"]
+    if action_type == "run_no_side_effect_probe" and not has_command(action.get("command")):
+        return [f"collection action {action_ref} with action_type 'run_no_side_effect_probe' must include command"]
+    if action_type in USER_ACTION_TYPES and not isinstance(action.get("question"), str):
+        return [f"collection action {action_ref} with action_type {action_type!r} must include question"]
+    if action_type in USER_ACTION_TYPES and not action["question"].strip():
+        return [f"collection action {action_ref} with action_type {action_type!r} must include a non-empty question"]
+    return []
+
+
 def classify_actions(check: dict[str, Any]) -> tuple[list[dict[str, Any]], list[dict[str, Any]], list[str]]:
     facts = fact_by_id(check)
     automatic: list[dict[str, Any]] = []
@@ -150,6 +172,11 @@ def classify_actions(check: dict[str, Any]) -> tuple[list[dict[str, Any]], list[
         fact_id = action.get("fact_id")
         if not isinstance(fact_id, str) or fact_id not in facts:
             errors.append(f"collection action {action.get('action_id') or index} references unknown fact_id")
+            continue
+        action_ref = action.get("action_id") or index
+        detail_errors = action_detail_errors(action, action_type, action_ref)
+        if detail_errors:
+            errors.extend(detail_errors)
             continue
         summary = action_summary(action, facts)
         if action_type in SAFE_ACTION_TYPES:
@@ -217,10 +244,26 @@ def next_action(run_dir: Path, requirements: dict[str, Any]) -> dict[str, Any]:
     if errors:
         return gate_payload(payload, ok=False, next_action="RepairRequirementsInformationState")
 
-    if status == "needs_user_input" or user:
+    if status == "needs_user_input":
+        if not user:
+            payload["blocking_reasons"] = [
+                "information_sufficiency_check status needs_user_input requires at least one user collection action"
+            ]
+            return gate_payload(payload, ok=False, next_action="RepairRequirementsInformationState")
         return gate_payload(payload, ok=False, next_action="AskUserForInformation")
 
-    if status == "needs_information_gathering" or automatic:
+    if status == "needs_information_gathering":
+        if not automatic:
+            payload["blocking_reasons"] = [
+                "information_sufficiency_check status needs_information_gathering requires at least one safe automatic collection action"
+            ]
+            return gate_payload(payload, ok=False, next_action="RepairRequirementsInformationState")
+        return gate_payload(payload, ok=False, next_action="RunInformationGathering")
+
+    if user:
+        return gate_payload(payload, ok=False, next_action="AskUserForInformation")
+
+    if automatic:
         return gate_payload(payload, ok=False, next_action="RunInformationGathering")
 
     payload["blocking_reasons"] = errors or [f"unsupported information_sufficiency_check status {status!r}"]

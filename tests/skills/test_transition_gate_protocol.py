@@ -45,6 +45,8 @@ class TransitionGateProtocolTest(unittest.TestCase):
                     "status": "planned",
                     "why_safe_or_needed": "A local probe is required before design.",
                     "evidence_ref": "evidence/client_minimal_example.json",
+                    "command": ["python3", "-c", "print('client ok')"],
+                    "working_dir": ".",
                     "allow_automatic_execution": True,
                 }
             ]
@@ -115,6 +117,63 @@ class TransitionGateProtocolTest(unittest.TestCase):
             self.assertFalse(payload["approval_allowed"])
             self.assertFalse(payload["handoff_allowed"])
             self.assertIn("collection_actions", "\n".join(payload["blocking_reasons"]))
+
+    def test_information_gate_status_user_input_requires_user_action(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            run_dir = Path(tmpdir)
+            req = requirements_with_information_sufficiency(status="needs_user_input")
+            check = req["approved_control"]["information_sufficiency_check"]
+            check["facts"][0]["current_status"] = "needs_user_input"
+            check["collection_actions"] = [
+                {
+                    "action_id": "IA-read-only",
+                    "fact_id": "F-client-minimal-example",
+                    "action_type": "read_source",
+                    "status": "planned",
+                    "why_safe_or_needed": "This is safe but does not ask the user.",
+                    "evidence_ref": "evidence/client_source_read.json",
+                    "paths": ["client/"],
+                }
+            ]
+            refresh_semantic_base(req)
+            write_requirements(run_dir, req)
+
+            result = run_script(INFO_LOOP, "--run-dir", str(run_dir), "--json")
+
+            self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+            payload = json.loads(result.stdout)
+            self.assertEqual("RepairRequirementsInformationState", payload["next_action"])
+            self.assertFalse(payload["terminal"])
+            self.assertEqual([], payload["user_actions"])
+            self.assertIn("needs_user_input", "\n".join(payload["blocking_reasons"]))
+
+    def test_information_gate_safe_probe_requires_executable_detail(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            run_dir = Path(tmpdir)
+            req = requirements_with_information_sufficiency(status="needs_information_gathering")
+            check = req["approved_control"]["information_sufficiency_check"]
+            check["facts"][0]["current_status"] = "needs_information_gathering"
+            check["collection_actions"] = [
+                {
+                    "action_id": "IA-empty-probe",
+                    "fact_id": "F-client-minimal-example",
+                    "action_type": "run_no_side_effect_probe",
+                    "status": "planned",
+                    "why_safe_or_needed": "A probe is needed, but no command was provided.",
+                    "evidence_ref": "evidence/client_probe.json",
+                }
+            ]
+            refresh_semantic_base(req)
+            write_requirements(run_dir, req)
+
+            result = run_script(INFO_LOOP, "--run-dir", str(run_dir), "--json")
+
+            self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+            payload = json.loads(result.stdout)
+            self.assertEqual("RepairRequirementsInformationState", payload["next_action"])
+            self.assertFalse(payload["terminal"])
+            self.assertEqual([], payload["automatic_actions"])
+            self.assertIn("command", "\n".join(payload["blocking_reasons"]))
 
     def test_information_gate_ready_for_approval_is_terminal_for_requirements_analysis(self):
         with tempfile.TemporaryDirectory() as tmpdir:
@@ -207,6 +266,21 @@ class TransitionGateProtocolTest(unittest.TestCase):
             self.assertTrue(payload["rerun_required"])
             self.assertFalse(payload["requires_independent_review"])
             self.assertIn("patch file is missing", "\n".join(payload["errors"]))
+
+    def test_amendment_orchestrator_no_proposal_is_terminal_wait_state(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            run_dir = Path(tmpdir)
+            write_strategy_run(run_dir, progress_events=[], strategy_policy="reviewed_replanning")
+
+            result = run_script(AMENDMENT_ORCHESTRATOR, "--run-dir", str(run_dir))
+
+            self.assertNotEqual(result.returncode, 0, result.stdout + result.stderr)
+            payload = json.loads(result.stdout)
+            self.assertEqual("AwaitAmendmentProposal", payload["next_action"])
+            self.assertTrue(payload["terminal"])
+            self.assertFalse(payload["rerun_required"])
+            self.assertFalse(payload["approval_allowed"])
+            self.assertFalse(payload["handoff_allowed"])
 
     def test_hot_path_docs_reference_shared_transition_gate_protocol(self):
         paths = [

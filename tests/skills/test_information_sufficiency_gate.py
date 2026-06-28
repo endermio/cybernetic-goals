@@ -402,6 +402,9 @@ class InformationSufficiencyGateTest(unittest.TestCase):
                     "status": "planned",
                     "why_safe_or_needed": "A minimal local example is required before design can name the client boundary.",
                     "evidence_ref": "evidence/client_minimal_example.json",
+                    "command": ["python3", "-c", "print('client ok')"],
+                    "working_dir": ".",
+                    "allow_automatic_execution": True,
                 }
             ]
             refresh_semantic_base(req)

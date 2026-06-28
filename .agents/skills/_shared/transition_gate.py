@@ -12,6 +12,7 @@ from typing import Any
 PROTOCOL = "transition-gate/v1"
 
 TERMINAL_ACTIONS = {
+    "AwaitAmendmentProposal",
     "ReadyForUserApproval",
     "ReadyForPreGoalHandoff",
     "RequirementsInformationBlocked",

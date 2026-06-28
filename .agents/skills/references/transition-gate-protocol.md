@@ -25,6 +25,9 @@ Required JSON fields:
 Rules:
 
 - If `terminal` is false, execute `next_action` and run the same gate again.
+- `terminal` does not mean success. It can also mean a wait or stop state, such
+  as waiting for a new amendment proposal or human decision. Do not rerun the
+  same gate until the missing external artifact or decision exists.
 - If `approval_allowed` is false, do not ask the user to approve that stage.
 - If `handoff_allowed` is false, do not move to the next control stage.
 - If `may_ask_user` is false, do not ask the user to authorize internal review,

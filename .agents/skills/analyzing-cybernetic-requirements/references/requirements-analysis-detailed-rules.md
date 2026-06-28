@@ -165,6 +165,15 @@ Use these states inside requirements analysis:
   requirements and return to user approval.
 - `satisfied` or `not_required`: the only states that can pass handoff.
 
+Information collection actions must be directly usable:
+
+- `read_source` and `read_documentation` require concrete `paths`.
+- `run_no_side_effect_probe` requires a concrete `command`.
+- `ask_user`, `external_access_request`, and `human_decision` require a concrete
+  `question`.
+- `needs_information_gathering` must have at least one safe automatic action.
+- `needs_user_input` must have at least one user action.
+
 Use the loop helper before asking for approval or handoff:
 
 ```bash

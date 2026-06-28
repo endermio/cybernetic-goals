@@ -551,6 +551,57 @@
               "items": {
                 "type": "object",
                 "additionalProperties": false,
+                "allOf": [
+                  {
+                    "if": {
+                      "properties": {
+                        "action_type": {
+                          "enum": [
+                            "read_source",
+                            "read_documentation"
+                          ]
+                        }
+                      }
+                    },
+                    "then": {
+                      "required": [
+                        "paths"
+                      ]
+                    }
+                  },
+                  {
+                    "if": {
+                      "properties": {
+                        "action_type": {
+                          "const": "run_no_side_effect_probe"
+                        }
+                      }
+                    },
+                    "then": {
+                      "required": [
+                        "command"
+                      ]
+                    }
+                  },
+                  {
+                    "if": {
+                      "properties": {
+                        "action_type": {
+                          "enum": [
+                            "ask_user",
+                            "external_access_request",
+                            "human_decision"
+                          ]
+                        }
+                      }
+                    },
+                    "then": {
+                      "required": [
+                        "question"
+                      ]
+                    }
+                  }
+                ],
                 "required": [
                   "action_id",
                   "fact_id",
