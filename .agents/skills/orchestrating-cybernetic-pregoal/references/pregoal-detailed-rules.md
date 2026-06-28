@@ -204,6 +204,10 @@ If pre-goal review subagents are not authorized:
 - You may create a draft review marked `Needs Independent Review`.
 - You must not claim independent review or mark the approved work chain `Approved` unless a separate reviewer, explicit human approval, or an authorized subagent review exists.
 - Ask the user to authorize pre-goal review subagents or provide explicit control-review approval of the review findings before compiling a final runtime `/goal`.
+- Do not apply this authorization rule to requirements-analysis internal
+  `RunInformationCounterexampleReview`; that review is the information
+  sufficiency gate before design/plan and should run without asking the user for
+  permission.
 
 ## Review Orchestration Modes
 
@@ -417,6 +421,18 @@ must not reinterpret missing facts as assumptions, and it must not ask design
 or runtime to invent the sufficiency standard. The check is satisfied only when
 blocking facts are traced to source requirements/outcomes, have acceptable
 evidence, and have passed independent counterexample review.
+
+`RunInformationSufficiencyCheck` means running:
+
+```bash
+python3 .agents/skills/analyzing-cybernetic-requirements/scripts/requirements_information_loop.py \
+  --run-dir docs/cybernetics/runs/YYYY-MM-DD-<slug> --json
+```
+
+Follow the returned `next_action`. If it returns
+`RunInformationCounterexampleReview`, start the internal independent review; do
+not ask the user to authorize that review. Ask the user only when the loop
+returns `AskUserForInformation`.
 
 ### Determine Artifact Paths
 

@@ -1,0 +1,262 @@
+#!/usr/bin/env python3
+"""Drive the requirements-analysis information sufficiency loop.
+
+This script does not compile pre-goal artifacts. It reports the next
+requirements-analysis action before approval: independent counterexample
+review, safe information gathering, user input, requirements revision, or
+approval readiness.
+"""
+from __future__ import annotations
+
+import argparse
+import json
+from pathlib import Path
+from typing import Any
+
+
+SAFE_ACTION_TYPES = {"read_source", "read_documentation", "run_no_side_effect_probe"}
+USER_ACTION_TYPES = {"ask_user", "external_access_request", "human_decision"}
+
+
+def read_json_object(path: Path) -> dict[str, Any]:
+    value = json.loads(path.read_text(encoding="utf-8"))
+    if not isinstance(value, dict):
+        raise ValueError(f"{path} must contain a JSON object")
+    return value
+
+
+def string_list(value: Any) -> list[str]:
+    if not isinstance(value, list):
+        return []
+    return [item for item in value if isinstance(item, str) and item]
+
+
+def fact_by_id(check: dict[str, Any]) -> dict[str, dict[str, Any]]:
+    facts = check.get("facts")
+    if not isinstance(facts, list):
+        return {}
+    result: dict[str, dict[str, Any]] = {}
+    for fact in facts:
+        if isinstance(fact, dict) and isinstance(fact.get("fact_id"), str):
+            result[fact["fact_id"]] = fact
+    return result
+
+
+def information_check(requirements: dict[str, Any]) -> dict[str, Any]:
+    approved = requirements.get("approved_control")
+    if not isinstance(approved, dict):
+        raise ValueError("requirements.control.json approved_control must be an object")
+    check = approved.get("information_sufficiency_check")
+    if not isinstance(check, dict):
+        raise ValueError("approved_control.information_sufficiency_check must be an object")
+    return check
+
+
+def base_payload(run_dir: Path, requirements: dict[str, Any], check: dict[str, Any]) -> dict[str, Any]:
+    return {
+        "run_dir": str(run_dir),
+        "requirements_status": requirements.get("status"),
+        "information_sufficiency_status": check.get("status"),
+        "automatic_actions": [],
+        "user_actions": [],
+        "blocking_reasons": [],
+    }
+
+
+def review_prompt(check: dict[str, Any]) -> str:
+    facts = fact_by_id(check)
+    lines = [
+        "Run an independent requirements information sufficiency counterexample review.",
+        "Try to find missing facts that would make later design or plan invalid.",
+        "Do not ask the user for permission to run this review; it is an internal requirements-analysis gate.",
+        "",
+        "Facts to challenge:",
+    ]
+    for fact_id, fact in sorted(facts.items()):
+        lines.append(f"- {fact_id}: {fact.get('statement', '')}")
+        lines.append(f"  why needed: {fact.get('why_needed', '')}")
+    lines.extend(
+        [
+            "",
+            "Required transformations to check:",
+            "- source_requirements->information_sufficiency_facts",
+            "- required_outcomes->information_sufficiency_facts",
+            "- information_sufficiency_facts->design_plan_entry",
+        ]
+    )
+    return "\n".join(lines)
+
+
+def action_summary(action: dict[str, Any], facts: dict[str, dict[str, Any]]) -> dict[str, Any]:
+    fact_id = action.get("fact_id")
+    fact = facts.get(fact_id) if isinstance(fact_id, str) else None
+    item = {
+        "action_id": action.get("action_id"),
+        "fact_id": fact_id,
+        "fact": fact.get("statement") if fact else None,
+        "action_type": action.get("action_type"),
+        "status": action.get("status"),
+        "why_safe_or_needed": action.get("why_safe_or_needed"),
+        "evidence_ref": action.get("evidence_ref"),
+    }
+    for key in ("command", "working_dir", "paths", "question", "allow_automatic_execution"):
+        if key in action:
+            item[key] = action[key]
+    return item
+
+
+def classify_actions(check: dict[str, Any]) -> tuple[list[dict[str, Any]], list[dict[str, Any]], list[str]]:
+    facts = fact_by_id(check)
+    automatic: list[dict[str, Any]] = []
+    user: list[dict[str, Any]] = []
+    errors: list[str] = []
+    actions = check.get("collection_actions")
+    if not isinstance(actions, list) or not actions:
+        return automatic, user, ["information_sufficiency_check needs collection_actions for unsatisfied facts"]
+    for index, action in enumerate(actions):
+        if not isinstance(action, dict):
+            errors.append(f"collection_actions[{index}] must be an object")
+            continue
+        action_type = action.get("action_type")
+        fact_id = action.get("fact_id")
+        if not isinstance(fact_id, str) or fact_id not in facts:
+            errors.append(f"collection action {action.get('action_id') or index} references unknown fact_id")
+            continue
+        summary = action_summary(action, facts)
+        if action_type in SAFE_ACTION_TYPES:
+            automatic.append(summary)
+        elif action_type in USER_ACTION_TYPES:
+            user.append(summary)
+        else:
+            errors.append(f"collection action {action.get('action_id') or index} has unsupported action_type {action_type!r}")
+    return automatic, user, errors
+
+
+def next_action(run_dir: Path, requirements: dict[str, Any]) -> dict[str, Any]:
+    check = information_check(requirements)
+    status = check.get("status")
+    payload = base_payload(run_dir, requirements, check)
+
+    if requirements.get("status") == "approved" and status in {"satisfied", "not_required"}:
+        payload.update(
+            {
+                "next_action": "ReadyForPreGoalHandoff",
+                "requires_user_authorization": False,
+                "message": "Information sufficiency is complete; run predict_pregoal_handoff.py next.",
+            }
+        )
+        return payload
+
+    if status == "needs_counterexample_review" or requirements.get("status") == "pending_counterexample_review":
+        payload.update(
+            {
+                "next_action": "RunInformationCounterexampleReview",
+                "requires_user_authorization": False,
+                "review_prompt": review_prompt(check),
+            }
+        )
+        return payload
+
+    if status == "needs_requirements_revision" or requirements.get("status") == "needs_requirements_revision":
+        payload.update(
+            {
+                "next_action": "ReviseRequirements",
+                "requires_user_authorization": False,
+                "message": (
+                    "Newly gathered information changes the requested result, completion standard, "
+                    "authority, or forbidden actions. Revise requirements before asking for approval."
+                ),
+            }
+        )
+        return payload
+
+    if status == "blocked" or requirements.get("status") == "blocked":
+        payload.update(
+            {
+                "next_action": "RequirementsInformationBlocked",
+                "requires_user_authorization": False,
+                "message": "A design-blocking fact cannot currently be collected.",
+            }
+        )
+        return payload
+
+    automatic, user, errors = classify_actions(check)
+    payload["automatic_actions"] = automatic
+    payload["user_actions"] = user
+    payload["blocking_reasons"] = errors
+
+    if status == "needs_user_input" or user:
+        payload.update(
+            {
+                "next_action": "AskUserForInformation",
+                "requires_user_authorization": True,
+            }
+        )
+        return payload
+
+    if status == "needs_information_gathering" or automatic:
+        payload.update(
+            {
+                "next_action": "RunInformationGathering",
+                "requires_user_authorization": False,
+            }
+        )
+        return payload
+
+    if status in {"satisfied", "not_required"}:
+        payload.update(
+            {
+                "next_action": "ReadyForUserApproval",
+                "requires_user_authorization": True,
+                "message": "Information sufficiency is complete; show the requirements approval commitment.",
+            }
+        )
+        return payload
+
+    payload.update(
+        {
+            "next_action": "RepairRequirementsInformationState",
+            "requires_user_authorization": False,
+            "blocking_reasons": errors or [f"unsupported information_sufficiency_check status {status!r}"],
+        }
+    )
+    return payload
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--run-dir", required=True, help="Path to docs/cybernetics/runs/<slug>.")
+    parser.add_argument("--json", action="store_true", help="Emit machine-readable JSON.")
+    args = parser.parse_args()
+
+    run_dir = Path(args.run_dir)
+    try:
+        requirements = read_json_object(run_dir / "requirements.control.json")
+        payload = next_action(run_dir, requirements)
+    except (OSError, ValueError, json.JSONDecodeError) as exc:
+        payload = {
+            "run_dir": str(run_dir),
+            "next_action": "RepairRequirementsInformationState",
+            "requires_user_authorization": False,
+            "blocking_reasons": [str(exc)],
+        }
+        if args.json:
+            print(json.dumps(payload, ensure_ascii=False, indent=2))
+        else:
+            print(f"NEXT: {payload['next_action']}")
+            print(f"ERROR: {payload['blocking_reasons'][0]}")
+        return 2
+
+    if args.json:
+        print(json.dumps(payload, ensure_ascii=False, indent=2))
+    else:
+        print(f"NEXT: {payload['next_action']}")
+        if payload.get("message"):
+            print(payload["message"])
+        for reason in payload.get("blocking_reasons", []):
+            print(f"ERROR: {reason}")
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

@@ -1046,6 +1046,9 @@ class ControlJsonSchemaTest(unittest.TestCase):
                     "status": "planned",
                     "why_safe_or_needed": "The probe is local and needed to observe the actual client boundary.",
                     "evidence_ref": "evidence/client_minimal_example.json",
+                    "command": ["python3", "-c", "print('client ok')"],
+                    "working_dir": ".",
+                    "allow_automatic_execution": True,
                 }
             ],
             "counterexample_review": {

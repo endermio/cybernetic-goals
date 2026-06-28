@@ -6,6 +6,7 @@
 .agents/skills/analyzing-cybernetic-requirements/references/decision-levels.md
 .agents/skills/analyzing-cybernetic-requirements/references/requirements-analysis-detailed-rules.md
 .agents/skills/analyzing-cybernetic-requirements/scripts/predict_pregoal_handoff.py
+.agents/skills/analyzing-cybernetic-requirements/scripts/requirements_information_loop.py
 .agents/skills/clarifying-cybernetic-tasks/SKILL.md
 .agents/skills/clarifying-cybernetic-tasks/agents/openai.yaml
 .agents/skills/clarifying-cybernetic-tasks/assets/clarification-brief-template.md

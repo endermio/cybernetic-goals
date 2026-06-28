@@ -55,7 +55,9 @@ analysis.
 
 Pre-goal review subagents require explicit authorization. Without subagent,
 human approval, or another independent reviewer, do not claim independent
-review or mark the chain Approved.
+review or mark the chain Approved. This rule does not apply to the
+requirements-analysis internal `RunInformationCounterexampleReview`; that gate
+runs before pre-goal review and does not require separate user authorization.
 
 Approved review must include `counterexample-gate` before runtime compilation.
 It must execute the requirements-approved `counterexample_gate_contract` and
@@ -65,8 +67,11 @@ legacy Drogon compatibility readiness; that is `NeedsRevision`.
 
 Before design or planning, run `scripts/orchestration_guard.py` for the matching
 state. If `information_sufficiency_check` fails, route to
-`RunInformationSufficiencyCheck`; do not treat missing facts as design
-assumptions.
+`RunInformationSufficiencyCheck` by running
+`.agents/skills/analyzing-cybernetic-requirements/scripts/requirements_information_loop.py
+--run-dir <run-dir> --json`; follow its `next_action`. Do not treat missing
+facts as design assumptions, and do not ask the user to authorize internal
+counterexample review.
 
 ## Compile Gate
 

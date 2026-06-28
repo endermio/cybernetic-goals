@@ -27,9 +27,10 @@ Detailed rules live in `references/requirements-analysis-detailed-rules.md`.
    `acceptable_evidence`, `current_status`, `evidence_ref`, and be challenged
    by independent `counterexample_review`. Use `schema_version: 1.2.0`.
    A free-form `required_observations` list is not enough.
-5. Information collection is part of requirements analysis: safely gather
-   needed facts before approval, or mark `needs_information_gathering`,
-   `needs_user_input`, or `needs_requirements_revision`.
+5. Information collection is part of requirements analysis. Before approval,
+   run `requirements_information_loop.py --run-dir <run-dir> --json` whenever
+   sufficiency is not `satisfied`/`not_required`; follow its `next_action`
+   instead of asking the user to authorize internal review.
 6. Define `counterexample_gate_contract` in the requirements stage and
    per-outcome `counterexample_gate` before orchestration starts.
 7. Before approval, show any missing/weak information facts as "needed before
@@ -81,7 +82,7 @@ If requirements are approved for `controlled_run`, run or quote:
 
 ```bash
 python3 .agents/skills/analyzing-cybernetic-requirements/scripts/predict_pregoal_handoff.py \
-  docs/cybernetics/runs/<slug>/requirements.control.json
+  --run-dir docs/cybernetics/runs/<slug>
 ```
 
 Use the script output for queue-friendly paths and pointer shape. The predicted

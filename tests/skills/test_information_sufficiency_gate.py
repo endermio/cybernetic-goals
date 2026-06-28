@@ -12,6 +12,7 @@ CONTROL_GUARD = ROOT / ".agents/skills/compiling-cybernetic-runtime-goals/script
 ORCHESTRATION_GUARD = ROOT / ".agents/skills/orchestrating-cybernetic-pregoal/scripts/orchestration_guard.py"
 VALIDATE = ROOT / ".agents/skills/using-control-json/scripts/validate_control_chain.py"
 PREDICTOR = ROOT / ".agents/skills/analyzing-cybernetic-requirements/scripts/predict_pregoal_handoff.py"
+INFO_LOOP = ROOT / ".agents/skills/analyzing-cybernetic-requirements/scripts/requirements_information_loop.py"
 
 
 def canonical_json_hash(value: dict, omit_top_level: set[str] | None = None) -> str:
@@ -540,6 +541,92 @@ class InformationSufficiencyGateTest(unittest.TestCase):
             payload = json.loads(result.stdout)
             self.assertEqual("RunInformationSufficiencyCheck", payload["next_allowed_action"])
             self.assertIn("information_sufficiency_check", "\n".join(payload["errors"]))
+
+    def test_information_loop_routes_counterexample_review_without_user_authorization(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            run_dir = Path(tmpdir)
+            req = requirements_with_information_sufficiency(status="needs_counterexample_review")
+            info_check = req["approved_control"]["information_sufficiency_check"]
+            info_check["counterexample_review"] = {
+                "status": "needs_revision",
+                "verdict": "needs_revision",
+                "reviewer": {
+                    "kind": "subagent",
+                    "id": "pending-information-sufficiency-reviewer",
+                    "evidence_ref": "evidence/information_sufficiency_counterexample.json",
+                },
+                "checked_facts": [],
+                "checked_transformations": [],
+                "findings": ["review has not run yet"],
+            }
+            refresh_semantic_base(req)
+            (run_dir / "requirements.control.json").write_text(json.dumps(req, indent=2), encoding="utf-8")
+
+            result = run_script(INFO_LOOP, "--run-dir", str(run_dir), "--json")
+
+            self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+            payload = json.loads(result.stdout)
+            self.assertEqual("RunInformationCounterexampleReview", payload["next_action"])
+            self.assertFalse(payload["requires_user_authorization"])
+            self.assertIn("F-client-minimal-example", payload["review_prompt"])
+
+    def test_information_loop_exposes_safe_information_gathering_actions(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            run_dir = Path(tmpdir)
+            req = requirements_with_information_sufficiency(status="needs_information_gathering")
+            info_check = req["approved_control"]["information_sufficiency_check"]
+            info_check["facts"][0]["current_status"] = "needs_information_gathering"
+            info_check["collection_actions"] = [
+                {
+                    "action_id": "IA-client-minimal-example",
+                    "fact_id": "F-client-minimal-example",
+                    "action_type": "run_no_side_effect_probe",
+                    "status": "planned",
+                    "why_safe_or_needed": "A local minimal example is required before design can name the client boundary.",
+                    "evidence_ref": "evidence/client_minimal_example.json",
+                    "command": ["python3", "-c", "print('client ok')"],
+                    "working_dir": ".",
+                    "allow_automatic_execution": True,
+                }
+            ]
+            refresh_semantic_base(req)
+            (run_dir / "requirements.control.json").write_text(json.dumps(req, indent=2), encoding="utf-8")
+
+            result = run_script(INFO_LOOP, "--run-dir", str(run_dir), "--json")
+
+            self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+            payload = json.loads(result.stdout)
+            self.assertEqual("RunInformationGathering", payload["next_action"])
+            self.assertEqual(["IA-client-minimal-example"], [item["action_id"] for item in payload["automatic_actions"]])
+            self.assertEqual([], payload["user_actions"])
+
+    def test_information_loop_surfaces_user_input_before_approval(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            run_dir = Path(tmpdir)
+            req = requirements_with_information_sufficiency(status="needs_user_input")
+            info_check = req["approved_control"]["information_sufficiency_check"]
+            info_check["facts"][0]["current_status"] = "needs_user_input"
+            info_check["collection_actions"] = [
+                {
+                    "action_id": "IA-client-credential",
+                    "fact_id": "F-client-minimal-example",
+                    "action_type": "ask_user",
+                    "status": "planned",
+                    "why_safe_or_needed": "The client credential cannot be inferred from local files.",
+                    "evidence_ref": "evidence/client_credential_decision.json",
+                    "question": "Please provide the client credential or confirm that this integration should use a mock credential.",
+                }
+            ]
+            refresh_semantic_base(req)
+            (run_dir / "requirements.control.json").write_text(json.dumps(req, indent=2), encoding="utf-8")
+
+            result = run_script(INFO_LOOP, "--run-dir", str(run_dir), "--json")
+
+            self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+            payload = json.loads(result.stdout)
+            self.assertEqual("AskUserForInformation", payload["next_action"])
+            self.assertEqual([], payload["automatic_actions"])
+            self.assertIn("client credential", payload["user_actions"][0]["question"])
 
 
 if __name__ == "__main__":

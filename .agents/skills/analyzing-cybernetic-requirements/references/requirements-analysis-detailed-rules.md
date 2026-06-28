@@ -151,8 +151,7 @@ must try to find missing facts that would invalidate design or plan. It must
 record reviewer provenance, checked facts, checked transformations, evidence
 reference, and findings. If a blocking fact is missing, unknown, weakly
 evidenced, or not independently reviewed, orchestration must stop before design
-or plan and report the smallest required information-gathering or human
-decision.
+or plan and route through the requirements information loop.
 
 Use these states inside requirements analysis:
 
@@ -165,6 +164,26 @@ Use these states inside requirements analysis:
   outcome, completion standard, authority, or forbidden actions; revise the
   requirements and return to user approval.
 - `satisfied` or `not_required`: the only states that can pass handoff.
+
+Use the loop helper before asking for approval or handoff:
+
+```bash
+python3 .agents/skills/analyzing-cybernetic-requirements/scripts/requirements_information_loop.py \
+  --run-dir docs/cybernetics/runs/YYYY-MM-DD-<slug> --json
+```
+
+Follow its `next_action`:
+
+- `RunInformationCounterexampleReview`: start an internal independent reviewer;
+  do not ask the user whether this review may run.
+- `RunInformationGathering`: perform the listed safe read-only source/doc/probe
+  actions and write their evidence.
+- `AskUserForInformation`: ask only for the listed credential, external access,
+  artifact, or business decision.
+- `ReviseRequirements`: update requirements meaning before approval because new
+  facts changed the requested result, done standard, authority, or forbidden
+  actions.
+- `ReadyForUserApproval`: show the approval commitment.
 
 Safe collection may read source, inspect local documentation, and run
 no-side-effect local probes or minimal examples. Ask the user before using
@@ -421,8 +440,8 @@ Use the script output instead of hand-writing predicted runtime commands when th
 
 If `predict_pregoal_handoff.py` blocks on `information_sufficiency_check`,
 schema version, missing evidence, or an unapproved counterexample review, do
-not hand-write an orchestration command. Report the blocking facts and ask for
-the needed probe, evidence, reviewer, or human decision.
+not hand-write an orchestration command. Run `requirements_information_loop.py`
+and follow its next action.
 
 If `design check: required`, still output the predicted runtime contract path and pointer-only `/goal` shape. State that `$orchestrating-cybernetic-pregoal` must invoke or request `$designing-cybernetic-solutions` before goal writing, and make the predicted downstream artifact paths include the expected solution design path. design check dispatch note must not replace the predicted pointer-only `/goal`. Do not output `$designing-cybernetic-solutions` as a standalone command before orchestration for `controlled_run` JSON pre-goal work.
 
