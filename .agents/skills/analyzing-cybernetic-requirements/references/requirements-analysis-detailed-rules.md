@@ -120,7 +120,8 @@ whether there are facts that must be known first. These are not solution-design
 choices; they are facts without which the design or plan could be invalid.
 
 When such facts exist, record `approved_control.information_sufficiency_check`
-in `requirements.control.json`. Each fact must include:
+in `requirements.control.json` and use `schema_version: 1.2.0`. Each fact must
+include:
 
 - a stable `fact_id`;
 - the fact statement;
@@ -146,6 +147,14 @@ reference, and findings. If a blocking fact is missing, unknown, weakly
 evidenced, or not independently reviewed, orchestration must stop before design
 or plan and report the smallest required information-gathering or human
 decision.
+
+Before asking for approval, expose these facts in plain language as
+"Information needed before design": fact, why it matters, acceptable evidence,
+current status, owner/source, and blocker if missing. If the independent
+counterexample review has not actually run and passed, say that explicitly and
+keep the requirements at pending/needs-revision. Do not mark top-level
+requirements approved while writing `counterexample_review.status` as
+`required_before_*`, `pending`, `planned`, or any future-work phrase.
 
 ## Ask Only High-Value Human Questions
 
@@ -387,6 +396,11 @@ python3 .agents/skills/analyzing-cybernetic-requirements/scripts/predict_pregoal
 
 Use the script output instead of hand-writing predicted runtime commands when the script supports JSON run directories. The script checks `Requirements Analysis Status: Complete`, `What the User Approved: Approved`, required answer-path data, deterministic path shape, design check, and same-slug control paths.
 
+If `predict_pregoal_handoff.py` blocks on `information_sufficiency_check`,
+schema version, missing evidence, or an unapproved counterexample review, do
+not hand-write an orchestration command. Report the blocking facts and ask for
+the needed probe, evidence, reviewer, or human decision.
+
 If `design check: required`, still output the predicted runtime contract path and pointer-only `/goal` shape. State that `$orchestrating-cybernetic-pregoal` must invoke or request `$designing-cybernetic-solutions` before goal writing, and make the predicted downstream artifact paths include the expected solution design path. design check dispatch note must not replace the predicted pointer-only `/goal`. Do not output `$designing-cybernetic-solutions` as a standalone command before orchestration for `controlled_run` JSON pre-goal work.
 
 The predicted pointer-only `/goal` is not the final approved runtime command. Label it as predicted or queue-friendly, and make it point to `runtime.control.json` that the pre-goal compiler must create after downstream artifacts are approved.
@@ -504,6 +518,11 @@ For `bounded_runtime` work with `rubric check: required`, summarize the confirme
 - [ ] `controlled_run` JSON pre-goal work includes `What the User Approved`.
 - [ ] If How this should be answered or What is not enough is recorded, `requirements.control.json` records the plain-language requirement without internal classification keys.
 - [ ] Human answers to clarification questions are not treated as approval.
+- [ ] Any required `information_sufficiency_check` uses schema_version 1.2.0,
+      has run-local evidence, and passed independent counterexample review
+      before handoff.
+- [ ] Missing or weak information facts were shown to the user as
+      design-blocking facts, not hidden in approved JSON.
 - [ ] If What the User Approved is not `Approved`, the response asks for approval or revision and does not output the orchestration command or predicted `/goal`.
 - [ ] No solution design, goal, plan, review, or approved runtime `/goal` was created.
 - [ ] `bounded_runtime` work with `rubric check: required` routes to `$writing-cybernetic-goals`, not JSON pre-goal orchestration by default.

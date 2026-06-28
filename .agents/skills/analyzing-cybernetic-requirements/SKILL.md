@@ -25,16 +25,19 @@ Detailed rules live in `references/requirements-analysis-detailed-rules.md`.
    `information_sufficiency_check`: facts must derive from
    `source_requirements` and/or `required_outcomes`, include `why_needed`,
    `acceptable_evidence`, `current_status`, `evidence_ref`, and be challenged
-   by independent `counterexample_review`. A free-form `required_observations`
-   list is not enough.
+   by independent `counterexample_review`. Use `schema_version: 1.2.0`.
+   A free-form `required_observations` list is not enough.
 5. Define `counterexample_gate_contract` in the requirements stage and
    per-outcome `counterexample_gate` before orchestration starts.
-6. Ask only questions that change approved meaning, evidence, scope,
+6. Before approval, show any missing/weak information facts as "needed before
+   design"; do not hide them inside approved JSON or future pre-goal work.
+7. Ask only questions that change approved meaning, evidence, scope,
    authority, or output contract.
-7. Classify uncertainty as human decision, default assumption, or deferred
+8. Classify uncertainty as human decision, default assumption, or deferred
    design/planning/execution detail.
-8. Produce or update `requirements.control.json`.
-9. For `controlled_run`, get `What the User Approved: Approved` before handoff.
+9. Produce or update `requirements.control.json`.
+10. For `controlled_run`, run `predict_pregoal_handoff.py`; only output its
+    handoff when it passes and `What the User Approved: Approved`.
 
 ## Source Requirements
 

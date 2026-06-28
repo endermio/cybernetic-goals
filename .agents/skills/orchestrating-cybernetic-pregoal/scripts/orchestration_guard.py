@@ -126,12 +126,19 @@ def evidence_ref_errors(run_dir: Path, label: str, evidence_ref: object) -> list
 
 def information_sufficiency_errors(run_dir: Path) -> list[str]:
     requirements = read_json_object(run_dir / "requirements.control.json")
-    if not requirements or not schema_version_at_least(requirements, "1.2.0"):
+    if not requirements:
         return []
     approved = requirements.get("approved_control")
     if not isinstance(approved, dict):
         return ["requirements.control.json approved_control must be an object"]
     check = approved.get("information_sufficiency_check")
+    if not schema_version_at_least(requirements, "1.2.0"):
+        if isinstance(check, dict):
+            return [
+                "requirements.control.json approved_control.information_sufficiency_check "
+                "requires schema_version >= 1.2.0"
+            ]
+        return []
     if not isinstance(check, dict):
         return [
             "requirements.control.json approved_control.information_sufficiency_check "

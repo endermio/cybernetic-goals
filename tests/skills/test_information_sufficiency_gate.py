@@ -11,6 +11,7 @@ ROOT = Path(__file__).resolve().parents[2]
 CONTROL_GUARD = ROOT / ".agents/skills/compiling-cybernetic-runtime-goals/scripts/control_chain_guard.py"
 ORCHESTRATION_GUARD = ROOT / ".agents/skills/orchestrating-cybernetic-pregoal/scripts/orchestration_guard.py"
 VALIDATE = ROOT / ".agents/skills/using-control-json/scripts/validate_control_chain.py"
+PREDICTOR = ROOT / ".agents/skills/analyzing-cybernetic-requirements/scripts/predict_pregoal_handoff.py"
 
 
 def canonical_json_hash(value: dict, omit_top_level: set[str] | None = None) -> str:
@@ -159,6 +160,35 @@ def requirements_with_information_sufficiency(*, status: str = "satisfied") -> d
                 "reject_if": ["A missing blocking fact does not prevent design."],
             },
             "final_answer_format": {"medium": "chat", "required_structure": ["summary"]},
+        },
+    }
+    refresh_semantic_base(req)
+    return req
+
+
+def requirements_with_legacy_information_sufficiency_shape() -> dict:
+    req = requirements_with_information_sufficiency()
+    req["schema_version"] = "1.1.0"
+    req["approved_control"]["information_sufficiency_check"] = {
+        "facts": [
+            {
+                "fact_id": "F-client-minimal-example",
+                "fact_statement": "The client starts locally and its input/output boundary is observed.",
+                "why_needed": "Without this fact, design can invent the wrong client boundary.",
+                "acceptable_evidence": ["minimal example command output"],
+                "current_status": "preliminary_probe_only",
+                "evidence_ref": "Prior probe evidence, not a run-local file",
+                "blocks_design": True,
+                "blocks_runtime_pass_if_unaddressed": True,
+            }
+        ],
+        "counterexample_review": {
+            "status": "required_before_orchestration_or_design_acceptance",
+            "checked_transformations": [
+                "source_requirements->information_sufficiency_facts",
+                "required_outcomes->information_sufficiency_facts",
+            ],
+            "findings": ["Independent review must still run."],
         },
     }
     refresh_semantic_base(req)
@@ -317,6 +347,46 @@ def write_run(run_dir: Path, requirements: dict) -> None:
 
 
 class InformationSufficiencyGateTest(unittest.TestCase):
+    def test_guard_runtime_validator_and_predictor_reject_legacy_information_sufficiency_shape(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            run_dir = Path(tmpdir)
+            req = requirements_with_legacy_information_sufficiency_shape()
+            write_run(run_dir, req)
+
+            guard = run_script(CONTROL_GUARD, "--run-dir", str(run_dir))
+            validate = run_script(VALIDATE, str(run_dir))
+            predictor = run_script(PREDICTOR, "--run-dir", str(run_dir))
+
+            for result in (guard, validate, predictor):
+                self.assertNotEqual(result.returncode, 0, result.stdout + result.stderr)
+                combined = result.stdout + result.stderr
+                self.assertIn("information_sufficiency_check", combined)
+                self.assertIn("schema_version >= 1.2.0", combined)
+
+    def test_predictor_rejects_unexecuted_information_counterexample_review(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            run_dir = Path(tmpdir)
+            req = requirements_with_information_sufficiency()
+            req["approved_control"]["information_sufficiency_check"]["counterexample_review"] = {
+                "status": "required_before_orchestration_or_design_acceptance",
+                "verdict": "needs_revision",
+                "checked_facts": ["F-client-minimal-example"],
+                "checked_transformations": [
+                    "source_requirements->information_sufficiency_facts",
+                    "required_outcomes->information_sufficiency_facts",
+                    "information_sufficiency_facts->design_plan_entry",
+                ],
+                "findings": ["Independent review has not run."],
+            }
+            refresh_semantic_base(req)
+            (run_dir / "requirements.control.json").write_text(json.dumps(req, indent=2), encoding="utf-8")
+
+            result = run_script(PREDICTOR, "--run-dir", str(run_dir))
+
+            self.assertNotEqual(result.returncode, 0, result.stdout + result.stderr)
+            self.assertIn("counterexample_review", result.stdout + result.stderr)
+            self.assertIn("pass with verdict approved", result.stdout + result.stderr)
+
     def test_guard_rejects_missing_information_sufficiency_for_v1_2(self):
         with tempfile.TemporaryDirectory() as tmpdir:
             run_dir = Path(tmpdir)

@@ -408,12 +408,17 @@ def evidence_ref_errors(run_dir: Path | None, label: str, evidence_ref: Any) -> 
 
 
 def information_sufficiency_errors(requirements: dict[str, Any], run_dir: Path | None = None) -> list[str]:
-    if not schema_version_at_least(requirements, "1.2.0"):
-        return []
     approved = requirements.get("approved_control")
     if not isinstance(approved, dict):
         return ["requirements.control.json approved_control must be an object"]
     check = approved.get("information_sufficiency_check")
+    if not schema_version_at_least(requirements, "1.2.0"):
+        if isinstance(check, dict):
+            return [
+                "requirements.control.json approved_control.information_sufficiency_check "
+                "requires schema_version >= 1.2.0"
+            ]
+        return []
     if not isinstance(check, dict):
         return [
             "requirements.control.json approved_control.information_sufficiency_check "
