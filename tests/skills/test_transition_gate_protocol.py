@@ -255,6 +255,37 @@ class TransitionGateProtocolTest(unittest.TestCase):
                     self.assertFalse(payload["handoff_allowed"])
                     self.assertIn("blocks handoff", "\n".join(payload["blocking_reasons"]))
 
+    def test_information_gate_satisfied_status_requires_complete_fact_and_review_shape(self):
+        mutations = [
+            lambda req: req["approved_control"]["information_sufficiency_check"]["facts"][0].pop("acceptable_evidence"),
+            lambda req: req["approved_control"]["information_sufficiency_check"]["facts"][0].pop("statement"),
+            lambda req: req["approved_control"]["information_sufficiency_check"]["facts"][0].update(
+                {"blocks_design_or_plan_if_missing": "yes"}
+            ),
+            lambda req: req["approved_control"]["information_sufficiency_check"]["counterexample_review"]["reviewer"].update(
+                {"kind": "self"}
+            ),
+            lambda req: req["approved_control"]["information_sufficiency_check"]["counterexample_review"].pop("findings"),
+        ]
+        for mutate in mutations:
+            with self.subTest(mutation=mutations.index(mutate)):
+                with tempfile.TemporaryDirectory() as tmpdir:
+                    run_dir = Path(tmpdir)
+                    req = requirements_with_information_sufficiency(status="satisfied")
+                    req["status"] = "approved"
+                    mutate(req)
+                    refresh_semantic_base(req)
+                    write_requirements(run_dir, req)
+                    write_information_evidence(run_dir)
+
+                    result = run_script(INFO_LOOP, "--run-dir", str(run_dir), "--json")
+
+                    self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+                    payload = json.loads(result.stdout)
+                    self.assertEqual("RepairRequirementsInformationState", payload["next_action"])
+                    self.assertFalse(payload["terminal"])
+                    self.assertFalse(payload["handoff_allowed"])
+
     def test_information_gate_ignores_non_planned_collection_actions_as_next_actions(self):
         with tempfile.TemporaryDirectory() as tmpdir:
             run_dir = Path(tmpdir)
@@ -285,6 +316,68 @@ class TransitionGateProtocolTest(unittest.TestCase):
             self.assertFalse(payload["terminal"])
             self.assertEqual([], payload["automatic_actions"])
             self.assertIn("planned", "\n".join(payload["blocking_reasons"]))
+
+    def test_information_gate_safe_probe_requires_explicit_automatic_authorization(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            run_dir = Path(tmpdir)
+            req = requirements_with_information_sufficiency(status="needs_information_gathering")
+            check = req["approved_control"]["information_sufficiency_check"]
+            check["facts"][0]["current_status"] = "needs_information_gathering"
+            check["collection_actions"] = [
+                {
+                    "action_id": "IA-no-auto-probe",
+                    "fact_id": "F-client-minimal-example",
+                    "action_type": "run_no_side_effect_probe",
+                    "status": "planned",
+                    "why_safe_or_needed": "The probe needs explicit authorization.",
+                    "evidence_ref": "evidence/client_probe.json",
+                    "command": ["python3", "-c", "print('client ok')"],
+                    "working_dir": ".",
+                    "allow_automatic_execution": False,
+                }
+            ]
+            refresh_semantic_base(req)
+            write_requirements(run_dir, req)
+
+            result = run_script(INFO_LOOP, "--run-dir", str(run_dir), "--json")
+
+            self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+            payload = json.loads(result.stdout)
+            self.assertEqual("RepairRequirementsInformationState", payload["next_action"])
+            self.assertFalse(payload["terminal"])
+            self.assertEqual([], payload["automatic_actions"])
+            self.assertIn("allow_automatic_execution", "\n".join(payload["blocking_reasons"]))
+
+    def test_information_gate_collection_action_evidence_ref_must_stay_in_run_dir(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            run_dir = Path(tmpdir)
+            req = requirements_with_information_sufficiency(status="needs_information_gathering")
+            check = req["approved_control"]["information_sufficiency_check"]
+            check["facts"][0]["current_status"] = "needs_information_gathering"
+            check["collection_actions"] = [
+                {
+                    "action_id": "IA-outside-evidence",
+                    "fact_id": "F-client-minimal-example",
+                    "action_type": "run_no_side_effect_probe",
+                    "status": "planned",
+                    "why_safe_or_needed": "The probe evidence must be recorded in the run directory.",
+                    "evidence_ref": "../outside.json",
+                    "command": ["python3", "-c", "print('client ok')"],
+                    "working_dir": ".",
+                    "allow_automatic_execution": True,
+                }
+            ]
+            refresh_semantic_base(req)
+            write_requirements(run_dir, req)
+
+            result = run_script(INFO_LOOP, "--run-dir", str(run_dir), "--json")
+
+            self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+            payload = json.loads(result.stdout)
+            self.assertEqual("RepairRequirementsInformationState", payload["next_action"])
+            self.assertFalse(payload["terminal"])
+            self.assertEqual([], payload["automatic_actions"])
+            self.assertIn("evidence_ref", "\n".join(payload["blocking_reasons"]))
 
     def test_information_gate_ready_for_approval_is_terminal_for_requirements_analysis(self):
         with tempfile.TemporaryDirectory() as tmpdir:

@@ -19,7 +19,7 @@ REPO_ROOT = Path(__file__).resolve().parents[4]
 sys.path.insert(0, str(REPO_ROOT / ".agents/skills/_shared"))
 
 from transition_gate import transition_gate_payload  # noqa: E402
-from information_sufficiency import information_sufficiency_errors  # noqa: E402
+from information_sufficiency import evidence_ref_path_errors, information_sufficiency_errors  # noqa: E402
 
 
 SAFE_ACTION_TYPES = {"read_source", "read_documentation", "run_no_side_effect_probe"}
@@ -145,16 +145,26 @@ def has_command(value: Any) -> bool:
     return has_string_list(value)
 
 
-def action_detail_errors(action: dict[str, Any], action_type: Any, action_ref: Any) -> list[str]:
+def action_detail_errors(run_dir: Path, action: dict[str, Any], action_type: Any, action_ref: Any) -> list[str]:
+    errors = evidence_ref_path_errors(
+        run_dir,
+        f"collection action {action_ref}",
+        action.get("evidence_ref"),
+        require_exists=False,
+    )
+    if action.get("allow_automatic_execution") is False and action_type in SAFE_ACTION_TYPES:
+        errors.append(f"collection action {action_ref} cannot be automatic when allow_automatic_execution is false")
+    if action_type == "run_no_side_effect_probe" and action.get("allow_automatic_execution") is not True:
+        errors.append(f"collection action {action_ref} must set allow_automatic_execution true for automatic probes")
     if action_type in {"read_source", "read_documentation"} and not has_string_list(action.get("paths")):
-        return [f"collection action {action_ref} with action_type {action_type!r} must include non-empty paths"]
+        errors.append(f"collection action {action_ref} with action_type {action_type!r} must include non-empty paths")
     if action_type == "run_no_side_effect_probe" and not has_command(action.get("command")):
-        return [f"collection action {action_ref} with action_type 'run_no_side_effect_probe' must include command"]
+        errors.append(f"collection action {action_ref} with action_type 'run_no_side_effect_probe' must include command")
     if action_type in USER_ACTION_TYPES and not isinstance(action.get("question"), str):
-        return [f"collection action {action_ref} with action_type {action_type!r} must include question"]
-    if action_type in USER_ACTION_TYPES and not action["question"].strip():
-        return [f"collection action {action_ref} with action_type {action_type!r} must include a non-empty question"]
-    return []
+        errors.append(f"collection action {action_ref} with action_type {action_type!r} must include question")
+    elif action_type in USER_ACTION_TYPES and not action["question"].strip():
+        errors.append(f"collection action {action_ref} with action_type {action_type!r} must include a non-empty question")
+    return errors
 
 
 def approval_or_handoff_errors(requirements: dict[str, Any], run_dir: Path) -> list[str]:
@@ -170,7 +180,7 @@ def requires_counterexample_review(errors: list[str]) -> bool:
     return bool(errors) and all(error.startswith(review_error_prefixes) for error in errors)
 
 
-def classify_actions(check: dict[str, Any]) -> tuple[list[dict[str, Any]], list[dict[str, Any]], list[str]]:
+def classify_actions(run_dir: Path, check: dict[str, Any]) -> tuple[list[dict[str, Any]], list[dict[str, Any]], list[str]]:
     facts = fact_by_id(check)
     automatic: list[dict[str, Any]] = []
     user: list[dict[str, Any]] = []
@@ -191,7 +201,7 @@ def classify_actions(check: dict[str, Any]) -> tuple[list[dict[str, Any]], list[
         if action.get("status") != "planned":
             errors.append(f"collection action {action_ref} must have status 'planned' to be used as the next action")
             continue
-        detail_errors = action_detail_errors(action, action_type, action_ref)
+        detail_errors = action_detail_errors(run_dir, action, action_type, action_ref)
         if detail_errors:
             errors.extend(detail_errors)
             continue
@@ -281,7 +291,7 @@ def next_action(run_dir: Path, requirements: dict[str, Any]) -> dict[str, Any]:
             message="Information sufficiency is complete; show the requirements approval commitment.",
         )
 
-    automatic, user, errors = classify_actions(check)
+    automatic, user, errors = classify_actions(run_dir, check)
     payload["automatic_actions"] = automatic
     payload["user_actions"] = user
     payload["blocking_reasons"] = errors

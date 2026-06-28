@@ -11,6 +11,28 @@ INFORMATION_SUFFICIENCY_GATE_POINTS = {
     "information_sufficiency_facts->design_plan_entry",
 }
 
+FACT_STATUSES = {
+    "satisfied",
+    "missing",
+    "needs_information_gathering",
+    "needs_user_input",
+    "needs_requirements_revision",
+    "blocked",
+    "not_required",
+}
+
+ACCEPTABLE_EVIDENCE_KINDS = {
+    "direct_observation",
+    "command_result",
+    "source_code",
+    "test_result",
+    "documentation",
+    "human_decision",
+    "external_blocker",
+}
+
+REVIEWER_KINDS = {"subagent", "human", "external"}
+
 
 def schema_version_at_least(requirements: dict[str, Any], minimum: str) -> bool:
     version = requirements.get("schema_version")
@@ -31,6 +53,16 @@ def string_list(value: Any) -> list[str]:
 
 
 def evidence_ref_errors(run_dir: Path, label: str, evidence_ref: Any) -> list[str]:
+    return evidence_ref_path_errors(run_dir, label, evidence_ref, require_exists=True)
+
+
+def evidence_ref_path_errors(
+    run_dir: Path,
+    label: str,
+    evidence_ref: Any,
+    *,
+    require_exists: bool,
+) -> list[str]:
     if not isinstance(evidence_ref, str) or not evidence_ref.strip():
         return [f"{label} evidence_ref must be non-empty"]
     path_part = evidence_ref.split("#", 1)[0]
@@ -45,11 +77,27 @@ def evidence_ref_errors(run_dir: Path, label: str, evidence_ref: Any) -> list[st
         resolved_ref.relative_to(resolved_run_dir)
     except ValueError:
         return [f"{label} evidence_ref must stay inside the run directory"]
-    if not resolved_ref.exists():
+    if require_exists and not resolved_ref.exists():
         return [f"{label} evidence_ref does not exist: {evidence_ref}"]
-    if not resolved_ref.is_file():
+    if require_exists and not resolved_ref.is_file():
         return [f"{label} evidence_ref must point to a file: {evidence_ref}"]
     return []
+
+
+def acceptable_evidence_errors(label: str, value: Any) -> list[str]:
+    if not isinstance(value, list) or not value:
+        return [f"{label} acceptable_evidence must be a non-empty list"]
+    errors: list[str] = []
+    for index, evidence in enumerate(value):
+        item_label = f"{label} acceptable_evidence[{index}]"
+        if not isinstance(evidence, dict):
+            errors.append(f"{item_label} must be an object")
+            continue
+        if evidence.get("kind") not in ACCEPTABLE_EVIDENCE_KINDS:
+            errors.append(f"{item_label} kind is not recognized")
+        if not isinstance(evidence.get("description"), str) or not evidence["description"].strip():
+            errors.append(f"{item_label} description must be non-empty")
+    return errors
 
 
 def information_sufficiency_errors(requirements: dict[str, Any], run_dir: Path) -> list[str]:
@@ -103,10 +151,16 @@ def information_sufficiency_errors(requirements: dict[str, Any], run_dir: Path) 
             errors.append(f"{label} must have fact_id")
             continue
         all_fact_ids.add(fact_id)
+        if not isinstance(fact.get("statement"), str) or not fact["statement"].strip():
+            errors.append(f"{label} statement must be non-empty")
         derived_from = fact.get("derived_from")
         if not isinstance(derived_from, dict):
             errors.append(f"{label} derived_from must be an object")
             continue
+        if not isinstance(derived_from.get("source_requirements"), list):
+            errors.append(f"{label} derived_from.source_requirements must be a list")
+        if not isinstance(derived_from.get("required_outcomes"), list):
+            errors.append(f"{label} derived_from.required_outcomes must be a list")
         fact_sources = set(string_list(derived_from.get("source_requirements")))
         fact_outcomes = set(string_list(derived_from.get("required_outcomes")))
         if not fact_sources and not fact_outcomes:
@@ -117,12 +171,18 @@ def information_sufficiency_errors(requirements: dict[str, Any], run_dir: Path) 
         unknown_outcomes = sorted(fact_outcomes - approved_outcomes)
         if unknown_outcomes:
             errors.append(f"{label} references unknown required_outcomes: {', '.join(unknown_outcomes)}")
-        if fact.get("blocks_design_or_plan_if_missing") is True:
+        if fact.get("current_status") not in FACT_STATUSES:
+            errors.append(f"{label} current_status is not recognized")
+        blocks_design = fact.get("blocks_design_or_plan_if_missing")
+        if not isinstance(blocks_design, bool):
+            errors.append(f"{label} blocks_design_or_plan_if_missing must be boolean")
+        if blocks_design is True:
             blocking_fact_ids.add(fact_id)
             if fact.get("current_status") != "satisfied":
                 errors.append(f"{label} is not satisfied and blocks handoff")
         if not isinstance(fact.get("why_needed"), str) or not fact["why_needed"].strip():
             errors.append(f"{label} why_needed must explain why design/plan needs this fact")
+        errors.extend(acceptable_evidence_errors(label, fact.get("acceptable_evidence")))
         errors.extend(evidence_ref_errors(run_dir, label, fact.get("evidence_ref")))
 
     review = check.get("counterexample_review")
@@ -134,6 +194,8 @@ def information_sufficiency_errors(requirements: dict[str, Any], run_dir: Path) 
     reviewer = review.get("reviewer")
     if not isinstance(reviewer, dict):
         errors.append("information_sufficiency_check counterexample_review reviewer must be an object")
+    elif reviewer.get("kind") not in REVIEWER_KINDS:
+        errors.append("information_sufficiency_check counterexample_review reviewer kind is not recognized")
     elif not isinstance(reviewer.get("id"), str) or not reviewer["id"].strip():
         errors.append("information_sufficiency_check counterexample_review reviewer must have kind, id, and evidence_ref")
     elif not isinstance(reviewer.get("evidence_ref"), str) or not reviewer["evidence_ref"].strip():
@@ -147,6 +209,8 @@ def information_sufficiency_errors(requirements: dict[str, Any], run_dir: Path) 
             )
         )
     checked_facts = set(string_list(review.get("checked_facts")))
+    if not isinstance(review.get("checked_facts"), list) or not checked_facts:
+        errors.append("information_sufficiency_check counterexample_review checked_facts must be a non-empty list")
     missing_checked_facts = sorted(blocking_fact_ids - checked_facts)
     if missing_checked_facts:
         errors.append(
@@ -154,6 +218,8 @@ def information_sufficiency_errors(requirements: dict[str, Any], run_dir: Path) 
             + ", ".join(missing_checked_facts)
         )
     checked_transformations = set(string_list(review.get("checked_transformations")))
+    if not isinstance(review.get("checked_transformations"), list) or not checked_transformations:
+        errors.append("information_sufficiency_check counterexample_review checked_transformations must be a non-empty list")
     missing_points = sorted(INFORMATION_SUFFICIENCY_GATE_POINTS - checked_transformations)
     if missing_points:
         errors.append(
@@ -166,4 +232,9 @@ def information_sufficiency_errors(requirements: dict[str, Any], run_dir: Path) 
             "information_sufficiency_check counterexample_review references unknown facts: "
             + ", ".join(unknown_checked_facts)
         )
+    findings = review.get("findings")
+    if not isinstance(findings, list):
+        errors.append("information_sufficiency_check counterexample_review findings must be a list")
+    elif any(not isinstance(finding, str) for finding in findings):
+        errors.append("information_sufficiency_check counterexample_review findings must contain only strings")
     return errors
