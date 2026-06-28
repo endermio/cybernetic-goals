@@ -99,6 +99,9 @@
 .github/ISSUE_TEMPLATE/cybernetic-improvement-pattern.md
 .github/workflows/aggregate-cybernetic-outcomes.yml
 AGENTS.md
+docs/cybernetics/runs/2026-06-09-json-only-control-facts-migration/README.md
+docs/cybernetics/runs/2026-06-10-reviewed-replanning-control/README.md
+docs/cybernetics/runs/2026-06-27-information-sufficiency-gate/README.md
 docs/cybernetic-framework/invariant-artifact-consumer-matrix.md
 docs/cybernetic-framework/reviewed-replanning-control-architecture.md
 docs/cybernetic-framework/superpowers-infrastructure-policy.md

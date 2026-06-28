@@ -11,6 +11,8 @@ This skill writes the goal control JSON. It does not analyze requirements, write
 
 Official persistent control facts are JSON only. Historical Markdown may be read as non-authoritative background, but do not create or compile Markdown as official guard, compiler, runtime, or long-term dual-path control input.
 
+For `controlled_run` requirements with schema `1.1.0+`, verify `approved_control.information_sufficiency_check` before any goal artifact is created: status is `satisfied` or explicitly reviewed `not_required`; blocking facts have run-local `evidence_ref` values; `counterexample_review` is independent, approved, and covers the facts and transformations into design/plan. If this gate is absent, pending, missing evidence, or not independently reviewed, stop and route to `RunInformationSufficiencyCheck` / `$analyzing-cybernetic-requirements` before creating `goal.control.json`.
+
 For complex work, the output is:
 
 ```text
@@ -33,7 +35,7 @@ For `controlled_run` JSON pre-goal work, do not create `goal.control.json` unles
 
 If the current user message approves the compact control commitment, update the requirements analysis `What the User Approved` section first, quoting or referencing that approval, then continue. Do not rely on in-memory approval to pass orchestration or runtime guards.
 
-For `controlled_run` requirements with schema `1.1.0+`, goal writing also requires a completed `approved_control.information_sufficiency_check`: status is `satisfied` or explicitly reviewed `not_required`; blocking facts have run-local `evidence_ref` values; `counterexample_review` is independent, approved, and covers the facts and transformations into design/plan. If this gate is absent, pending, missing evidence, or not independently reviewed, stop and route to `RunInformationSufficiencyCheck` / `$analyzing-cybernetic-requirements` before creating `goal.control.json`.
+For `controlled_run` requirements with schema `1.1.0+`, goal writing also requires the information sufficiency gate described above.
 
 Do not put “first write a plan, then execute it” inside an execution `/goal` for complex work.
 

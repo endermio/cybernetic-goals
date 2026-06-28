@@ -8,6 +8,15 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[2]
 
 
+def version_tuple(version: object) -> tuple[int, ...]:
+    if not isinstance(version, str):
+        return ()
+    try:
+        return tuple(int(part) for part in version.split("."))
+    except ValueError:
+        return ()
+
+
 class SkillRepositoryIntegrityTest(unittest.TestCase):
     def test_manifest_includes_release_place_files(self):
         manifest_paths = set(
@@ -107,14 +116,14 @@ class SkillRepositoryIntegrityTest(unittest.TestCase):
                 self.assertLessEqual(len(matches), 2, matches)
 
     def test_downstream_manual_skills_require_information_sufficiency_gate(self):
-        downstream_paths = [
-            ".agents/skills/designing-cybernetic-solutions/SKILL.md",
-            ".agents/skills/designing-cybernetic-solutions/references/solution-design-detailed-rules.md",
-            ".agents/skills/writing-cybernetic-goals/SKILL.md",
-            ".agents/skills/writing-cybernetic-goals/references/goal-writing-detailed-rules.md",
-            ".agents/skills/writing-cybernetic-execution-policies/SKILL.md",
-            ".agents/skills/writing-cybernetic-execution-policies/references/execution-policy-detailed-rules.md",
-        ]
+        downstream_paths = {
+            ".agents/skills/designing-cybernetic-solutions/SKILL.md": "Produce `design.control.json`",
+            ".agents/skills/designing-cybernetic-solutions/references/solution-design-detailed-rules.md": "create or update `design.control.json`",
+            ".agents/skills/writing-cybernetic-goals/SKILL.md": "docs/cybernetics/runs/<slug>/goal.control.json",
+            ".agents/skills/writing-cybernetic-goals/references/goal-writing-detailed-rules.md": "docs/cybernetics/runs/<slug>/goal.control.json",
+            ".agents/skills/writing-cybernetic-execution-policies/SKILL.md": "docs/cybernetics/runs/<slug>/plan.control.json",
+            ".agents/skills/writing-cybernetic-execution-policies/references/execution-policy-detailed-rules.md": "docs/cybernetics/runs/<slug>/plan.control.json",
+        }
         required_terms = [
             "information_sufficiency_check",
             "counterexample_review",
@@ -124,11 +133,43 @@ class SkillRepositoryIntegrityTest(unittest.TestCase):
             "RunInformationSufficiencyCheck",
         ]
 
-        for path in downstream_paths:
+        for path, output_marker in downstream_paths.items():
             text = (ROOT / path).read_text(encoding="utf-8")
             with self.subTest(path=path):
                 for term in required_terms:
                     self.assertIn(term, text)
+                gate_index = text.index("information_sufficiency_check")
+                output_index = text.index(output_marker)
+                self.assertLess(
+                    gate_index,
+                    output_index,
+                    "information sufficiency gate must appear before creating the downstream control artifact",
+                )
+
+    def test_historical_successful_control_runs_are_marked_non_authoritative(self):
+        for req_path in sorted((ROOT / "docs/cybernetics/runs").glob("*/requirements.control.json")):
+            run_dir = req_path.parent
+            final_path = run_dir / "final-report.json"
+            if not final_path.exists():
+                continue
+
+            requirements = json.loads(req_path.read_text(encoding="utf-8"))
+            final_report = json.loads(final_path.read_text(encoding="utf-8"))
+            if (
+                version_tuple(requirements.get("schema_version")) < (1, 1, 0)
+                and final_report.get("goal_achieved") is True
+            ):
+                with self.subTest(run=run_dir.relative_to(ROOT)):
+                    marker = run_dir / "README.md"
+                    self.assertTrue(marker.exists(), "legacy successful runs need a README marker")
+                    marker_text = marker.read_text(encoding="utf-8").lower()
+                    for term in (
+                        "historical",
+                        "bootstrap",
+                        "non-authoritative",
+                        "information_sufficiency_check",
+                    ):
+                        self.assertIn(term, marker_text)
 
 
 if __name__ == "__main__":

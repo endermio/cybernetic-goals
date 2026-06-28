@@ -41,7 +41,7 @@ RETURN_STAGE_ORDER = {
     "plan": 3,
     "review": 4,
 }
-INFORMATION_SUFFICIENCY_STATES = {"before-design", "before-policy"}
+INFORMATION_SUFFICIENCY_STATES = set(NEXT_ACTION)
 
 
 def payload(ok: bool, state: str, next_action: str, errors: list[str]) -> dict[str, object]:

@@ -189,7 +189,7 @@ def generation_entry_from_patch(
         "status": "active",
         "parent": current_generation,
         "runtime": f"{new_generation}/runtime.control.json",
-        "review": f"{new_generation}/review.control.json",
+        "review": f"amendments/{amendment['amendment_id']}.review.control.json",
         "amendment_source": f"progress.jsonl#{amendment['amendment_id']}",
         "patch_ref": amendment["patch_ref"],
         "required_steps": copy.deepcopy(patch["required_steps"]),
@@ -267,6 +267,10 @@ def apply_amendment(run_dir: Path, requested_amendment_id: str | None = None) ->
     new_generation = next_generation_id(run_control)
     new_generation_entry = generation_entry_from_patch(patch, amendment, new_generation, current_generation)
     review_ref = f"amendments/{amendment_id}.review.control.json"
+    parent_run_ref = f"amendments/{amendment_id}.parent-run.control.json"
+    parent_run_path = run_dir / parent_run_ref
+    if not parent_run_path.exists():
+        write_json(parent_run_path, run_control)
     review_path = run_dir / review_ref
     if not review_path.exists():
         candidate_path = run_dir / f"amendments/{amendment_id}.candidate-generation.json"
@@ -281,7 +285,16 @@ def apply_amendment(run_dir: Path, requested_amendment_id: str | None = None) ->
             errors=["reviewed amendment patch requires approved review before generation switch"],
         )
     review = read_json(review_path)
-    review_errors = generation_review_errors(review, context="amendment patch")
+    review_errors = generation_review_errors(
+        review,
+        context="amendment patch",
+        requirements=artifacts["requirements"],
+        run_dir=run_dir,
+        run_control=run_control,
+        runtime=artifacts["runtime"],
+        runtime_rel=current.get("runtime") if isinstance(current.get("runtime"), str) else None,
+        review_rel=review_ref,
+    )
     if review.get("artifact_type") != "review.control" or review.get("status") != "approved":
         review_errors.append("amendment patch review must be an approved review.control artifact")
     if review_errors:
@@ -294,7 +307,6 @@ def apply_amendment(run_dir: Path, requested_amendment_id: str | None = None) ->
     updated_run["generations"].append(new_generation_entry)
     updated_run["current_generation"] = new_generation
     write_json(run_dir / "run.control.json", updated_run)
-    write_json(run_dir / new_generation_entry["review"], review)
 
     runtime_path = compile_runtime_control(run_dir)
     append_progress_event(

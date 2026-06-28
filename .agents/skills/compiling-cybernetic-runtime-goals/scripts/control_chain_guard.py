@@ -15,7 +15,11 @@ from typing import Any
 REPO_ROOT = Path(__file__).resolve().parents[4]
 sys.path.insert(0, str(REPO_ROOT / ".agents/skills/_shared"))
 
-from information_sufficiency import information_sufficiency_errors as shared_information_sufficiency_errors  # noqa: E402
+from information_sufficiency import (  # noqa: E402
+    is_sha256,
+    information_sufficiency_errors as shared_information_sufficiency_errors,
+    reviewer_artifact_binding_errors,
+)
 
 SCHEMA_DIR = REPO_ROOT / "schemas/control-json"
 DELEGATION_WORKFLOW_REGISTRY = REPO_ROOT / ".agents/skills/references/delegation-workflow-registry.json"
@@ -717,6 +721,11 @@ def require_generation_review_checks(
     *,
     context: str,
     requirements: dict[str, Any] | None = None,
+    run_dir: Path | None = None,
+    run_control: dict[str, Any] | None = None,
+    runtime: dict[str, Any] | None = None,
+    runtime_rel: str | None = None,
+    review_rel: str | None = None,
 ) -> None:
     review_checks = review.get("review_checks")
     if not isinstance(review_checks, list):
@@ -772,6 +781,141 @@ def require_generation_review_checks(
                 f"{context} counterexample-gate reviewer provenance must be subagent, human, or external "
                 "with id and evidence_ref"
             )
+        evidence_errors = review_counterexample_evidence_errors(
+            counterexample,
+            reviewer=reviewer,
+            run_dir=run_dir,
+            requirements=requirements,
+            run_control=run_control,
+            runtime=runtime,
+            runtime_rel=runtime_rel,
+            review=review,
+            review_rel=review_rel,
+        )
+        if evidence_errors:
+            raise ControlJsonValidationError(
+                f"{context} counterexample-gate evidence invalid: " + "; ".join(evidence_errors)
+            )
+
+
+def review_counterexample_evidence_errors(
+    check: dict[str, Any],
+    *,
+    reviewer: dict[str, Any],
+    run_dir: Path | None,
+    requirements: dict[str, Any] | None,
+    run_control: dict[str, Any] | None,
+    runtime: dict[str, Any] | None,
+    runtime_rel: str | None,
+    review: dict[str, Any],
+    review_rel: str | None,
+) -> list[str]:
+    evidence_ref = reviewer.get("evidence_ref")
+    errors = evidence_ref_errors(run_dir, "review counterexample-gate evidence", evidence_ref)
+    if errors:
+        return errors
+    assert run_dir is not None
+    assert isinstance(evidence_ref, str)
+    path_part = evidence_ref.split("#", 1)[0]
+    if review_rel and path_part == review_rel:
+        return ["review counterexample-gate evidence_ref must not point back to review.control.json"]
+    try:
+        evidence = json.loads((run_dir / path_part).read_text(encoding="utf-8"))
+    except json.JSONDecodeError as exc:
+        return [f"review counterexample-gate evidence must be JSON: {exc}"]
+    if not isinstance(evidence, dict):
+        return ["review counterexample-gate evidence must be a JSON object"]
+
+    if evidence.get("artifact_type") != "review.counterexample_gate.evidence":
+        errors.append("artifact_type is not recognized")
+    if evidence.get("independent_review") is not True:
+        errors.append("independent_review must be true")
+    if evidence.get("status") != check.get("status") or evidence.get("verdict") != check.get("verdict"):
+        errors.append("status/verdict must match counterexample-gate check")
+    if evidence.get("check_id") != COUNTEREXAMPLE_GATE_CHECK:
+        errors.append("check_id must be counterexample-gate")
+
+    evidence_reviewer = evidence.get("reviewer")
+    if not isinstance(evidence_reviewer, dict):
+        errors.append("reviewer must be an object")
+    elif evidence_reviewer.get("kind") != reviewer.get("kind") or evidence_reviewer.get("id") != reviewer.get("id"):
+        errors.append("reviewer must match counterexample-gate declaration")
+
+    reviewer_session = evidence.get("reviewer_session")
+    if not isinstance(reviewer_session, dict):
+        errors.append("reviewer_session must be an object")
+    elif (
+        reviewer_session.get("kind") != reviewer.get("kind")
+        or reviewer_session.get("id") != reviewer.get("id")
+        or not isinstance(reviewer_session.get("transcript_ref"), str)
+        or not reviewer_session["transcript_ref"].strip()
+    ):
+        errors.append("reviewer_session must bind reviewer kind/id and transcript_ref")
+
+    review_request = evidence.get("review_request")
+    if not isinstance(review_request, dict):
+        errors.append("review_request must be an object")
+    elif not is_sha256(review_request.get("prompt_hash")):
+        errors.append("review_request must include prompt_hash")
+    errors.extend(
+        reviewer_artifact_binding_errors(
+            run_dir,
+            evidence_ref=evidence_ref,
+            evidence=evidence,
+            reviewer=reviewer,
+            label="review counterexample-gate evidence",
+        )
+    )
+
+    for field in ("checked_transformations", "evidence"):
+        if set(string_list(evidence.get(field))) != set(string_list(check.get(field))):
+            errors.append(f"{field} must match counterexample-gate check")
+
+    expected_hashes = review_counterexample_expected_hashes(
+        requirements=requirements,
+        run_control=run_control,
+        runtime=runtime,
+        runtime_rel=runtime_rel,
+        review=review,
+        review_rel=review_rel,
+    )
+    hashes = evidence.get("reviewed_artifact_hashes")
+    if not isinstance(hashes, dict) or not hashes:
+        errors.append("reviewed_artifact_hashes must be a non-empty object")
+    else:
+        for filename, expected_hash in expected_hashes.items():
+            if hashes.get(filename) != expected_hash:
+                errors.append(f"hash mismatch for {filename}")
+    if isinstance(review_request, dict):
+        request_hashes = review_request.get("reviewed_artifact_hashes")
+        if not isinstance(request_hashes, dict):
+            errors.append("review_request.reviewed_artifact_hashes must be an object")
+        else:
+            for filename, expected_hash in expected_hashes.items():
+                if request_hashes.get(filename) != expected_hash:
+                    errors.append(f"review_request hash mismatch for {filename}")
+    return errors
+
+
+def review_counterexample_expected_hashes(
+    *,
+    requirements: dict[str, Any] | None,
+    run_control: dict[str, Any] | None,
+    runtime: dict[str, Any] | None,
+    runtime_rel: str | None,
+    review: dict[str, Any],
+    review_rel: str | None,
+) -> dict[str, str]:
+    expected: dict[str, str] = {}
+    if isinstance(requirements, dict):
+        expected["requirements.control.json"] = control_file_hash("requirements.control.json", requirements)
+    if isinstance(run_control, dict):
+        expected["run.control.json"] = control_file_hash("run.control.json", run_control)
+    if isinstance(runtime, dict) and isinstance(runtime_rel, str) and runtime_rel:
+        expected[runtime_rel] = control_file_hash(runtime_rel, runtime)
+    if isinstance(review_rel, str) and review_rel:
+        expected[review_rel] = control_file_hash(review_rel, review)
+    return expected
 
 
 def synthetic_step_ids(artifact: dict[str, Any]) -> set[str]:
@@ -912,7 +1056,31 @@ def validate_generation_control_run(run_dir: Path) -> dict[str, dict[str, Any]]:
         if review.get("artifact_type") != "review.control" or review.get("status") != "approved":
             raise ControlJsonValidationError(f"{review_rel}: amendment generation review must be approved")
         if strategy_kind in {"execution", "amendment"}:
-            require_generation_review_checks(review, context=f"{strategy_kind} generation", requirements=requirements)
+            review_run_control = run_control
+            review_runtime = runtime
+            review_runtime_rel = runtime_rel
+            if strategy_kind == "amendment":
+                amendment_source = generation.get("amendment_source")
+                amendment_id = amendment_source.split("#", 1)[1] if isinstance(amendment_source, str) and "#" in amendment_source else None
+                if not amendment_id:
+                    raise ControlJsonValidationError("run.control.json: amendment_source must include amendment id after #")
+                review_run_control = read_json_object(run_dir / f"amendments/{amendment_id}.parent-run.control.json")
+                parent_id = generation.get("parent")
+                parent_generation = generation_entry(run_control, parent_id) if isinstance(parent_id, str) else None
+                if not parent_generation or not isinstance(parent_generation.get("runtime"), str):
+                    raise ControlJsonValidationError("run.control.json: amendment parent must name a runtime")
+                review_runtime_rel = parent_generation["runtime"]
+                review_runtime = read_json_object(run_dir / review_runtime_rel)
+            require_generation_review_checks(
+                review,
+                context=f"{strategy_kind} generation",
+                requirements=requirements,
+                run_dir=run_dir,
+                run_control=review_run_control,
+                runtime=review_runtime,
+                runtime_rel=review_runtime_rel,
+                review_rel=review_rel,
+            )
     if strategy_kind in {"execution", "amendment"} and not review_rel:
         raise ControlJsonValidationError(f"run.control.json: {strategy_kind} generations must declare review")
     if generation.get("parent") and (not review_rel or not generation.get("amendment_source")):

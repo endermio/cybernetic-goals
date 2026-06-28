@@ -17,7 +17,10 @@ from tests.skills.test_reviewed_replanning_control import (
     requirements,
     run_control,
     runtime_control,
+    write_generation_review_evidence,
+    write_information_sufficiency_review_evidence,
     write_strategy_run,
+    write_updated_strategy_artifacts,
 )
 
 
@@ -160,6 +163,7 @@ class JsonOfficialGuardCompilerPathTest(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmpdir:
             run_dir = Path(tmpdir)
             (run_dir / "requirements.control.json").write_text(json.dumps(req, indent=2), encoding="utf-8")
+            write_information_sufficiency_review_evidence(run_dir, req)
             (run_dir / "run.control.json").write_text(json.dumps(run, indent=2), encoding="utf-8")
 
             result = run_script(COMPILER, "--run-dir", str(run_dir))
@@ -243,6 +247,15 @@ class JsonOfficialGuardCompilerPathTest(unittest.TestCase):
             runtime["required_steps"][0]["satisfies_outcomes"] = ["O-other"]
             apply_hashes(req, run, runtime, "gen-000/runtime.control.json", review, "gen-000/review.control.json")
             (run_dir / "gen-000/runtime.control.json").write_text(json.dumps(runtime, indent=2), encoding="utf-8")
+            write_generation_review_evidence(
+                run_dir,
+                req=req,
+                run=run,
+                runtime=runtime,
+                runtime_rel="gen-000/runtime.control.json",
+                review=review,
+                review_rel="gen-000/review.control.json",
+            )
 
             result = run_script(CONTROL_GUARD, "--run-dir", str(run_dir))
 
@@ -263,9 +276,7 @@ class JsonOfficialGuardCompilerPathTest(unittest.TestCase):
             req["approved_control"]["semantic_base"]["hash"] = canonical_json_hash(approved)
             runtime["runtime"]["writable_evidence_paths"] = ["results/"]
             apply_hashes(req, run, runtime, "gen-000/runtime.control.json", review, "gen-000/review.control.json")
-            (run_dir / "requirements.control.json").write_text(json.dumps(req, indent=2), encoding="utf-8")
-            (run_dir / "run.control.json").write_text(json.dumps(run, indent=2), encoding="utf-8")
-            (run_dir / "gen-000/runtime.control.json").write_text(json.dumps(runtime, indent=2), encoding="utf-8")
+            write_updated_strategy_artifacts(run_dir, req=req, run=run, runtime=runtime, review=review)
 
             result = run_script(CONTROL_GUARD, "--run-dir", str(run_dir))
 

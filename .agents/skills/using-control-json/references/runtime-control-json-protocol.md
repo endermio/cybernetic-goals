@@ -37,8 +37,9 @@ Use approved JSON to decide what work is authorized, what counts as done, where 
 
 If the approved target, plan, review, or runtime contract appears wrong, stale, or insufficient, append an observation through `.agents/skills/using-control-json/scripts/append_progress_event.py` when `progress.jsonl` is available and valid. If the current strategy cannot produce a blocking required outcome but the approved anchors can remain unchanged, append a `control.amendment.proposed` event instead of hard-completing with substitute evidence. If the needed change would alter approved anchors or authority, stop and report the smallest required human decision.
 
-If execution discovers a fact that should have been known before design or
-planning, treat it as an `information_sufficiency_check` issue. Runtime must
+If execution discovers a fact that should have been known before downstream
+control generation or strategy selection, treat it as an
+`information_sufficiency_check` issue. Runtime must
 not invent a new sufficiency standard, silently continue from assumptions, or
 convert the missing fact into a design detail. Record the observation, and when
 the current strategy can be repaired without changing approved anchors, append
@@ -184,7 +185,8 @@ requirements-approved gate contract means the run is not executable until
 requirements are fixed.
 Requirements define `information_sufficiency_check`, and runtime treats that
 check as approved control. Blocking facts must have been derived from source
-requirements/outcomes and independently challenged before design or planning. A
+requirements/outcomes and independently challenged before downstream control
+generation or strategy selection. A
 runtime completion or blocked claim cannot rely on facts invented afterward
 unless a reviewed amendment or human reapproval updates the control structure.
 Each blocking required outcome also has a per-outcome `counterexample_gate`;

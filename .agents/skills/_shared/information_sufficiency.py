@@ -1,6 +1,8 @@
 """Shared requirements information-sufficiency validation."""
 from __future__ import annotations
 
+import hashlib
+import json
 from pathlib import Path
 from typing import Any
 
@@ -52,6 +54,30 @@ def string_list(value: Any) -> list[str]:
     return [item for item in value if isinstance(item, str) and item]
 
 
+def canonical_json_hash(value: dict[str, Any]) -> str:
+    encoded = json.dumps(value, ensure_ascii=False, sort_keys=True, separators=(",", ":")).encode("utf-8")
+    return "sha256:" + hashlib.sha256(encoded).hexdigest()
+
+
+def file_sha256(path: Path) -> str:
+    return "sha256:" + hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+def is_sha256(value: Any) -> bool:
+    if not isinstance(value, str) or not value.startswith("sha256:"):
+        return False
+    digest = value.removeprefix("sha256:")
+    return len(digest) == 64 and digest != "0" * 64 and all(char in "0123456789abcdef" for char in digest)
+
+
+def is_local_ref(ref: str) -> bool:
+    return "://" not in ref
+
+
+def ref_path_part(ref: str) -> str:
+    return ref.split("#", 1)[0]
+
+
 def evidence_ref_errors(run_dir: Path, label: str, evidence_ref: Any) -> list[str]:
     return evidence_ref_path_errors(run_dir, label, evidence_ref, require_exists=True)
 
@@ -68,6 +94,8 @@ def evidence_ref_path_errors(
     path_part = evidence_ref.split("#", 1)[0]
     if not path_part:
         return [f"{label} evidence_ref must name a file before any JSON pointer fragment"]
+    if not is_local_ref(path_part):
+        return [f"{label} evidence_ref must be a run-local relative file"]
     ref_path = Path(path_part)
     if ref_path.is_absolute():
         return [f"{label} evidence_ref must be relative to the run directory"]
@@ -82,6 +110,151 @@ def evidence_ref_path_errors(
     if require_exists and not resolved_ref.is_file():
         return [f"{label} evidence_ref must point to a file: {evidence_ref}"]
     return []
+
+
+def evidence_ref_json(run_dir: Path, evidence_ref: str) -> tuple[dict[str, Any] | None, list[str]]:
+    path_part = evidence_ref.split("#", 1)[0]
+    path_errors = evidence_ref_path_errors(run_dir, "counterexample_review evidence", evidence_ref, require_exists=True)
+    if path_errors:
+        return None, path_errors
+    try:
+        data = json.loads((run_dir / path_part).read_text(encoding="utf-8"))
+    except json.JSONDecodeError as exc:
+        return None, [f"counterexample_review evidence must be JSON: {exc}"]
+    if not isinstance(data, dict):
+        return None, ["counterexample_review evidence must be a JSON object"]
+    return data, []
+
+
+def bound_artifact_ref_errors(
+    run_dir: Path,
+    *,
+    evidence_ref: str,
+    label: str,
+    ref: Any,
+    expected_hash: Any,
+) -> list[str]:
+    errors: list[str] = []
+    if not isinstance(ref, str) or not ref.strip():
+        return [f"{label} ref must be non-empty"]
+    if not is_sha256(expected_hash):
+        errors.append(f"{label} hash must be a non-zero sha256 digest")
+    if ref == evidence_ref or ref_path_part(ref) == ref_path_part(evidence_ref):
+        errors.append(f"{label} ref must not point to the counterexample evidence itself")
+    if not is_local_ref(ref):
+        errors.append(f"{label} ref must be a run-local relative file")
+        return errors
+    path_errors = evidence_ref_path_errors(run_dir, label, ref, require_exists=True)
+    errors.extend(path_errors)
+    if not path_errors and is_sha256(expected_hash):
+        actual_hash = file_sha256(run_dir / ref_path_part(ref))
+        if actual_hash != expected_hash:
+            errors.append(f"{label} hash does not match referenced artifact")
+    return errors
+
+
+def reviewer_artifact_binding_errors(
+    run_dir: Path,
+    *,
+    evidence_ref: str,
+    evidence: dict[str, Any],
+    reviewer: dict[str, Any],
+    label: str,
+) -> list[str]:
+    errors: list[str] = []
+    reviewer_session = evidence.get("reviewer_session")
+    if isinstance(reviewer_session, dict):
+        transcript_ref = reviewer_session.get("transcript_ref")
+        errors.extend(
+            bound_artifact_ref_errors(
+                run_dir,
+                evidence_ref=evidence_ref,
+                label=f"{label} reviewer_session.transcript",
+                ref=transcript_ref,
+                expected_hash=reviewer_session.get("transcript_hash"),
+            )
+        )
+    review_request = evidence.get("review_request")
+    if isinstance(review_request, dict):
+        prompt_ref = review_request.get("prompt_ref")
+        errors.extend(
+            bound_artifact_ref_errors(
+                run_dir,
+                evidence_ref=evidence_ref,
+                label=f"{label} review_request.prompt",
+                ref=prompt_ref,
+                expected_hash=review_request.get("prompt_hash"),
+            )
+        )
+    return errors
+
+
+def review_evidence_errors(
+    requirements: dict[str, Any],
+    run_dir: Path,
+    review: dict[str, Any],
+    reviewer: dict[str, Any],
+) -> list[str]:
+    evidence_ref = reviewer.get("evidence_ref")
+    evidence, errors = evidence_ref_json(run_dir, evidence_ref)
+    if errors:
+        return errors
+    assert evidence is not None
+
+    if evidence.get("artifact_type") != "information_sufficiency.counterexample_review.evidence":
+        errors.append("counterexample_review evidence artifact_type is not recognized")
+    if evidence.get("independent_review") is not True:
+        errors.append("counterexample_review evidence must mark independent_review true")
+    if evidence.get("status") != review.get("status") or evidence.get("verdict") != review.get("verdict"):
+        errors.append("counterexample_review evidence status/verdict must match review declaration")
+
+    evidence_reviewer = evidence.get("reviewer")
+    if not isinstance(evidence_reviewer, dict):
+        errors.append("counterexample_review evidence reviewer must be an object")
+    elif evidence_reviewer.get("kind") != reviewer.get("kind") or evidence_reviewer.get("id") != reviewer.get("id"):
+        errors.append("counterexample_review evidence reviewer must match review declaration")
+
+    reviewer_session = evidence.get("reviewer_session")
+    if not isinstance(reviewer_session, dict):
+        errors.append("counterexample_review evidence reviewer_session must be an object")
+    elif (
+        reviewer_session.get("kind") != reviewer.get("kind")
+        or reviewer_session.get("id") != reviewer.get("id")
+        or not isinstance(reviewer_session.get("transcript_ref"), str)
+        or not reviewer_session["transcript_ref"].strip()
+    ):
+        errors.append("counterexample_review evidence reviewer_session must bind reviewer kind/id and transcript_ref")
+
+    review_request = evidence.get("review_request")
+    if not isinstance(review_request, dict):
+        errors.append("counterexample_review evidence review_request must be an object")
+    elif not is_sha256(review_request.get("prompt_hash")):
+        errors.append("counterexample_review evidence review_request must include prompt_hash")
+    errors.extend(
+        reviewer_artifact_binding_errors(
+            run_dir,
+            evidence_ref=evidence_ref,
+            evidence=evidence,
+            reviewer=reviewer,
+            label="counterexample_review evidence",
+        )
+    )
+
+    for field in ("checked_facts", "checked_transformations"):
+        if set(string_list(evidence.get(field))) != set(string_list(review.get(field))):
+            errors.append(f"counterexample_review evidence {field} must match review declaration")
+
+    hashes = evidence.get("reviewed_artifact_hashes")
+    if not isinstance(hashes, dict) or not hashes:
+        errors.append("counterexample_review evidence reviewed_artifact_hashes must be a non-empty object")
+    elif hashes.get("requirements.control.json") != canonical_json_hash(requirements):
+        errors.append("counterexample_review evidence requirements.control.json hash does not match")
+    if isinstance(review_request, dict):
+        request_hashes = review_request.get("reviewed_artifact_hashes")
+        if not isinstance(request_hashes, dict) or request_hashes.get("requirements.control.json") != canonical_json_hash(requirements):
+            errors.append("counterexample_review evidence review_request requirements.control.json hash does not match")
+
+    return errors
 
 
 def acceptable_evidence_errors(label: str, value: Any) -> list[str]:
@@ -211,6 +384,7 @@ def information_sufficiency_errors(requirements: dict[str, Any], run_dir: Path) 
                 reviewer.get("evidence_ref"),
             )
         )
+        errors.extend(review_evidence_errors(requirements, run_dir, review, reviewer))
     checked_facts = set(string_list(review.get("checked_facts")))
     if not isinstance(review.get("checked_facts"), list) or not checked_facts:
         errors.append("information_sufficiency_check counterexample_review checked_facts must be a non-empty list")

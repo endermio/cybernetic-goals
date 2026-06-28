@@ -118,7 +118,7 @@
       "reviewer": {
         "kind": "subagent",
         "id": "counterexample-reviewer",
-        "evidence_ref": "review.control.json#counterexample-gate",
+        "evidence_ref": "evidence/pre_runtime_counterexample_review.json",
         "summary": "Independent reverse review checked decomposition and completion counterexamples."
       }
     },

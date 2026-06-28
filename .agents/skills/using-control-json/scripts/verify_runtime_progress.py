@@ -2,18 +2,23 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 from pathlib import Path
 
 from control_json_runtime import (
     blocking_required_outcomes,
+    control_file_hash,
     counterexample_allowed_reviewer_kinds,
     counterexample_contract_points,
     counterexample_required_outcome_gate_points,
     covered_outcomes_by_steps,
+    evidence_ref_errors,
+    is_sha256,
     required_evidence_by_outcome,
     result_payload,
     read_progress_events,
+    reviewer_artifact_binding_errors,
     source_requirement_map,
     source_requirements_completed_by_evidence,
     step_outcome_map,
@@ -175,14 +180,20 @@ def runtime_counterexample_review_coverage(
     events: list[dict],
     *,
     requirements: dict,
+    runtime: dict,
+    runtime_rel: str | None,
+    review: dict | None,
+    review_rel: str | None,
+    run_dir: Path,
     current_generation: str | None,
+    progress_hash: str | None,
 ) -> tuple[set[str], set[str], set[str], list[str]]:
     reviewed_steps: set[str] = set()
     reviewed_outcomes: set[str] = set()
     checked_transformations: set[str] = set()
     errors: list[str] = []
     allowed_reviewer_kinds = counterexample_allowed_reviewer_kinds(requirements)
-    for event in events:
+    for event_index, event in enumerate(events, start=1):
         if event.get("event_type") != "counterexample.review.completed":
             continue
         if current_generation is not None and event.get("runtime_generation") != current_generation:
@@ -204,10 +215,141 @@ def runtime_counterexample_review_coverage(
                 "runtime counterexample review reviewer provenance must satisfy requirements.control.json minimum_reviewer"
             )
             continue
+        evidence_errors = runtime_counterexample_review_evidence_errors(
+            run_dir,
+            event=event,
+            reviewer=reviewer,
+            event_index=event_index,
+            expected_hashes=runtime_counterexample_review_expected_hashes(
+                requirements=requirements,
+                runtime=runtime,
+                runtime_rel=runtime_rel,
+                review=review,
+                review_rel=review_rel,
+                progress_hash=progress_hash,
+            ),
+        )
+        if evidence_errors:
+            errors.extend(evidence_errors)
+            continue
         reviewed_steps.update(string_list(event.get("reviewed_steps")))
         reviewed_outcomes.update(string_list(event.get("reviewed_outcomes")))
         checked_transformations.update(string_list(event.get("checked_transformations")))
     return reviewed_steps, reviewed_outcomes, checked_transformations, errors
+
+
+def runtime_counterexample_review_evidence_errors(
+    run_dir: Path,
+    *,
+    event: dict,
+    reviewer: dict,
+    event_index: int,
+    expected_hashes: dict[str, str],
+) -> list[str]:
+    evidence_ref = reviewer.get("evidence_ref")
+    errors = evidence_ref_errors(run_dir, "runtime counterexample review evidence", evidence_ref)
+    if errors:
+        return errors
+
+    path_part = evidence_ref.split("#", 1)[0]
+    try:
+        evidence = json.loads((run_dir / path_part).read_text(encoding="utf-8"))
+    except json.JSONDecodeError as exc:
+        return [f"runtime counterexample review evidence must be JSON: {exc}"]
+    if not isinstance(evidence, dict):
+        return ["runtime counterexample review evidence must be a JSON object"]
+
+    errors = []
+    if evidence.get("artifact_type") != "runtime.counterexample_review.evidence":
+        errors.append("runtime counterexample review evidence artifact_type is not recognized")
+    if evidence.get("independent_review") is not True:
+        errors.append("runtime counterexample review evidence must mark independent_review true")
+    if evidence.get("status") != event.get("status") or evidence.get("verdict") != event.get("verdict"):
+        errors.append("runtime counterexample review evidence status/verdict must match event")
+
+    evidence_reviewer = evidence.get("reviewer")
+    if not isinstance(evidence_reviewer, dict):
+        errors.append("runtime counterexample review evidence reviewer must be an object")
+    elif evidence_reviewer.get("kind") != reviewer.get("kind") or evidence_reviewer.get("id") != reviewer.get("id"):
+        errors.append("runtime counterexample review evidence reviewer must match event")
+
+    reviewer_session = evidence.get("reviewer_session")
+    if not isinstance(reviewer_session, dict):
+        errors.append("runtime counterexample review evidence reviewer_session must be an object")
+    elif (
+        reviewer_session.get("kind") != reviewer.get("kind")
+        or reviewer_session.get("id") != reviewer.get("id")
+        or not isinstance(reviewer_session.get("transcript_ref"), str)
+        or not reviewer_session["transcript_ref"].strip()
+    ):
+        errors.append("runtime counterexample review evidence reviewer_session must bind reviewer kind/id and transcript_ref")
+
+    review_request = evidence.get("review_request")
+    if not isinstance(review_request, dict):
+        errors.append("runtime counterexample review evidence review_request must be an object")
+    elif not is_sha256(review_request.get("prompt_hash")):
+        errors.append("runtime counterexample review evidence review_request must include prompt_hash")
+    errors.extend(
+        reviewer_artifact_binding_errors(
+            run_dir,
+            evidence_ref=evidence_ref,
+            evidence=evidence,
+            reviewer=reviewer,
+            label="runtime counterexample review evidence",
+        )
+    )
+
+    for field in ("reviewed_steps", "reviewed_outcomes", "checked_transformations", "evidence"):
+        if set(string_list(evidence.get(field))) != set(string_list(event.get(field))):
+            errors.append(f"runtime counterexample review evidence {field} must match event")
+    if evidence.get("progress_event_line") != event_index:
+        errors.append("runtime counterexample review evidence progress_event_line must point to the reviewed event")
+
+    hashes = evidence.get("reviewed_artifact_hashes")
+    if not isinstance(hashes, dict) or not hashes:
+        errors.append("runtime counterexample review evidence reviewed_artifact_hashes must be a non-empty object")
+    else:
+        for filename, expected_hash in expected_hashes.items():
+            if hashes.get(filename) != expected_hash:
+                errors.append(f"runtime counterexample review evidence hash mismatch for {filename}")
+    if isinstance(review_request, dict):
+        request_hashes = review_request.get("reviewed_artifact_hashes")
+        if not isinstance(request_hashes, dict):
+            errors.append("runtime counterexample review evidence review_request.reviewed_artifact_hashes must be an object")
+        else:
+            for filename, expected_hash in expected_hashes.items():
+                if request_hashes.get(filename) != expected_hash:
+                    errors.append(f"runtime counterexample review evidence review_request hash mismatch for {filename}")
+
+    return errors
+
+
+def runtime_counterexample_review_expected_hashes(
+    *,
+    requirements: dict,
+    runtime: dict,
+    runtime_rel: str | None,
+    review: dict | None,
+    review_rel: str | None,
+    progress_hash: str | None,
+) -> dict[str, str]:
+    expected = {
+        "requirements.control.json": control_file_hash("requirements.control.json", requirements),
+    }
+    if isinstance(runtime_rel, str) and runtime_rel:
+        expected[runtime_rel] = control_file_hash(runtime_rel, runtime)
+    if isinstance(review, dict) and isinstance(review_rel, str) and review_rel:
+        expected[review_rel] = control_file_hash(review_rel, review)
+    if isinstance(progress_hash, str) and progress_hash:
+        expected["progress.jsonl"] = progress_hash
+    return expected
+
+
+def file_sha256(path: Path) -> str | None:
+    try:
+        return "sha256:" + hashlib.sha256(path.read_bytes()).hexdigest()
+    except FileNotFoundError:
+        return None
 
 
 def final_report_errors(
@@ -273,6 +415,7 @@ def main() -> int:
         errors.extend(verify_approved_hashes(run_dir, Path(args.approved_hashes), readonly or None))
 
     events, event_errors = read_progress_events(run_dir / "progress.jsonl")
+    progress_hash = file_sha256(run_dir / "progress.jsonl")
     errors.extend(event_errors)
 
     required_steps = step_ids(artifacts["runtime"])
@@ -281,13 +424,22 @@ def main() -> int:
     if not isinstance(current_generation, str):
         current_generation = None
     generation = None
+    runtime_rel = None
+    review_rel = None
     if isinstance(run_control, dict) and current_generation is not None:
         for candidate in run_control.get("generations", []):
             if isinstance(candidate, dict) and candidate.get("id") == current_generation:
                 generation = candidate
+                runtime_candidate = candidate.get("runtime")
+                if isinstance(runtime_candidate, str):
+                    runtime_rel = runtime_candidate
+                review_candidate = candidate.get("review")
+                if isinstance(review_candidate, str):
+                    review_rel = review_candidate
                 break
     strategy_kind = generation.get("strategy_kind") if isinstance(generation, dict) else None
     runtime = artifacts["runtime"]
+    review = artifacts.get("review")
     imported_evidence = set(
         item for item in runtime.get("imported_evidence", []) if isinstance(item, str)
     )
@@ -357,7 +509,13 @@ def main() -> int:
     ) = runtime_counterexample_review_coverage(
         events,
         requirements=artifacts["requirements"],
+        runtime=runtime,
+        runtime_rel=runtime_rel,
+        review=review,
+        review_rel=review_rel,
+        run_dir=run_dir,
         current_generation=current_generation,
+        progress_hash=progress_hash,
     )
     errors.extend(counterexample_review_errors)
     missing_counterexample_steps = sorted(required_steps - counterexample_reviewed_steps)

@@ -9,6 +9,7 @@ from tests.skills.test_information_sufficiency_gate import (
     refresh_semantic_base,
 )
 from tests.skills.test_reviewed_replanning_control import write_strategy_run
+from tests.skills.test_reviewed_replanning_control import write_information_sufficiency_review_evidence
 
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -37,10 +38,8 @@ def write_information_evidence(run_dir: Path) -> None:
         json.dumps({"status": "pass", "observation": "client ok"}, indent=2),
         encoding="utf-8",
     )
-    (evidence_dir / "information_sufficiency_counterexample.json").write_text(
-        json.dumps({"status": "pass", "verdict": "approved"}, indent=2),
-        encoding="utf-8",
-    )
+    requirements = json.loads((run_dir / "requirements.control.json").read_text(encoding="utf-8"))
+    write_information_sufficiency_review_evidence(run_dir, requirements)
 
 
 class TransitionGateProtocolTest(unittest.TestCase):
@@ -130,6 +129,62 @@ class TransitionGateProtocolTest(unittest.TestCase):
             self.assertFalse(payload["approval_allowed"])
             self.assertFalse(payload["handoff_allowed"])
             self.assertIn("collection_actions", "\n".join(payload["blocking_reasons"]))
+
+    def test_information_gate_rejects_remote_evidence_ref_for_automatic_collection_action(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            run_dir = Path(tmpdir)
+            req = requirements_with_information_sufficiency(status="needs_information_gathering")
+            check = req["approved_control"]["information_sufficiency_check"]
+            check["facts"][0]["current_status"] = "needs_information_gathering"
+            check["collection_actions"] = [
+                {
+                    "action_id": "IA-client-minimal-example",
+                    "fact_id": "F-client-minimal-example",
+                    "action_type": "run_no_side_effect_probe",
+                    "status": "planned",
+                    "why_safe_or_needed": "A local probe is required before design.",
+                    "evidence_ref": "https://example.invalid/client_minimal_example.json",
+                    "command": ["python3", "-c", "print('client ok')"],
+                    "working_dir": ".",
+                    "allow_automatic_execution": True,
+                }
+            ]
+            refresh_semantic_base(req)
+            write_requirements(run_dir, req)
+
+            result = run_script(INFO_LOOP, "--run-dir", str(run_dir), "--json")
+
+            self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+            payload = json.loads(result.stdout)
+            self.assertEqual("RepairRequirementsInformationState", payload["next_action"])
+            self.assertIn("run-local relative file", "\n".join(payload["blocking_reasons"]))
+
+    def test_information_gate_rejects_remote_evidence_ref_for_user_collection_action(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            run_dir = Path(tmpdir)
+            req = requirements_with_information_sufficiency(status="needs_user_input")
+            check = req["approved_control"]["information_sufficiency_check"]
+            check["facts"][0]["current_status"] = "needs_user_input"
+            check["collection_actions"] = [
+                {
+                    "action_id": "IA-client-credential",
+                    "fact_id": "F-client-minimal-example",
+                    "action_type": "ask_user",
+                    "status": "planned",
+                    "why_safe_or_needed": "The credential is not available locally.",
+                    "evidence_ref": "https://example.invalid/client_credential_decision.json",
+                    "question": "Provide the client credential.",
+                }
+            ]
+            refresh_semantic_base(req)
+            write_requirements(run_dir, req)
+
+            result = run_script(INFO_LOOP, "--run-dir", str(run_dir), "--json")
+
+            self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+            payload = json.loads(result.stdout)
+            self.assertEqual("RepairRequirementsInformationState", payload["next_action"])
+            self.assertIn("run-local relative file", "\n".join(payload["blocking_reasons"]))
 
     def test_information_gate_status_user_input_requires_user_action(self):
         with tempfile.TemporaryDirectory() as tmpdir:

@@ -29,6 +29,74 @@ def control_hash(filename: str, artifact: dict) -> str:
     return canonical_json_hash(artifact, omit)
 
 
+def file_hash(path: Path) -> str:
+    return "sha256:" + hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+def text_hash(text: str) -> str:
+    return "sha256:" + hashlib.sha256(text.encode("utf-8")).hexdigest()
+
+
+def write_text_artifact(run_dir: Path, ref: str, text: str) -> str:
+    path = run_dir / ref
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(text, encoding="utf-8")
+    return file_hash(path)
+
+
+def bound_refs_for_evidence(evidence_ref: str) -> tuple[str, str]:
+    evidence_path = Path(evidence_ref.split("#", 1)[0])
+    return (
+        str(evidence_path.with_suffix(".prompt.txt")),
+        str(evidence_path.with_suffix(".transcript.txt")),
+    )
+
+
+def write_information_sufficiency_review_evidence(run_dir: Path, req: dict) -> None:
+    info_review = req["approved_control"]["information_sufficiency_check"]["counterexample_review"]
+    info_reviewer = info_review["reviewer"]
+    reviewed_hashes = {
+        "requirements.control.json": control_hash("requirements.control.json", req)
+    }
+    prompt_ref, transcript_ref = bound_refs_for_evidence(info_reviewer["evidence_ref"])
+    prompt_hash = write_text_artifact(run_dir, prompt_ref, "information sufficiency counterexample review")
+    transcript_hash = write_text_artifact(
+        run_dir,
+        transcript_ref,
+        "independent information sufficiency reviewer transcript",
+    )
+    evidence_path = run_dir / "evidence/information_sufficiency_counterexample.json"
+    evidence_path.parent.mkdir(parents=True, exist_ok=True)
+    evidence_path.write_text(
+        json.dumps(
+            {
+                "artifact_type": "information_sufficiency.counterexample_review.evidence",
+                "independent_review": True,
+                "status": info_review["status"],
+                "verdict": info_review["verdict"],
+                "reviewer": {"kind": info_reviewer["kind"], "id": info_reviewer["id"]},
+                "reviewer_session": {
+                    "kind": info_reviewer["kind"],
+                    "id": info_reviewer["id"],
+                    "transcript_ref": transcript_ref,
+                    "transcript_hash": transcript_hash,
+                },
+                "review_request": {
+                    "prompt_ref": prompt_ref,
+                    "prompt_hash": prompt_hash,
+                    "reviewed_artifact_hashes": reviewed_hashes,
+                },
+                "checked_facts": info_review["checked_facts"],
+                "checked_transformations": info_review["checked_transformations"],
+                "findings": info_review.get("findings", []),
+                "reviewed_artifact_hashes": reviewed_hashes,
+            },
+            indent=2,
+        ),
+        encoding="utf-8",
+    )
+
+
 def refresh_semantic_base(req: dict) -> None:
     approved = copy.deepcopy(req["approved_control"])
     approved.pop("semantic_base", None)
@@ -91,7 +159,7 @@ def requirements(outcome_id: str = "O-target-startup", evidence_id: str = "evide
                     "reviewer": {
                         "kind": "subagent",
                         "id": "information-sufficiency-reviewer",
-                        "evidence_ref": "requirements.control.json#approved_control/information_sufficiency_check",
+                        "evidence_ref": "evidence/information_sufficiency_counterexample.json",
                     },
                     "checked_facts": ["F-target-startup-context"],
                     "checked_transformations": [
@@ -329,7 +397,7 @@ def approved_generation_review() -> dict:
             check["reviewer"] = {
                 "kind": "subagent",
                 "id": "counterexample-reviewer",
-                "evidence_ref": "gen-000/review.control.json#counterexample-gate",
+                "evidence_ref": "evidence/pre_runtime_counterexample_review.json",
                 "summary": "Independent reverse review checked the required decomposition and completion gates.",
             }
         checks.append(check)
@@ -339,6 +407,102 @@ def approved_generation_review() -> dict:
         "status": "approved",
         "review_checks": checks,
     }
+
+
+def write_generation_review_evidence(
+    run_dir: Path,
+    *,
+    req: dict,
+    run: dict,
+    runtime: dict,
+    runtime_rel: str,
+    review: dict,
+    review_rel: str,
+) -> None:
+    counterexample = next(
+        check for check in review["review_checks"] if check["check_id"] == "counterexample-gate"
+    )
+    reviewer = counterexample["reviewer"]
+    reviewed_hashes = {
+        "requirements.control.json": control_hash("requirements.control.json", req),
+        "run.control.json": control_hash("run.control.json", run),
+        runtime_rel: control_hash(runtime_rel, runtime),
+        review_rel: control_hash(review_rel, review),
+    }
+    evidence_ref = reviewer["evidence_ref"]
+    prompt_ref, transcript_ref = bound_refs_for_evidence(evidence_ref)
+    prompt_hash = write_text_artifact(run_dir, prompt_ref, "pre-runtime counterexample review")
+    transcript_hash = write_text_artifact(run_dir, transcript_ref, "independent pre-runtime reviewer transcript")
+    evidence_path = run_dir / evidence_ref.split("#", 1)[0]
+    evidence_path.parent.mkdir(parents=True, exist_ok=True)
+    evidence_path.write_text(
+        json.dumps(
+            {
+                "artifact_type": "review.counterexample_gate.evidence",
+                "independent_review": True,
+                "status": counterexample["status"],
+                "verdict": counterexample["verdict"],
+                "reviewer": {"kind": reviewer["kind"], "id": reviewer["id"]},
+                "reviewer_session": {
+                    "kind": reviewer["kind"],
+                    "id": reviewer["id"],
+                    "transcript_ref": transcript_ref,
+                    "transcript_hash": transcript_hash,
+                },
+                "review_request": {
+                    "prompt_ref": prompt_ref,
+                    "prompt_hash": prompt_hash,
+                    "reviewed_artifact_hashes": reviewed_hashes,
+                },
+                "check_id": "counterexample-gate",
+                "checked_transformations": counterexample["checked_transformations"],
+                "evidence": counterexample["evidence"],
+                "reviewed_artifact_hashes": reviewed_hashes,
+            },
+            indent=2,
+        ),
+        encoding="utf-8",
+    )
+
+
+def parent_run_snapshot(run: dict, parent_generation: str) -> dict:
+    snapshot = copy.deepcopy(run)
+    snapshot["current_generation"] = parent_generation
+    snapshot["generations"] = []
+    for generation in run["generations"]:
+        item = copy.deepcopy(generation)
+        if item["id"] == parent_generation:
+            item["status"] = "active"
+        elif item.get("parent"):
+            item["status"] = "candidate"
+        snapshot["generations"].append(item)
+    return snapshot
+
+
+def write_updated_strategy_artifacts(
+    run_dir: Path,
+    *,
+    req: dict,
+    run: dict,
+    runtime: dict,
+    review: dict,
+    runtime_rel: str = "gen-000/runtime.control.json",
+    review_rel: str = "gen-000/review.control.json",
+) -> None:
+    (run_dir / "requirements.control.json").write_text(json.dumps(req, indent=2), encoding="utf-8")
+    write_information_sufficiency_review_evidence(run_dir, req)
+    (run_dir / "run.control.json").write_text(json.dumps(run, indent=2), encoding="utf-8")
+    (run_dir / runtime_rel).write_text(json.dumps(runtime, indent=2), encoding="utf-8")
+    (run_dir / review_rel).write_text(json.dumps(review, indent=2), encoding="utf-8")
+    write_generation_review_evidence(
+        run_dir,
+        req=req,
+        run=run,
+        runtime=runtime,
+        runtime_rel=runtime_rel,
+        review=review,
+        review_rel=review_rel,
+    )
 
 
 def amendment_patch(
@@ -414,7 +578,7 @@ def counterexample_review_event(
     generation: str = "gen-000",
     reviewed_steps: list[str] | None = None,
     reviewed_outcomes: list[str] | None = None,
-    evidence_id: str = "evidence.counterexample-review",
+    evidence_id: str = "evidence/runtime_counterexample_review.json",
 ) -> dict:
     return {
         "event_type": "counterexample.review.completed",
@@ -489,19 +653,121 @@ def write_strategy_run(
         review = approved_generation_review()
     apply_hashes(req, run, runtime, runtime_rel, review, review_rel)
     (run_dir / "requirements.control.json").write_text(json.dumps(req, indent=2), encoding="utf-8")
+    write_information_sufficiency_review_evidence(run_dir, req)
     (run_dir / "run.control.json").write_text(json.dumps(run, indent=2), encoding="utf-8")
     runtime_path = run_dir / runtime_rel
     runtime_path.parent.mkdir(parents=True, exist_ok=True)
     runtime_path.write_text(json.dumps(runtime, indent=2), encoding="utf-8")
+    current_entry = next(item for item in run["generations"] if item["id"] == current_generation)
+    parent_id = current_entry.get("parent")
+    parent_runtime = None
+    parent_runtime_rel = None
+    parent_snapshot = None
+    if isinstance(parent_id, str):
+        parent_entry = next(item for item in run["generations"] if item["id"] == parent_id)
+        parent_runtime_rel = parent_entry["runtime"]
+        parent_runtime = runtime_control(req, run, parent_id, outcome_id, required_evidence_id)
+        parent_runtime_path = run_dir / parent_runtime_rel
+        parent_runtime_path.parent.mkdir(parents=True, exist_ok=True)
+        parent_runtime_path.write_text(json.dumps(parent_runtime, indent=2), encoding="utf-8")
+        amendment_source = current_entry.get("amendment_source")
+        amendment_id = amendment_source.split("#", 1)[1] if isinstance(amendment_source, str) and "#" in amendment_source else None
+        if amendment_id:
+            parent_snapshot = parent_run_snapshot(run, parent_id)
+            snapshot_path = run_dir / f"amendments/{amendment_id}.parent-run.control.json"
+            snapshot_path.parent.mkdir(parents=True, exist_ok=True)
+            snapshot_path.write_text(json.dumps(parent_snapshot, indent=2), encoding="utf-8")
     if review_rel and review:
         review_path = run_dir / review_rel
         review_path.parent.mkdir(parents=True, exist_ok=True)
         review_path.write_text(json.dumps(review, indent=2), encoding="utf-8")
+        review_run = parent_snapshot if parent_snapshot is not None else run
+        review_runtime = parent_runtime if parent_runtime is not None else runtime
+        review_runtime_rel = parent_runtime_rel if parent_runtime_rel is not None else runtime_rel
+        write_generation_review_evidence(
+            run_dir,
+            req=req,
+            run=review_run,
+            runtime=review_runtime,
+            runtime_rel=review_runtime_rel,
+            review=review,
+            review_rel=review_rel,
+        )
     if progress_events is not None:
-        (run_dir / "progress.jsonl").write_text(
+        progress_path = run_dir / "progress.jsonl"
+        progress_path.write_text(
             "".join(json.dumps(event) + "\n" for event in progress_events),
             encoding="utf-8",
         )
+        for index, event in enumerate(progress_events, start=1):
+            if event.get("event_type") != "counterexample.review.completed":
+                continue
+            reviewer = event.get("reviewer")
+            if not isinstance(reviewer, dict):
+                continue
+            evidence_ref = reviewer.get("evidence_ref")
+            if not isinstance(evidence_ref, str) or not evidence_ref:
+                continue
+            path_part = evidence_ref.split("#", 1)[0]
+            evidence_path = run_dir / path_part
+            if evidence_path.exists():
+                continue
+            evidence_path.parent.mkdir(parents=True, exist_ok=True)
+            prompt_ref, transcript_ref = bound_refs_for_evidence(evidence_ref)
+            prompt_hash = write_text_artifact(run_dir, prompt_ref, "runtime counterexample review")
+            transcript_hash = write_text_artifact(
+                run_dir,
+                transcript_ref,
+                "independent runtime reviewer transcript",
+            )
+            evidence_path.write_text(
+                json.dumps(
+                    {
+                        "artifact_type": "runtime.counterexample_review.evidence",
+                        "independent_review": True,
+                        "status": event["status"],
+                        "verdict": event["verdict"],
+                        "reviewer": {"kind": reviewer["kind"], "id": reviewer["id"]},
+                        "reviewer_session": {
+                            "kind": reviewer["kind"],
+                            "id": reviewer["id"],
+                            "transcript_ref": transcript_ref,
+                            "transcript_hash": transcript_hash,
+                        },
+                        "review_request": {
+                            "prompt_ref": prompt_ref,
+                            "prompt_hash": prompt_hash,
+                            "reviewed_artifact_hashes": {
+                                "progress.jsonl": file_hash(progress_path),
+                                "requirements.control.json": control_hash("requirements.control.json", req),
+                                runtime_rel: control_hash(runtime_rel, runtime),
+                                **(
+                                    {review_rel: control_hash(review_rel, review)}
+                                    if review_rel and review
+                                    else {}
+                                ),
+                            },
+                        },
+                        "reviewed_steps": event["reviewed_steps"],
+                        "reviewed_outcomes": event["reviewed_outcomes"],
+                        "checked_transformations": event["checked_transformations"],
+                        "evidence": event["evidence"],
+                        "reviewed_artifact_hashes": {
+                            "progress.jsonl": file_hash(progress_path),
+                            "requirements.control.json": control_hash("requirements.control.json", req),
+                            runtime_rel: control_hash(runtime_rel, runtime),
+                            **(
+                                {review_rel: control_hash(review_rel, review)}
+                                if review_rel and review
+                                else {}
+                            ),
+                        },
+                        "progress_event_line": index,
+                    },
+                    indent=2,
+                ),
+                encoding="utf-8",
+            )
     if report is not None:
         (run_dir / "final-report.json").write_text(json.dumps(report, indent=2), encoding="utf-8")
 
@@ -693,9 +959,7 @@ class ReviewedReplanningControlTest(unittest.TestCase):
             )
             refresh_semantic_base(req)
             apply_hashes(req, run, runtime, "gen-000/runtime.control.json", review, "gen-000/review.control.json")
-            req_path.write_text(json.dumps(req, indent=2), encoding="utf-8")
-            (run_dir / "run.control.json").write_text(json.dumps(run, indent=2), encoding="utf-8")
-            runtime_path.write_text(json.dumps(runtime, indent=2), encoding="utf-8")
+            write_updated_strategy_artifacts(run_dir, req=req, run=run, runtime=runtime, review=review)
 
             result = run_script(CONTROL_GUARD, "--run-dir", str(run_dir))
             validate = run_script(VALIDATE, str(run_dir))
@@ -707,6 +971,29 @@ class ReviewedReplanningControlTest(unittest.TestCase):
                     "counterexample-gate missing requirements-approved gate points: required_evidence->quality_standard",
                     command_result.stdout + command_result.stderr,
                 )
+
+    def test_guard_and_runtime_validator_reject_pre_runtime_counterexample_missing_run_runtime_hashes(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            run_dir = Path(tmpdir)
+            write_strategy_run(run_dir)
+            evidence_path = run_dir / "evidence/pre_runtime_counterexample_review.json"
+            evidence = json.loads(evidence_path.read_text(encoding="utf-8"))
+            for hashes in (
+                evidence["reviewed_artifact_hashes"],
+                evidence["review_request"]["reviewed_artifact_hashes"],
+            ):
+                hashes.pop("run.control.json")
+                hashes.pop("gen-000/runtime.control.json")
+            evidence_path.write_text(json.dumps(evidence, indent=2), encoding="utf-8")
+
+            guard = run_script(CONTROL_GUARD, "--run-dir", str(run_dir))
+            validate = run_script(VALIDATE, str(run_dir))
+
+            for result in (guard, validate):
+                self.assertNotEqual(result.returncode, 0, result.stdout + result.stderr)
+                output = result.stdout + result.stderr
+                self.assertIn("run.control.json", output)
+                self.assertIn("gen-000/runtime.control.json", output)
 
     def test_guard_rejects_counterexample_gate_missing_required_outcome_gate_point(self):
         with tempfile.TemporaryDirectory() as tmpdir:
@@ -869,7 +1156,21 @@ class ReviewedReplanningControlTest(unittest.TestCase):
             review["review_scope"] = "amendment"
             review["amendment_source"] = "progress.jsonl#A1"
             review["parent_generation"] = "gen-000"
+            counterexample = next(check for check in review["review_checks"] if check["check_id"] == "counterexample-gate")
+            counterexample["reviewer"]["evidence_ref"] = "amendments/A1.counterexample_review.json"
             review_path.write_text(json.dumps(review, indent=2), encoding="utf-8")
+            req = json.loads((run_dir / "requirements.control.json").read_text(encoding="utf-8"))
+            run = json.loads((run_dir / "run.control.json").read_text(encoding="utf-8"))
+            runtime = json.loads((run_dir / "gen-000/runtime.control.json").read_text(encoding="utf-8"))
+            write_generation_review_evidence(
+                run_dir,
+                req=req,
+                run=run,
+                runtime=runtime,
+                runtime_rel="gen-000/runtime.control.json",
+                review=review,
+                review_rel="amendments/A1.review.control.json",
+            )
 
             result = run_script(AMENDMENT_ORCHESTRATOR, "--run-dir", str(run_dir))
 
@@ -889,12 +1190,14 @@ class ReviewedReplanningControlTest(unittest.TestCase):
                 [{"step_id": "S2", "transition": "reviewed amendment strategy produces required evidence", "evidence": ["evidence.target-startup.v2"], "satisfies_outcomes": ["O-target-startup"]}],
                 generations["gen-001"]["required_steps"],
             )
-            self.assertTrue((run_dir / "gen-001/review.control.json").exists())
+            self.assertEqual("amendments/A1.review.control.json", generations["gen-001"]["review"])
+            self.assertFalse((run_dir / "gen-001/review.control.json").exists())
+            self.assertTrue((run_dir / "amendments/A1.review.control.json").exists())
             self.assertTrue((run_dir / "gen-001/runtime.control.json").exists())
             runtime = json.loads((run_dir / "gen-001/runtime.control.json").read_text(encoding="utf-8"))
             self.assertEqual("S2", runtime["required_steps"][0]["step_id"])
             self.assertEqual(["evidence.target-startup"], runtime["invalidated_evidence"])
-            copied_review = json.loads((run_dir / "gen-001/review.control.json").read_text(encoding="utf-8"))
+            copied_review = json.loads((run_dir / "amendments/A1.review.control.json").read_text(encoding="utf-8"))
             source_check = next(
                 check
                 for check in copied_review["review_checks"]
@@ -908,6 +1211,73 @@ class ReviewedReplanningControlTest(unittest.TestCase):
                 if line.strip()
             ]
             self.assertTrue(any(item.get("event_type") == "control.amendment.approved" for item in progress))
+
+    def test_amendment_orchestrator_rejects_amendment_review_missing_parent_hashes(self):
+        event = progress_event(
+            "evidence.target-startup",
+            event_type="control.amendment.proposed",
+            amendment_id="A1",
+        )
+        with tempfile.TemporaryDirectory() as tmpdir:
+            run_dir = Path(tmpdir)
+            write_strategy_run(run_dir, progress_events=[event], strategy_policy="reviewed_replanning")
+            patch_path = run_dir / "amendments/A1.patch.json"
+            review_path = run_dir / "amendments/A1.review.control.json"
+            patch_path.parent.mkdir(parents=True, exist_ok=True)
+            patch_path.write_text(json.dumps(amendment_patch(), indent=2), encoding="utf-8")
+            review = approved_generation_review()
+            review["review_scope"] = "amendment"
+            review["amendment_source"] = "progress.jsonl#A1"
+            review["parent_generation"] = "gen-000"
+            counterexample = next(check for check in review["review_checks"] if check["check_id"] == "counterexample-gate")
+            counterexample["reviewer"]["evidence_ref"] = "amendments/A1.counterexample_review.json"
+            review_path.write_text(json.dumps(review, indent=2), encoding="utf-8")
+            req = json.loads((run_dir / "requirements.control.json").read_text(encoding="utf-8"))
+            run = json.loads((run_dir / "run.control.json").read_text(encoding="utf-8"))
+            runtime = json.loads((run_dir / "gen-000/runtime.control.json").read_text(encoding="utf-8"))
+            write_generation_review_evidence(
+                run_dir,
+                req=req,
+                run=run,
+                runtime=runtime,
+                runtime_rel="gen-000/runtime.control.json",
+                review=review,
+                review_rel="amendments/A1.review.control.json",
+            )
+            evidence_path = run_dir / "amendments/A1.counterexample_review.json"
+            evidence = json.loads(evidence_path.read_text(encoding="utf-8"))
+            for hashes in (
+                evidence["reviewed_artifact_hashes"],
+                evidence["review_request"]["reviewed_artifact_hashes"],
+            ):
+                hashes.pop("run.control.json")
+                hashes.pop("gen-000/runtime.control.json")
+            evidence_path.write_text(json.dumps(evidence, indent=2), encoding="utf-8")
+
+            result = run_script(AMENDMENT_ORCHESTRATOR, "--run-dir", str(run_dir))
+
+            self.assertNotEqual(result.returncode, 0, result.stdout + result.stderr)
+            self.assertIn("run.control.json", result.stdout + result.stderr)
+            self.assertIn("gen-000/runtime.control.json", result.stdout + result.stderr)
+
+    def test_guard_and_runtime_validator_reject_remote_pre_runtime_counterexample_prompt_or_transcript(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            run_dir = Path(tmpdir)
+            write_strategy_run(run_dir)
+            evidence_path = run_dir / "evidence/pre_runtime_counterexample_review.json"
+            evidence = json.loads(evidence_path.read_text(encoding="utf-8"))
+            evidence["reviewer_session"]["transcript_ref"] = "https://example.invalid/pre-runtime-transcript"
+            evidence["reviewer_session"]["transcript_hash"] = text_hash("remote transcript")
+            evidence["review_request"]["prompt_ref"] = "https://example.invalid/pre-runtime-prompt"
+            evidence["review_request"]["prompt_hash"] = text_hash("remote prompt")
+            evidence_path.write_text(json.dumps(evidence, indent=2), encoding="utf-8")
+
+            guard = run_script(CONTROL_GUARD, "--run-dir", str(run_dir))
+            validate = run_script(VALIDATE, str(run_dir))
+
+            for result in (guard, validate):
+                self.assertNotEqual(result.returncode, 0, result.stdout + result.stderr)
+                self.assertIn("ref must be a run-local relative file", result.stdout + result.stderr)
 
     def test_amendment_orchestrator_rejects_frozen_strategy_continuation(self):
         event = {
@@ -1044,9 +1414,16 @@ class ReviewedReplanningControlTest(unittest.TestCase):
             review = json.loads((run_dir / "gen-000/review.control.json").read_text(encoding="utf-8"))
             refresh_semantic_base(req)
             apply_hashes(req, run, runtime, "gen-000/runtime.control.json", review, "gen-000/review.control.json")
-            (run_dir / "requirements.control.json").write_text(json.dumps(req, indent=2), encoding="utf-8")
-            (run_dir / "run.control.json").write_text(json.dumps(run, indent=2), encoding="utf-8")
-            (run_dir / "gen-000/runtime.control.json").write_text(json.dumps(runtime, indent=2), encoding="utf-8")
+            write_updated_strategy_artifacts(run_dir, req=req, run=run, runtime=runtime, review=review)
+            write_generation_review_evidence(
+                run_dir,
+                req=req,
+                run=run,
+                runtime=runtime,
+                runtime_rel="gen-000/runtime.control.json",
+                review=review,
+                review_rel="gen-000/review.control.json",
+            )
 
             guard = run_script(CONTROL_GUARD, "--run-dir", str(run_dir))
             validate = run_script(VALIDATE, str(run_dir))
@@ -1070,9 +1447,16 @@ class ReviewedReplanningControlTest(unittest.TestCase):
             review = json.loads((run_dir / "gen-000/review.control.json").read_text(encoding="utf-8"))
             refresh_semantic_base(req)
             apply_hashes(req, run, runtime, "gen-000/runtime.control.json", review, "gen-000/review.control.json")
-            (run_dir / "requirements.control.json").write_text(json.dumps(req, indent=2), encoding="utf-8")
-            (run_dir / "run.control.json").write_text(json.dumps(run, indent=2), encoding="utf-8")
-            (run_dir / "gen-000/runtime.control.json").write_text(json.dumps(runtime, indent=2), encoding="utf-8")
+            write_updated_strategy_artifacts(run_dir, req=req, run=run, runtime=runtime, review=review)
+            write_generation_review_evidence(
+                run_dir,
+                req=req,
+                run=run,
+                runtime=runtime,
+                runtime_rel="gen-000/runtime.control.json",
+                review=review,
+                review_rel="gen-000/review.control.json",
+            )
 
             guard = run_script(CONTROL_GUARD, "--run-dir", str(run_dir))
             validate = run_script(VALIDATE, str(run_dir))
@@ -1285,9 +1669,16 @@ class ReviewedReplanningControlTest(unittest.TestCase):
             review = json.loads((run_dir / "gen-000/review.control.json").read_text(encoding="utf-8"))
             refresh_semantic_base(req)
             apply_hashes(req, run, runtime, "gen-000/runtime.control.json", review, "gen-000/review.control.json")
-            (run_dir / "requirements.control.json").write_text(json.dumps(req, indent=2), encoding="utf-8")
-            (run_dir / "run.control.json").write_text(json.dumps(run, indent=2), encoding="utf-8")
-            (run_dir / "gen-000/runtime.control.json").write_text(json.dumps(runtime, indent=2), encoding="utf-8")
+            write_updated_strategy_artifacts(run_dir, req=req, run=run, runtime=runtime, review=review)
+            write_generation_review_evidence(
+                run_dir,
+                req=req,
+                run=run,
+                runtime=runtime,
+                runtime_rel="gen-000/runtime.control.json",
+                review=review,
+                review_rel="gen-000/review.control.json",
+            )
 
             result = run_script(CONTROL_GUARD, "--run-dir", str(run_dir))
 
@@ -1324,9 +1715,7 @@ class ReviewedReplanningControlTest(unittest.TestCase):
             review = json.loads((run_dir / "gen-000/review.control.json").read_text(encoding="utf-8"))
             refresh_semantic_base(req)
             apply_hashes(req, run, runtime, "gen-000/runtime.control.json", review, "gen-000/review.control.json")
-            (run_dir / "requirements.control.json").write_text(json.dumps(req, indent=2), encoding="utf-8")
-            (run_dir / "run.control.json").write_text(json.dumps(run, indent=2), encoding="utf-8")
-            (run_dir / "gen-000/runtime.control.json").write_text(json.dumps(runtime, indent=2), encoding="utf-8")
+            write_updated_strategy_artifacts(run_dir, req=req, run=run, runtime=runtime, review=review)
 
             result = run_script(CONTROL_GUARD, "--run-dir", str(run_dir))
 
@@ -1357,9 +1746,7 @@ class ReviewedReplanningControlTest(unittest.TestCase):
             review = json.loads((run_dir / "gen-000/review.control.json").read_text(encoding="utf-8"))
             refresh_semantic_base(req)
             apply_hashes(req, run, runtime, "gen-000/runtime.control.json", review, "gen-000/review.control.json")
-            (run_dir / "requirements.control.json").write_text(json.dumps(req, indent=2), encoding="utf-8")
-            (run_dir / "run.control.json").write_text(json.dumps(run, indent=2), encoding="utf-8")
-            (run_dir / "gen-000/runtime.control.json").write_text(json.dumps(runtime, indent=2), encoding="utf-8")
+            write_updated_strategy_artifacts(run_dir, req=req, run=run, runtime=runtime, review=review)
 
             result = run_script(CONTROL_GUARD, "--run-dir", str(run_dir))
 
@@ -1391,9 +1778,7 @@ class ReviewedReplanningControlTest(unittest.TestCase):
             review = json.loads((run_dir / "gen-000/review.control.json").read_text(encoding="utf-8"))
             refresh_semantic_base(req)
             apply_hashes(req, run, runtime, "gen-000/runtime.control.json", review, "gen-000/review.control.json")
-            (run_dir / "requirements.control.json").write_text(json.dumps(req, indent=2), encoding="utf-8")
-            (run_dir / "run.control.json").write_text(json.dumps(run, indent=2), encoding="utf-8")
-            (run_dir / "gen-000/runtime.control.json").write_text(json.dumps(runtime, indent=2), encoding="utf-8")
+            write_updated_strategy_artifacts(run_dir, req=req, run=run, runtime=runtime, review=review)
 
             result = run_script(CONTROL_GUARD, "--run-dir", str(run_dir))
 
@@ -1424,9 +1809,7 @@ class ReviewedReplanningControlTest(unittest.TestCase):
             review = json.loads((run_dir / "gen-000/review.control.json").read_text(encoding="utf-8"))
             refresh_semantic_base(req)
             apply_hashes(req, run, runtime, "gen-000/runtime.control.json", review, "gen-000/review.control.json")
-            (run_dir / "requirements.control.json").write_text(json.dumps(req, indent=2), encoding="utf-8")
-            (run_dir / "run.control.json").write_text(json.dumps(run, indent=2), encoding="utf-8")
-            (run_dir / "gen-000/runtime.control.json").write_text(json.dumps(runtime, indent=2), encoding="utf-8")
+            write_updated_strategy_artifacts(run_dir, req=req, run=run, runtime=runtime, review=review)
 
             result = run_script(CONTROL_GUARD, "--run-dir", str(run_dir))
 
@@ -1457,9 +1840,7 @@ class ReviewedReplanningControlTest(unittest.TestCase):
             review = json.loads((run_dir / "gen-000/review.control.json").read_text(encoding="utf-8"))
             refresh_semantic_base(req)
             apply_hashes(req, run, runtime, "gen-000/runtime.control.json", review, "gen-000/review.control.json")
-            (run_dir / "requirements.control.json").write_text(json.dumps(req, indent=2), encoding="utf-8")
-            (run_dir / "run.control.json").write_text(json.dumps(run, indent=2), encoding="utf-8")
-            (run_dir / "gen-000/runtime.control.json").write_text(json.dumps(runtime, indent=2), encoding="utf-8")
+            write_updated_strategy_artifacts(run_dir, req=req, run=run, runtime=runtime, review=review)
 
             result = run_script(CONTROL_GUARD, "--run-dir", str(run_dir))
 
@@ -1489,9 +1870,7 @@ class ReviewedReplanningControlTest(unittest.TestCase):
             review = json.loads((run_dir / "gen-000/review.control.json").read_text(encoding="utf-8"))
             refresh_semantic_base(req)
             apply_hashes(req, run, runtime, "gen-000/runtime.control.json", review, "gen-000/review.control.json")
-            (run_dir / "requirements.control.json").write_text(json.dumps(req, indent=2), encoding="utf-8")
-            (run_dir / "run.control.json").write_text(json.dumps(run, indent=2), encoding="utf-8")
-            (run_dir / "gen-000/runtime.control.json").write_text(json.dumps(runtime, indent=2), encoding="utf-8")
+            write_updated_strategy_artifacts(run_dir, req=req, run=run, runtime=runtime, review=review)
 
             result = run_script(CONTROL_GUARD, "--run-dir", str(run_dir))
 
@@ -1524,9 +1903,7 @@ class ReviewedReplanningControlTest(unittest.TestCase):
             review = json.loads((run_dir / "gen-000/review.control.json").read_text(encoding="utf-8"))
             refresh_semantic_base(req)
             apply_hashes(req, run, runtime, "gen-000/runtime.control.json", review, "gen-000/review.control.json")
-            (run_dir / "requirements.control.json").write_text(json.dumps(req, indent=2), encoding="utf-8")
-            (run_dir / "run.control.json").write_text(json.dumps(run, indent=2), encoding="utf-8")
-            (run_dir / "gen-000/runtime.control.json").write_text(json.dumps(runtime, indent=2), encoding="utf-8")
+            write_updated_strategy_artifacts(run_dir, req=req, run=run, runtime=runtime, review=review)
 
             result = run_script(CONTROL_GUARD, "--run-dir", str(run_dir))
 
@@ -1642,6 +2019,7 @@ class ReviewedReplanningControlTest(unittest.TestCase):
             )
             run["semantic_base_ref"] = copy.deepcopy(req["approved_control"]["semantic_base"])
             (run_dir / "requirements.control.json").write_text(json.dumps(req, indent=2), encoding="utf-8")
+            write_information_sufficiency_review_evidence(run_dir, req)
             (run_dir / "run.control.json").write_text(json.dumps(run, indent=2), encoding="utf-8")
 
             result = run_script(COMPILER, "--run-dir", str(run_dir))

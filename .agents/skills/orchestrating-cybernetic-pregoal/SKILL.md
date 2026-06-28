@@ -66,8 +66,8 @@ each blocking outcome's per-outcome gate. Self-written evidence is not enough.
 Regression rule: a required `/api/v2` implementation must not be accepted as
 legacy Drogon compatibility readiness; that is `NeedsRevision`.
 
-Before design or planning, run `scripts/orchestration_guard.py` for the matching
-state. If `information_sufficiency_check` fails, route to
+Before every pre-goal transition, run `scripts/orchestration_guard.py` for the
+matching state. If `information_sufficiency_check` fails, route to
 `RunInformationSufficiencyCheck` by running
 `.agents/skills/analyzing-cybernetic-requirements/scripts/requirements_information_loop.py
 --run-dir <run-dir> --json`; follow its `next_action` and rerun the gate. Do

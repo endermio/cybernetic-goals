@@ -85,7 +85,7 @@
         "reviewer": {
           "kind": "subagent",
           "id": "example-information-sufficiency-reviewer",
-          "evidence_ref": "requirements.control.json#approved_control/information_sufficiency_check"
+          "evidence_ref": "evidence/information_sufficiency_counterexample.json"
         },
         "checked_facts": [
           "F-json-control-scope"

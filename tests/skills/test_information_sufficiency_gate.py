@@ -28,6 +28,29 @@ def control_hash(filename: str, artifact: dict) -> str:
     return canonical_json_hash(artifact, omit)
 
 
+def text_hash(text: str) -> str:
+    return "sha256:" + hashlib.sha256(text.encode("utf-8")).hexdigest()
+
+
+def file_hash(path: Path) -> str:
+    return "sha256:" + hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+def write_text_artifact(run_dir: Path, ref: str, text: str) -> str:
+    path = run_dir / ref
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(text, encoding="utf-8")
+    return file_hash(path)
+
+
+def bound_refs_for_evidence(evidence_ref: str) -> tuple[str, str]:
+    evidence_path = Path(evidence_ref.split("#", 1)[0])
+    return (
+        str(evidence_path.with_suffix(".prompt.txt")),
+        str(evidence_path.with_suffix(".transcript.txt")),
+    )
+
+
 def run_script(*args: str) -> subprocess.CompletedProcess:
     return subprocess.run(
         ["python3", *map(str, args)],
@@ -337,11 +360,49 @@ def write_run(run_dir: Path, requirements: dict) -> None:
         json.dumps({"status": "pass", "observed": ["startup", "input_output_boundary"]}),
         encoding="utf-8",
     )
-    (run_dir / "evidence/information_sufficiency_counterexample.json").write_text(
-        json.dumps({"status": "pass", "verdict": "approved"}),
-        encoding="utf-8",
-    )
     (run_dir / "requirements.control.json").write_text(json.dumps(requirements, indent=2), encoding="utf-8")
+    info_check = requirements["approved_control"].get("information_sufficiency_check")
+    review = info_check.get("counterexample_review") if isinstance(info_check, dict) else None
+    reviewer = review.get("reviewer") if isinstance(review, dict) else None
+    if isinstance(review, dict) and isinstance(reviewer, dict):
+        reviewed_hashes = {
+            "requirements.control.json": control_hash("requirements.control.json", requirements)
+        }
+        prompt_ref, transcript_ref = bound_refs_for_evidence(reviewer["evidence_ref"])
+        prompt_hash = write_text_artifact(run_dir, prompt_ref, "information sufficiency counterexample review")
+        transcript_hash = write_text_artifact(
+            run_dir,
+            transcript_ref,
+            "independent information sufficiency reviewer transcript",
+        )
+        (run_dir / "evidence/information_sufficiency_counterexample.json").write_text(
+            json.dumps(
+                {
+                    "artifact_type": "information_sufficiency.counterexample_review.evidence",
+                    "independent_review": True,
+                    "status": review.get("status"),
+                    "verdict": review.get("verdict"),
+                    "reviewer": {"kind": reviewer.get("kind"), "id": reviewer.get("id")},
+                    "reviewer_session": {
+                        "kind": reviewer.get("kind"),
+                        "id": reviewer.get("id"),
+                        "transcript_ref": transcript_ref,
+                        "transcript_hash": transcript_hash,
+                    },
+                    "review_request": {
+                        "prompt_ref": prompt_ref,
+                        "prompt_hash": prompt_hash,
+                        "reviewed_artifact_hashes": reviewed_hashes,
+                    },
+                    "checked_facts": review.get("checked_facts"),
+                    "checked_transformations": review.get("checked_transformations"),
+                    "findings": review.get("findings", []),
+                    "reviewed_artifact_hashes": reviewed_hashes,
+                },
+                indent=2,
+            ),
+            encoding="utf-8",
+        )
     (run_dir / "run.control.json").write_text(json.dumps(run, indent=2), encoding="utf-8")
     (run_dir / "gen-000/review.control.json").write_text(json.dumps(review, indent=2), encoding="utf-8")
     (run_dir / "gen-000/runtime.control.json").write_text(json.dumps(runtime, indent=2), encoding="utf-8")
@@ -552,25 +613,102 @@ class InformationSufficiencyGateTest(unittest.TestCase):
             self.assertIn("counterexample_review reviewer", result.stdout + result.stderr)
             self.assertIn("counterexample_review reviewer", validate.stdout + validate.stderr)
 
-    def test_orchestration_before_design_routes_to_information_sufficiency_before_design(self):
+    def test_guard_and_runtime_validator_reject_placeholder_information_counterexample_evidence(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            run_dir = Path(tmpdir)
+            req = requirements_with_information_sufficiency()
+            write_run(run_dir, req)
+            (run_dir / "evidence/information_sufficiency_counterexample.json").write_text(
+                json.dumps({"status": "pass", "verdict": "approved"}),
+                encoding="utf-8",
+            )
+
+            result = run_script(CONTROL_GUARD, "--run-dir", str(run_dir))
+            validate = run_script(VALIDATE, str(run_dir))
+
+            self.assertNotEqual(result.returncode, 0, result.stdout + result.stderr)
+            self.assertNotEqual(validate.returncode, 0, validate.stdout + validate.stderr)
+            self.assertIn("counterexample_review evidence", result.stdout + result.stderr)
+            self.assertIn("counterexample_review evidence", validate.stdout + validate.stderr)
+
+    def test_guard_and_runtime_validator_reject_shape_complete_counterexample_without_provenance(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            run_dir = Path(tmpdir)
+            req = requirements_with_information_sufficiency()
+            write_run(run_dir, req)
+            review = req["approved_control"]["information_sufficiency_check"]["counterexample_review"]
+            reviewer = review["reviewer"]
+            (run_dir / "evidence/information_sufficiency_counterexample.json").write_text(
+                json.dumps(
+                    {
+                        "artifact_type": "information_sufficiency.counterexample_review.evidence",
+                        "independent_review": True,
+                        "status": review["status"],
+                        "verdict": review["verdict"],
+                        "reviewer": {"kind": reviewer["kind"], "id": reviewer["id"]},
+                        "checked_facts": review["checked_facts"],
+                        "checked_transformations": review["checked_transformations"],
+                        "findings": [],
+                        "reviewed_artifact_hashes": {
+                            "requirements.control.json": control_hash("requirements.control.json", req)
+                        },
+                    },
+                    indent=2,
+                ),
+                encoding="utf-8",
+            )
+
+            result = run_script(CONTROL_GUARD, "--run-dir", str(run_dir))
+            validate = run_script(VALIDATE, str(run_dir))
+
+            self.assertNotEqual(result.returncode, 0, result.stdout + result.stderr)
+            self.assertNotEqual(validate.returncode, 0, validate.stdout + validate.stderr)
+            self.assertIn("reviewer_session", result.stdout + result.stderr)
+            self.assertIn("reviewer_session", validate.stdout + validate.stderr)
+
+    def test_guard_and_runtime_validator_reject_remote_information_counterexample_prompt_or_transcript(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            run_dir = Path(tmpdir)
+            req = requirements_with_information_sufficiency()
+            write_run(run_dir, req)
+            evidence_path = run_dir / "evidence/information_sufficiency_counterexample.json"
+            evidence = json.loads(evidence_path.read_text(encoding="utf-8"))
+            evidence["reviewer_session"]["transcript_ref"] = "https://example.invalid/reviewer-transcript"
+            evidence["reviewer_session"]["transcript_hash"] = text_hash("remote transcript")
+            evidence["review_request"]["prompt_ref"] = "https://example.invalid/review-prompt"
+            evidence["review_request"]["prompt_hash"] = text_hash("remote prompt")
+            evidence_path.write_text(json.dumps(evidence, indent=2), encoding="utf-8")
+
+            result = run_script(CONTROL_GUARD, "--run-dir", str(run_dir))
+            validate = run_script(VALIDATE, str(run_dir))
+
+            self.assertNotEqual(result.returncode, 0, result.stdout + result.stderr)
+            self.assertNotEqual(validate.returncode, 0, validate.stdout + validate.stderr)
+            for command_result in (result, validate):
+                output = command_result.stdout + command_result.stderr
+                self.assertIn("ref must be a run-local relative file", output)
+
+    def test_orchestration_routes_all_pregoal_states_to_information_sufficiency_first(self):
         with tempfile.TemporaryDirectory() as tmpdir:
             run_dir = Path(tmpdir)
             req = requirements_with_information_sufficiency(status="missing")
             (run_dir / "requirements.control.json").write_text(json.dumps(req, indent=2), encoding="utf-8")
 
-            result = run_script(
-                ORCHESTRATION_GUARD,
-                "--state",
-                "before-design",
-                "--run-dir",
-                str(run_dir),
-                "--json",
-            )
+            for state in ("before-design", "before-goal", "before-policy", "before-review", "before-runtime-compile"):
+                with self.subTest(state=state):
+                    result = run_script(
+                        ORCHESTRATION_GUARD,
+                        "--state",
+                        state,
+                        "--run-dir",
+                        str(run_dir),
+                        "--json",
+                    )
 
-            self.assertNotEqual(result.returncode, 0, result.stdout + result.stderr)
-            payload = json.loads(result.stdout)
-            self.assertEqual("RunInformationSufficiencyCheck", payload["next_allowed_action"])
-            self.assertIn("information_sufficiency_check", "\n".join(payload["errors"]))
+                    self.assertNotEqual(result.returncode, 0, result.stdout + result.stderr)
+                    payload = json.loads(result.stdout)
+                    self.assertEqual("RunInformationSufficiencyCheck", payload["next_allowed_action"])
+                    self.assertIn("information_sufficiency_check", "\n".join(payload["errors"]))
 
     def test_orchestration_rejects_satisfied_check_with_unfinished_nonblocking_fact(self):
         with tempfile.TemporaryDirectory() as tmpdir:

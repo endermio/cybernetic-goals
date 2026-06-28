@@ -17,6 +17,8 @@ The design expresses the required answer path and the controllable support struc
 
 Official persistent control facts are JSON only. Historical Markdown may be read as non-authoritative background, but do not create or compile Markdown as official guard, compiler, runtime, or long-term dual-path control input.
 
+For `controlled_run` requirements with schema `1.1.0+`, verify `approved_control.information_sufficiency_check` before any design artifact is created: status is `satisfied` or explicitly reviewed `not_required`; blocking facts have run-local `evidence_ref` values; `counterexample_review` is independent, approved, and covers the facts and transformations into design/plan. If this gate is absent, pending, missing evidence, or not independently reviewed, stop and route to `RunInformationSufficiencyCheck` / `$analyzing-cybernetic-requirements` before creating `design.control.json`.
+
 Output:
 
 ```text
@@ -70,7 +72,7 @@ For `controlled_run` JSON pre-goal work, do not proceed unless the requirements 
 
 If the current user message approves the compact control commitment, update the requirements analysis `What the User Approved` section first, quoting or referencing that approval, then continue. Do not rely on in-memory approval to pass orchestration or runtime guards.
 
-For `controlled_run` requirements with schema `1.1.0+`, design may start only after `approved_control.information_sufficiency_check` is complete: status is `satisfied` or explicitly reviewed `not_required`; blocking facts have run-local `evidence_ref` values; `counterexample_review` is independent, approved, and covers the facts and transformations into design/plan. If this gate is absent, pending, missing evidence, or not independently reviewed, stop and route to `RunInformationSufficiencyCheck` / `$analyzing-cybernetic-requirements` before creating `design.control.json`.
+For `controlled_run` requirements with schema `1.1.0+`, design may start only after the information sufficiency gate described above is complete.
 
 ## Optional Infrastructure
 

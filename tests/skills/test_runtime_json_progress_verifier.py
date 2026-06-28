@@ -13,7 +13,10 @@ from tests.skills.test_reviewed_replanning_control import (
     final_report,
     progress_event,
     refresh_semantic_base,
+    write_generation_review_evidence,
+    write_information_sufficiency_review_evidence,
     write_strategy_run,
+    write_updated_strategy_artifacts,
 )
 
 
@@ -91,9 +94,7 @@ class RuntimeJsonProgressVerifierTest(unittest.TestCase):
             review = json.loads((run_dir / "gen-000/review.control.json").read_text(encoding="utf-8"))
             refresh_semantic_base(req)
             apply_hashes(req, run, runtime, "gen-000/runtime.control.json", review, "gen-000/review.control.json")
-            (run_dir / "requirements.control.json").write_text(json.dumps(req, indent=2), encoding="utf-8")
-            (run_dir / "run.control.json").write_text(json.dumps(run, indent=2), encoding="utf-8")
-            (run_dir / "gen-000/runtime.control.json").write_text(json.dumps(runtime, indent=2), encoding="utf-8")
+            write_updated_strategy_artifacts(run_dir, req=req, run=run, runtime=runtime, review=review)
 
             result = run_script(VALIDATE, str(run_dir))
 
@@ -124,9 +125,7 @@ class RuntimeJsonProgressVerifierTest(unittest.TestCase):
             review = json.loads((run_dir / "gen-000/review.control.json").read_text(encoding="utf-8"))
             refresh_semantic_base(req)
             apply_hashes(req, run, runtime, "gen-000/runtime.control.json", review, "gen-000/review.control.json")
-            (run_dir / "requirements.control.json").write_text(json.dumps(req, indent=2), encoding="utf-8")
-            (run_dir / "run.control.json").write_text(json.dumps(run, indent=2), encoding="utf-8")
-            (run_dir / "gen-000/runtime.control.json").write_text(json.dumps(runtime, indent=2), encoding="utf-8")
+            write_updated_strategy_artifacts(run_dir, req=req, run=run, runtime=runtime, review=review)
 
             result = run_script(VALIDATE, str(run_dir))
 
@@ -157,9 +156,7 @@ class RuntimeJsonProgressVerifierTest(unittest.TestCase):
             review = json.loads((run_dir / "gen-000/review.control.json").read_text(encoding="utf-8"))
             refresh_semantic_base(req)
             apply_hashes(req, run, runtime, "gen-000/runtime.control.json", review, "gen-000/review.control.json")
-            (run_dir / "requirements.control.json").write_text(json.dumps(req, indent=2), encoding="utf-8")
-            (run_dir / "run.control.json").write_text(json.dumps(run, indent=2), encoding="utf-8")
-            (run_dir / "gen-000/runtime.control.json").write_text(json.dumps(runtime, indent=2), encoding="utf-8")
+            write_updated_strategy_artifacts(run_dir, req=req, run=run, runtime=runtime, review=review)
 
             result = run_script(VALIDATE, str(run_dir))
 
@@ -189,9 +186,7 @@ class RuntimeJsonProgressVerifierTest(unittest.TestCase):
             review = json.loads((run_dir / "gen-000/review.control.json").read_text(encoding="utf-8"))
             refresh_semantic_base(req)
             apply_hashes(req, run, runtime, "gen-000/runtime.control.json", review, "gen-000/review.control.json")
-            (run_dir / "requirements.control.json").write_text(json.dumps(req, indent=2), encoding="utf-8")
-            (run_dir / "run.control.json").write_text(json.dumps(run, indent=2), encoding="utf-8")
-            (run_dir / "gen-000/runtime.control.json").write_text(json.dumps(runtime, indent=2), encoding="utf-8")
+            write_updated_strategy_artifacts(run_dir, req=req, run=run, runtime=runtime, review=review)
 
             result = run_script(VALIDATE, str(run_dir))
 
@@ -224,9 +219,7 @@ class RuntimeJsonProgressVerifierTest(unittest.TestCase):
             review = json.loads((run_dir / "gen-000/review.control.json").read_text(encoding="utf-8"))
             refresh_semantic_base(req)
             apply_hashes(req, run, runtime, "gen-000/runtime.control.json", review, "gen-000/review.control.json")
-            (run_dir / "requirements.control.json").write_text(json.dumps(req, indent=2), encoding="utf-8")
-            (run_dir / "run.control.json").write_text(json.dumps(run, indent=2), encoding="utf-8")
-            (run_dir / "gen-000/runtime.control.json").write_text(json.dumps(runtime, indent=2), encoding="utf-8")
+            write_updated_strategy_artifacts(run_dir, req=req, run=run, runtime=runtime, review=review)
 
             result = run_script(VALIDATE, str(run_dir))
 
@@ -256,9 +249,7 @@ class RuntimeJsonProgressVerifierTest(unittest.TestCase):
             review = json.loads((run_dir / "gen-000/review.control.json").read_text(encoding="utf-8"))
             refresh_semantic_base(req)
             apply_hashes(req, run, runtime, "gen-000/runtime.control.json", review, "gen-000/review.control.json")
-            (run_dir / "requirements.control.json").write_text(json.dumps(req, indent=2), encoding="utf-8")
-            (run_dir / "run.control.json").write_text(json.dumps(run, indent=2), encoding="utf-8")
-            (run_dir / "gen-000/runtime.control.json").write_text(json.dumps(runtime, indent=2), encoding="utf-8")
+            write_updated_strategy_artifacts(run_dir, req=req, run=run, runtime=runtime, review=review)
 
             result = run_script(VALIDATE, str(run_dir))
 
@@ -532,6 +523,133 @@ class RuntimeJsonProgressVerifierTest(unittest.TestCase):
                 "missing runtime counterexample review for required steps: S1",
                 result.stdout + result.stderr,
             )
+
+    def test_verify_runtime_progress_rejects_placeholder_counterexample_review_evidence(self):
+        review_event = counterexample_review_event(evidence_id="evidence/runtime_counterexample_review.json")
+        with tempfile.TemporaryDirectory() as tmpdir:
+            run_dir = Path(tmpdir)
+            write_strategy_run(
+                run_dir,
+                progress_events=[
+                    progress_event("evidence.target-startup"),
+                    review_event,
+                ],
+                report=final_report("gen-000", "evidence.target-startup"),
+            )
+            (run_dir / "evidence").mkdir(exist_ok=True)
+            (run_dir / "evidence/runtime_counterexample_review.json").write_text(
+                json.dumps({"status": "pass", "verdict": "approved"}),
+                encoding="utf-8",
+            )
+
+            result = run_script(VERIFY, str(run_dir))
+
+            self.assertNotEqual(result.returncode, 0, result.stdout + result.stderr)
+            self.assertIn("runtime counterexample review evidence", result.stdout + result.stderr)
+
+    def test_verify_runtime_progress_rejects_counterexample_review_evidence_with_stale_hashes(self):
+        review_event = counterexample_review_event(evidence_id="evidence/runtime_counterexample_review.json")
+        with tempfile.TemporaryDirectory() as tmpdir:
+            run_dir = Path(tmpdir)
+            write_strategy_run(
+                run_dir,
+                progress_events=[
+                    progress_event("evidence.target-startup"),
+                    review_event,
+                ],
+                report=final_report("gen-000", "evidence.target-startup"),
+            )
+            reviewer = review_event["reviewer"]
+            (run_dir / "evidence/runtime_counterexample_review.json").write_text(
+                json.dumps(
+                    {
+                        "artifact_type": "runtime.counterexample_review.evidence",
+                        "independent_review": True,
+                        "status": review_event["status"],
+                        "verdict": review_event["verdict"],
+                        "reviewer": {"kind": reviewer["kind"], "id": reviewer["id"]},
+                        "reviewed_steps": review_event["reviewed_steps"],
+                        "reviewed_outcomes": review_event["reviewed_outcomes"],
+                        "checked_transformations": review_event["checked_transformations"],
+                        "evidence": review_event["evidence"],
+                        "reviewed_artifact_hashes": {
+                            "requirements.control.json": "sha256:stale",
+                            "gen-000/runtime.control.json": "sha256:stale",
+                        },
+                    }
+                ),
+                encoding="utf-8",
+            )
+
+            result = run_script(VERIFY, str(run_dir))
+
+            self.assertNotEqual(result.returncode, 0, result.stdout + result.stderr)
+            self.assertIn("runtime counterexample review evidence", result.stdout + result.stderr)
+            self.assertIn("hash", result.stdout + result.stderr)
+
+    def test_verify_runtime_progress_rejects_shape_complete_counterexample_review_without_session(self):
+        review_event = counterexample_review_event(evidence_id="evidence/runtime_counterexample_review.json")
+        with tempfile.TemporaryDirectory() as tmpdir:
+            run_dir = Path(tmpdir)
+            write_strategy_run(
+                run_dir,
+                progress_events=[
+                    progress_event("evidence.target-startup"),
+                    review_event,
+                ],
+                report=final_report("gen-000", "evidence.target-startup"),
+            )
+            reviewer = review_event["reviewer"]
+            generated = json.loads((run_dir / "evidence/runtime_counterexample_review.json").read_text(encoding="utf-8"))
+            generated.pop("reviewer_session")
+            generated.pop("review_request")
+            generated.update(
+                {
+                    "status": review_event["status"],
+                    "verdict": review_event["verdict"],
+                    "reviewer": {"kind": reviewer["kind"], "id": reviewer["id"]},
+                    "reviewed_steps": review_event["reviewed_steps"],
+                    "reviewed_outcomes": review_event["reviewed_outcomes"],
+                    "checked_transformations": review_event["checked_transformations"],
+                    "evidence": review_event["evidence"],
+                }
+            )
+            (run_dir / "evidence/runtime_counterexample_review.json").write_text(
+                json.dumps(generated),
+                encoding="utf-8",
+            )
+
+            result = run_script(VERIFY, str(run_dir))
+
+            self.assertNotEqual(result.returncode, 0, result.stdout + result.stderr)
+            self.assertIn("reviewer_session", result.stdout + result.stderr)
+
+    def test_verify_runtime_progress_rejects_remote_counterexample_prompt_or_transcript(self):
+        review_event = counterexample_review_event(evidence_id="evidence/runtime_counterexample_review.json")
+        with tempfile.TemporaryDirectory() as tmpdir:
+            run_dir = Path(tmpdir)
+            write_strategy_run(
+                run_dir,
+                progress_events=[
+                    progress_event("evidence.target-startup"),
+                    review_event,
+                ],
+                report=final_report("gen-000", "evidence.target-startup"),
+            )
+            generated = json.loads((run_dir / "evidence/runtime_counterexample_review.json").read_text(encoding="utf-8"))
+            generated["reviewer_session"]["transcript_ref"] = "https://example.invalid/runtime-transcript"
+            generated["reviewer_session"]["transcript_hash"] = "sha256:" + hashlib.sha256(b"remote transcript").hexdigest()
+            generated["review_request"]["prompt_ref"] = "https://example.invalid/runtime-prompt"
+            generated["review_request"]["prompt_hash"] = "sha256:" + hashlib.sha256(b"remote prompt").hexdigest()
+            (run_dir / "evidence/runtime_counterexample_review.json").write_text(
+                json.dumps(generated),
+                encoding="utf-8",
+            )
+
+            result = run_script(VERIFY, str(run_dir))
+
+            self.assertNotEqual(result.returncode, 0, result.stdout + result.stderr)
+            self.assertIn("ref must be a run-local relative file", result.stdout + result.stderr)
 
     def test_build_runtime_prompt_outputs_short_goal_pointer(self):
         with tempfile.TemporaryDirectory() as tmpdir:

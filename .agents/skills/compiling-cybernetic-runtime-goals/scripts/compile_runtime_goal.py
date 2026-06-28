@@ -77,7 +77,34 @@ def require_review_before_runtime_write(
         raise ControlJsonValidationError(f"{review_rel}: expected artifact_type review.control")
     if review.get("status") != "approved":
         raise ControlJsonValidationError(f"{review_rel}: generation review must be approved")
-    require_generation_review_checks(review, context=f"{strategy_kind} generation", requirements=requirements)
+    run_control = read_json_object(run_dir / "run.control.json")
+    runtime_rel = generation.get("runtime")
+    runtime = read_json_object(run_dir / runtime_rel) if isinstance(runtime_rel, str) and (run_dir / runtime_rel).exists() else {}
+    review_run_control = run_control
+    review_runtime = runtime
+    review_runtime_rel = runtime_rel if isinstance(runtime_rel, str) else None
+    if strategy_kind == "amendment":
+        amendment_source = generation.get("amendment_source")
+        amendment_id = amendment_source.split("#", 1)[1] if isinstance(amendment_source, str) and "#" in amendment_source else None
+        if not amendment_id:
+            raise ControlJsonValidationError("run.control.json: amendment_source must include amendment id after #")
+        review_run_control = read_json_object(run_dir / f"amendments/{amendment_id}.parent-run.control.json")
+        parent_id = generation.get("parent")
+        parent_generation = generation_entry(run_control, parent_id) if isinstance(parent_id, str) else None
+        if not parent_generation or not isinstance(parent_generation.get("runtime"), str):
+            raise ControlJsonValidationError("run.control.json: amendment parent must name a runtime")
+        review_runtime_rel = parent_generation["runtime"]
+        review_runtime = read_json_object(run_dir / review_runtime_rel)
+    require_generation_review_checks(
+        review,
+        context=f"{strategy_kind} generation",
+        requirements=requirements,
+        run_dir=run_dir,
+        run_control=review_run_control,
+        runtime=review_runtime,
+        runtime_rel=review_runtime_rel,
+        review_rel=review_rel,
+    )
 
 
 def compile_generation_runtime_control(run_dir: Path) -> Path:
