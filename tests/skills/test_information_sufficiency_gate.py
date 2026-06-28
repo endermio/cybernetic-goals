@@ -443,6 +443,24 @@ class InformationSufficiencyGateTest(unittest.TestCase):
             self.assertIn("F-client-minimal-example", result.stdout + result.stderr)
             self.assertIn("not satisfied", result.stdout + result.stderr)
 
+    def test_guard_and_runtime_validator_reject_satisfied_check_with_unfinished_nonblocking_fact(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            run_dir = Path(tmpdir)
+            req = requirements_with_information_sufficiency(status="satisfied")
+            fact = req["approved_control"]["information_sufficiency_check"]["facts"][0]
+            fact["current_status"] = "needs_user_input"
+            fact["blocks_design_or_plan_if_missing"] = False
+            refresh_semantic_base(req)
+            write_run(run_dir, req)
+
+            result = run_script(CONTROL_GUARD, "--run-dir", str(run_dir))
+            validate = run_script(VALIDATE, str(run_dir))
+
+            self.assertNotEqual(result.returncode, 0, result.stdout + result.stderr)
+            self.assertNotEqual(validate.returncode, 0, validate.stdout + validate.stderr)
+            self.assertIn("not terminal", result.stdout + result.stderr)
+            self.assertIn("not terminal", validate.stdout + validate.stderr)
+
     def test_guard_rejects_fact_not_derived_from_source_or_outcome(self):
         with tempfile.TemporaryDirectory() as tmpdir:
             run_dir = Path(tmpdir)
@@ -524,6 +542,39 @@ class InformationSufficiencyGateTest(unittest.TestCase):
             payload = json.loads(result.stdout)
             self.assertEqual("RunInformationSufficiencyCheck", payload["next_allowed_action"])
             self.assertIn("information_sufficiency_check", "\n".join(payload["errors"]))
+
+    def test_orchestration_rejects_satisfied_check_with_unfinished_nonblocking_fact(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            run_dir = Path(tmpdir)
+            req = requirements_with_information_sufficiency(status="satisfied")
+            fact = req["approved_control"]["information_sufficiency_check"]["facts"][0]
+            fact["current_status"] = "needs_user_input"
+            fact["blocks_design_or_plan_if_missing"] = False
+            refresh_semantic_base(req)
+            (run_dir / "requirements.control.json").write_text(json.dumps(req, indent=2), encoding="utf-8")
+            (run_dir / "evidence").mkdir(parents=True, exist_ok=True)
+            (run_dir / "evidence/client_minimal_example.json").write_text(
+                json.dumps({"status": "pass"}),
+                encoding="utf-8",
+            )
+            (run_dir / "evidence/information_sufficiency_counterexample.json").write_text(
+                json.dumps({"status": "pass", "verdict": "approved"}),
+                encoding="utf-8",
+            )
+
+            result = run_script(
+                ORCHESTRATION_GUARD,
+                "--state",
+                "before-design",
+                "--run-dir",
+                str(run_dir),
+                "--json",
+            )
+
+            self.assertNotEqual(result.returncode, 0, result.stdout + result.stderr)
+            payload = json.loads(result.stdout)
+            self.assertEqual("RunInformationSufficiencyCheck", payload["next_allowed_action"])
+            self.assertIn("not terminal", "\n".join(payload["errors"]))
 
     def test_orchestration_before_policy_routes_to_information_sufficiency_before_policy(self):
         with tempfile.TemporaryDirectory() as tmpdir:

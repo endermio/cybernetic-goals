@@ -4,11 +4,16 @@ import copy
 import hashlib
 import json
 import re
+import sys
 from pathlib import Path
 from typing import Any
 
 
 REPO_ROOT = Path(__file__).resolve().parents[4]
+sys.path.insert(0, str(REPO_ROOT / ".agents/skills/_shared"))
+
+from information_sufficiency import information_sufficiency_errors as shared_information_sufficiency_errors  # noqa: E402
+
 DELEGATION_WORKFLOW_REGISTRY = REPO_ROOT / ".agents/skills/references/delegation-workflow-registry.json"
 
 CONTROL_FILES = {
@@ -408,124 +413,7 @@ def evidence_ref_errors(run_dir: Path | None, label: str, evidence_ref: Any) -> 
 
 
 def information_sufficiency_errors(requirements: dict[str, Any], run_dir: Path | None = None) -> list[str]:
-    approved = requirements.get("approved_control")
-    if not isinstance(approved, dict):
-        return ["requirements.control.json approved_control must be an object"]
-    check = approved.get("information_sufficiency_check")
-    if not schema_version_at_least(requirements, "1.2.0"):
-        if isinstance(check, dict):
-            return [
-                "requirements.control.json approved_control.information_sufficiency_check "
-                "requires schema_version >= 1.2.0"
-            ]
-        return []
-    if not isinstance(check, dict):
-        return [
-            "requirements.control.json approved_control.information_sufficiency_check "
-            "is required for schema_version >= 1.2.0"
-        ]
-
-    errors: list[str] = []
-    status = check.get("status")
-    if status not in {"satisfied", "not_required"}:
-        errors.append(f"information_sufficiency_check status must be satisfied before design/plan, got {status!r}")
-
-    source_map, _, source_errors = source_requirement_map(requirements)
-    errors.extend(source_errors)
-    known_sources = set(source_map)
-    known_outcomes = {
-        outcome.get("id")
-        for outcome in approved.get("required_outcomes", [])
-        if isinstance(outcome, dict) and isinstance(outcome.get("id"), str)
-    }
-    facts = check.get("facts")
-    if not isinstance(facts, list) or not facts:
-        errors.append("information_sufficiency_check facts must be a non-empty list")
-        facts = []
-
-    blocking_fact_ids: set[str] = set()
-    all_fact_ids: set[str] = set()
-    for index, fact in enumerate(facts):
-        if not isinstance(fact, dict):
-            errors.append(f"information_sufficiency_check facts[{index}] must be an object")
-            continue
-        fact_id = fact.get("fact_id")
-        label = f"information_sufficiency_check fact {fact_id or index}"
-        if not isinstance(fact_id, str) or not fact_id:
-            errors.append(f"{label} must have fact_id")
-            continue
-        all_fact_ids.add(fact_id)
-        derived_from = fact.get("derived_from")
-        if not isinstance(derived_from, dict):
-            errors.append(f"{label} derived_from must be an object")
-            continue
-        fact_sources = set(string_list(derived_from.get("source_requirements")))
-        fact_outcomes = set(string_list(derived_from.get("required_outcomes")))
-        if not fact_sources and not fact_outcomes:
-            errors.append(f"{label} derived_from must reference source_requirements or required_outcomes")
-        unknown_sources = sorted(fact_sources - known_sources)
-        if unknown_sources:
-            errors.append(f"{label} references unknown source_requirements: {', '.join(unknown_sources)}")
-        unknown_outcomes = sorted(fact_outcomes - known_outcomes)
-        if unknown_outcomes:
-            errors.append(f"{label} references unknown required_outcomes: {', '.join(unknown_outcomes)}")
-        if fact.get("blocks_design_or_plan_if_missing") is True:
-            blocking_fact_ids.add(fact_id)
-            if fact.get("current_status") != "satisfied":
-                errors.append(f"{label} is not satisfied and blocks design/plan")
-        acceptable = fact.get("acceptable_evidence")
-        if not isinstance(acceptable, list) or not acceptable:
-            errors.append(f"{label} acceptable_evidence must be non-empty")
-        if not isinstance(fact.get("why_needed"), str) or not fact["why_needed"].strip():
-            errors.append(f"{label} why_needed must explain why design/plan needs this fact")
-        errors.extend(evidence_ref_errors(run_dir, label, fact.get("evidence_ref")))
-
-    review = check.get("counterexample_review")
-    if not isinstance(review, dict):
-        errors.append("information_sufficiency_check counterexample_review must be an object")
-        return errors
-    if review.get("status") != "pass" or review.get("verdict") != "approved":
-        errors.append("information_sufficiency_check counterexample_review must pass with verdict approved")
-    reviewer = review.get("reviewer")
-    if not isinstance(reviewer, dict):
-        errors.append("information_sufficiency_check counterexample_review reviewer must be an object")
-    elif (
-        reviewer.get("kind") not in COUNTEREXAMPLE_REVIEWER_KINDS
-        or not isinstance(reviewer.get("id"), str)
-        or not reviewer["id"].strip()
-        or not isinstance(reviewer.get("evidence_ref"), str)
-        or not reviewer["evidence_ref"].strip()
-    ):
-        errors.append("information_sufficiency_check counterexample_review reviewer must have kind, id, and evidence_ref")
-    elif reviewer.get("kind") in counterexample_allowed_reviewer_kinds(requirements):
-        errors.extend(
-            evidence_ref_errors(
-                run_dir,
-                "information_sufficiency_check counterexample_review reviewer",
-                reviewer.get("evidence_ref"),
-            )
-        )
-    checked_facts = set(string_list(review.get("checked_facts")))
-    missing_checked_facts = sorted(blocking_fact_ids - checked_facts)
-    if missing_checked_facts:
-        errors.append(
-            "information_sufficiency_check counterexample_review missing checked_facts: "
-            + ", ".join(missing_checked_facts)
-        )
-    checked_transformations = set(string_list(review.get("checked_transformations")))
-    missing_points = sorted(INFORMATION_SUFFICIENCY_GATE_POINTS - checked_transformations)
-    if missing_points:
-        errors.append(
-            "information_sufficiency_check counterexample_review missing checked_transformations: "
-            + ", ".join(missing_points)
-        )
-    unknown_checked_facts = sorted(checked_facts - all_fact_ids)
-    if unknown_checked_facts:
-        errors.append(
-            "information_sufficiency_check counterexample_review references unknown facts: "
-            + ", ".join(unknown_checked_facts)
-        )
-    return errors
+    return shared_information_sufficiency_errors(requirements, run_dir or Path.cwd())
 
 
 def generation_review_errors(

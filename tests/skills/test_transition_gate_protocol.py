@@ -219,6 +219,88 @@ class TransitionGateProtocolTest(unittest.TestCase):
             self.assertEqual([], payload["automatic_actions"])
             self.assertIn("command", "\n".join(payload["blocking_reasons"]))
 
+    def test_information_gate_collection_action_requires_non_empty_identity_and_reason(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            run_dir = Path(tmpdir)
+            req = requirements_with_information_sufficiency(status="needs_information_gathering")
+            check = req["approved_control"]["information_sufficiency_check"]
+            check["facts"][0]["current_status"] = "needs_information_gathering"
+            check["collection_actions"] = [
+                {
+                    "action_id": None,
+                    "fact_id": "F-client-minimal-example",
+                    "action_type": "run_no_side_effect_probe",
+                    "status": "planned",
+                    "why_safe_or_needed": "",
+                    "evidence_ref": "evidence/client_probe.json",
+                    "command": ["python3", "-c", "print('client ok')"],
+                    "working_dir": ".",
+                    "allow_automatic_execution": True,
+                }
+            ]
+            refresh_semantic_base(req)
+            write_requirements(run_dir, req)
+
+            result = run_script(INFO_LOOP, "--run-dir", str(run_dir), "--json")
+
+            self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+            payload = json.loads(result.stdout)
+            self.assertEqual("RepairRequirementsInformationState", payload["next_action"])
+            self.assertEqual([], payload["automatic_actions"])
+            reasons = "\n".join(payload["blocking_reasons"])
+            self.assertIn("action_id", reasons)
+            self.assertIn("why_safe_or_needed", reasons)
+
+    def test_information_gate_collection_actions_must_cover_current_blocking_facts(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            run_dir = Path(tmpdir)
+            req = requirements_with_information_sufficiency(status="needs_information_gathering")
+            check = req["approved_control"]["information_sufficiency_check"]
+            check["facts"][0]["current_status"] = "missing"
+            check["facts"][0]["blocks_design_or_plan_if_missing"] = True
+            check["facts"].append(
+                {
+                    "fact_id": "F-side-nonblocking-probe",
+                    "statement": "A side observation is useful but not design-blocking.",
+                    "derived_from": {
+                        "source_requirements": ["SR-client-minimal-example"],
+                        "required_outcomes": ["O-client-integration"],
+                    },
+                    "why_needed": "This side fact cannot replace the current blocker.",
+                    "acceptable_evidence": [
+                        {"kind": "direct_observation", "description": "A side probe output."}
+                    ],
+                    "current_status": "needs_information_gathering",
+                    "evidence_ref": "evidence/side_probe.json",
+                    "blocks_design_or_plan_if_missing": False,
+                }
+            )
+            check["collection_actions"] = [
+                {
+                    "action_id": "IA-side-probe",
+                    "fact_id": "F-side-nonblocking-probe",
+                    "action_type": "run_no_side_effect_probe",
+                    "status": "planned",
+                    "why_safe_or_needed": "This side probe is safe but misses the blocking fact.",
+                    "evidence_ref": "evidence/side_probe.json",
+                    "command": ["python3", "-c", "print('side ok')"],
+                    "working_dir": ".",
+                    "allow_automatic_execution": True,
+                }
+            ]
+            refresh_semantic_base(req)
+            write_requirements(run_dir, req)
+
+            result = run_script(INFO_LOOP, "--run-dir", str(run_dir), "--json")
+
+            self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+            payload = json.loads(result.stdout)
+            self.assertEqual("RepairRequirementsInformationState", payload["next_action"])
+            self.assertEqual([], payload["automatic_actions"])
+            reasons = "\n".join(payload["blocking_reasons"])
+            self.assertIn("F-client-minimal-example", reasons)
+            self.assertIn("blocking", reasons)
+
     def test_information_gate_satisfied_status_requires_passed_counterexample_review(self):
         for requirements_status, forbidden_next_action in (
             ("pending_approval", "ReadyForUserApproval"),

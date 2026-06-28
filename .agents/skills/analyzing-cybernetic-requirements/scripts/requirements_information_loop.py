@@ -24,6 +24,13 @@ from information_sufficiency import evidence_ref_path_errors, information_suffic
 
 SAFE_ACTION_TYPES = {"read_source", "read_documentation", "run_no_side_effect_probe"}
 USER_ACTION_TYPES = {"ask_user", "external_access_request", "human_decision"}
+UNFINISHED_FACT_STATUSES = {
+    "missing",
+    "needs_information_gathering",
+    "needs_user_input",
+    "needs_requirements_revision",
+    "blocked",
+}
 
 
 def read_json_object(path: Path) -> dict[str, Any]:
@@ -150,6 +157,10 @@ def action_detail_errors(run_dir: Path, action: dict[str, Any], action_type: Any
         action.get("evidence_ref"),
         require_exists=False,
     )
+    if not isinstance(action.get("action_id"), str) or not action["action_id"].strip():
+        errors.append(f"collection action {action_ref} must include non-empty action_id")
+    if not isinstance(action.get("why_safe_or_needed"), str) or not action["why_safe_or_needed"].strip():
+        errors.append(f"collection action {action_ref} must include non-empty why_safe_or_needed")
     if action.get("allow_automatic_execution") is False and action_type in SAFE_ACTION_TYPES:
         errors.append(f"collection action {action_ref} cannot be automatic when allow_automatic_execution is false")
     if action_type == "run_no_side_effect_probe" and action.get("allow_automatic_execution") is not True:
@@ -184,9 +195,27 @@ def classify_actions(run_dir: Path, check: dict[str, Any]) -> tuple[list[dict[st
     automatic: list[dict[str, Any]] = []
     user: list[dict[str, Any]] = []
     errors: list[str] = []
+    current_blocking_fact_ids = {
+        fact_id
+        for fact_id, fact in facts.items()
+        if fact.get("blocks_design_or_plan_if_missing") is True and fact.get("current_status") == check_status
+    }
+    mismatched_blocking_facts = [
+        f"{fact_id} ({fact.get('current_status')!r})"
+        for fact_id, fact in sorted(facts.items())
+        if fact.get("blocks_design_or_plan_if_missing") is True
+        and fact.get("current_status") in UNFINISHED_FACT_STATUSES
+        and fact.get("current_status") != check_status
+    ]
+    if mismatched_blocking_facts:
+        errors.append(
+            "information_sufficiency_check has unfinished blocking facts outside current status: "
+            + ", ".join(mismatched_blocking_facts)
+        )
     actions = check.get("collection_actions")
     if not isinstance(actions, list) or not actions:
         return automatic, user, ["information_sufficiency_check needs collection_actions for unsatisfied facts"]
+    covered_blocking_fact_ids: set[str] = set()
     for index, action in enumerate(actions):
         if not isinstance(action, dict):
             errors.append(f"collection_actions[{index}] must be an object")
@@ -214,10 +243,22 @@ def classify_actions(run_dir: Path, check: dict[str, Any]) -> tuple[list[dict[st
         summary = action_summary(action, facts)
         if action_type in SAFE_ACTION_TYPES:
             automatic.append(summary)
+            if fact_id in current_blocking_fact_ids:
+                covered_blocking_fact_ids.add(fact_id)
         elif action_type in USER_ACTION_TYPES:
             user.append(summary)
+            if fact_id in current_blocking_fact_ids:
+                covered_blocking_fact_ids.add(fact_id)
         else:
             errors.append(f"collection action {action.get('action_id') or index} has unsupported action_type {action_type!r}")
+    missing_blocking_fact_ids = sorted(current_blocking_fact_ids - covered_blocking_fact_ids)
+    if missing_blocking_fact_ids:
+        errors.append(
+            "information_sufficiency_check collection_actions missing current blocking facts: "
+            + ", ".join(missing_blocking_fact_ids)
+        )
+    if errors:
+        return [], [], errors
     return automatic, user, errors
 
 
