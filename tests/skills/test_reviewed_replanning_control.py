@@ -63,6 +63,45 @@ def requirements(outcome_id: str = "O-target-startup", evidence_id: str = "evide
                     "blocks_goal_achieved_if_missing": True,
                 }
             ],
+            "information_sufficiency_check": {
+                "status": "not_required",
+                "facts": [
+                    {
+                        "fact_id": "F-target-startup-context",
+                        "statement": "No additional pre-design context is needed for the target-generation fixture.",
+                        "derived_from": {
+                            "source_requirements": ["SR-target-startup"],
+                            "required_outcomes": [outcome_id],
+                        },
+                        "why_needed": "The fixture request already names the target generation and required evidence.",
+                        "acceptable_evidence": [
+                            {
+                                "kind": "source_code",
+                                "description": "The test fixture itself defines the target generation and evidence id.",
+                            }
+                        ],
+                        "current_status": "not_required",
+                        "evidence_ref": "requirements.control.json#approved_control/source_requirements",
+                        "blocks_design_or_plan_if_missing": False,
+                    }
+                ],
+                "counterexample_review": {
+                    "status": "pass",
+                    "verdict": "approved",
+                    "reviewer": {
+                        "kind": "subagent",
+                        "id": "information-sufficiency-reviewer",
+                        "evidence_ref": "requirements.control.json#approved_control/information_sufficiency_check",
+                    },
+                    "checked_facts": ["F-target-startup-context"],
+                    "checked_transformations": [
+                        "source_requirements->information_sufficiency_facts",
+                        "required_outcomes->information_sufficiency_facts",
+                        "information_sufficiency_facts->design_plan_entry",
+                    ],
+                    "findings": [],
+                },
+            },
             "required_outcomes": [
                 {
                     "id": outcome_id,

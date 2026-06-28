@@ -71,6 +71,9 @@ class JsonControlTemplateHardCutTest(unittest.TestCase):
                 expected_schema_version = "1.1.0" if data["artifact_type"] == "requirements.control" else "1"
 
                 self.assertEqual(expected_schema_version, data["schema_version"])
+                if data["artifact_type"] == "requirements.control":
+                    self.assertIn("information_sufficiency_check", data["approved_control"])
+                    self.assertIn(data["approved_control"]["information_sufficiency_check"]["status"], {"satisfied", "not_required"})
                 self.assertNotRegex(serialized, re.compile("|".join(re.escape(name) for name in OFFICIAL_MARKDOWN_CONTROL_FILENAMES)))
 
         self.assertEqual(expected_artifact_types, observed_artifact_types)

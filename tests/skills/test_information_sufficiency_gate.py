@@ -348,6 +348,34 @@ def write_run(run_dir: Path, requirements: dict) -> None:
 
 
 class InformationSufficiencyGateTest(unittest.TestCase):
+    def test_approved_v1_1_without_information_sufficiency_check_is_not_handoff_ready(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            run_dir = Path(tmpdir)
+            req = requirements_with_information_sufficiency(status="satisfied")
+            req["schema_version"] = "1.1.0"
+            del req["approved_control"]["information_sufficiency_check"]
+            refresh_semantic_base(req)
+            write_run(run_dir, req)
+
+            guard = run_script(CONTROL_GUARD, "--run-dir", str(run_dir))
+            validate = run_script(VALIDATE, str(run_dir))
+            predictor = run_script(PREDICTOR, "--run-dir", str(run_dir))
+            orchestration = run_script(
+                ORCHESTRATION_GUARD,
+                "--state",
+                "before-design",
+                "--run-dir",
+                str(run_dir),
+                "--json",
+            )
+
+            for result in (guard, validate, predictor, orchestration):
+                self.assertNotEqual(result.returncode, 0, result.stdout + result.stderr)
+                self.assertIn("information_sufficiency_check", result.stdout + result.stderr)
+            self.assertIn("is required", guard.stdout + guard.stderr)
+            payload = json.loads(orchestration.stdout)
+            self.assertEqual("RunInformationSufficiencyCheck", payload["next_allowed_action"])
+
     def test_guard_runtime_validator_and_predictor_reject_legacy_information_sufficiency_shape(self):
         with tempfile.TemporaryDirectory() as tmpdir:
             run_dir = Path(tmpdir)
@@ -362,7 +390,8 @@ class InformationSufficiencyGateTest(unittest.TestCase):
                 self.assertNotEqual(result.returncode, 0, result.stdout + result.stderr)
                 combined = result.stdout + result.stderr
                 self.assertIn("information_sufficiency_check", combined)
-                self.assertIn("schema_version >= 1.2.0", combined)
+                self.assertIn("statement must be non-empty", combined)
+                self.assertIn("derived_from must be an object", combined)
 
     def test_predictor_rejects_unexecuted_information_counterexample_review(self):
         with tempfile.TemporaryDirectory() as tmpdir:

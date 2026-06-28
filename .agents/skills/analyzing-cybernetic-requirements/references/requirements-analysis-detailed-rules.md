@@ -125,9 +125,10 @@ collection, user input, or requirements revision.
 Do not ask for final requirements approval until the information sufficiency
 state is `satisfied` or `not_required`.
 
-When such facts exist, record `approved_control.information_sufficiency_check`
-in `requirements.control.json` and use `schema_version: 1.2.0`. Each fact must
-include:
+Always record `approved_control.information_sufficiency_check` in
+`requirements.control.json`. If requirements analysis finds no design-blocking
+unknowns, set the check status to `not_required` and record the reviewed reason.
+Use `schema_version: 1.1.0` or later. Each fact must include:
 
 - a stable `fact_id`;
 - the fact statement;
@@ -574,9 +575,9 @@ For `bounded_runtime` work with `rubric check: required`, summarize the confirme
 - [ ] `controlled_run` JSON pre-goal work includes `What the User Approved`.
 - [ ] If How this should be answered or What is not enough is recorded, `requirements.control.json` records the plain-language requirement without internal classification keys.
 - [ ] Human answers to clarification questions are not treated as approval.
-- [ ] Any required `information_sufficiency_check` uses schema_version 1.2.0,
-      has run-local evidence, and passed independent counterexample review
-      before handoff.
+- [ ] `information_sufficiency_check` is present, uses schema_version 1.1.0 or
+      later, has run-local evidence, and passed independent counterexample
+      review before handoff.
 - [ ] Information collection was completed inside requirements analysis, or
       the artifact is explicitly `needs_information_gathering`,
       `needs_user_input`, `needs_counterexample_review`,

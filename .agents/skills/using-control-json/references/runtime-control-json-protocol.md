@@ -182,12 +182,11 @@ The quality gate scope comes from the requirements-approved
 not invent, weaken, or replace that contract. Missing or inconsistent
 requirements-approved gate contract means the run is not executable until
 requirements are fixed.
-When requirements define `information_sufficiency_check`, runtime also treats
-that check as approved control. Blocking facts must have been derived from
-source requirements/outcomes and independently challenged before design or
-planning. A runtime completion or blocked claim cannot rely on facts invented
-afterward unless a reviewed amendment or human reapproval updates the control
-structure.
+Requirements define `information_sufficiency_check`, and runtime treats that
+check as approved control. Blocking facts must have been derived from source
+requirements/outcomes and independently challenged before design or planning. A
+runtime completion or blocked claim cannot rely on facts invented afterward
+unless a reviewed amendment or human reapproval updates the control structure.
 Each blocking required outcome also has a per-outcome `counterexample_gate`;
 its checked transformations must be covered before the outcome can support
 `goal_achieved: true` or a terminal blocked claim.

@@ -86,6 +86,7 @@ class UsingControlJsonProtocolTest(unittest.TestCase):
         text = combined_protocol_text()
 
         self.assertIn("information_sufficiency_check", text)
+        self.assertIn("Requirements define `information_sufficiency_check`", text)
         self.assertRegex(text, re.compile(r"should have been known before design or\s+planning", re.I))
         self.assertRegex(text, re.compile(r"must\s+not[^.\n]*invent[^.\n]*sufficiency standard", re.I))
         self.assertIn("control.amendment.proposed", text)

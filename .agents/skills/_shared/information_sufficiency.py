@@ -105,17 +105,15 @@ def information_sufficiency_errors(requirements: dict[str, Any], run_dir: Path) 
     if not isinstance(approved, dict):
         return ["requirements.control.json approved_control must be an object"]
     check = approved.get("information_sufficiency_check")
-    if not schema_version_at_least(requirements, "1.2.0"):
-        if isinstance(check, dict):
-            return [
-                "requirements.control.json approved_control.information_sufficiency_check "
-                "requires schema_version >= 1.2.0"
-            ]
-        return []
     if not isinstance(check, dict):
         return [
             "requirements.control.json approved_control.information_sufficiency_check "
-            "is required for schema_version >= 1.2.0"
+            "is required before approval, pre-goal handoff, design, plan, or runtime"
+        ]
+    if not schema_version_at_least(requirements, "1.1.0"):
+        return [
+            "requirements.control.json approved_control.information_sufficiency_check "
+            "requires schema_version >= 1.1.0"
         ]
 
     errors: list[str] = []

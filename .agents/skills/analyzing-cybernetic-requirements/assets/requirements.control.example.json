@@ -31,7 +31,7 @@
     },
     "semantic_base": {
       "id": "semantic-base:control-example",
-      "hash": "sha256:9c5415e59b89f878087618a0bb92c1966ccbc40553e12cc274666a4a454038f0"
+      "hash": "sha256:498d396c4c1dd84711cce6d49a942b902522f7ae69827e6454b13b50bd043543"
     },
     "source_requirements": [
       {
@@ -53,6 +53,51 @@
         "blocks_goal_achieved_if_missing": true
       }
     ],
+    "information_sufficiency_check": {
+      "status": "not_required",
+      "facts": [
+        {
+          "fact_id": "F-json-control-scope",
+          "statement": "No additional pre-design context is needed for this JSON-control example because the requested object and evidence are already explicit.",
+          "derived_from": {
+            "source_requirements": [
+              "SR-json-control-example"
+            ],
+            "required_outcomes": [
+              "O-json-control-example"
+            ]
+          },
+          "why_needed": "Requirements analysis must still record that there are no hidden design-blocking facts before approval.",
+          "acceptable_evidence": [
+            {
+              "kind": "source_code",
+              "description": "The example requirements artifact itself contains the requested object, required outcome, and evidence target."
+            }
+          ],
+          "current_status": "not_required",
+          "evidence_ref": "requirements.control.json#approved_control/source_requirements",
+          "blocks_design_or_plan_if_missing": false
+        }
+      ],
+      "counterexample_review": {
+        "status": "pass",
+        "verdict": "approved",
+        "reviewer": {
+          "kind": "subagent",
+          "id": "example-information-sufficiency-reviewer",
+          "evidence_ref": "requirements.control.json#approved_control/information_sufficiency_check"
+        },
+        "checked_facts": [
+          "F-json-control-scope"
+        ],
+        "checked_transformations": [
+          "source_requirements->information_sufficiency_facts",
+          "required_outcomes->information_sufficiency_facts",
+          "information_sufficiency_facts->design_plan_entry"
+        ],
+        "findings": []
+      }
+    },
     "required_outcomes": [
       {
         "id": "O-json-control-example",

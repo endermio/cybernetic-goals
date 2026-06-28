@@ -408,15 +408,15 @@ The requirements analysis is acceptable only when:
 - `What the User Approved: Approved`;
 - routing or requirements recorded `controlled_run` JSON pre-goal fit and the run can
   record target model, strategy policy, gate mode, and phase structure.
-- any required `information_sufficiency_check` uses schema_version 1.2.0, is
-  satisfied before entering design or execution policy, and passed independent
+- `information_sufficiency_check` is present, uses schema_version 1.1.0 or
+  later, is satisfied before entering design or execution policy, and passed independent
   counterexample review.
 
 If requirements analysis is incomplete or What the User Approved is missing/not Approved, stop
 before design.
 
-If `information_sufficiency_check` exists in an older shape, lacks run-local
-evidence, is not satisfied, or has no approved independent review, stop before
+If `information_sufficiency_check` is missing, exists in an older shape, lacks
+run-local evidence, is not satisfied, or has no approved independent review, stop before
 design or plan and route to `RunInformationSufficiencyCheck`. The orchestrator
 must not reinterpret missing facts as assumptions, and it must not ask design
 or runtime to invent the sufficiency standard. The check is satisfied only when

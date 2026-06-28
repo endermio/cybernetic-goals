@@ -541,6 +541,46 @@ apply_integrity_metadata(
 )
 
 
+def add_information_sufficiency_check(fixture: dict) -> dict:
+    fixture["approved_control"]["information_sufficiency_check"] = {
+        "status": "not_required",
+        "facts": [
+            {
+                "fact_id": "F-schema-context",
+                "statement": "No additional pre-design context is required.",
+                "derived_from": {
+                    "source_requirements": ["SR-schema-validation"],
+                    "required_outcomes": ["outcome.schema-validation"],
+                },
+                "why_needed": "Schema validation target is already explicit.",
+                "acceptable_evidence": [
+                    {"kind": "source_code", "description": "Schema fixture is explicit."}
+                ],
+                "current_status": "not_required",
+                "evidence_ref": "requirements.control.json#source_requirements",
+                "blocks_design_or_plan_if_missing": False,
+            }
+        ],
+        "counterexample_review": {
+            "status": "pass",
+            "verdict": "approved",
+            "reviewer": {
+                "kind": "subagent",
+                "id": "information-sufficiency-reviewer",
+                "evidence_ref": "review.control.json#information-sufficiency",
+            },
+            "checked_facts": ["F-schema-context"],
+            "checked_transformations": [
+                "source_requirements->information_sufficiency_facts",
+                "required_outcomes->information_sufficiency_facts",
+                "information_sufficiency_facts->design_plan_entry",
+            ],
+            "findings": [],
+        },
+    }
+    return fixture
+
+
 class SchemaValidationError(AssertionError):
     pass
 
@@ -695,6 +735,7 @@ class ControlJsonSchemaTest(unittest.TestCase):
 
         fixture = copy.deepcopy(SCHEMA_FIXTURES["requirements.control.schema.json"])
         fixture["schema_version"] = "1.1.0"
+        add_information_sufficiency_check(fixture)
         del fixture["approved_control"]["counterexample_gate_contract"]
 
         with self.assertRaises(SchemaValidationError):
@@ -716,6 +757,7 @@ class ControlJsonSchemaTest(unittest.TestCase):
 
         fixture = copy.deepcopy(SCHEMA_FIXTURES["requirements.control.schema.json"])
         fixture["schema_version"] = "1.1.0"
+        add_information_sufficiency_check(fixture)
         del fixture["approved_control"]["required_outcomes"][0]["counterexample_gate"]
 
         with self.assertRaises(SchemaValidationError):
@@ -894,43 +936,7 @@ class ControlJsonSchemaTest(unittest.TestCase):
         for schema_version in ("1.1.0", "1.2.0", "1.3.0", "2.0.0"):
             fixture = copy.deepcopy(SCHEMA_FIXTURES["requirements.control.schema.json"])
             fixture["schema_version"] = schema_version
-            if schema_version != "1.1.0":
-                fixture["approved_control"]["information_sufficiency_check"] = {
-                    "status": "not_required",
-                    "facts": [
-                        {
-                            "fact_id": "F-schema-context",
-                            "statement": "No additional pre-design context is required.",
-                            "derived_from": {
-                                "source_requirements": ["SR-schema-validation"],
-                                "required_outcomes": ["outcome.schema-validation"],
-                            },
-                            "why_needed": "Schema validation target is already explicit.",
-                            "acceptable_evidence": [
-                                {"kind": "source_code", "description": "Schema fixture is explicit."}
-                            ],
-                            "current_status": "not_required",
-                            "evidence_ref": "requirements.control.json#source_requirements",
-                            "blocks_design_or_plan_if_missing": False,
-                        }
-                    ],
-                    "counterexample_review": {
-                        "status": "pass",
-                        "verdict": "approved",
-                        "reviewer": {
-                            "kind": "subagent",
-                            "id": "information-sufficiency-reviewer",
-                            "evidence_ref": "review.control.json#information-sufficiency",
-                        },
-                        "checked_facts": ["F-schema-context"],
-                        "checked_transformations": [
-                            "source_requirements->information_sufficiency_facts",
-                            "required_outcomes->information_sufficiency_facts",
-                            "information_sufficiency_facts->design_plan_entry",
-                        ],
-                        "findings": [],
-                    },
-                }
+            add_information_sufficiency_check(fixture)
             del fixture["approved_control"]["source_requirements"]
 
             with self.assertRaises(AssertionError):
@@ -940,6 +946,7 @@ class ControlJsonSchemaTest(unittest.TestCase):
         schema = json.loads((SCHEMA_DIR / "requirements.control.schema.json").read_text(encoding="utf-8"))
         fixture = copy.deepcopy(SCHEMA_FIXTURES["requirements.control.schema.json"])
         fixture["schema_version"] = "1.1.0"
+        add_information_sufficiency_check(fixture)
         del fixture["approved_control"]["source_requirements"][0]["completion_checks"]
 
         with self.assertRaises(AssertionError):
@@ -971,6 +978,7 @@ class ControlJsonSchemaTest(unittest.TestCase):
             with self.subTest(field=name):
                 fixture = copy.deepcopy(SCHEMA_FIXTURES["requirements.control.schema.json"])
                 fixture["schema_version"] = "1.1.0"
+                add_information_sufficiency_check(fixture)
                 target = fixture
                 for key in path[:-1]:
                     target = target[key]
@@ -1002,19 +1010,19 @@ class ControlJsonSchemaTest(unittest.TestCase):
 
         validate(fixture, schema)
 
-    def test_requirements_schema_requires_information_sufficiency_check_for_v1_2_and_later(self):
+    def test_requirements_schema_requires_information_sufficiency_check_for_v1_1_and_later(self):
         schema = json.loads((SCHEMA_DIR / "requirements.control.schema.json").read_text(encoding="utf-8"))
-        for schema_version in ("1.2.0", "1.2.1", "1.3.0", "2.0.0"):
+        for schema_version in ("1.1.0", "1.1.1", "1.2.0", "1.3.0", "2.0.0"):
             fixture = copy.deepcopy(SCHEMA_FIXTURES["requirements.control.schema.json"])
             fixture["schema_version"] = schema_version
 
             with self.assertRaises(SchemaValidationError):
                 validate(fixture, schema)
 
-    def test_requirements_schema_accepts_information_sufficiency_check_for_v1_2(self):
+    def test_requirements_schema_accepts_information_sufficiency_check_for_v1_1(self):
         schema = json.loads((SCHEMA_DIR / "requirements.control.schema.json").read_text(encoding="utf-8"))
         fixture = copy.deepcopy(SCHEMA_FIXTURES["requirements.control.schema.json"])
-        fixture["schema_version"] = "1.2.0"
+        fixture["schema_version"] = "1.1.0"
         fixture["approved_control"]["information_sufficiency_check"] = {
             "status": "satisfied",
             "facts": [
@@ -1181,6 +1189,7 @@ class ControlJsonSchemaTest(unittest.TestCase):
         schema = json.loads((SCHEMA_DIR / "requirements.control.schema.json").read_text(encoding="utf-8"))
         fixture = copy.deepcopy(SCHEMA_FIXTURES["requirements.control.schema.json"])
         fixture["schema_version"] = "1.1.0"
+        add_information_sufficiency_check(fixture)
         source = fixture["approved_control"]["source_requirements"][0]["source"]
         del source["quote"]
 

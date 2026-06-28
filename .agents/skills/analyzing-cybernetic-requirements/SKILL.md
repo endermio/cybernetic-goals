@@ -22,11 +22,11 @@ All stage-routing gates use `../references/transition-gate-protocol.md`.
 2. Preserve the requested scope and action. Do not reduce requested behavior to
    a plan, readiness, framework, compatibility result, or future option.
 3. Extract `source_requirements` before `required_outcomes`.
-4. If design or planning needs facts first, define
-   `information_sufficiency_check`: facts must derive from
+4. Always define `information_sufficiency_check`. If no pre-design facts are
+   needed, set it to `not_required`. Facts must derive from
    `source_requirements` and/or `required_outcomes`, include `why_needed`,
    `acceptable_evidence`, `current_status`, `evidence_ref`, and be challenged
-   by independent `counterexample_review`. Use `schema_version: 1.2.0`.
+   by independent `counterexample_review`. Use `schema_version: 1.1.0` or later.
    A free-form `required_observations` list is not enough.
 5. Information collection is part of requirements analysis. Before approval,
    run `requirements_information_loop.py --run-dir <run-dir> --json` whenever
