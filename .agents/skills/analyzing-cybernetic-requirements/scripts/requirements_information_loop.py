@@ -156,6 +156,21 @@ def action_detail_errors(action: dict[str, Any], action_type: Any, action_ref: A
     return []
 
 
+def counterexample_review_passed(check: dict[str, Any]) -> bool:
+    review = check.get("counterexample_review")
+    return (
+        isinstance(review, dict)
+        and review.get("status") == "pass"
+        and review.get("verdict") == "approved"
+    )
+
+
+def counterexample_review_errors(check: dict[str, Any]) -> list[str]:
+    if counterexample_review_passed(check):
+        return []
+    return ["information_sufficiency_check counterexample_review must pass with verdict approved before approval or handoff"]
+
+
 def classify_actions(check: dict[str, Any]) -> tuple[list[dict[str, Any]], list[dict[str, Any]], list[str]]:
     facts = fact_by_id(check)
     automatic: list[dict[str, Any]] = []
@@ -174,6 +189,9 @@ def classify_actions(check: dict[str, Any]) -> tuple[list[dict[str, Any]], list[
             errors.append(f"collection action {action.get('action_id') or index} references unknown fact_id")
             continue
         action_ref = action.get("action_id") or index
+        if action.get("status") != "planned":
+            errors.append(f"collection action {action_ref} must have status 'planned' to be used as the next action")
+            continue
         detail_errors = action_detail_errors(action, action_type, action_ref)
         if detail_errors:
             errors.extend(detail_errors)
@@ -194,6 +212,15 @@ def next_action(run_dir: Path, requirements: dict[str, Any]) -> dict[str, Any]:
     payload = base_payload(run_dir, requirements, check)
 
     if requirements.get("status") == "approved" and status in {"satisfied", "not_required"}:
+        review_errors = counterexample_review_errors(check)
+        if review_errors:
+            payload["blocking_reasons"] = review_errors
+            return gate_payload(
+                payload,
+                ok=False,
+                next_action="RunInformationCounterexampleReview",
+                review_prompt=review_prompt(check),
+            )
         return gate_payload(
             payload,
             ok=True,
@@ -229,6 +256,15 @@ def next_action(run_dir: Path, requirements: dict[str, Any]) -> dict[str, Any]:
         )
 
     if status in {"satisfied", "not_required"}:
+        review_errors = counterexample_review_errors(check)
+        if review_errors:
+            payload["blocking_reasons"] = review_errors
+            return gate_payload(
+                payload,
+                ok=False,
+                next_action="RunInformationCounterexampleReview",
+                review_prompt=review_prompt(check),
+            )
         return gate_payload(
             payload,
             ok=True,
