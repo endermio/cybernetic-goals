@@ -119,6 +119,12 @@ Before controlled-run design or planning, requirements analysis must determine
 whether there are facts that must be known first. These are not solution-design
 choices; they are facts without which the design or plan could be invalid.
 
+Information collection is part of requirements analysis. Do not ask for final
+requirements approval while design-blocking facts still need review,
+collection, user input, or requirements revision.
+Do not ask for final requirements approval until the information sufficiency
+state is `satisfied` or `not_required`.
+
 When such facts exist, record `approved_control.information_sufficiency_check`
 in `requirements.control.json` and use `schema_version: 1.2.0`. Each fact must
 include:
@@ -147,6 +153,23 @@ reference, and findings. If a blocking fact is missing, unknown, weakly
 evidenced, or not independently reviewed, orchestration must stop before design
 or plan and report the smallest required information-gathering or human
 decision.
+
+Use these states inside requirements analysis:
+
+- `needs_counterexample_review`: run the independent review before approval.
+- `needs_information_gathering`: gather safe read-only facts, examples, probes,
+  or source/documentation observations before approval.
+- `needs_user_input`: stop and ask for the missing credential, artifact,
+  external access, or business decision.
+- `needs_requirements_revision`: newly gathered facts change the requested
+  outcome, completion standard, authority, or forbidden actions; revise the
+  requirements and return to user approval.
+- `satisfied` or `not_required`: the only states that can pass handoff.
+
+Safe collection may read source, inspect local documentation, and run
+no-side-effect local probes or minimal examples. Ask the user before using
+credentials, touching external systems, accessing real DEV/N1/N2 services, or
+running anything that could change state.
 
 Before asking for approval, expose these facts in plain language as
 "Information needed before design": fact, why it matters, acceptable evidence,
@@ -521,6 +544,10 @@ For `bounded_runtime` work with `rubric check: required`, summarize the confirme
 - [ ] Any required `information_sufficiency_check` uses schema_version 1.2.0,
       has run-local evidence, and passed independent counterexample review
       before handoff.
+- [ ] Information collection was completed inside requirements analysis, or
+      the artifact is explicitly `needs_information_gathering`,
+      `needs_user_input`, `needs_counterexample_review`,
+      `needs_requirements_revision`, or `blocked` and no handoff was output.
 - [ ] Missing or weak information facts were shown to the user as
       design-blocking facts, not hidden in approved JSON.
 - [ ] If What the User Approved is not `Approved`, the response asks for approval or revision and does not output the orchestration command or predicted `/goal`.

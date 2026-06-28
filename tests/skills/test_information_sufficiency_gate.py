@@ -387,6 +387,30 @@ class InformationSufficiencyGateTest(unittest.TestCase):
             self.assertIn("counterexample_review", result.stdout + result.stderr)
             self.assertIn("pass with verdict approved", result.stdout + result.stderr)
 
+    def test_predictor_rejects_information_gathering_before_handoff_even_if_top_level_is_approved(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            run_dir = Path(tmpdir)
+            req = requirements_with_information_sufficiency(status="needs_information_gathering")
+            fact = req["approved_control"]["information_sufficiency_check"]["facts"][0]
+            fact["current_status"] = "needs_information_gathering"
+            req["approved_control"]["information_sufficiency_check"]["collection_actions"] = [
+                {
+                    "action_id": "IA-client-minimal-example",
+                    "fact_id": "F-client-minimal-example",
+                    "action_type": "run_no_side_effect_probe",
+                    "status": "planned",
+                    "why_safe_or_needed": "A minimal local example is required before design can name the client boundary.",
+                    "evidence_ref": "evidence/client_minimal_example.json",
+                }
+            ]
+            refresh_semantic_base(req)
+            (run_dir / "requirements.control.json").write_text(json.dumps(req, indent=2), encoding="utf-8")
+
+            result = run_script(PREDICTOR, "--run-dir", str(run_dir))
+
+            self.assertNotEqual(result.returncode, 0, result.stdout + result.stderr)
+            self.assertIn("information_sufficiency_check status must be satisfied", result.stdout + result.stderr)
+
     def test_guard_rejects_missing_information_sufficiency_for_v1_2(self):
         with tempfile.TemporaryDirectory() as tmpdir:
             run_dir = Path(tmpdir)

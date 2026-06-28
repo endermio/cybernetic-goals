@@ -27,16 +27,19 @@ Detailed rules live in `references/requirements-analysis-detailed-rules.md`.
    `acceptable_evidence`, `current_status`, `evidence_ref`, and be challenged
    by independent `counterexample_review`. Use `schema_version: 1.2.0`.
    A free-form `required_observations` list is not enough.
-5. Define `counterexample_gate_contract` in the requirements stage and
+5. Information collection is part of requirements analysis: safely gather
+   needed facts before approval, or mark `needs_information_gathering`,
+   `needs_user_input`, or `needs_requirements_revision`.
+6. Define `counterexample_gate_contract` in the requirements stage and
    per-outcome `counterexample_gate` before orchestration starts.
-6. Before approval, show any missing/weak information facts as "needed before
+7. Before approval, show any missing/weak information facts as "needed before
    design"; do not hide them inside approved JSON or future pre-goal work.
-7. Ask only questions that change approved meaning, evidence, scope,
+8. Ask only questions that change approved meaning, evidence, scope,
    authority, or output contract.
-8. Classify uncertainty as human decision, default assumption, or deferred
+9. Classify uncertainty as human decision, default assumption, or deferred
    design/planning/execution detail.
-9. Produce or update `requirements.control.json`.
-10. For `controlled_run`, run `predict_pregoal_handoff.py`; only output its
+10. Produce or update `requirements.control.json`.
+11. For `controlled_run`, run `predict_pregoal_handoff.py`; only output its
     handoff when it passes and `What the User Approved: Approved`.
 
 ## Source Requirements

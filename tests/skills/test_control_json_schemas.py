@@ -1011,6 +1011,63 @@ class ControlJsonSchemaTest(unittest.TestCase):
 
         validate(fixture, schema)
 
+    def test_requirements_schema_accepts_information_collection_loop_state_for_v1_2(self):
+        schema = json.loads((SCHEMA_DIR / "requirements.control.schema.json").read_text(encoding="utf-8"))
+        fixture = copy.deepcopy(SCHEMA_FIXTURES["requirements.control.schema.json"])
+        fixture["schema_version"] = "1.2.0"
+        fixture["status"] = "pending_information_gathering"
+        fixture["approved_control"]["information_sufficiency_check"] = {
+            "status": "needs_information_gathering",
+            "facts": [
+                {
+                    "fact_id": "F-client-minimal-example",
+                    "statement": "The client starts locally and its input/output boundary is observed.",
+                    "derived_from": {
+                        "source_requirements": ["SR-schema-validation"],
+                        "required_outcomes": ["outcome.schema-validation"],
+                    },
+                    "why_needed": "Design cannot define the integration boundary before observing a minimal run.",
+                    "acceptable_evidence": [
+                        {
+                            "kind": "command_result",
+                            "description": "A local no-side-effect minimal example command output.",
+                        }
+                    ],
+                    "current_status": "needs_information_gathering",
+                    "evidence_ref": "evidence/client_minimal_example.json",
+                    "blocks_design_or_plan_if_missing": True,
+                }
+            ],
+            "collection_actions": [
+                {
+                    "action_id": "IA-client-minimal-example",
+                    "fact_id": "F-client-minimal-example",
+                    "action_type": "run_no_side_effect_probe",
+                    "status": "planned",
+                    "why_safe_or_needed": "The probe is local and needed to observe the actual client boundary.",
+                    "evidence_ref": "evidence/client_minimal_example.json",
+                }
+            ],
+            "counterexample_review": {
+                "status": "needs_revision",
+                "verdict": "needs_revision",
+                "reviewer": {
+                    "kind": "subagent",
+                    "id": "information-sufficiency-reviewer",
+                    "evidence_ref": "evidence/information_sufficiency_counterexample.json",
+                },
+                "checked_facts": ["F-client-minimal-example"],
+                "checked_transformations": [
+                    "source_requirements->information_sufficiency_facts",
+                    "required_outcomes->information_sufficiency_facts",
+                    "information_sufficiency_facts->design_plan_entry",
+                ],
+                "findings": ["Minimal client behavior still needs direct evidence."],
+            },
+        }
+
+        validate(fixture, schema)
+
     def test_requirements_schema_rejects_source_without_quote_or_reference(self):
         schema = json.loads((SCHEMA_DIR / "requirements.control.schema.json").read_text(encoding="utf-8"))
         fixture = copy.deepcopy(SCHEMA_FIXTURES["requirements.control.schema.json"])

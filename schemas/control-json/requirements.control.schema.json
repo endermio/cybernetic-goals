@@ -20,6 +20,13 @@
     },
     "status": {
       "enum": [
+        "draft",
+        "pending_information_gathering",
+        "pending_counterexample_review",
+        "pending_user_input",
+        "needs_requirements_revision",
+        "pending_approval",
+        "blocked",
         "approved"
       ]
     },
@@ -428,6 +435,10 @@
               "enum": [
                 "satisfied",
                 "missing",
+                "needs_counterexample_review",
+                "needs_information_gathering",
+                "needs_user_input",
+                "needs_requirements_revision",
                 "blocked",
                 "not_required"
               ]
@@ -518,6 +529,9 @@
                     "enum": [
                       "satisfied",
                       "missing",
+                      "needs_information_gathering",
+                      "needs_user_input",
+                      "needs_requirements_revision",
                       "blocked",
                       "not_required"
                     ]
@@ -528,6 +542,57 @@
                   },
                   "blocks_design_or_plan_if_missing": {
                     "type": "boolean"
+                  }
+                }
+              }
+            },
+            "collection_actions": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "action_id",
+                  "fact_id",
+                  "action_type",
+                  "status",
+                  "why_safe_or_needed",
+                  "evidence_ref"
+                ],
+                "properties": {
+                  "action_id": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "fact_id": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "action_type": {
+                    "enum": [
+                      "read_source",
+                      "read_documentation",
+                      "run_no_side_effect_probe",
+                      "ask_user",
+                      "external_access_request",
+                      "human_decision"
+                    ]
+                  },
+                  "status": {
+                    "enum": [
+                      "planned",
+                      "completed",
+                      "blocked",
+                      "not_required"
+                    ]
+                  },
+                  "why_safe_or_needed": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "evidence_ref": {
+                    "type": "string",
+                    "minLength": 1
                   }
                 }
               }

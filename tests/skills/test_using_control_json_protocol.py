@@ -91,6 +91,18 @@ class UsingControlJsonProtocolTest(unittest.TestCase):
         self.assertIn("control.amendment.proposed", text)
         self.assertRegex(text, re.compile(r"reviewed amendment proposal", re.I))
 
+    def test_requirements_skill_defines_information_collection_as_requirements_analysis_loop(self):
+        main = (ROOT / ".agents/skills/analyzing-cybernetic-requirements/SKILL.md").read_text(encoding="utf-8")
+        details = (
+            ROOT / ".agents/skills/analyzing-cybernetic-requirements/references/requirements-analysis-detailed-rules.md"
+        ).read_text(encoding="utf-8")
+        text = main + "\n" + details
+
+        self.assertIn("Information collection is part of requirements analysis", text)
+        self.assertIn("needs_information_gathering", text)
+        self.assertIn("needs_requirements_revision", text)
+        self.assertIn("Do not ask for final requirements approval", text)
+
     def test_goal_achieved_true_requires_verifier_permission(self):
         text = combined_protocol_text()
 
