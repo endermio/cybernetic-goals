@@ -317,6 +317,54 @@ class TransitionGateProtocolTest(unittest.TestCase):
             self.assertEqual([], payload["automatic_actions"])
             self.assertIn("planned", "\n".join(payload["blocking_reasons"]))
 
+    def test_information_gate_collection_action_must_target_current_unsatisfied_fact(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            run_dir = Path(tmpdir)
+            req = requirements_with_information_sufficiency(status="needs_information_gathering")
+            check = req["approved_control"]["information_sufficiency_check"]
+            check["facts"].append(
+                {
+                    "fact_id": "F-satisfied-side-fact",
+                    "statement": "An unrelated side fact is already satisfied.",
+                    "derived_from": {
+                        "source_requirements": ["SR-client-minimal-example"],
+                        "required_outcomes": ["O-client-integration"],
+                    },
+                    "why_needed": "This side fact is not the current blocker.",
+                    "acceptable_evidence": [
+                        {"kind": "direct_observation", "description": "Already observed."}
+                    ],
+                    "current_status": "satisfied",
+                    "evidence_ref": "evidence/client_minimal_example.json",
+                    "blocks_design_or_plan_if_missing": True,
+                }
+            )
+            check["facts"][0]["current_status"] = "needs_information_gathering"
+            check["collection_actions"] = [
+                {
+                    "action_id": "IA-stale-side-fact",
+                    "fact_id": "F-satisfied-side-fact",
+                    "action_type": "run_no_side_effect_probe",
+                    "status": "planned",
+                    "why_safe_or_needed": "This action is stale and does not address the current blocker.",
+                    "evidence_ref": "evidence/stale_side_fact.json",
+                    "command": ["python3", "-c", "print('side ok')"],
+                    "working_dir": ".",
+                    "allow_automatic_execution": True,
+                }
+            ]
+            refresh_semantic_base(req)
+            write_requirements(run_dir, req)
+
+            result = run_script(INFO_LOOP, "--run-dir", str(run_dir), "--json")
+
+            self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+            payload = json.loads(result.stdout)
+            self.assertEqual("RepairRequirementsInformationState", payload["next_action"])
+            self.assertFalse(payload["terminal"])
+            self.assertEqual([], payload["automatic_actions"])
+            self.assertIn("current_status", "\n".join(payload["blocking_reasons"]))
+
     def test_information_gate_safe_probe_requires_explicit_automatic_authorization(self):
         with tempfile.TemporaryDirectory() as tmpdir:
             run_dir = Path(tmpdir)
@@ -398,6 +446,24 @@ class TransitionGateProtocolTest(unittest.TestCase):
             self.assertTrue(payload["approval_allowed"])
             self.assertFalse(payload["handoff_allowed"])
             self.assertTrue(payload["may_ask_user"])
+
+    def test_information_gate_ready_for_approval_requires_pending_approval_status(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            run_dir = Path(tmpdir)
+            req = requirements_with_information_sufficiency(status="satisfied")
+            req["status"] = "draft"
+            refresh_semantic_base(req)
+            write_requirements(run_dir, req)
+            write_information_evidence(run_dir)
+
+            result = run_script(INFO_LOOP, "--run-dir", str(run_dir), "--json")
+
+            self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+            payload = json.loads(result.stdout)
+            self.assertEqual("RepairRequirementsInformationState", payload["next_action"])
+            self.assertFalse(payload["terminal"])
+            self.assertFalse(payload["approval_allowed"])
+            self.assertIn("pending_approval", "\n".join(payload["blocking_reasons"]))
 
     def test_orchestration_guard_uses_transition_gate_fields_for_blocked_handoff(self):
         with tempfile.TemporaryDirectory() as tmpdir:

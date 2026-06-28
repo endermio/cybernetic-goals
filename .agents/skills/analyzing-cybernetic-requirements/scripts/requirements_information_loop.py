@@ -182,6 +182,7 @@ def requires_counterexample_review(errors: list[str]) -> bool:
 
 def classify_actions(run_dir: Path, check: dict[str, Any]) -> tuple[list[dict[str, Any]], list[dict[str, Any]], list[str]]:
     facts = fact_by_id(check)
+    check_status = check.get("status")
     automatic: list[dict[str, Any]] = []
     user: list[dict[str, Any]] = []
     errors: list[str] = []
@@ -198,6 +199,13 @@ def classify_actions(run_dir: Path, check: dict[str, Any]) -> tuple[list[dict[st
             errors.append(f"collection action {action.get('action_id') or index} references unknown fact_id")
             continue
         action_ref = action.get("action_id") or index
+        fact_status = facts[fact_id].get("current_status")
+        if fact_status != check_status:
+            errors.append(
+                f"collection action {action_ref} targets fact {fact_id} with current_status {fact_status!r}, "
+                f"but information_sufficiency_check status is {check_status!r}"
+            )
+            continue
         if action.get("status") != "planned":
             errors.append(f"collection action {action_ref} must have status 'planned' to be used as the next action")
             continue
@@ -270,6 +278,11 @@ def next_action(run_dir: Path, requirements: dict[str, Any]) -> dict[str, Any]:
         )
 
     if status in {"satisfied", "not_required"}:
+        if requirements.get("status") != "pending_approval":
+            payload["blocking_reasons"] = [
+                "requirements.control.json status must be pending_approval before asking for user approval"
+            ]
+            return gate_payload(payload, ok=False, next_action="RepairRequirementsInformationState")
         approval_errors = approval_or_handoff_errors(requirements, run_dir)
         if approval_errors:
             payload["blocking_reasons"] = approval_errors

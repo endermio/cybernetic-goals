@@ -1,6 +1,7 @@
 import copy
 import hashlib
 import json
+import re
 import unittest
 from pathlib import Path
 
@@ -604,6 +605,8 @@ def validate(instance, schema, path="$"):
             raise SchemaValidationError(f"{path}: expected string")
         if schema.get("minLength", 0) and len(instance) < schema["minLength"]:
             raise SchemaValidationError(f"{path}: expected non-empty string")
+        if "pattern" in schema and re.search(schema["pattern"], instance) is None:
+            raise SchemaValidationError(f"{path}: expected pattern {schema['pattern']!r}")
     elif expected_type == "boolean":
         if not isinstance(instance, bool):
             raise SchemaValidationError(f"{path}: expected boolean")
@@ -961,14 +964,19 @@ class ControlJsonSchemaTest(unittest.TestCase):
 
         validate(fixture, schema)
 
-    def test_requirements_schema_requires_information_sufficiency_check_for_v1_2(self):
+    def test_requirements_schema_requires_information_sufficiency_check_for_v1_2_and_later(self):
+        schema = json.loads((SCHEMA_DIR / "requirements.control.schema.json").read_text(encoding="utf-8"))
+        for schema_version in ("1.2.0", "1.2.1", "1.3.0", "2.0.0"):
+            fixture = copy.deepcopy(SCHEMA_FIXTURES["requirements.control.schema.json"])
+            fixture["schema_version"] = schema_version
+
+            with self.assertRaises(SchemaValidationError):
+                validate(fixture, schema)
+
+    def test_requirements_schema_accepts_information_sufficiency_check_for_v1_2(self):
         schema = json.loads((SCHEMA_DIR / "requirements.control.schema.json").read_text(encoding="utf-8"))
         fixture = copy.deepcopy(SCHEMA_FIXTURES["requirements.control.schema.json"])
         fixture["schema_version"] = "1.2.0"
-
-        with self.assertRaises(SchemaValidationError):
-            validate(fixture, schema)
-
         fixture["approved_control"]["information_sufficiency_check"] = {
             "status": "satisfied",
             "facts": [
