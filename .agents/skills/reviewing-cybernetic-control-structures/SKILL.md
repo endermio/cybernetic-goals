@@ -7,7 +7,7 @@ description: 'Use when requirements analysis, any required design, goal.control.
 
 ## Overview
 
-Review whether the approved work chain is coherent enough to execute.
+Review whether approved work can execute.
 
 Input: requirements JSON, optional design, goal JSON, execution policy or
 current generation strategy. Output: `review.control.json`.
@@ -15,6 +15,7 @@ current generation strategy. Output: `review.control.json`.
 This skill does not execute target work and does not start `/goal`.
 Detailed review dimensions live in `references/control-review-detailed-rules.md`
 and `references/review-rubric.md`.
+Stage-routing gate results follow `../references/transition-gate-protocol.md`.
 
 ## Independent Review Rule
 
@@ -37,7 +38,8 @@ Subagent semantic review verdicts must be one of:
 
 `NeedsRevision` is not a simple fail. It means the chain contains repairable
 intent drift, obligation downgrade, or artifact misrouting.
-runtime compilation is forbidden until the verdict is `Approved`.
+runtime compilation is forbidden until the verdict is `Approved`; route to the
+returned stage, repair, and review again.
 
 ## Required Checks
 
@@ -60,7 +62,7 @@ Use the detailed reference for the full rubric.
 
 ## Intent Preservation / Obligation Preservation Review
 
-Reject or return to revision when implementation, measurement, repair,
+Reject when implementation, measurement, repair,
 diagnosis, or decision work is weakened into readiness, future work, allowed
 action, compatibility-only behavior, a framework, or a plan.
 

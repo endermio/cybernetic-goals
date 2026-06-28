@@ -185,6 +185,11 @@ Follow its `next_action`:
   actions.
 - `ReadyForUserApproval`: show the approval commitment.
 
+The helper is a transition gate, not an executor. Follow
+`../references/transition-gate-protocol.md`: when `terminal` is false, perform
+the returned `next_action`, update requirements/evidence as needed, and run the
+same helper again before approval or handoff.
+
 Safe collection may read source, inspect local documentation, and run
 no-side-effect local probes or minimal examples. Ask the user before using
 credentials, touching external systems, accessing real DEV/N1/N2 services, or

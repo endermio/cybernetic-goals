@@ -156,6 +156,13 @@ blocker before reporting the run as terminal.
 
 ## Verifier Gate
 
+Gate routing semantics follow
+`.agents/skills/references/transition-gate-protocol.md`. A structural or
+quality gate result with `terminal: false` means the runtime agent must execute
+the returned `next_action`, record the required evidence or status, and rerun
+the same gate. It must not report the gate result itself as completion or as a
+human approval request unless `may_ask_user` is true.
+
 ### Structural Gates And Quality Gate
 
 Structural gates are schema validation, `control_chain_guard`,

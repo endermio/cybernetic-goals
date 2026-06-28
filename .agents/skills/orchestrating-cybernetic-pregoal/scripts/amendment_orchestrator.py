@@ -14,11 +14,14 @@ from typing import Any
 REPO_ROOT = Path(__file__).resolve().parents[4]
 COMPILE_SCRIPTS = REPO_ROOT / ".agents/skills/compiling-cybernetic-runtime-goals/scripts"
 RUNTIME_SCRIPTS = REPO_ROOT / ".agents/skills/using-control-json/scripts"
+SHARED_SCRIPTS = REPO_ROOT / ".agents/skills/_shared"
 sys.path.insert(0, str(COMPILE_SCRIPTS))
 sys.path.insert(0, str(RUNTIME_SCRIPTS))
+sys.path.insert(0, str(SHARED_SCRIPTS))
 
 from compile_runtime_goal import compile_runtime_control  # noqa: E402
 from control_json_runtime import generation_review_errors, read_progress_events, validate_control_chain  # noqa: E402
+from transition_gate import transition_gate_payload  # noqa: E402
 
 
 ANCHOR_FIELDS = ("semantic_base_change", "required_outcomes_changed", "authority_expanded")
@@ -34,8 +37,16 @@ def write_json(path: Path, value: dict[str, Any]) -> None:
 
 
 def result_payload(ok: bool, **fields: Any) -> dict[str, Any]:
-    payload: dict[str, Any] = {"ok": ok}
-    payload.update(fields)
+    next_action = str(fields.pop("next_allowed_action", fields.pop("next_action", "ContinueCurrentGeneration")))
+    errors = fields.pop("errors", [])
+    payload = transition_gate_payload(
+        ok=ok,
+        gate_id="amendment-orchestrator",
+        next_action=next_action,
+        errors=errors if isinstance(errors, list) else [str(errors)],
+        legacy_next_allowed_action=True,
+        **fields,
+    )
     return payload
 
 

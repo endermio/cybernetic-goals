@@ -434,6 +434,11 @@ Follow the returned `next_action`. If it returns
 not ask the user to authorize that review. Ask the user only when the loop
 returns `AskUserForInformation`.
 
+All orchestration routers are transition gates. Use
+`../references/transition-gate-protocol.md`: a nonterminal result is not a user
+report and not a completion state. Execute the returned action, update the
+artifact/evidence it names, and run the same gate again.
+
 ### Determine Artifact Paths
 
 Derive the run directory from the requirements control path unless the user specifies paths.

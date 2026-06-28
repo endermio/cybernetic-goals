@@ -18,6 +18,7 @@ This skill supports official generation-aware JSON control runs:
   and the current `gen-N/runtime.control.json`.
 
 Read `references/runtime-control-json-protocol.md` before executing, reporting status, or preparing completion evidence.
+Gate result semantics follow `../references/transition-gate-protocol.md`.
 
 ## Operating Contract
 

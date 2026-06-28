@@ -13,6 +13,7 @@ This skill does not design, plan, compile runtime JSON, or execute target work.
 
 Official persistent control facts are JSON only. Markdown is background.
 Detailed rules live in `references/requirements-analysis-detailed-rules.md`.
+All stage-routing gates use `../references/transition-gate-protocol.md`.
 
 ## Hot Path
 
@@ -30,7 +31,8 @@ Detailed rules live in `references/requirements-analysis-detailed-rules.md`.
 5. Information collection is part of requirements analysis. Before approval,
    run `requirements_information_loop.py --run-dir <run-dir> --json` whenever
    sufficiency is not `satisfied`/`not_required`; follow its `next_action`
-   instead of asking the user to authorize internal review.
+   and rerun the gate after the action. Do not ask the user to authorize
+   internal review or safe read-only collection.
 6. Define `counterexample_gate_contract` in the requirements stage and
    per-outcome `counterexample_gate` before orchestration starts.
 7. Before approval, show any missing/weak information facts as "needed before

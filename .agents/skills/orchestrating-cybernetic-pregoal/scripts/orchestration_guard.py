@@ -15,6 +15,9 @@ from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parents[4]
 CONTROL_CHAIN_GUARD = REPO_ROOT / ".agents/skills/compiling-cybernetic-runtime-goals/scripts/control_chain_guard.py"
+sys.path.insert(0, str(REPO_ROOT / ".agents/skills/_shared"))
+
+from transition_gate import transition_gate_payload  # noqa: E402
 
 NEXT_ACTION = {
     "before-design": "RunDesign",
@@ -46,13 +49,14 @@ INFORMATION_SUFFICIENCY_GATE_POINTS = {
 
 
 def payload(ok: bool, state: str, next_action: str, errors: list[str]) -> dict[str, object]:
-    return {
-        "ok": ok,
-        "state": state,
-        "next_allowed_action": next_action,
-        "errors": errors,
-        "warnings": [],
-    }
+    return transition_gate_payload(
+        ok=ok,
+        gate_id="pregoal-orchestration",
+        state=state,
+        next_action=next_action,
+        errors=errors,
+        legacy_next_allowed_action=True,
+    )
 
 
 def print_result(data: dict[str, object], as_json: bool) -> None:

@@ -10,8 +10,15 @@ from __future__ import annotations
 
 import argparse
 import json
+import sys
 from pathlib import Path
 from typing import Any
+
+
+REPO_ROOT = Path(__file__).resolve().parents[4]
+sys.path.insert(0, str(REPO_ROOT / ".agents/skills/_shared"))
+
+from transition_gate import transition_gate_payload  # noqa: E402
 
 
 SAFE_ACTION_TYPES = {"read_source", "read_documentation", "run_no_side_effect_probe"}
@@ -61,6 +68,28 @@ def base_payload(run_dir: Path, requirements: dict[str, Any], check: dict[str, A
         "user_actions": [],
         "blocking_reasons": [],
     }
+
+
+def gate_payload(
+    payload: dict[str, Any],
+    *,
+    ok: bool,
+    next_action: str,
+    errors: list[str] | None = None,
+    **fields: Any,
+) -> dict[str, Any]:
+    blocking_reasons = payload.get("blocking_reasons")
+    result = transition_gate_payload(
+        ok=ok,
+        gate_id="requirements-information-sufficiency",
+        next_action=next_action,
+        errors=errors if errors is not None else blocking_reasons if isinstance(blocking_reasons, list) else [],
+        **fields,
+    )
+    result.update(payload)
+    result["next_action"] = next_action
+    result["requires_user_authorization"] = result["may_ask_user"]
+    return result
 
 
 def review_prompt(check: dict[str, Any]) -> str:
@@ -138,47 +167,39 @@ def next_action(run_dir: Path, requirements: dict[str, Any]) -> dict[str, Any]:
     payload = base_payload(run_dir, requirements, check)
 
     if requirements.get("status") == "approved" and status in {"satisfied", "not_required"}:
-        payload.update(
-            {
-                "next_action": "ReadyForPreGoalHandoff",
-                "requires_user_authorization": False,
-                "message": "Information sufficiency is complete; run predict_pregoal_handoff.py next.",
-            }
+        return gate_payload(
+            payload,
+            ok=True,
+            next_action="ReadyForPreGoalHandoff",
+            message="Information sufficiency is complete; run predict_pregoal_handoff.py next.",
         )
-        return payload
 
     if status == "needs_counterexample_review" or requirements.get("status") == "pending_counterexample_review":
-        payload.update(
-            {
-                "next_action": "RunInformationCounterexampleReview",
-                "requires_user_authorization": False,
-                "review_prompt": review_prompt(check),
-            }
+        return gate_payload(
+            payload,
+            ok=False,
+            next_action="RunInformationCounterexampleReview",
+            review_prompt=review_prompt(check),
         )
-        return payload
 
     if status == "needs_requirements_revision" or requirements.get("status") == "needs_requirements_revision":
-        payload.update(
-            {
-                "next_action": "ReviseRequirements",
-                "requires_user_authorization": False,
-                "message": (
-                    "Newly gathered information changes the requested result, completion standard, "
-                    "authority, or forbidden actions. Revise requirements before asking for approval."
-                ),
-            }
+        return gate_payload(
+            payload,
+            ok=False,
+            next_action="ReviseRequirements",
+            message=(
+                "Newly gathered information changes the requested result, completion standard, "
+                "authority, or forbidden actions. Revise requirements before asking for approval."
+            ),
         )
-        return payload
 
     if status == "blocked" or requirements.get("status") == "blocked":
-        payload.update(
-            {
-                "next_action": "RequirementsInformationBlocked",
-                "requires_user_authorization": False,
-                "message": "A design-blocking fact cannot currently be collected.",
-            }
+        return gate_payload(
+            payload,
+            ok=False,
+            next_action="RequirementsInformationBlocked",
+            message="A design-blocking fact cannot currently be collected.",
         )
-        return payload
 
     automatic, user, errors = classify_actions(check)
     payload["automatic_actions"] = automatic
@@ -186,41 +207,21 @@ def next_action(run_dir: Path, requirements: dict[str, Any]) -> dict[str, Any]:
     payload["blocking_reasons"] = errors
 
     if status == "needs_user_input" or user:
-        payload.update(
-            {
-                "next_action": "AskUserForInformation",
-                "requires_user_authorization": True,
-            }
-        )
-        return payload
+        return gate_payload(payload, ok=False, next_action="AskUserForInformation")
 
     if status == "needs_information_gathering" or automatic:
-        payload.update(
-            {
-                "next_action": "RunInformationGathering",
-                "requires_user_authorization": False,
-            }
-        )
-        return payload
+        return gate_payload(payload, ok=False, next_action="RunInformationGathering")
 
     if status in {"satisfied", "not_required"}:
-        payload.update(
-            {
-                "next_action": "ReadyForUserApproval",
-                "requires_user_authorization": True,
-                "message": "Information sufficiency is complete; show the requirements approval commitment.",
-            }
+        return gate_payload(
+            payload,
+            ok=True,
+            next_action="ReadyForUserApproval",
+            message="Information sufficiency is complete; show the requirements approval commitment.",
         )
-        return payload
 
-    payload.update(
-        {
-            "next_action": "RepairRequirementsInformationState",
-            "requires_user_authorization": False,
-            "blocking_reasons": errors or [f"unsupported information_sufficiency_check status {status!r}"],
-        }
-    )
-    return payload
+    payload["blocking_reasons"] = errors or [f"unsupported information_sufficiency_check status {status!r}"]
+    return gate_payload(payload, ok=False, next_action="RepairRequirementsInformationState")
 
 
 def main() -> int:
@@ -234,12 +235,15 @@ def main() -> int:
         requirements = read_json_object(run_dir / "requirements.control.json")
         payload = next_action(run_dir, requirements)
     except (OSError, ValueError, json.JSONDecodeError) as exc:
-        payload = {
-            "run_dir": str(run_dir),
-            "next_action": "RepairRequirementsInformationState",
-            "requires_user_authorization": False,
-            "blocking_reasons": [str(exc)],
-        }
+        payload = transition_gate_payload(
+            ok=False,
+            gate_id="requirements-information-sufficiency",
+            next_action="RepairRequirementsInformationState",
+            errors=[str(exc)],
+            run_dir=str(run_dir),
+            blocking_reasons=[str(exc)],
+        )
+        payload["requires_user_authorization"] = payload["may_ask_user"]
         if args.json:
             print(json.dumps(payload, ensure_ascii=False, indent=2))
         else:

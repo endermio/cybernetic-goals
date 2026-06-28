@@ -25,6 +25,7 @@ Read the rule files before acting:
 - `references/subagent-review-roles.md`
 - `references/output-and-final-checks.md`
 - `references/pregoal-detailed-rules.md`
+- `../references/transition-gate-protocol.md`
 
 ## Process Need Check
 
@@ -69,9 +70,9 @@ Before design or planning, run `scripts/orchestration_guard.py` for the matching
 state. If `information_sufficiency_check` fails, route to
 `RunInformationSufficiencyCheck` by running
 `.agents/skills/analyzing-cybernetic-requirements/scripts/requirements_information_loop.py
---run-dir <run-dir> --json`; follow its `next_action`. Do not treat missing
-facts as design assumptions, and do not ask the user to authorize internal
-counterexample review.
+--run-dir <run-dir> --json`; follow its `next_action` and rerun the gate. Do
+not treat missing facts as design assumptions, and do not ask the user to
+authorize internal counterexample review.
 
 ## Compile Gate
 
@@ -99,7 +100,8 @@ patch has approved review, and generation switch passes guard. With
 ## State Machine
 
 Use `scripts/orchestration_guard.py --state <state> --run-dir <run-dir>` before
-each transition and follow `NEXT:`.
+each transition. A nonterminal transition-gate result is not a report to the
+user; execute its `next_action` and run the gate again.
 
 Main transitions: RequirementsMissing, RequirementsComplete, DesignReady,
 GoalReady, PolicyReady, ReviewApproved, RuntimeGoalReady.
