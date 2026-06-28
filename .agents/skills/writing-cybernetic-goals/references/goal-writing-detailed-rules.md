@@ -33,6 +33,8 @@ For `controlled_run` JSON pre-goal work, do not create `goal.control.json` unles
 
 If the current user message approves the compact control commitment, update the requirements analysis `What the User Approved` section first, quoting or referencing that approval, then continue. Do not rely on in-memory approval to pass orchestration or runtime guards.
 
+For `controlled_run` requirements with schema `1.1.0+`, goal writing also requires a completed `approved_control.information_sufficiency_check`: status is `satisfied` or explicitly reviewed `not_required`; blocking facts have run-local `evidence_ref` values; `counterexample_review` is independent, approved, and covers the facts and transformations into design/plan. If this gate is absent, pending, missing evidence, or not independently reviewed, stop and route to `RunInformationSufficiencyCheck` / `$analyzing-cybernetic-requirements` before creating `goal.control.json`.
+
 Do not put “first write a plan, then execute it” inside an execution `/goal` for complex work.
 
 For `bounded_runtime` goals, create `goal.control.json` and bounded `runtime.control.json`, then output a short `/goal` pointer to `runtime.control.json` using `.agents/skills/using-bounded-control-json` only when the task limits and any required evaluation rubric are explicit. The bounded runtime does not require requirements/design/plan/review control JSON. Do not recommend `$writing-cybernetic-execution-policies` or `$reviewing-cybernetic-control-structures` by default unless the user explicitly requests them or the task reveals unresolved control decisions.
@@ -205,6 +207,7 @@ Before creating goal control JSON for complex work, check:
 - `requirements.control.json` exists;
 - `Requirements Analysis Status` is `Complete` or the user explicitly states the meaning are confirmed;
 - for `controlled_run` JSON pre-goal work, `What the User Approved: Approved` is present unless the current user message explicitly approves the compact control commitment;
+- for `controlled_run` JSON pre-goal work, `information_sufficiency_check` is `satisfied` or reviewed `not_required`, has run-local `evidence_ref` values, and has approved independent `counterexample_review`; otherwise route to `RunInformationSufficiencyCheck`;
 - confirmed decisions are recorded;
 - required solution design exists, or the user explicitly says the required design is unnecessary;
 - no blocking human decision remains unresolved.
@@ -372,6 +375,7 @@ If the user explicitly requests a small inline `/goal` and the task is low-risk,
 - [ ] The goal includes Where The Result Must Show Up for compiled runtime goals; direct bounded goals include it when requirements define result placement or intended-result realization spans places.
 - [ ] The goal includes What Counts As Done for compiled runtime goals, including a required answer path reference.
 - [ ] For `controlled_run` JSON pre-goal work, What the User Approved is Approved before the goal is written.
+- [ ] For `controlled_run` JSON pre-goal work, the information sufficiency gate has passed before the goal is written.
 - [ ] Success Condition allows `goal achieved: yes` only when the what counts as done is satisfied and user-purpose evidence/result-placement permit the matching achieved claims.
 - [ ] Any strongest positive result claim requires result-placement adequate; partial, missing, unavailable, or not applicable with justification receives calibrated wording.
 - [ ] Evidence checks are named but not treated as the objective.

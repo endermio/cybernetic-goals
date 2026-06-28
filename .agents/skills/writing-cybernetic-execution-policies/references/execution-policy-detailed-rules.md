@@ -40,6 +40,8 @@ amendment during goal execution.
 
 If the current user message approves the compact control commitment, update the requirements analysis `What the User Approved` section first, quoting or referencing that approval, then continue. Do not rely on in-memory approval to pass orchestration or runtime guards.
 
+For `controlled_run` requirements with schema `1.1.0+`, planning also requires a completed `approved_control.information_sufficiency_check`: status is `satisfied` or explicitly reviewed `not_required`; blocking facts have run-local `evidence_ref` values; `counterexample_review` is independent, approved, and covers the facts and transformations into design/plan. If this gate is absent, pending, missing evidence, or not independently reviewed, stop and route to `RunInformationSufficiencyCheck` / `$analyzing-cybernetic-requirements` before creating `plan.control.json`.
+
 ## Required Infrastructure
 
 Follow `$cybernetic-superpowers-infrastructure`.
@@ -456,6 +458,7 @@ Response-only next step:
 
 - [ ] Non-trivial execution policies invoke `$superpowers:writing-plans` or load and follow its `SKILL.md` instructions, otherwise stop/report missing infrastructure.
 - [ ] For `controlled_run` JSON pre-goal work, What the User Approved is Approved before execution-policy writing starts.
+- [ ] For `controlled_run` JSON pre-goal work, `information_sufficiency_check` is `satisfied` or reviewed `not_required`, has run-local `evidence_ref` values, and has approved independent `counterexample_review`; otherwise route to `RunInformationSufficiencyCheck`.
 - [ ] The plan records planning workflow status.
 - [ ] The plan does not self-substitute for a missing required planning workflow.
 - [ ] If blocked, the assistant response includes a response-only next step.

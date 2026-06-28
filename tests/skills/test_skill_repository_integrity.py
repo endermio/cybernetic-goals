@@ -106,6 +106,30 @@ class SkillRepositoryIntegrityTest(unittest.TestCase):
                 matches = contrastive.findall(text)
                 self.assertLessEqual(len(matches), 2, matches)
 
+    def test_downstream_manual_skills_require_information_sufficiency_gate(self):
+        downstream_paths = [
+            ".agents/skills/designing-cybernetic-solutions/SKILL.md",
+            ".agents/skills/designing-cybernetic-solutions/references/solution-design-detailed-rules.md",
+            ".agents/skills/writing-cybernetic-goals/SKILL.md",
+            ".agents/skills/writing-cybernetic-goals/references/goal-writing-detailed-rules.md",
+            ".agents/skills/writing-cybernetic-execution-policies/SKILL.md",
+            ".agents/skills/writing-cybernetic-execution-policies/references/execution-policy-detailed-rules.md",
+        ]
+        required_terms = [
+            "information_sufficiency_check",
+            "counterexample_review",
+            "satisfied",
+            "not_required",
+            "evidence_ref",
+            "RunInformationSufficiencyCheck",
+        ]
+
+        for path in downstream_paths:
+            text = (ROOT / path).read_text(encoding="utf-8")
+            with self.subTest(path=path):
+                for term in required_terms:
+                    self.assertIn(term, text)
+
 
 if __name__ == "__main__":
     unittest.main()

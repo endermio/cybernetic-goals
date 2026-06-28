@@ -30,7 +30,11 @@ The user-entered `/goal` must stay pointer-only.
 ### Mode A: Complex Control Contract
 
 Use for `controlled_run` JSON pre-goal orchestration. Requires approved
-requirements and any required design.
+requirements, any required design, and a completed information sufficiency gate:
+for schema `1.1.0+`, `approved_control.information_sufficiency_check` is
+`satisfied` or reviewed `not_required`, has run-local `evidence_ref` values, and
+has approved independent `counterexample_review`. Otherwise route to
+`RunInformationSufficiencyCheck`.
 
 Output:
 
@@ -115,6 +119,7 @@ Do not write conversational next-step prompts into goal control JSON.
 
 - [ ] Requirements and any required design exist.
 - [ ] Controlled runs have `What the User Approved: Approved`.
+- [ ] Controlled runs pass the information sufficiency gate before goal writing.
 - [ ] Goal does not weaken source requirements.
 - [ ] Runtime `/goal` is pointer-only.
 - [ ] `bounded_runtime` mode points to `using-bounded-control-json`.

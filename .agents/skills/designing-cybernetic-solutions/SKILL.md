@@ -23,12 +23,17 @@ Use `references/design-check.md` for the design trigger rubric.
 1. Read approved `requirements.control.json`.
 2. Confirm `What the User Approved` is Approved when `controlled_run` work is
    involved.
-3. Identify the model gap: objects, roles, relationships, information flow,
+3. For `controlled_run` with schema `1.1.0+`, confirm
+   `approved_control.information_sufficiency_check` is `satisfied` or reviewed
+   `not_required`, has run-local `evidence_ref` values, and has approved
+   independent `counterexample_review`; otherwise route to
+   `RunInformationSufficiencyCheck`.
+4. Identify the model gap: objects, roles, relationships, information flow,
    authority, lifecycle, failure model, evidence model, or output structure.
-4. Produce `design.control.json` only for the model needed downstream.
-5. Preserve requirement meaning exactly. If design would change the approved
+5. Produce `design.control.json` only for the model needed downstream.
+6. Preserve requirement meaning exactly. If design would change the approved
    target, return to requirements.
-6. Mark tactical choices as tactical; do not freeze them as meaning rules unless
+7. Mark tactical choices as tactical; do not freeze them as meaning rules unless
    requirements approved them.
 
 ## Required Sections
@@ -82,6 +87,7 @@ artifact.
 ## Validation Checklist
 
 - [ ] Design consumes approved requirements.
+- [ ] Controlled runs pass the information sufficiency gate before design.
 - [ ] Requirement meaning was not changed.
 - [ ] Required answer path is preserved.
 - [ ] Solution model is explicit enough for goal and execution policy.

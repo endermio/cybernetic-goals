@@ -70,6 +70,8 @@ For `controlled_run` JSON pre-goal work, do not proceed unless the requirements 
 
 If the current user message approves the compact control commitment, update the requirements analysis `What the User Approved` section first, quoting or referencing that approval, then continue. Do not rely on in-memory approval to pass orchestration or runtime guards.
 
+For `controlled_run` requirements with schema `1.1.0+`, design may start only after `approved_control.information_sufficiency_check` is complete: status is `satisfied` or explicitly reviewed `not_required`; blocking facts have run-local `evidence_ref` values; `counterexample_review` is independent, approved, and covers the facts and transformations into design/plan. If this gate is absent, pending, missing evidence, or not independently reviewed, stop and route to `RunInformationSufficiencyCheck` / `$analyzing-cybernetic-requirements` before creating `design.control.json`.
+
 ## Optional Infrastructure
 
 Use `$superpowers:brainstorming` only when the design space is exploratory or the user explicitly asks for design exploration.
@@ -176,19 +178,20 @@ Open design questions that affect requirement meaning, controlled relationships,
 
 1. Read completed requirements control JSON.
 2. For `controlled_run` JSON pre-goal work, verify `What the User Approved: Approved` before deriving or writing the design.
-3. Derive the design path from the requirements path.
-4. Inspect the routing context from the user request, router output, and requirements checks.
-5. Inspect only enough context to avoid generic design.
-6. Identify whether `$superpowers:brainstorming` is required, used, blocked, or not required.
-7. If What the User Approved records how this should be answered or what is not enough, instantiate that answer path and record Required Answer Path Check before deriving any model.
-8. Build the target answer path instance: answer path nodes, answer/state transitions, required evidence, and completion conditions.
-9. Derive the what supports each required step from answer path nodes: support objects, mechanisms, relationships, flows, inside/outside choices, alternatives, and rules that cannot change.
-10. Write design details only as required-step mappings: mechanisms, interfaces/contracts, state/lifecycle, failure model, evidence/evidence check model, compatibility/integration, and decisions must each name the required step they support or be marked supporting-only.
-11. If Final Answer Format Check requires structure synthesis, design the output structure and evidence-reference rules.
-12. Separate design rules that cannot change from tactical degrees of freedom.
-13. Map answer path and support model elements to goal implications and execution-policy implications.
-14. If material design questions remain, record them and stop without marking Approved.
-15. Do not create goal, plan, review, runtime `/goal`, or target-work files.
+3. Verify the information sufficiency gate before design: `information_sufficiency_check` status is `satisfied` or reviewed `not_required`, includes run-local `evidence_ref` values, and has approved independent `counterexample_review`; otherwise route to `RunInformationSufficiencyCheck`.
+4. Derive the design path from the requirements path.
+5. Inspect the routing context from the user request, router output, and requirements checks.
+6. Inspect only enough context to avoid generic design.
+7. Identify whether `$superpowers:brainstorming` is required, used, blocked, or not required.
+8. If What the User Approved records how this should be answered or what is not enough, instantiate that answer path and record Required Answer Path Check before deriving any model.
+9. Build the target answer path instance: answer path nodes, answer/state transitions, required evidence, and completion conditions.
+10. Derive the what supports each required step from answer path nodes: support objects, mechanisms, relationships, flows, inside/outside choices, alternatives, and rules that cannot change.
+11. Write design details only as required-step mappings: mechanisms, interfaces/contracts, state/lifecycle, failure model, evidence/evidence check model, compatibility/integration, and decisions must each name the required step they support or be marked supporting-only.
+12. If Final Answer Format Check requires structure synthesis, design the output structure and evidence-reference rules.
+13. Separate design rules that cannot change from tactical degrees of freedom.
+14. Map answer path and support model elements to goal implications and execution-policy implications.
+15. If material design questions remain, record them and stop without marking Approved.
+16. Do not create goal, plan, review, runtime `/goal`, or target-work files.
 
 ## Response-Only Handoff Rule
 
@@ -254,6 +257,7 @@ Do not write goal control JSON until this design decision is resolved or the hum
 
 - [ ] Requirements analysis is complete before design is approved.
 - [ ] For `controlled_run` JSON pre-goal work, What the User Approved is Approved before design starts.
+- [ ] For `controlled_run` JSON pre-goal work, `information_sufficiency_check` is `satisfied` or reviewed `not_required`, has run-local `evidence_ref` values, and has approved independent `counterexample_review`; otherwise route to `RunInformationSufficiencyCheck`.
 - [ ] If What the User Approved records How this should be answered or What is not enough, the design includes Required Answer Path Check and does not substitute a weaker answer path.
 - [ ] The design path uses the requirements analysis date/slug.
 - [ ] The design stays within core cybernetic vocabulary unless an explicit adapter supplies additional terms.

@@ -31,6 +31,12 @@ For `controlled_run`, do not create an execution policy unless
 `What the User Approved` is Approved or the current user message explicitly
 approves the compact control commitment.
 
+For `controlled_run` with requirements schema `1.1.0+`, also require
+`approved_control.information_sufficiency_check` to be `satisfied` or reviewed
+`not_required`, with run-local `evidence_ref` values and approved independent
+`counterexample_review`. If this is absent or unfinished, route to
+`RunInformationSufficiencyCheck`.
+
 When `strategy_policy` is `reviewed_replanning`, the policy may describe a
 current-generation strategy. It must separate hard anchors from strategy details
 that may change by reviewed amendment.
@@ -140,6 +146,7 @@ the policy artifact.
 ## Validation Checklist
 
 - [ ] Requirements, goal, and any required design are referenced.
+- [ ] Controlled runs pass the information sufficiency gate before planning.
 - [ ] Rules that cannot change are separated from tactics.
 - [ ] Work assignment is explicit and compatible with workflow limits.
 - [ ] Blocking required steps have producing actions.
