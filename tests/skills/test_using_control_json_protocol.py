@@ -105,11 +105,15 @@ class UsingControlJsonProtocolTest(unittest.TestCase):
 
     def test_goal_achieved_true_requires_verifier_permission(self):
         text = combined_protocol_text()
+        normalized = " ".join(text.split())
 
         self.assertIn("goal_achieved: true", text)
         self.assertRegex(text, re.compile(r"verifier[^.\n]*before[^.\n]*(accepting|reporting|acting on)", re.I))
         self.assertRegex(text, re.compile(r"final-report\.json[^.\n]*does not grant verifier permission to itself", re.I))
-        self.assertRegex(text, re.compile(r"verifier[^.\n]*output[^.\n]*source of truth", re.I))
+        self.assertIn("structural final-claim gate", normalized)
+        self.assertIn("not a semantic quality gate", normalized)
+        self.assertNotIn("verifier process output as the source of truth", normalized)
+        self.assertNotRegex(text, re.compile(r"verifier[^.\n]*output[^.\n]*source of truth", re.I))
 
     def test_validators_are_structural_gates_not_quality_approval(self):
         text = combined_protocol_text()

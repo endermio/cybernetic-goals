@@ -146,8 +146,10 @@ not an automatically reviewable strategy change.
 `final-report.json` is the terminal runtime report. It records the runtime's
 completion or non-completion claim, evidence, work coverage, and remaining gaps.
 It does not grant verifier permission to itself. A legacy `verification` object
-may be present for compatibility, but `verify_runtime_progress.py` output is the
-source of truth for whether `goal_achieved: true` is accepted.
+may be present for compatibility, but the configured verifier is a structural
+final-claim gate for whether the current JSON/progress evidence permits
+`goal_achieved: true`. Verifier success is not a semantic quality gate; the
+requirements-approved Counterexample Gate is the adversarial quality gate.
 
 Write `final-report.json` after progress evidence exists. Then run the verifier.
 If the verifier does not permit completion, rewrite or replace the terminal
