@@ -30,6 +30,19 @@ def write_requirements(run_dir: Path, requirements: dict) -> None:
     (run_dir / "requirements.control.json").write_text(json.dumps(requirements, indent=2), encoding="utf-8")
 
 
+def write_information_evidence(run_dir: Path) -> None:
+    evidence_dir = run_dir / "evidence"
+    evidence_dir.mkdir(parents=True, exist_ok=True)
+    (evidence_dir / "client_minimal_example.json").write_text(
+        json.dumps({"status": "pass", "observation": "client ok"}, indent=2),
+        encoding="utf-8",
+    )
+    (evidence_dir / "information_sufficiency_counterexample.json").write_text(
+        json.dumps({"status": "pass", "verdict": "approved"}, indent=2),
+        encoding="utf-8",
+    )
+
+
 class TransitionGateProtocolTest(unittest.TestCase):
     def test_information_gate_nonterminal_actions_prohibit_approval_and_require_rerun(self):
         with tempfile.TemporaryDirectory() as tmpdir:
@@ -203,6 +216,7 @@ class TransitionGateProtocolTest(unittest.TestCase):
                     }
                     refresh_semantic_base(req)
                     write_requirements(run_dir, req)
+                    write_information_evidence(run_dir)
 
                     result = run_script(INFO_LOOP, "--run-dir", str(run_dir), "--json")
 
@@ -213,6 +227,33 @@ class TransitionGateProtocolTest(unittest.TestCase):
                     self.assertFalse(payload["terminal"])
                     self.assertFalse(payload["approval_allowed"])
                     self.assertFalse(payload["handoff_allowed"])
+
+    def test_information_gate_satisfied_status_requires_satisfied_blocking_facts(self):
+        for requirements_status, forbidden_next_action in (
+            ("pending_approval", "ReadyForUserApproval"),
+            ("approved", "ReadyForPreGoalHandoff"),
+        ):
+            with self.subTest(requirements_status=requirements_status):
+                with tempfile.TemporaryDirectory() as tmpdir:
+                    run_dir = Path(tmpdir)
+                    req = requirements_with_information_sufficiency(status="satisfied")
+                    req["status"] = requirements_status
+                    fact = req["approved_control"]["information_sufficiency_check"]["facts"][0]
+                    fact["current_status"] = "missing"
+                    refresh_semantic_base(req)
+                    write_requirements(run_dir, req)
+                    write_information_evidence(run_dir)
+
+                    result = run_script(INFO_LOOP, "--run-dir", str(run_dir), "--json")
+
+                    self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+                    payload = json.loads(result.stdout)
+                    self.assertNotEqual(forbidden_next_action, payload["next_action"])
+                    self.assertEqual("RepairRequirementsInformationState", payload["next_action"])
+                    self.assertFalse(payload["terminal"])
+                    self.assertFalse(payload["approval_allowed"])
+                    self.assertFalse(payload["handoff_allowed"])
+                    self.assertIn("blocks handoff", "\n".join(payload["blocking_reasons"]))
 
     def test_information_gate_ignores_non_planned_collection_actions_as_next_actions(self):
         with tempfile.TemporaryDirectory() as tmpdir:
@@ -252,6 +293,7 @@ class TransitionGateProtocolTest(unittest.TestCase):
             req["status"] = "pending_approval"
             refresh_semantic_base(req)
             write_requirements(run_dir, req)
+            write_information_evidence(run_dir)
 
             result = run_script(INFO_LOOP, "--run-dir", str(run_dir), "--json")
 

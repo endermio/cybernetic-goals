@@ -1,3 +1,4 @@
+.agents/skills/_shared/information_sufficiency.py
 .agents/skills/_shared/transition_gate.py
 .agents/skills/analyzing-cybernetic-requirements/SKILL.md
 .agents/skills/analyzing-cybernetic-requirements/agents/openai.yaml

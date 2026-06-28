@@ -19,6 +19,7 @@ REPO_ROOT = Path(__file__).resolve().parents[4]
 sys.path.insert(0, str(REPO_ROOT / ".agents/skills/_shared"))
 
 from transition_gate import transition_gate_payload  # noqa: E402
+from information_sufficiency import information_sufficiency_errors  # noqa: E402
 
 
 SAFE_ACTION_TYPES = {"read_source", "read_documentation", "run_no_side_effect_probe"}
@@ -156,19 +157,17 @@ def action_detail_errors(action: dict[str, Any], action_type: Any, action_ref: A
     return []
 
 
-def counterexample_review_passed(check: dict[str, Any]) -> bool:
-    review = check.get("counterexample_review")
-    return (
-        isinstance(review, dict)
-        and review.get("status") == "pass"
-        and review.get("verdict") == "approved"
+def approval_or_handoff_errors(requirements: dict[str, Any], run_dir: Path) -> list[str]:
+    return information_sufficiency_errors(requirements, run_dir)
+
+
+def requires_counterexample_review(errors: list[str]) -> bool:
+    review_error_prefixes = (
+        "information_sufficiency_check counterexample_review must pass with verdict approved",
+        "information_sufficiency_check counterexample_review missing checked_facts:",
+        "information_sufficiency_check counterexample_review missing checked_transformations:",
     )
-
-
-def counterexample_review_errors(check: dict[str, Any]) -> list[str]:
-    if counterexample_review_passed(check):
-        return []
-    return ["information_sufficiency_check counterexample_review must pass with verdict approved before approval or handoff"]
+    return bool(errors) and all(error.startswith(review_error_prefixes) for error in errors)
 
 
 def classify_actions(check: dict[str, Any]) -> tuple[list[dict[str, Any]], list[dict[str, Any]], list[str]]:
@@ -212,13 +211,18 @@ def next_action(run_dir: Path, requirements: dict[str, Any]) -> dict[str, Any]:
     payload = base_payload(run_dir, requirements, check)
 
     if requirements.get("status") == "approved" and status in {"satisfied", "not_required"}:
-        review_errors = counterexample_review_errors(check)
-        if review_errors:
-            payload["blocking_reasons"] = review_errors
+        handoff_errors = approval_or_handoff_errors(requirements, run_dir)
+        if handoff_errors:
+            payload["blocking_reasons"] = handoff_errors
+            next_gate_action = (
+                "RunInformationCounterexampleReview"
+                if requires_counterexample_review(handoff_errors)
+                else "RepairRequirementsInformationState"
+            )
             return gate_payload(
                 payload,
                 ok=False,
-                next_action="RunInformationCounterexampleReview",
+                next_action=next_gate_action,
                 review_prompt=review_prompt(check),
             )
         return gate_payload(
@@ -256,13 +260,18 @@ def next_action(run_dir: Path, requirements: dict[str, Any]) -> dict[str, Any]:
         )
 
     if status in {"satisfied", "not_required"}:
-        review_errors = counterexample_review_errors(check)
-        if review_errors:
-            payload["blocking_reasons"] = review_errors
+        approval_errors = approval_or_handoff_errors(requirements, run_dir)
+        if approval_errors:
+            payload["blocking_reasons"] = approval_errors
+            next_gate_action = (
+                "RunInformationCounterexampleReview"
+                if requires_counterexample_review(approval_errors)
+                else "RepairRequirementsInformationState"
+            )
             return gate_payload(
                 payload,
                 ok=False,
-                next_action="RunInformationCounterexampleReview",
+                next_action=next_gate_action,
                 review_prompt=review_prompt(check),
             )
         return gate_payload(
