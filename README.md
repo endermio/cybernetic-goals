@@ -79,7 +79,7 @@ $orchestrating-cybernetic-pregoal
   -> run pre-goal compilation after requirements analysis, invoking solution design when Design Gate is required
 ```
 
-Full pre-goal orchestration includes the solution-design stage when Design Gate is required, but solution design remains owned by `$designing-cybernetic-solutions`.
+Controlled-run orchestration includes the solution-design stage when Design Gate is required, but solution design remains owned by `$designing-cybernetic-solutions`.
 
 The orchestrator drives the following skills and stops if the review cannot converge:
 
@@ -100,7 +100,7 @@ $compiling-cybernetic-runtime-goals
   -> docs/cybernetics/runs/YYYY-MM-DD-feature/runtime.control.json plus a short /goal pointer
 ```
 
-For simple work, the router should reject the full pipeline and recommend an inline prompt or inline `/goal`.
+For simple work, the router should reject the controlled-run chain and recommend an inline prompt or inline `/goal`.
 
 ## Included skills
 

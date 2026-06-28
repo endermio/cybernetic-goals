@@ -201,17 +201,6 @@ def next_action(run_dir: Path, requirements: dict[str, Any]) -> dict[str, Any]:
             message="A design-blocking fact cannot currently be collected.",
         )
 
-    automatic, user, errors = classify_actions(check)
-    payload["automatic_actions"] = automatic
-    payload["user_actions"] = user
-    payload["blocking_reasons"] = errors
-
-    if status == "needs_user_input" or user:
-        return gate_payload(payload, ok=False, next_action="AskUserForInformation")
-
-    if status == "needs_information_gathering" or automatic:
-        return gate_payload(payload, ok=False, next_action="RunInformationGathering")
-
     if status in {"satisfied", "not_required"}:
         return gate_payload(
             payload,
@@ -219,6 +208,20 @@ def next_action(run_dir: Path, requirements: dict[str, Any]) -> dict[str, Any]:
             next_action="ReadyForUserApproval",
             message="Information sufficiency is complete; show the requirements approval commitment.",
         )
+
+    automatic, user, errors = classify_actions(check)
+    payload["automatic_actions"] = automatic
+    payload["user_actions"] = user
+    payload["blocking_reasons"] = errors
+
+    if errors:
+        return gate_payload(payload, ok=False, next_action="RepairRequirementsInformationState")
+
+    if status == "needs_user_input" or user:
+        return gate_payload(payload, ok=False, next_action="AskUserForInformation")
+
+    if status == "needs_information_gathering" or automatic:
+        return gate_payload(payload, ok=False, next_action="RunInformationGathering")
 
     payload["blocking_reasons"] = errors or [f"unsupported information_sufficiency_check status {status!r}"]
     return gate_payload(payload, ok=False, next_action="RepairRequirementsInformationState")

@@ -132,10 +132,23 @@ class SkillHotPathCompressionTest(unittest.TestCase):
         self.assertIn("User-entered short `/goal` pointer", orchestrator_checks)
         self.assertIn("runtime.control.json", orchestrator_checks)
         self.assertIn("using-control-json", orchestrator_checks)
+        self.assertIn("transition-gate", orchestrator_checks)
+        self.assertNotIn("Follow the guard's `NEXT:` value", orchestrator_checks)
 
         control_rules = read(".agents/skills/writing-cybernetic-goals/references/control-contract-rules.md")
         self.assertIn("/goal Execute the runtime control JSON at", control_rules)
         self.assertIn("using-control-json", control_rules)
+
+    def test_guides_do_not_reintroduce_process_weight_labels(self):
+        readme = read("README.md")
+        pregoal_details = read(".agents/skills/orchestrating-cybernetic-pregoal/references/pregoal-detailed-rules.md")
+        compiler_skill = read(".agents/skills/compiling-cybernetic-runtime-goals/SKILL.md")
+
+        self.assertNotIn("full pipeline", readme)
+        self.assertIn("controlled-run chain", readme)
+        self.assertNotIn("propacheck", pregoal_details)
+        self.assertNotIn("stop and report the next allowed action", pregoal_details)
+        self.assertNotIn("`NEXT: ...` if emitted", compiler_skill)
 
     def test_skill_descriptions_are_trigger_only_and_compact(self):
         for path in sorted((ROOT / ".agents/skills").glob("*/SKILL.md")):

@@ -47,7 +47,7 @@ Owned orchestration:
 - emulate narrow cybernetic formatting only when a downstream cybernetic skill is unavailable and that fallback is explicitly allowed
 - create or update approved control files under `docs/cybernetics/runs/<slug>/`
 - invoke, request, or validate a solution design when required design is required
-- propacheck and validate output contract presence across downstream artifacts
+- propagate and validate output contract presence across downstream artifacts
 - use explicitly authorized subagents as independent reviewers
 - run an Intent Preservation / Obligation Preservation subagent review pass
   when subagent review is authorized
@@ -397,7 +397,8 @@ Do not pass a separate generation override that can diverge from the manifest.
 Read `references/orchestration-protocol.md` for the control-layer map, then use
 the state machine below. Before each transition, run
 `scripts/orchestration_guard.py` with the matching `--state` when available. If
-the guard fails, stop and report the next allowed action from the guard.
+the guard returns a nonterminal transition-gate result, execute its
+`next_action`, update the named artifact or evidence, and rerun the gate.
 
 ### Validate Inputs
 
@@ -494,7 +495,7 @@ Design artifacts with status `Candidate`, `Reviewed`, or `Approved` may enter do
 - if What the User Approved records `How this should be answered` or `What is not enough`, the design records a Required Answer Path check that preserves the approved answer path and avoids what is not enough;
 - final review will check Design Match and Required Answer Path when What the User Approved records how this should be answered.
 
-If any design artifact exists, propacheck its path to goal writing, execution-policy writing, review, and runtime compilation, even when required design is satisfied or no longer required.
+If any design artifact exists, propagate its path to goal writing, execution-policy writing, review, and runtime compilation, even when required design is satisfied or no longer required.
 
 ## Required Answer Path Check
 

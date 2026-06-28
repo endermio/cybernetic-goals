@@ -8,6 +8,7 @@ from tests.skills.test_information_sufficiency_gate import (
     requirements_with_information_sufficiency,
     refresh_semantic_base,
 )
+from tests.skills.test_reviewed_replanning_control import write_strategy_run
 
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -94,6 +95,27 @@ class TransitionGateProtocolTest(unittest.TestCase):
             self.assertFalse(payload["approval_allowed"])
             self.assertFalse(payload["handoff_allowed"])
 
+    def test_information_gate_missing_collection_actions_routes_to_repair_not_empty_action(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            run_dir = Path(tmpdir)
+            req = requirements_with_information_sufficiency(status="needs_information_gathering")
+            check = req["approved_control"]["information_sufficiency_check"]
+            check["facts"][0]["current_status"] = "needs_information_gathering"
+            check.pop("collection_actions", None)
+            refresh_semantic_base(req)
+            write_requirements(run_dir, req)
+
+            result = run_script(INFO_LOOP, "--run-dir", str(run_dir), "--json")
+
+            self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+            payload = json.loads(result.stdout)
+            self.assertEqual("RepairRequirementsInformationState", payload["next_action"])
+            self.assertFalse(payload["terminal"])
+            self.assertTrue(payload["rerun_required"])
+            self.assertFalse(payload["approval_allowed"])
+            self.assertFalse(payload["handoff_allowed"])
+            self.assertIn("collection_actions", "\n".join(payload["blocking_reasons"]))
+
     def test_information_gate_ready_for_approval_is_terminal_for_requirements_analysis(self):
         with tempfile.TemporaryDirectory() as tmpdir:
             run_dir = Path(tmpdir)
@@ -153,6 +175,38 @@ class TransitionGateProtocolTest(unittest.TestCase):
             self.assertTrue(payload["rerun_required"])
             self.assertFalse(payload["approval_allowed"])
             self.assertFalse(payload["handoff_allowed"])
+
+    def test_amendment_orchestrator_missing_patch_routes_to_patch_repair_not_review(self):
+        event = {
+            "event_type": "control.amendment.proposed",
+            "schema_version": "1.0.0",
+            "occurred_at": "2026-06-10T00:00:00Z",
+            "runtime_generation": "gen-000",
+            "amendment_id": "A1",
+            "reason": "current strategy cannot produce required evidence",
+            "triggering_observation": "current strategy produced substitute evidence",
+            "affected_stages": ["plan", "runtime"],
+            "affected_source_requirements": ["SR-target-startup"],
+            "semantic_base_change": False,
+            "required_outcomes_changed": False,
+            "authority_expanded": False,
+            "proposed_changes": ["replace substitute evidence with producing strategy"],
+            "review_required": ["intent-preservation", "required-outcome-coverage"],
+            "patch_ref": "amendments/A1.patch.json",
+        }
+        with tempfile.TemporaryDirectory() as tmpdir:
+            run_dir = Path(tmpdir)
+            write_strategy_run(run_dir, progress_events=[event], strategy_policy="reviewed_replanning")
+
+            result = run_script(AMENDMENT_ORCHESTRATOR, "--run-dir", str(run_dir))
+
+            self.assertNotEqual(result.returncode, 0, result.stdout + result.stderr)
+            payload = json.loads(result.stdout)
+            self.assertEqual("FixAmendmentPatch", payload["next_action"])
+            self.assertFalse(payload["terminal"])
+            self.assertTrue(payload["rerun_required"])
+            self.assertFalse(payload["requires_independent_review"])
+            self.assertIn("patch file is missing", "\n".join(payload["errors"]))
 
     def test_hot_path_docs_reference_shared_transition_gate_protocol(self):
         paths = [

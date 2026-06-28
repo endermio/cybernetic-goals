@@ -256,7 +256,7 @@ def apply_amendment(run_dir: Path, requested_amendment_id: str | None = None) ->
     if patch_path is None or not patch_path.exists():
         return 2, result_payload(
             False,
-            next_allowed_action="RunReview",
+            next_allowed_action="FixAmendmentPatch",
             amendment_id=amendment_id,
             errors=["amendment patch file is missing: " + str(amendment.get("patch_ref"))],
         )

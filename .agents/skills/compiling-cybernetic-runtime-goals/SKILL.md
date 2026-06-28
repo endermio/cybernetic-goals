@@ -72,7 +72,7 @@ Reason:
 
 Guard/compiler result:
 - `FAIL`
-- `NEXT: ...` if emitted
+- transition-gate `next_action` if emitted
 
 Response-only next step:
 - return to `$orchestrating-cybernetic-pregoal` with the failing output, or

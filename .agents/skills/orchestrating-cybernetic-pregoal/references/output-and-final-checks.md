@@ -60,7 +60,8 @@ Next allowed action:
 - `RunDesign` / `RunGoalWriting` / `RunExecutionPolicy` / `RunReview` / `RunRuntimeCompile` / `Blocked`
 
 Response-only next step:
-- Follow the guard's `NEXT:` value when available.
+- Follow the transition-gate result: if `terminal` is false, execute
+  `next_action`, update the named artifact or evidence, and rerun the same gate.
 - If requirements are incomplete: return to `$analyzing-cybernetic-requirements` with the smallest missing decision.
 - If required design is missing: invoke or request `$designing-cybernetic-solutions`; if that skill is unavailable, stay `Blocked`.
 - If goal, execution policy, or review is missing or stale: run the matching next allowed pre-goal stage.
@@ -79,8 +80,8 @@ Before responding, verify:
 - [ ] No required solution design synthesis was emulated inside the orchestrator.
 - [ ] Requirements analysis was complete before creating downstream artifacts.
 - [ ] Required solution design was created by `$designing-cybernetic-solutions` or explicitly provided before goal writing, otherwise blocked.
-- [ ] Existing design artifact paths were propacheckd to goal, execution policy, review, and runtime compilation.
-- [ ] Output contract presence was propacheckd and validated; no output contract was synthesized by the orchestrator.
+- [ ] Existing design artifact paths were propagated to goal, execution policy, review, and runtime compilation.
+- [ ] Output contract presence was propagated and validated; no output contract was synthesized by the orchestrator.
 - [ ] `goal.control.json` preserved confirmed human decisions.
 - [ ] Goal and execution policy control JSON preserved required solution design.
 - [ ] `plan.control.json` preserved `goal.control.json`.
