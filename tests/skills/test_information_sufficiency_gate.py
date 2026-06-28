@@ -789,7 +789,37 @@ class InformationSufficiencyGateTest(unittest.TestCase):
             payload = json.loads(result.stdout)
             self.assertEqual("RunInformationCounterexampleReview", payload["next_action"])
             self.assertFalse(payload["requires_user_authorization"])
+            self.assertFalse(payload["user_action_required"])
+            self.assertTrue(payload["agent_must_continue"])
             self.assertIn("F-client-minimal-example", payload["review_prompt"])
+
+    def test_information_loop_plain_output_marks_internal_review_as_agent_owned(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            run_dir = Path(tmpdir)
+            req = requirements_with_information_sufficiency(status="needs_counterexample_review")
+            info_check = req["approved_control"]["information_sufficiency_check"]
+            info_check["counterexample_review"] = {
+                "status": "needs_revision",
+                "verdict": "needs_revision",
+                "reviewer": {
+                    "kind": "subagent",
+                    "id": "pending-information-sufficiency-reviewer",
+                    "evidence_ref": "evidence/information_sufficiency_counterexample.json",
+                },
+                "checked_facts": [],
+                "checked_transformations": [],
+                "findings": ["review has not run yet"],
+            }
+            refresh_semantic_base(req)
+            (run_dir / "requirements.control.json").write_text(json.dumps(req, indent=2), encoding="utf-8")
+
+            result = run_script(INFO_LOOP, "--run-dir", str(run_dir))
+
+            self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+            self.assertIn("NEXT: RunInformationCounterexampleReview", result.stdout)
+            self.assertIn("AGENT_MUST_CONTINUE: true", result.stdout)
+            self.assertIn("USER_ACTION_REQUIRED: false", result.stdout)
+            self.assertIn("DO_NOT_ASK_USER_AUTHORIZATION", result.stdout)
 
     def test_information_loop_exposes_safe_information_gathering_actions(self):
         with tempfile.TemporaryDirectory() as tmpdir:

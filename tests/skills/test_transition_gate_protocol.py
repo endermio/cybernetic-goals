@@ -77,6 +77,8 @@ class TransitionGateProtocolTest(unittest.TestCase):
             self.assertFalse(payload["approval_allowed"])
             self.assertFalse(payload["handoff_allowed"])
             self.assertFalse(payload["may_ask_user"])
+            self.assertFalse(payload["user_action_required"])
+            self.assertTrue(payload["agent_must_continue"])
 
     def test_information_gate_user_input_allows_question_but_not_approval(self):
         with tempfile.TemporaryDirectory() as tmpdir:
@@ -106,6 +108,8 @@ class TransitionGateProtocolTest(unittest.TestCase):
             self.assertFalse(payload["terminal"])
             self.assertTrue(payload["rerun_required"])
             self.assertTrue(payload["may_ask_user"])
+            self.assertTrue(payload["user_action_required"])
+            self.assertFalse(payload["agent_must_continue"])
             self.assertFalse(payload["approval_allowed"])
             self.assertFalse(payload["handoff_allowed"])
 

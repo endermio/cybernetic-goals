@@ -38,6 +38,7 @@ def transition_gate_payload(
     **fields: Any,
 ) -> dict[str, Any]:
     terminal = bool(ok) or next_action in TERMINAL_ACTIONS
+    user_action_required = next_action in USER_ACTIONS
     payload: dict[str, Any] = {
         "gate_protocol": PROTOCOL,
         "gate_id": gate_id,
@@ -48,7 +49,9 @@ def transition_gate_payload(
         "rerun_required": not terminal,
         "approval_allowed": next_action in APPROVAL_ACTIONS,
         "handoff_allowed": next_action in HANDOFF_ACTIONS or (ok and next_action not in APPROVAL_ACTIONS),
-        "may_ask_user": next_action in USER_ACTIONS,
+        "may_ask_user": user_action_required,
+        "user_action_required": user_action_required,
+        "agent_must_continue": not terminal and not user_action_required,
         "requires_independent_review": next_action in INDEPENDENT_REVIEW_ACTIONS,
         "errors": errors or [],
         "warnings": [],

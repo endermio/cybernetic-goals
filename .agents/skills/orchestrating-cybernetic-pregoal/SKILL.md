@@ -102,6 +102,9 @@ patch has approved review, and generation switch passes guard. With
 Use `scripts/orchestration_guard.py --state <state> --run-dir <run-dir>` before
 each transition. A nonterminal transition-gate result is not a report to the
 user; execute its `next_action` and run the gate again.
+If the gate reports `agent_must_continue: true`, continue internally in the
+same turn. Do not ask the user to authorize `RunInformationCounterexampleReview`
+or other agent-owned transition actions.
 
 Main transitions: RequirementsMissing, RequirementsComplete, DesignReady,
 GoalReady, PolicyReady, ReviewApproved, RuntimeGoalReady.

@@ -199,6 +199,9 @@ The helper is a transition gate, not an executor. Follow
 `../references/transition-gate-protocol.md`: when `terminal` is false, perform
 the returned `next_action`, update requirements/evidence as needed, and run the
 same helper again before approval or handoff.
+When the helper emits `agent_must_continue: true`, continue the requirements
+analysis loop in the current turn. Do not stop to ask for user authorization
+unless the helper emits `user_action_required: true`.
 
 Safe collection may read source, inspect local documentation, and run
 no-side-effect local probes or minimal examples. Ask the user before using

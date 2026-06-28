@@ -434,6 +434,9 @@ Follow the returned `next_action`. If it returns
 `RunInformationCounterexampleReview`, start the internal independent review; do
 not ask the user to authorize that review. Ask the user only when the loop
 returns `AskUserForInformation`.
+If the payload says `agent_must_continue: true`, the orchestrator must execute
+that action before reporting back. A status-only message that waits for user
+permission is a protocol violation unless `user_action_required` is true.
 
 All orchestration routers are transition gates. Use
 `../references/transition-gate-protocol.md`: a nonterminal result is not a user
