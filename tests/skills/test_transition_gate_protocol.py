@@ -188,6 +188,37 @@ class TransitionGateProtocolTest(unittest.TestCase):
             self.assertEqual([], payload["automatic_actions"])
             self.assertIn("command", "\n".join(payload["blocking_reasons"]))
 
+    def test_information_gate_safe_probe_command_must_be_array(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            run_dir = Path(tmpdir)
+            req = requirements_with_information_sufficiency(status="needs_information_gathering")
+            check = req["approved_control"]["information_sufficiency_check"]
+            check["facts"][0]["current_status"] = "needs_information_gathering"
+            check["collection_actions"] = [
+                {
+                    "action_id": "IA-string-command",
+                    "fact_id": "F-client-minimal-example",
+                    "action_type": "run_no_side_effect_probe",
+                    "status": "planned",
+                    "why_safe_or_needed": "The probe command must follow schema shape.",
+                    "evidence_ref": "evidence/client_probe.json",
+                    "command": "python3 -c 'print(1)'",
+                    "working_dir": ".",
+                    "allow_automatic_execution": True,
+                }
+            ]
+            refresh_semantic_base(req)
+            write_requirements(run_dir, req)
+
+            result = run_script(INFO_LOOP, "--run-dir", str(run_dir), "--json")
+
+            self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+            payload = json.loads(result.stdout)
+            self.assertEqual("RepairRequirementsInformationState", payload["next_action"])
+            self.assertFalse(payload["terminal"])
+            self.assertEqual([], payload["automatic_actions"])
+            self.assertIn("command", "\n".join(payload["blocking_reasons"]))
+
     def test_information_gate_satisfied_status_requires_passed_counterexample_review(self):
         for requirements_status, forbidden_next_action in (
             ("pending_approval", "ReadyForUserApproval"),
@@ -254,6 +285,32 @@ class TransitionGateProtocolTest(unittest.TestCase):
                     self.assertFalse(payload["approval_allowed"])
                     self.assertFalse(payload["handoff_allowed"])
                     self.assertIn("blocks handoff", "\n".join(payload["blocking_reasons"]))
+
+    def test_information_gate_satisfied_status_rejects_any_unfinished_fact(self):
+        for requirements_status, forbidden_next_action in (
+            ("pending_approval", "ReadyForUserApproval"),
+            ("approved", "ReadyForPreGoalHandoff"),
+        ):
+            with self.subTest(requirements_status=requirements_status):
+                with tempfile.TemporaryDirectory() as tmpdir:
+                    run_dir = Path(tmpdir)
+                    req = requirements_with_information_sufficiency(status="satisfied")
+                    req["status"] = requirements_status
+                    fact = req["approved_control"]["information_sufficiency_check"]["facts"][0]
+                    fact["current_status"] = "needs_user_input"
+                    fact["blocks_design_or_plan_if_missing"] = False
+                    refresh_semantic_base(req)
+                    write_requirements(run_dir, req)
+                    write_information_evidence(run_dir)
+
+                    result = run_script(INFO_LOOP, "--run-dir", str(run_dir), "--json")
+
+                    self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+                    payload = json.loads(result.stdout)
+                    self.assertNotEqual(forbidden_next_action, payload["next_action"])
+                    self.assertEqual("RepairRequirementsInformationState", payload["next_action"])
+                    self.assertFalse(payload["terminal"])
+                    self.assertIn("not terminal", "\n".join(payload["blocking_reasons"]))
 
     def test_information_gate_satisfied_status_requires_complete_fact_and_review_shape(self):
         mutations = [

@@ -173,6 +173,11 @@ def information_sufficiency_errors(requirements: dict[str, Any], run_dir: Path) 
             errors.append(f"{label} references unknown required_outcomes: {', '.join(unknown_outcomes)}")
         if fact.get("current_status") not in FACT_STATUSES:
             errors.append(f"{label} current_status is not recognized")
+        if check.get("status") in {"satisfied", "not_required"} and fact.get("current_status") not in {
+            "satisfied",
+            "not_required",
+        }:
+            errors.append(f"{label} current_status {fact.get('current_status')!r} is not terminal")
         blocks_design = fact.get("blocks_design_or_plan_if_missing")
         if not isinstance(blocks_design, bool):
             errors.append(f"{label} blocks_design_or_plan_if_missing must be boolean")

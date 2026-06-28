@@ -140,8 +140,6 @@ def has_string_list(value: Any) -> bool:
 
 
 def has_command(value: Any) -> bool:
-    if isinstance(value, str):
-        return bool(value.strip())
     return has_string_list(value)
 
 

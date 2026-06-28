@@ -889,14 +889,52 @@ class ControlJsonSchemaTest(unittest.TestCase):
         self.assertIn("runtime_generation", final_report_schema["properties"])
         self.assertIn("unresolved_amendments", final_report_schema["properties"])
 
-    def test_requirements_schema_rejects_missing_source_requirements_for_v1_1(self):
+    def test_requirements_schema_rejects_missing_source_requirements_for_v1_1_and_later(self):
         schema = json.loads((SCHEMA_DIR / "requirements.control.schema.json").read_text(encoding="utf-8"))
-        fixture = copy.deepcopy(SCHEMA_FIXTURES["requirements.control.schema.json"])
-        fixture["schema_version"] = "1.1.0"
-        del fixture["approved_control"]["source_requirements"]
+        for schema_version in ("1.1.0", "1.2.0", "1.3.0", "2.0.0"):
+            fixture = copy.deepcopy(SCHEMA_FIXTURES["requirements.control.schema.json"])
+            fixture["schema_version"] = schema_version
+            if schema_version != "1.1.0":
+                fixture["approved_control"]["information_sufficiency_check"] = {
+                    "status": "not_required",
+                    "facts": [
+                        {
+                            "fact_id": "F-schema-context",
+                            "statement": "No additional pre-design context is required.",
+                            "derived_from": {
+                                "source_requirements": ["SR-schema-validation"],
+                                "required_outcomes": ["outcome.schema-validation"],
+                            },
+                            "why_needed": "Schema validation target is already explicit.",
+                            "acceptable_evidence": [
+                                {"kind": "source_code", "description": "Schema fixture is explicit."}
+                            ],
+                            "current_status": "not_required",
+                            "evidence_ref": "requirements.control.json#source_requirements",
+                            "blocks_design_or_plan_if_missing": False,
+                        }
+                    ],
+                    "counterexample_review": {
+                        "status": "pass",
+                        "verdict": "approved",
+                        "reviewer": {
+                            "kind": "subagent",
+                            "id": "information-sufficiency-reviewer",
+                            "evidence_ref": "review.control.json#information-sufficiency",
+                        },
+                        "checked_facts": ["F-schema-context"],
+                        "checked_transformations": [
+                            "source_requirements->information_sufficiency_facts",
+                            "required_outcomes->information_sufficiency_facts",
+                            "information_sufficiency_facts->design_plan_entry",
+                        ],
+                        "findings": [],
+                    },
+                }
+            del fixture["approved_control"]["source_requirements"]
 
-        with self.assertRaises(AssertionError):
-            validate(fixture, schema)
+            with self.assertRaises(AssertionError):
+                validate(fixture, schema)
 
     def test_requirements_schema_rejects_missing_source_requirement_fields_for_v1_1(self):
         schema = json.loads((SCHEMA_DIR / "requirements.control.schema.json").read_text(encoding="utf-8"))
