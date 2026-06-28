@@ -12,9 +12,9 @@ JSON pre-goal control-chain executor.
 
 `bounded_runtime` keeps its meaning only if it avoids the expanded
 `requirements/design/goal/plan/review/runtime` chain. If execution needs
-design, execution policy, review, required-outcome coverage, subagent
-coordination, or multi-stage control decisions, stop and route the work to the
-JSON pre-goal flow instead.
+design, execution policy, semantic quality review, required-outcome coverage,
+subagent coordination, or multi-stage control decisions, stop and route the
+work to a controlled run instead.
 
 ## Required Files
 
@@ -59,8 +59,12 @@ Before accepting or reporting `goal_achieved: true`, run:
 python3 .agents/skills/using-bounded-control-json/scripts/verify_bounded_runtime.py docs/cybernetics/runs/<slug>
 ```
 
-Use the verifier process output as the source of truth for whether
-`final-report.json.goal_achieved: true` is accepted.
+Treat this verifier as a structural final-claim gate: it checks that the bounded
+runtime claim matches the bounded JSON and recorded evidence. It is not a
+semantic quality gate. If the task needs adversarial semantic review,
+counterexamples, source-requirement preservation, or independent challenge, stop
+and route it to a controlled-run Counterexample Gate instead of accepting
+bounded verifier success as quality proof.
 
 ## Short `/goal` Adapter
 

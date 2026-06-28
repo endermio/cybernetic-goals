@@ -199,10 +199,14 @@ class BoundedControlJsonProtocolTest(unittest.TestCase):
 
     def test_bounded_skill_says_final_report_does_not_self_grant_verifier_permission(self):
         text = BOUNDED_SKILL.read_text(encoding="utf-8")
+        normalized = " ".join(text.split())
 
         self.assertIn("final-report.json", text)
         self.assertIn("does not grant verifier permission to itself", text)
-        self.assertIn("verifier process output", text)
+        self.assertIn("structural final-claim gate", normalized)
+        self.assertIn("not a semantic quality gate", normalized)
+        self.assertIn("controlled-run Counterexample Gate", normalized)
+        self.assertNotIn("verifier process output as the source of truth", normalized)
 
 
 if __name__ == "__main__":
