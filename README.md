@@ -1,31 +1,17 @@
 # Cybernetic Skills Pack
 
-This package contains a pre-goal control pipeline for Codex-style agent work.
+This package provides JSON-controlled workflows for Codex-style agent work.
+It is meant for work where the agent should not invent the target, plan, review
+standard, or completion claim while executing.
 
-The core idea is:
-
-```text
-skills = compile-time control tools
-/goal = runtime executor
-Superpowers = planning/review/execution substrate
-```
-
-Human input does not always arrive as a formed task. For pre-task intent such
-as confusion, dissatisfaction, risk sense, failed experience, method preference,
-or distrust of the current process, start from the human situation:
+Core split:
 
 ```text
-human situation
-  -> $framing-cybernetic-intent
-  -> shared intent understanding
-  -> optional task formation
-  -> $routing-cybernetic-workflows
+skills = prepare and review control objects
+/goal = execute an approved runtime control object
+counterexample gates = quality control
+validators = structural checks
 ```
-
-Only route formed tasks. Do not treat a requested method or workflow as the
-human purpose.
-
-For complex work, do not let `/goal` analyze requirements, invent the solution design, write its own plan, review its own plan, or invent a new control strategy during execution. Instead, prepare and approve JSON control files first, then emit a short `/goal` pointer to the approved runtime control JSON.
 
 Official persistent control facts live only in:
 
@@ -37,120 +23,301 @@ docs/cybernetics/runs/<slug>/final-report.json
 docs/cybernetics/runs/<slug>/evidence/
 ```
 
-Historical Markdown artifacts are non-authoritative background only. Do not use Markdown as official guard, compiler, runtime, or long-term dual-path control input.
+Markdown files are background only. Do not use Markdown as official guard,
+compiler, runtime, or long-term dual-path control input.
 
-Superpowers dependencies are stage-specific infrastructure, not optional style suggestions. See `docs/cybernetic-framework/superpowers-infrastructure-policy.md`.
+## When To Use
+
+Use this pack when a task needs durable control over target meaning, completion
+standards, evidence, review, or runtime authority.
+
+Common cases:
+
+- product or API work where "done" must preserve user-approved meaning;
+- long-running implementation, debugging, performance, or integration work;
+- work where missing context can make design or planning wrong;
+- work that needs independent counterexample review before execution or
+  completion;
+- runtime work that must record progress and evidence before claiming success.
+
+Do not use the controlled-run chain for ordinary direct work. If a normal
+Codex answer, direct edit, small bounded fix, or inline `/goal` preserves the
+target with less overhead, use that instead.
 
 ## Install
 
-From this package root, copy the skill directories into either your user-level skill directory:
+Recommended user-level install:
 
 ```bash
-mkdir -p ~/.agents/skills
-cp -R .agents/skills/* ~/.agents/skills/
+mkdir -p /home/ender/.agents/skills
+rsync -a --delete .agents/skills/ /home/ender/.agents/skills/
+diff -qr .agents/skills /home/ender/.agents/skills
 ```
 
-or into a repository-local skill directory:
+Repository-local install:
 
 ```bash
 mkdir -p /path/to/target-repo/.agents/skills
-cp -R .agents/skills/* /path/to/target-repo/.agents/skills/
+rsync -a --delete .agents/skills/ /path/to/target-repo/.agents/skills/
+diff -qr .agents/skills /path/to/target-repo/.agents/skills
 ```
 
-## Recommended workflow
+The `diff` command should print nothing.
 
-For complex work:
+## Recommended Workflow
+
+Start from the human situation, not from a preferred process label:
 
 ```text
 human situation
-  -> for pre-task intent before formed task routing
-
-$framing-cybernetic-intent
-  -> shared intent understanding
-  -> optional task formation
-
-$routing-cybernetic-workflows
-  -> decide whether a formed task should use the cybernetic workflow
-
-$analyzing-cybernetic-requirements
-  -> docs/cybernetics/runs/YYYY-MM-DD-feature/requirements.control.json
-
-$orchestrating-cybernetic-pregoal
-  -> run pre-goal compilation after requirements analysis, invoking solution design when Design Gate is required
+  -> $framing-cybernetic-intent, when intent is not yet a formed task
+  -> $routing-cybernetic-workflows, when a formed task may or may not need this pack
+  -> $analyzing-cybernetic-requirements
+  -> user approval of requirements
+  -> $orchestrating-cybernetic-pregoal
+  -> short runtime /goal pointer
+  -> /goal Use .agents/skills/using-control-json ...
 ```
 
-Controlled-run orchestration includes the solution-design stage when Design Gate is required, but solution design remains owned by `$designing-cybernetic-solutions`.
+Only route formed tasks. A requested method is not automatically the human
+purpose.
 
-The orchestrator drives the following skills and stops if the review cannot converge:
+### Requirements Analysis
+
+`$analyzing-cybernetic-requirements` owns the requirements phase. It has three
+internal stages:
+
+1. Extract target meaning: source requirements, required outcomes, what counts
+   as done, authority, forbidden actions, and counterexample contracts.
+2. Discover and collect required information: derive facts that must be known
+   before design or planning, run safe read-only collection, and run an
+   independent information-sufficiency counterexample review.
+3. Ask for user approval only after the information gate is satisfied or
+   explicitly not required.
+
+Do not ask the user to approve requirements while information sufficiency is
+pending. Do not push pending facts into design or runtime as assumptions.
+
+### Transition Gates
+
+Transition gates say what must happen next. They are not status reports.
+
+Important fields:
 
 ```text
-$designing-cybernetic-solutions
-  -> docs/cybernetics/runs/YYYY-MM-DD-feature/design.control.json when Design Gate is required
+agent_must_continue: true
+  -> execute next_action internally and rerun the same gate
 
-$writing-cybernetic-goals
-  -> docs/cybernetics/runs/YYYY-MM-DD-feature/goal.control.json
+user_action_required: true
+  -> stop and ask only for the requested user information, decision, or approval
 
-$writing-cybernetic-execution-policies
-  -> docs/cybernetics/runs/YYYY-MM-DD-feature/plan.control.json
+approval_allowed: true
+  -> the current stage may be shown to the user for approval
 
-$reviewing-cybernetic-control-structures
-  -> docs/cybernetics/runs/YYYY-MM-DD-feature/review.control.json
-
-$compiling-cybernetic-runtime-goals
-  -> docs/cybernetics/runs/YYYY-MM-DD-feature/runtime.control.json plus a short /goal pointer
+handoff_allowed: true
+  -> the current stage may move to the next control phase
 ```
 
-For simple work, the router should reject the controlled-run chain and recommend an inline prompt or inline `/goal`.
+Examples:
 
-## Included skills
+```text
+RunInformationCounterexampleReview
+  -> agent-owned; do not ask the user for authorization
 
-- `framing-cybernetic-intent`: collaboratively frame pre-task human intent into shared understanding before optional task formation and routing.
-- `routing-cybernetic-workflows`: classify complexity and route to the right workflow.
-- `analyzing-cybernetic-requirements`: analyze human intent and create `requirements.control.json`.
-- `clarifying-cybernetic-tasks`: deprecated compatibility alias for `analyzing-cybernetic-requirements`.
-- `designing-cybernetic-solutions`: create a general solution/system model when Design Gate is required.
-- `orchestrating-cybernetic-pregoal`: orchestrate the pre-goal compilation chain after requirements analysis, including design dispatch when required.
-- `recording-cybernetic-run-outcomes`: record local metadata-only cybernetic run outcomes without upload or self-modification.
-- `cybernetic-superpowers-infrastructure`: define stage-specific Superpowers substrate dependencies and non-substitution rules.
-- `writing-cybernetic-goals`: create a control contract, not a runtime `/goal`, for complex work.
-- `writing-cybernetic-execution-policies`: create an execution policy / plan as a control law.
-- `reviewing-cybernetic-control-structures`: review requirements analysis, design when required, goal, and plan as a coherent control system.
-- `compiling-cybernetic-runtime-goals`: compile `runtime.control.json` and a short runtime `/goal` pointer only after approval gates pass.
+RunInformationGathering
+  -> agent-owned if actions are safe read-only collection or no-side-effect probes
 
-## Observability / meta-control
+AskUserForInformation
+  -> user-owned; ask for the specific credential, file, access, or business decision
 
-The pack includes an optional local-first observability layer under `observability/`.
+ReadyForUserApproval
+  -> user-owned; stop and ask the user to approve requirements
+```
+
+### Pre-goal Orchestration
+
+After approved requirements exist, use `$orchestrating-cybernetic-pregoal`.
+
+Default controlled-run shape:
+
+```text
+requirements.control.json
+run.control.json
+gen-000/runtime.control.json
+```
+
+Some runs also include expanded strategy artifacts:
+
+```text
+design.control.json
+goal.control.json
+plan.control.json
+review.control.json
+runtime.control.json
+```
+
+The orchestrator may coordinate:
+
+- `$designing-cybernetic-solutions`
+- `$writing-cybernetic-goals`
+- `$writing-cybernetic-execution-policies`
+- `$reviewing-cybernetic-control-structures`
+- `$compiling-cybernetic-runtime-goals`
+
+It must not execute target work. It outputs a short `/goal` pointer only after
+review and structural gates pass.
+
+### Strategy Policy
+
+Do not use legacy "lean/full" process labels as control concepts.
+
+Use `strategy_policy`:
+
+```text
+frozen_strategy
+  -> runtime follows the approved strategy; if the strategy is wrong, stop for decision
+
+reviewed_replanning
+  -> runtime may propose reviewed amendments to strategy, while preserving approved target anchors
+```
+
+The strategy policy is separate from risk. Live operations, destructive
+actions, external systems, credentials, deployment, or irreversible migration
+still require explicit human gates.
+
+### Runtime Execution
+
+The runtime `/goal` should be pointer-only, for example:
+
+```text
+/goal Use .agents/skills/using-control-json and execute docs/cybernetics/runs/YYYY-MM-DD-slug/runtime.control.json. If the JSON is missing, invalid, inconsistent, or insufficient, stop and report the smallest required human decision.
+```
+
+Runtime must not rewrite requirements, invent a new plan, approve its own
+review, or claim completion without verifier permission.
+
+## Quality Gates
+
+Counterexample gates are the quality gates. They try to prove the target,
+stage, or completion claim is wrong.
+
+Validators and schema checks are structural gates. They can say JSON is shaped
+correctly, but they do not prove the work is semantically good.
+
+Required counterexample gates appear at these points:
+
+- requirements information sufficiency before user approval;
+- pre-goal review before runtime compilation;
+- each required step or stage target before treating it as completed;
+- final runtime completion before `goal_achieved: true`.
+
+Self-written evidence is not enough for quality approval. Use an independent
+reviewer, subagent, explicit human approval, or another approved independent
+review path.
+
+## Included Skills
+
+- `framing-cybernetic-intent`: frame pre-task human intent before task routing.
+- `routing-cybernetic-workflows`: decide whether a formed task should use this
+  pack or simpler direct work.
+- `analyzing-cybernetic-requirements`: create requirements control JSON, run
+  information sufficiency gates, and prepare user approval.
+- `clarifying-cybernetic-tasks`: deprecated compatibility alias for
+  `analyzing-cybernetic-requirements`.
+- `designing-cybernetic-solutions`: create solution/system design when required.
+- `writing-cybernetic-goals`: create goal control contracts.
+- `writing-cybernetic-execution-policies`: create execution policy and work
+  assignment control.
+- `reviewing-cybernetic-control-structures`: review the approved work chain and
+  counterexample gates.
+- `orchestrating-cybernetic-pregoal`: coordinate approved pre-goal artifacts and
+  compile a runtime pointer.
+- `compiling-cybernetic-runtime-goals`: compile runtime control JSON and a short
+  `/goal` pointer.
+- `using-control-json`: execute an approved runtime control JSON goal.
+- `using-bounded-control-json`: execute bounded runtime JSON goals with only
+  goal/runtime control files.
+- `recording-cybernetic-run-outcomes`: record local metadata-only process
+  evidence.
+- `cybernetic-superpowers-infrastructure`: define stage-specific Superpowers
+  substrate dependencies.
+
+## Useful Scripts
+
+Key scripts:
+
+```text
+.agents/skills/analyzing-cybernetic-requirements/scripts/requirements_information_loop.py
+.agents/skills/analyzing-cybernetic-requirements/scripts/predict_pregoal_handoff.py
+.agents/skills/orchestrating-cybernetic-pregoal/scripts/orchestration_guard.py
+.agents/skills/compiling-cybernetic-runtime-goals/scripts/control_chain_guard.py
+.agents/skills/compiling-cybernetic-runtime-goals/scripts/compile_runtime_goal.py
+.agents/skills/using-control-json/scripts/validate_control_chain.py
+.agents/skills/using-control-json/scripts/verify_runtime_progress.py
+```
+
+Typical checks:
+
+```bash
+python3 .agents/skills/analyzing-cybernetic-requirements/scripts/requirements_information_loop.py \
+  --run-dir docs/cybernetics/runs/YYYY-MM-DD-slug --json
+
+python3 .agents/skills/analyzing-cybernetic-requirements/scripts/predict_pregoal_handoff.py \
+  docs/cybernetics/runs/YYYY-MM-DD-slug
+
+python3 .agents/skills/orchestrating-cybernetic-pregoal/scripts/orchestration_guard.py \
+  --state before-runtime-compile --run-dir docs/cybernetics/runs/YYYY-MM-DD-slug --json
+
+python3 .agents/skills/using-control-json/scripts/validate_control_chain.py \
+  docs/cybernetics/runs/YYYY-MM-DD-slug
+
+python3 .agents/skills/using-control-json/scripts/verify_runtime_progress.py \
+  docs/cybernetics/runs/YYYY-MM-DD-slug
+```
+
+## Common Failure Modes
+
+- Asking the user to authorize `RunInformationCounterexampleReview`. That is an
+  internal requirements-analysis gate.
+- Asking for requirements approval before information sufficiency is satisfied.
+- Treating a validator pass as semantic quality approval.
+- Letting runtime write or approve its own plan.
+- Treating "not already available" as blocked when the approved goal requires
+  creating the missing capability.
+- Reusing abandoned run drafts as approval sources.
+- Claiming `goal_achieved: true` before final verifier permission.
+
+## Observability
+
+The optional observability layer under `observability/` is local-first.
 
 Defaults:
 
 - local recording only;
 - `metadata_only` mode;
-- no raw prompt, content summary/excerpt, artifact body, code/log excerpt, credential, customer data, real path, or real repository name upload by default;
+- no raw prompt, content summary/excerpt, artifact body, code/log excerpt,
+  credential, customer data, real path, or real repository name upload by
+  default;
 - no network sync from ordinary skill execution;
 - no automatic skill modification, release publishing, or machine update.
 
-Manual sync and aggregation are script-driven. Cloud-side outputs are candidates for review, not accepted control-law changes.
+Cloud-side outputs are candidates for review, not accepted control changes.
 
-## Framework maintenance
+## Maintenance
 
-Cross-artifact control rules are tracked in `docs/cybernetic-framework/invariant-artifact-consumer-matrix.md`.
+Cross-artifact control rules are tracked in:
 
-When adding or changing an invariant, update that matrix in the same change so the rule is mapped across source skill text, artifact templates, deterministic guards, review dimensions, runtime/downstream consumers, and regression coverage.
+```text
+docs/cybernetic-framework/invariant-artifact-consumer-matrix.md
+```
 
-## Scripts
+When adding or changing an invariant, update that matrix in the same change so
+the rule is mapped across skill text, artifact templates, deterministic guards,
+review dimensions, runtime consumers, and regression coverage.
 
-The scripts are intentionally small and deterministic. They check structure and phase gates; they do not decide requirement semantics.
+## Why This Exists
 
-- `control_artifact_lint.py`: lint requirements analysis/design/goal/plan/review control artifacts.
-- `check_pregoal_inputs.py`: check that orchestration starts from the expected requirements analysis input.
-- `control_chain_guard.py`: block premature runtime goal compilation.
-- `compile_runtime_goal.py`: compile approved runtime control JSON and the short `/goal` pointer.
-- `validate_run_events.py`: validate metadata-only run-event files and taxonomy codes.
-- `record_run_event.py`: write or dry-run local metadata-only JSONL run events.
-- `redact_run_event.py`: remove unsafe fields before export.
-- `sync_run_events_to_github.py`: dry-run/export by default and refuse real upload unless explicitly configured.
-- `aggregate_run_events.py`: create non-live machine-readable aggregation summaries and eval-candidate packages.
-
-## Why this structure exists
-
-Pre-goal skills synthesize and review the solution model and control structure. `/goal` runs the approved control structure. This separates controller synthesis from controller execution and prevents an execution agent from designing, approving, and running its own control law.
+Pre-goal skills prepare and review the control structure. `/goal` runs the
+approved control structure. This separates control preparation from execution
+and prevents an execution agent from defining, approving, and completing its own
+task.
