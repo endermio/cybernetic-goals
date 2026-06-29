@@ -408,6 +408,7 @@ def main() -> int:
         print(json.dumps(payload, ensure_ascii=False, indent=2))
     else:
         print(f"NEXT: {payload['next_action']}")
+        print(f"ACTION_OWNER: {payload.get('action_owner')}")
         print(f"TERMINAL: {str(payload.get('terminal')).lower()}")
         print(f"RERUN_REQUIRED: {str(payload.get('rerun_required')).lower()}")
         print(f"USER_ACTION_REQUIRED: {str(payload.get('user_action_required')).lower()}")

@@ -19,6 +19,7 @@ Required JSON fields:
   "may_ask_user": false,
   "user_action_required": false,
   "agent_must_continue": true,
+  "action_owner": "agent",
   "requires_independent_review": true,
   "errors": []
 }
@@ -38,6 +39,9 @@ Rules:
   and run the same gate again. Do not stop with a status report unless the
   action reaches `AskUserForInformation`, `HumanApprovalRequired`, or another
   terminal stop state.
+- `action_owner` summarizes the routing decision: `agent` for internal loop
+  work, `user` for waits on human input or approval, and `none` for terminal
+  states with no owner.
 - If `user_action_required` is true, ask only for the requested user-owned
   information, approval, or decision.
 - If `requires_independent_review` is true, the next action must use an

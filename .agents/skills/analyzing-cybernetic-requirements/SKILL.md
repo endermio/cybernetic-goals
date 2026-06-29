@@ -75,10 +75,26 @@ final answer format.
 Record Meaning, Rubric, Output Contract, Design, Goal, Execution Plan, Review,
 and Risk as required, satisfied, or not applicable.
 
+## State Machine
+
+Treat `requirements_information_loop.py` as a loop controller.
+
+- `agent_must_continue: true`: execute `next_action` in this turn and rerun the
+  same gate.
+- `RunInformationCounterexampleReview`, `RunInformationGathering`,
+  `RepairRequirementsInformationState`, and `ReviseRequirements` are agent-owned.
+- `AskUserForInformation` and `ReadyForUserApproval` are user-owned stop points.
+- Only user-owned actions are reported to the user as waits. Pending approval is
+  not a stop while the next action is agent-owned.
+
 ## Output Format
 
-If requirements are not approved, output the smallest approval or revision
-question. Do not output orchestration or runtime `/goal`.
+Before output, run the information loop when `information_sufficiency_check` is
+not complete. If the result is agent-owned, continue the loop rather than
+reporting a wait.
+
+If the result is user-owned, ask only for the requested information, decision, or
+approval. Do not output orchestration or runtime `/goal`.
 
 If requirements are approved for `controlled_run`, run or quote:
 

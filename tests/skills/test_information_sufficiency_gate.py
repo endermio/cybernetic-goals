@@ -788,6 +788,7 @@ class InformationSufficiencyGateTest(unittest.TestCase):
             self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
             payload = json.loads(result.stdout)
             self.assertEqual("RunInformationCounterexampleReview", payload["next_action"])
+            self.assertEqual("agent", payload["action_owner"])
             self.assertFalse(payload["requires_user_authorization"])
             self.assertFalse(payload["user_action_required"])
             self.assertTrue(payload["agent_must_continue"])
@@ -817,6 +818,7 @@ class InformationSufficiencyGateTest(unittest.TestCase):
 
             self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
             self.assertIn("NEXT: RunInformationCounterexampleReview", result.stdout)
+            self.assertIn("ACTION_OWNER: agent", result.stdout)
             self.assertIn("AGENT_MUST_CONTINUE: true", result.stdout)
             self.assertIn("USER_ACTION_REQUIRED: false", result.stdout)
             self.assertIn("DO_NOT_ASK_USER_AUTHORIZATION", result.stdout)

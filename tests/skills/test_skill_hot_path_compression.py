@@ -67,9 +67,15 @@ class SkillHotPathCompressionTest(unittest.TestCase):
     def test_requirements_output_format_is_compact_and_script_owned(self):
         skill = read(".agents/skills/analyzing-cybernetic-requirements/SKILL.md")
         output_format = section_body(skill, "Output Format")
+        state_machine = section_body(skill, "State Machine")
 
         self.assertLessEqual(len(output_format.splitlines()), 90)
         self.assertIn("predict_pregoal_handoff.py", output_format)
+        self.assertIn("agent_must_continue", state_machine)
+        self.assertIn("RunInformationCounterexampleReview", state_machine)
+        self.assertIn("ReadyForUserApproval", state_machine)
+        self.assertIn("Only user-owned actions are reported to the user", state_machine)
+        self.assertNotIn("If requirements are not approved, output", output_format)
         self.assertNotIn(
             "/goal Execute the approved execution policy in docs/cybernetics/plans/YYYY-MM-DD-slug.md",
             output_format,
