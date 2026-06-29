@@ -1,6 +1,6 @@
 {
   "artifact_type": "requirements.control",
-  "schema_version": "1.1.0",
+  "schema_version": "1.2.0",
   "status": "approved",
   "approved_control": {
     "human_purpose": "Move official cybernetic control facts to strict JSON.",
@@ -32,6 +32,12 @@
     "semantic_base": {
       "id": "semantic-base:control-example",
       "hash": "sha256:498d396c4c1dd84711cce6d49a942b902522f7ae69827e6454b13b50bd043543"
+    },
+    "completion_logic": {
+      "all_required": [
+        "O-json-control-example"
+      ],
+      "no_offset": []
     },
     "source_requirements": [
       {
@@ -109,6 +115,14 @@
         "completed_target_objects": [
           "cybernetic control chain"
         ],
+        "claim_scope": {
+          "required_contexts": [
+            "json_control_path"
+          ],
+          "forbidden_contexts": [
+            "markdown_control_path"
+          ]
+        },
         "blocks_goal_achieved_if_missing": true,
         "required_evidence": [
           {
@@ -122,7 +136,16 @@
             "evidence_claim": "The guard result proves JSON control files pass and Markdown control inputs are rejected.",
             "completed_target_objects": [
               "cybernetic control chain"
-            ]
+            ],
+            "claim_scope": {
+              "applies_when": [
+                "json_control_path"
+              ],
+              "proves": "JSON control files pass validation and Markdown control inputs are rejected for official use.",
+              "does_not_prove": [
+                "Markdown template authority"
+              ]
+            }
           }
         ],
         "not_satisfied_by": [

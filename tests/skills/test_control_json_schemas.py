@@ -885,6 +885,27 @@ class ControlJsonSchemaTest(unittest.TestCase):
             self.assertIn(field, runtime["properties"])
         self.assertIn("generation", runtime["required"])
 
+    def test_requirements_schema_defines_claim_scope_and_completion_logic_for_v1_2(self):
+        requirements = load_json(SCHEMA_DIR / "requirements.control.schema.json")
+        approved_control = requirements["properties"]["approved_control"]
+        self.assertIn("completion_logic", approved_control["properties"])
+        completion_logic = approved_control["properties"]["completion_logic"]
+        self.assertIn("all_required", completion_logic["required"])
+        self.assertIn("no_offset", completion_logic["required"])
+
+        outcome_schema = approved_control["properties"]["required_outcomes"]["items"]
+        self.assertIn("claim_scope", outcome_schema["properties"])
+        outcome_claim_scope = outcome_schema["properties"]["claim_scope"]
+        self.assertIn("required_contexts", outcome_claim_scope["required"])
+        self.assertIn("forbidden_contexts", outcome_claim_scope["properties"])
+
+        evidence_schema = outcome_schema["properties"]["required_evidence"]["items"]
+        self.assertIn("claim_scope", evidence_schema["properties"])
+        evidence_claim_scope = evidence_schema["properties"]["claim_scope"]
+        self.assertIn("applies_when", evidence_claim_scope["required"])
+        self.assertIn("proves", evidence_claim_scope["required"])
+        self.assertIn("does_not_prove", evidence_claim_scope["properties"])
+
     def test_generation_and_amendment_schemas_are_first_class(self):
         run_schema = load_json(SCHEMA_DIR / "run.control.schema.json")
         amendment_schema = load_json(SCHEMA_DIR / "amendment-proposal.schema.json")

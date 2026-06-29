@@ -511,10 +511,129 @@ def required_evidence_source_map(requirements: dict[str, Any], errors: list[str]
     return evidence_map
 
 
+def version_tuple(value: Any) -> tuple[int, ...]:
+    if not isinstance(value, str):
+        return ()
+    try:
+        return tuple(int(part) for part in value.split("."))
+    except ValueError:
+        return ()
+
+
+def schema_version_at_least(requirements: dict[str, Any], minimum: str) -> bool:
+    return version_tuple(requirements.get("schema_version")) >= version_tuple(minimum)
+
+
+def claim_scope_errors(requirements: dict[str, Any]) -> list[str]:
+    if not schema_version_at_least(requirements, "1.2.0"):
+        return []
+
+    approved = requirements.get("approved_control", {})
+    outcomes = approved.get("required_outcomes") if isinstance(approved, dict) else None
+    if not isinstance(outcomes, list):
+        return []
+
+    errors: list[str] = []
+    known_outcomes = {outcome.get("id") for outcome in outcomes if isinstance(outcome, dict)}
+    blocking_outcomes = {
+        outcome.get("id")
+        for outcome in outcomes
+        if isinstance(outcome, dict)
+        and isinstance(outcome.get("id"), str)
+        and outcome.get("blocks_goal_achieved_if_missing") is True
+    }
+
+    completion_logic = approved.get("completion_logic") if isinstance(approved, dict) else None
+    if not isinstance(completion_logic, dict):
+        errors.append("requirements.control.json approved_control.completion_logic is required for schema_version >= 1.2.0")
+    else:
+        all_required = set(string_list(completion_logic.get("all_required")))
+        if not all_required:
+            errors.append("requirements.control.json approved_control.completion_logic.all_required must be a non-empty list")
+        unknown_required = sorted(all_required - known_outcomes)
+        if unknown_required:
+            errors.append("requirements.control.json completion_logic.all_required references unknown outcomes: " + ", ".join(unknown_required))
+        missing_blocking = sorted(blocking_outcomes - all_required)
+        if missing_blocking:
+            errors.append("requirements.control.json completion_logic.all_required missing blocking outcomes: " + ", ".join(missing_blocking))
+        no_offset = completion_logic.get("no_offset", [])
+        if not isinstance(no_offset, list):
+            errors.append("requirements.control.json completion_logic.no_offset must be a list when present")
+        else:
+            for index, item in enumerate(no_offset):
+                label = f"requirements.control.json completion_logic.no_offset[{index}]"
+                if not isinstance(item, dict):
+                    errors.append(f"{label} must be an object")
+                    continue
+                failed = item.get("failed_outcome")
+                if not isinstance(failed, str) or not failed:
+                    errors.append(f"{label}.failed_outcome must be a non-empty string")
+                elif failed not in known_outcomes:
+                    errors.append(f"{label}.failed_outcome references unknown outcome {failed}")
+                offsets = set(string_list(item.get("cannot_be_offset_by")))
+                if not offsets:
+                    errors.append(f"{label}.cannot_be_offset_by must be a non-empty list")
+                unknown_offsets = sorted(offsets - known_outcomes)
+                if unknown_offsets:
+                    errors.append(f"{label}.cannot_be_offset_by references unknown outcomes: " + ", ".join(unknown_offsets))
+                if not isinstance(item.get("reason"), str) or not item.get("reason"):
+                    errors.append(f"{label}.reason must be a non-empty string")
+
+    for outcome_index, outcome in enumerate(outcomes):
+        if not isinstance(outcome, dict):
+            continue
+        outcome_id = outcome.get("id")
+        if not isinstance(outcome_id, str) or not outcome_id:
+            continue
+        outcome_label = f"requirements.control.json required_outcomes[{outcome_index}]"
+        scope = outcome.get("claim_scope")
+        if not isinstance(scope, dict):
+            errors.append(f"{outcome_label}.claim_scope is required for schema_version >= 1.2.0")
+            required_contexts: set[str] = set()
+            forbidden_contexts: set[str] = set()
+        else:
+            required_contexts = set(string_list(scope.get("required_contexts")))
+            forbidden_contexts = set(string_list(scope.get("forbidden_contexts")))
+            if not required_contexts:
+                errors.append(f"{outcome_label}.claim_scope.required_contexts must be a non-empty list")
+        required_evidence = outcome.get("required_evidence")
+        if not isinstance(required_evidence, list):
+            continue
+        for evidence_index, evidence in enumerate(required_evidence):
+            if not isinstance(evidence, dict):
+                continue
+            evidence_id = evidence.get("evidence_id")
+            evidence_label = f"{outcome_label}.required_evidence[{evidence_index}]"
+            evidence_scope = evidence.get("claim_scope")
+            if not isinstance(evidence_scope, dict):
+                errors.append(f"{evidence_label}.claim_scope is required for schema_version >= 1.2.0")
+                continue
+            applies_when = set(string_list(evidence_scope.get("applies_when")))
+            if not applies_when:
+                errors.append(f"{evidence_label}.claim_scope.applies_when must be a non-empty list")
+            if not isinstance(evidence_scope.get("proves"), str) or not evidence_scope.get("proves"):
+                errors.append(f"{evidence_label}.claim_scope.proves must be a non-empty string")
+            missing_contexts = sorted(required_contexts - applies_when)
+            if missing_contexts:
+                errors.append(
+                    f"evidence {evidence_id} claim_scope does not cover outcome {outcome_id} "
+                    "required contexts: "
+                    + ", ".join(missing_contexts)
+                )
+            forbidden_overlap = sorted(forbidden_contexts & applies_when)
+            if forbidden_overlap:
+                errors.append(
+                    f"evidence {evidence_id} claim_scope uses forbidden contexts for outcome {outcome_id}: "
+                    + ", ".join(forbidden_overlap)
+                )
+    return errors
+
+
 def validate_source_requirement_coverage(
     requirements: dict[str, Any],
 ) -> tuple[set[str], dict[str, set[str]], dict[str, dict[str, Any]], list[str]]:
     source_map, blocking_sources, errors = source_requirement_map(requirements)
+    errors.extend(claim_scope_errors(requirements))
     has_source_requirements = bool(source_map) or bool(errors)
     if not has_source_requirements and str(requirements.get("schema_version", "")) < "1.1.0":
         return blocking_sources, {}, {}, errors

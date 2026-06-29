@@ -23,6 +23,7 @@ from tests.skills.test_reviewed_replanning_control import (
 ROOT = Path(__file__).resolve().parents[2]
 PROGRESS_EVENT_SCHEMA = ROOT / "schemas/control-json/progress-event.schema.json"
 SCRIPTS = ROOT / ".agents/skills/using-control-json/scripts"
+CONTROL_GUARD = ROOT / ".agents/skills/compiling-cybernetic-runtime-goals/scripts/control_chain_guard.py"
 VALIDATE = SCRIPTS / "validate_control_chain.py"
 APPEND = SCRIPTS / "append_progress_event.py"
 VERIFY = SCRIPTS / "verify_runtime_progress.py"
@@ -255,6 +256,137 @@ class RuntimeJsonProgressVerifierTest(unittest.TestCase):
 
             self.assertNotEqual(result.returncode, 0, result.stdout + result.stderr)
             self.assertIn("source requirement appears weaker than source quote", result.stdout + result.stderr)
+
+    def test_validate_control_chain_rejects_fallback_scoped_evidence_for_normal_path_outcome(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            run_dir = Path(tmpdir)
+            write_strategy_run(run_dir)
+            req = json.loads((run_dir / "requirements.control.json").read_text(encoding="utf-8"))
+            req["schema_version"] = "1.2.0"
+            req["approved_control"]["human_purpose"] = "deploy stable N1/N2 with QSS happy path"
+            req["approved_control"]["requested_transformation"] = (
+                "merge main and deploy stable so normal N1/N2 paths use QSS without fallback"
+            )
+            info_fact = req["approved_control"]["information_sufficiency_check"]["facts"][0]
+            info_fact["derived_from"] = {
+                "source_requirements": ["SR-stable-qss-happy-path"],
+                "required_outcomes": ["O-stable-normal-qss"],
+            }
+            sr = req["approved_control"]["source_requirements"][0]
+            sr.update(
+                {
+                    "id": "SR-stable-qss-happy-path",
+                    "source": {
+                        "kind": "user_message",
+                        "quote": "merge main and deploy stable N1/N2 with QSS normal path working",
+                    },
+                    "required_action": "deploy stable N1/N2 QSS normal path",
+                    "target_objects": ["stable N1", "stable N2", "QSS provider"],
+                    "completion_checks": [
+                        "N1/N2 direct QSS health pass",
+                        "normal cross-node provider is qss-client",
+                        "fallback reason is empty",
+                    ],
+                }
+            )
+            outcome = req["approved_control"]["required_outcomes"][0]
+            outcome.update(
+                {
+                    "id": "O-stable-normal-qss",
+                    "statement": "Stable normal cross-node path uses qss-client without fallback.",
+                    "source_requirements": ["SR-stable-qss-happy-path"],
+                    "completion_claim": "Stable normal QSS path is complete.",
+                    "completed_target_objects": ["stable N1", "stable N2", "QSS provider"],
+                    "claim_scope": {
+                        "required_contexts": ["normal_stable_operation"],
+                        "forbidden_contexts": ["qss_fault_injection", "known_provider_outage"],
+                    },
+                }
+            )
+            evidence = outcome["required_evidence"][0]
+            evidence.update(
+                {
+                    "evidence_id": "evidence.stable-fallback-e2e",
+                    "description": "Fallback E2E passes while N2 direct QSS health fails.",
+                    "satisfies_source_requirements": ["SR-stable-qss-happy-path"],
+                    "evidence_claim": (
+                        "N2 direct QSS health fails but fallback business E2E passes without plaintext downgrade."
+                    ),
+                    "completed_target_objects": ["stable N1", "stable N2", "QSS provider"],
+                    "claim_scope": {
+                        "applies_when": ["qss_fault_injection", "known_provider_outage"],
+                        "proves": "fallback resilience when QSS is unavailable",
+                        "does_not_prove": ["normal stable QSS happy path"],
+                    },
+                }
+            )
+            fallback_outcome = copy.deepcopy(outcome)
+            fallback_outcome.update(
+                {
+                    "id": "O-qss-fallback-resilience",
+                    "statement": "Fallback remains safe when QSS is unavailable.",
+                    "completion_claim": "QSS outage fallback is safe.",
+                    "claim_scope": {
+                        "required_contexts": ["qss_fault_injection", "known_provider_outage"],
+                        "forbidden_contexts": ["normal_stable_operation"],
+                    },
+                    "blocks_goal_achieved_if_missing": False,
+                }
+            )
+            fallback_evidence = fallback_outcome["required_evidence"][0]
+            fallback_evidence.update(
+                {
+                    "evidence_id": "evidence.fallback-resilience",
+                    "description": "Fallback E2E passes during a QSS outage.",
+                    "evidence_claim": "Fallback keeps business E2E working without plaintext downgrade.",
+                    "claim_scope": {
+                        "applies_when": ["qss_fault_injection", "known_provider_outage"],
+                        "proves": "fallback resilience when QSS is unavailable",
+                        "does_not_prove": ["normal stable QSS happy path"],
+                    },
+                }
+            )
+            fallback_outcome["counterexample_gate"]["required_evidence_ids"] = ["evidence.fallback-resilience"]
+            req["approved_control"]["required_outcomes"].append(fallback_outcome)
+            req["approved_control"]["completion_logic"] = {
+                "all_required": ["O-stable-normal-qss"],
+                "no_offset": [
+                    {
+                        "failed_outcome": "O-stable-normal-qss",
+                        "cannot_be_offset_by": ["O-qss-fallback-resilience"],
+                        "reason": "fallback resilience cannot prove normal stable QSS operation",
+                    }
+                ],
+            }
+            outcome["counterexample_gate"]["required_evidence_ids"] = ["evidence.stable-fallback-e2e"]
+            outcome["counterexample_gate"]["reject_if"] = [
+                "Fallback evidence is accepted as normal stable QSS completion."
+            ]
+            run = json.loads((run_dir / "run.control.json").read_text(encoding="utf-8"))
+            runtime = json.loads((run_dir / "gen-000/runtime.control.json").read_text(encoding="utf-8"))
+            review = json.loads((run_dir / "gen-000/review.control.json").read_text(encoding="utf-8"))
+            run["generations"][0]["required_steps"][0]["satisfies_outcomes"] = ["O-stable-normal-qss"]
+            runtime["required_steps"][0]["satisfies_outcomes"] = ["O-stable-normal-qss"]
+            runtime["required_steps"][0]["evidence"] = ["evidence.stable-fallback-e2e"]
+            runtime["verifier"]["required_outcomes"] = ["O-stable-normal-qss"]
+            refresh_semantic_base(req)
+            apply_hashes(req, run, runtime, "gen-000/runtime.control.json", review, "gen-000/review.control.json")
+            write_updated_strategy_artifacts(run_dir, req=req, run=run, runtime=runtime, review=review)
+            write_information_sufficiency_review_evidence(run_dir, req)
+
+            result = run_script(VALIDATE, str(run_dir))
+            guard = run_script(CONTROL_GUARD, "--run-dir", str(run_dir))
+
+            self.assertNotEqual(result.returncode, 0, result.stdout + result.stderr)
+            self.assertIn(
+                "evidence evidence.stable-fallback-e2e claim_scope does not cover outcome O-stable-normal-qss",
+                result.stdout + result.stderr,
+            )
+            self.assertNotEqual(guard.returncode, 0, guard.stdout + guard.stderr)
+            self.assertIn(
+                "evidence evidence.stable-fallback-e2e claim_scope does not cover outcome O-stable-normal-qss",
+                guard.stdout + guard.stderr,
+            )
 
     def test_append_progress_event_appends_jsonl_and_rejects_invalid_basics(self):
         event = progress_event("new evidence pointer")

@@ -26,23 +26,26 @@ All stage-routing gates use `../references/transition-gate-protocol.md`.
    needed, set it to `not_required`. Facts must derive from
    `source_requirements` and/or `required_outcomes`, include `why_needed`,
    `acceptable_evidence`, `current_status`, `evidence_ref`, and be challenged
-   by independent `counterexample_review`. Use `schema_version: 1.1.0` or later.
-   A free-form `required_observations` list is not enough.
-5. Information collection is part of requirements analysis. Before approval,
+   by independent `counterexample_review`. Use `schema_version: 1.2.0+`.
+   Do not use free-form `required_observations`.
+5. Record claim scope: each outcome states the contexts where it must be true,
+   each evidence item states when it applies and what it proves, and
+   `completion_logic` states required outcomes and no-offset rules.
+6. Information collection is part of requirements analysis. Before approval,
    run `requirements_information_loop.py --run-dir <run-dir> --json` whenever
    sufficiency is not `satisfied`/`not_required`; follow its `next_action`
    and rerun the gate after the action. Do not ask the user to authorize
    internal review or safe read-only collection.
-6. Define `counterexample_gate_contract` in the requirements stage and
+7. Define `counterexample_gate_contract` in the requirements stage and
    per-outcome `counterexample_gate` before orchestration starts.
-7. Before approval, show any missing/weak information facts as "needed before
+8. Before approval, show any missing/weak information facts as "needed before
    design"; do not hide them inside approved JSON or future pre-goal work.
-8. Ask only questions that change approved meaning, evidence, scope,
+9. Ask only questions that change approved meaning, evidence, scope,
    authority, or output contract.
-9. Classify uncertainty as human decision, default assumption, or deferred
+10. Classify uncertainty as human decision, default assumption, or deferred
    design/planning/execution detail.
-10. Produce or update `requirements.control.json`.
-11. For `controlled_run`, run `predict_pregoal_handoff.py`; only output its
+11. Produce or update `requirements.control.json`.
+12. For `controlled_run`, run `predict_pregoal_handoff.py`; only output its
     handoff when it passes and `What the User Approved: Approved`.
 
 ## Source Requirements
@@ -61,6 +64,11 @@ not replace or weaken it.
 Each blocking `required_outcome` needs a per-outcome `counterexample_gate` with
 completion standard, checked transformations, required evidence IDs, and
 reject-if conditions.
+
+For schema `1.2.0+`, also check evidence scope. A fault-path, fallback,
+diagnostic, partial, or outage evidence item may support only the context it
+actually proves. It cannot satisfy a normal-path outcome unless its
+`claim_scope.applies_when` covers that outcome's required contexts.
 
 ## Approval Commitment
 

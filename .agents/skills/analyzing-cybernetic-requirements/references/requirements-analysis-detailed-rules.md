@@ -113,6 +113,35 @@ Add task-specific transformations when the user's request needs them. Later
 review may require stronger evidence, but must not weaken, replace, or invent a
 different quality contract.
 
+## Evidence Claim Scope
+
+For new controlled runs use `schema_version: 1.2.0` or later and record evidence
+claim scope before approval. This prevents evidence from one condition being
+used as proof for a different condition.
+
+Each blocking `required_outcome` must include:
+
+- `claim_scope.required_contexts`: conditions where the outcome must be true;
+- `claim_scope.forbidden_contexts`: conditions that cannot prove this outcome,
+  when applicable.
+
+Each `required_evidence` item must include:
+
+- `claim_scope.applies_when`: conditions where the evidence was collected or is
+  valid;
+- `claim_scope.proves`: exact claim this evidence supports;
+- `claim_scope.does_not_prove`: important claims this evidence must not be used
+  to prove, when applicable.
+
+`approved_control.completion_logic` must list every blocking outcome in
+`all_required`. Use `no_offset` when one outcome's success must not compensate
+for another outcome's failure. Example: fallback-resilience evidence cannot
+offset a failed normal-path provider-health outcome.
+
+If the user adds a new source requirement during review, re-check claim scope. A
+new result place, deployment target, normal/fault condition, or evidence context
+can require new outcomes and a new no-offset rule before approval.
+
 ## Information Sufficiency Check
 
 Before controlled-run design or planning, requirements analysis must determine
@@ -128,7 +157,7 @@ state is `satisfied` or `not_required`.
 Always record `approved_control.information_sufficiency_check` in
 `requirements.control.json`. If requirements analysis finds no design-blocking
 unknowns, set the check status to `not_required` and record the reviewed reason.
-Use `schema_version: 1.1.0` or later. Each fact must include:
+Use `schema_version: 1.2.0` or later. Each fact must include:
 
 - a stable `fact_id`;
 - the fact statement;
@@ -578,9 +607,11 @@ For `bounded_runtime` work with `rubric check: required`, summarize the confirme
 - [ ] `controlled_run` JSON pre-goal work includes `What the User Approved`.
 - [ ] If How this should be answered or What is not enough is recorded, `requirements.control.json` records the plain-language requirement without internal classification keys.
 - [ ] Human answers to clarification questions are not treated as approval.
-- [ ] `information_sufficiency_check` is present, uses schema_version 1.1.0 or
+- [ ] `information_sufficiency_check` is present, uses schema_version 1.2.0 or
       later, has run-local evidence, and passed independent counterexample
       review before handoff.
+- [ ] Schema 1.2.0+ controlled runs define `completion_logic` and
+      `claim_scope` for blocking outcomes and their evidence.
 - [ ] Information collection was completed inside requirements analysis, or
       the artifact is explicitly `needs_information_gathering`,
       `needs_user_input`, `needs_counterexample_review`,

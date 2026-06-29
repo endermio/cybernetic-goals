@@ -82,6 +82,10 @@ def requirements_with_information_sufficiency(*, status: str = "satisfied") -> d
             "how_we_know_purpose_was_met": "design starts only after minimal client behavior is observed",
             "where_result_must_show_up": ["requirements.control.json", "orchestration guard"],
             "what_counts_as_done": "minimal client behavior facts are derived, evidenced, and reviewed before design",
+            "completion_logic": {
+                "all_required": ["O-client-integration"],
+                "no_offset": [],
+            },
             "source_requirements": [
                 {
                     "id": "SR-client-minimal-example",
@@ -140,6 +144,10 @@ def requirements_with_information_sufficiency(*, status: str = "satisfied") -> d
                     "source_requirements": ["SR-client-minimal-example"],
                     "completion_claim": "Pre-design client facts are known and evidenced.",
                     "completed_target_objects": ["client startup", "client input/output"],
+                    "claim_scope": {
+                        "required_contexts": ["pre_design_client_integration"],
+                        "forbidden_contexts": ["assumption_only_design"],
+                    },
                     "blocks_goal_achieved_if_missing": True,
                     "required_evidence": [
                         {
@@ -150,6 +158,11 @@ def requirements_with_information_sufficiency(*, status: str = "satisfied") -> d
                             "satisfies_source_requirements": ["SR-client-minimal-example"],
                             "evidence_claim": "The minimal client example was observed.",
                             "completed_target_objects": ["client startup", "client input/output"],
+                            "claim_scope": {
+                                "applies_when": ["pre_design_client_integration"],
+                                "proves": "The client minimal example was observed before design.",
+                                "does_not_prove": ["assumption-only client design"],
+                            },
                         }
                     ],
                     "not_satisfied_by": ["agent-authored required_observations list"],
